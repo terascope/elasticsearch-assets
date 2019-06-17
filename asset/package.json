@@ -12,7 +12,7 @@
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.0.1",
         "@terascope/error-parser": "^1.0.1",
-        "@terascope/job-components": "^0.15.1",
+        "@terascope/job-components": "^0.18.0",
         "bluebird": "^3.5.3",
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
