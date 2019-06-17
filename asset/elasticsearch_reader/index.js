@@ -279,7 +279,7 @@ function selfValidation(op) {
             throw new Error('If subslice_by_key is set to true, the elasticsearch type parameter of the documents must also be set');
         }
     }
-    elasticApi({}).validateGeoParameters(op);
+    elasticApi({}, {}).validateGeoParameters(op);
 }
 
 function crossValidation(job) {
