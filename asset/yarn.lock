@@ -46,10 +46,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
-"@terascope/teraslice-state-storage@^0.1.1":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.1.2.tgz#10225d0aba0adcacbc1a0bc072cc3a755ac6e9ac"
-  integrity sha512-jT+w1avtX/I3uqo+mx4kSvAWeKzKWT9V1S1bB7ewXuBoNGyc8xWZvckDqIIDRc/TMtd/XOyVYFZC6+UwuThMKA==
+"@terascope/teraslice-state-storage@^0.2.0":
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.2.0.tgz#4b36f1510ebcf724979a83dd9a3206649adb6f5d"
+  integrity sha512-aSbhVNmDlRWPbB5GvQT2scroi9ZWouWfdR8XJQn9ZFAvRlsEQ0Ifoz2f8caaJzuggxoxf1GGUvpAynUaxNxxFQ==
   dependencies:
     "@terascope/elasticsearch-api" "^2.0.3"
     "@terascope/job-components" "^0.20.2"
