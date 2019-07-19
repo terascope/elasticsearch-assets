@@ -11,7 +11,7 @@
     "description": "",
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.0.3",
-        "@terascope/teraslice-state-storage": "^0.2.0",
+        "@terascope/teraslice-state-storage": "^0.3.0",
         "@terascope/error-parser": "^1.0.1",
         "@terascope/job-components": "^0.20.2",
         "bluebird": "^3.5.5",
