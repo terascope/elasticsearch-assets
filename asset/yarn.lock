@@ -14,7 +14,7 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.0.3":
+"@terascope/elasticsearch-api@^2.0.3", "@terascope/elasticsearch-api@^2.1.0":
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.0.tgz#e89135b514a78576849846690a4d584f0a848a5d"
   integrity sha512-rxfu06yv1mx7qFrznRchjhIBeIvdq64dEDr5tJT+I/rrTcm5FvoT05fyxBQuW9OMX1CIs8IZpX1Osl8E/YO5yA==
@@ -30,7 +30,7 @@
   dependencies:
     lodash.get "^4.4.2"
 
-"@terascope/job-components@^0.20.2":
+"@terascope/job-components@^0.20.2", "@terascope/job-components@^0.20.5":
   version "0.20.5"
   resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.20.5.tgz#c0f911d03a36fa60b8c15073e2aba1684dc42049"
   integrity sha512-8ixwyt6JrsL4ca3dDYYk/fJXexM8wFOF4LWXq7oIK/MmJENf4EKppySLtzhtxXAtjJmg4MlkO62InxN060u4VA==
@@ -46,15 +46,15 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
-"@terascope/teraslice-state-storage@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.2.0.tgz#4b36f1510ebcf724979a83dd9a3206649adb6f5d"
-  integrity sha512-aSbhVNmDlRWPbB5GvQT2scroi9ZWouWfdR8XJQn9ZFAvRlsEQ0Ifoz2f8caaJzuggxoxf1GGUvpAynUaxNxxFQ==
+"@terascope/teraslice-state-storage@^0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.4.0.tgz#aff79cc5cfb8a5c137f2804f81ae800a412ced4c"
+  integrity sha512-yghKXrAd6le5kGAMqYKnpW2k2GS7Y81E6gFMmgt6wllZG7gNhY7Wgz1B/u6SStXvz/JZGS96F/K5m6vjmtRzEg==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.0.3"
-    "@terascope/job-components" "^0.20.2"
+    "@terascope/elasticsearch-api" "^2.1.0"
+    "@terascope/job-components" "^0.20.5"
     bluebird "^3.5.5"
-    lru-cache "^5.1.1"
+    mnemonist "^0.29.0"
 
 "@terascope/utils@^0.12.4":
   version "0.12.4"
@@ -283,13 +283,6 @@ lowercase-keys@^2.0.0:
   resolved "https://registry.yarnpkg.com/lowercase-keys/-/lowercase-keys-2.0.0.tgz#2603e78b7b4b0006cbca2fbcc8a3202558ac9479"
   integrity sha512-tqNXrS78oMOE73NMxK4EMLQsQowWf8jKooH9g7xPavRT706R6bkQJ6DY2Te7QukaZsulxa30wQ7bk0pm4XiHmA==
 
-lru-cache@^5.1.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-5.1.1.tgz#1da27e6710271947695daf6848e847f01d84b920"
-  integrity sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==
-  dependencies:
-    yallist "^3.0.2"
-
 mersenne-twister@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/mersenne-twister/-/mersenne-twister-1.1.0.tgz#f916618ee43d7179efcf641bec4531eb9670978a"
@@ -304,6 +297,13 @@ minimist@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
   integrity sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
+
+mnemonist@^0.29.0:
+  version "0.29.0"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.29.0.tgz#46f4be7ca8decde47e1150c3b34a2762292a93fa"
+  integrity sha512-5dCXynwnyjBy/jEQ35185H+XxbiMJtcapd6lmHbVhjPkRtXP3BjA/GS1EJyoMQZOGQs65sBhX30wNAepl5twsQ==
+  dependencies:
+    obliterator "^1.5.0"
 
 mocker-data-generator@^2.6.6:
   version "2.6.6"
@@ -335,6 +335,11 @@ normalize-url@^4.1.0:
   version "4.3.0"
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.3.0.tgz#9c49e10fc1876aeb76dba88bf1b2b5d9fa57b2ee"
   integrity sha512-0NLtR71o4k6GLP+mr6Ty34c5GA6CMoEsncKJxvQd8NzPxaHRJNnb5gZE8R1XF4CPIS7QPHLJ74IFszwtNVAHVQ==
+
+obliterator@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/obliterator/-/obliterator-1.5.0.tgz#f3535e5be192473ef59efb2d30396738f7c645c6"
+  integrity sha512-dENe0UviDf8/auXn0bIBKwCcUr49khvSBWDLlszv/ZB2qz1VxWDmkNKFqO2nfmve7hQb/QIDY7+rc7K3LdJimQ==
 
 once@^1.3.1, once@^1.4.0:
   version "1.4.0"
@@ -412,11 +417,6 @@ wrappy@1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/wrappy/-/wrappy-1.0.2.tgz#b5243d8f3ec1aa35f1364605bc0d1036e30ab69f"
   integrity sha1-tSQ9jz7BqjXxNkYFvA0QNuMKtp8=
-
-yallist@^3.0.2:
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/yallist/-/yallist-3.0.3.tgz#b4b049e314be545e3ce802236d6cd22cd91c3de9"
-  integrity sha512-S+Zk8DEWE6oKpV+vI3qWkaK+jSbIK86pCwe2IF/xwIpQ8jEuxpw9NyaGjmp9+BoJv5FV2piqCDcoCtStppiq2A==
 
 yargs-parser@11.0.0:
   version "11.0.0"
