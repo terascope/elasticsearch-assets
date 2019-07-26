@@ -46,15 +46,15 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.6.tgz#763d035cf31d2e1fd819ae827274f50874016708"
   integrity sha512-TmLOLh49UVdksjwAUzOO6lqOQMwJIW0pHsXKibcdfzAcUgwXL3JH6BjO2l1u5njQeHjoj1SOyBk6aU1/fHd0PQ==
 
-"@terascope/teraslice-state-storage@^0.4.0":
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.4.0.tgz#aff79cc5cfb8a5c137f2804f81ae800a412ced4c"
-  integrity sha512-yghKXrAd6le5kGAMqYKnpW2k2GS7Y81E6gFMmgt6wllZG7gNhY7Wgz1B/u6SStXvz/JZGS96F/K5m6vjmtRzEg==
+"@terascope/teraslice-state-storage@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.5.0.tgz#34b45ae9e141cc3844b87ed4b9abe46a3096880b"
+  integrity sha512-uqrFSn/FRnxvshbhqyXzDbmKxxBLyfm89rCH7TJt6picAdcLi9gTTa1Df3trumd+8AtkL7MguGjaQRXb1rfK1w==
   dependencies:
     "@terascope/elasticsearch-api" "^2.1.0"
     "@terascope/job-components" "^0.20.5"
     bluebird "^3.5.5"
-    mnemonist "^0.29.0"
+    mnemonist "^0.30.0"
 
 "@terascope/utils@^0.12.4":
   version "0.12.4"
@@ -298,10 +298,10 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
   integrity sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
 
-mnemonist@^0.29.0:
-  version "0.29.0"
-  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.29.0.tgz#46f4be7ca8decde47e1150c3b34a2762292a93fa"
-  integrity sha512-5dCXynwnyjBy/jEQ35185H+XxbiMJtcapd6lmHbVhjPkRtXP3BjA/GS1EJyoMQZOGQs65sBhX30wNAepl5twsQ==
+mnemonist@^0.30.0:
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.30.0.tgz#c8c37f4425b8abcf7aa04a34199af254b398a90f"
+  integrity sha512-g9rbX4ug7am8oW3jnM7adaFaj5vv5PeOaMPNUwjKQQaTyY+qPQHTmUF59/ZOfQdtTknkjA7+7RhtmL2C0mtwPA==
   dependencies:
     obliterator "^1.5.0"
 
