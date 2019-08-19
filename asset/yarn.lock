@@ -40,15 +40,15 @@
     lodash.get "^4.4.2"
 
 "@terascope/job-components@^0.20.5":
-  version "0.20.8"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.20.8.tgz#415b68913d136f02356e5f604c520c3899f18be0"
-  integrity sha512-8Hw1A54o1imObBnSeZXuDfZ3qKFhCmS0LFYTYorupF1upR5Kkca69UU7knDASx08MjR3M18EDhxmbMc2MJ9Jtw==
+  version "0.20.9"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.20.9.tgz#bb41ee6a0b26e5da59a21f428663dd45fb28948c"
+  integrity sha512-0h9wFLO5wiKMo2hnw6DnQOUZhtgB/CHinghQhFUYZG5APgGt51uu2UL5xodTLkdDzbYlQF2wYWWHXVYowrghkg==
   dependencies:
     "@terascope/queue" "^1.1.6"
-    "@terascope/utils" "^0.14.1"
+    "@terascope/utils" "^0.16.0"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
-    uuid "^3.3.2"
+    uuid "^3.3.3"
 
 "@terascope/queue@^1.1.6":
   version "1.1.6"
@@ -436,10 +436,10 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-uuid@^3.3.2:
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.2.tgz#1b4af4955eb3077c501c23872fc6513811587131"
-  integrity sha512-yXJmeNaw3DnnKAOKJE51sL/ZaYfWJRl1pK9dr19YFCu0ObS231AB1/LbqTKRAQ5kw8A90rA6fr4riOUpTZvQZA==
+uuid@^3.3.3:
+  version "3.3.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.3.tgz#4568f0216e78760ee1dbf3a4d2cf53e224112866"
+  integrity sha512-pW0No1RGHgzlpHJO1nsVrHKpOEIxkGg1xB+v0ZmdNH5OAeAwzAVrCnI2/6Mtx+Uys6iaylxa+D3g4j63IKKjSQ==
 
 validator@10.8.0:
   version "10.8.0"
