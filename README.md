@@ -11,7 +11,7 @@ This asset bundle requires a running Teraslice cluster, you can find the documen
 yarn global add teraslice-cli
 
 # Step 2:
-teraslice-cli assets <cluster-alias> deploy --build
+teraslice-cli assets deploy <cluster-alias> --build
 ```
 
 ## Operations
