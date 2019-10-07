@@ -29,7 +29,7 @@
         "eslint": "^6.5.1",
         "jest": "^24.9.0",
         "jest-extended": "^0.11.2",
-        "nock": "^11.3.5",
+        "nock": "^11.4.0",
         "teraslice-test-harness": "^0.8.8",
         "typescript": "^3.6.3"
     }
