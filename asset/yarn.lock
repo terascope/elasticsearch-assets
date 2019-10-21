@@ -15,11 +15,11 @@
     defer-to-connect "^1.0.1"
 
 "@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.8":
-  version "2.1.8"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.8.tgz#1a762a9eb67e183c51cc0a4801ab93ba2d2d9a7b"
-  integrity sha512-1bajFGmrV10t2Km93f9lg353G3RVIbn7Sa0doolNtgTC0+vG4qwg9bp+00Y1mgohPwHmzQCOc+tSZNpF3XpwXQ==
+  version "2.1.11"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.11.tgz#a066a34fa281abae319368ae4497642aae1875eb"
+  integrity sha512-Z4wM7Mb0sfTDJNLDFXNKu7ZwSoRhSLsLF9CV7/o+jyWV83COhsSpOr2l3zgA0zyfn0SVaJ8Voi2PgdQKqTa7Aw==
   dependencies:
-    "@terascope/utils" "^0.20.1"
+    "@terascope/utils" "^0.20.3"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
