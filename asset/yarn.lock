@@ -14,12 +14,12 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.8":
-  version "2.1.8"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.8.tgz#1a762a9eb67e183c51cc0a4801ab93ba2d2d9a7b"
-  integrity sha512-1bajFGmrV10t2Km93f9lg353G3RVIbn7Sa0doolNtgTC0+vG4qwg9bp+00Y1mgohPwHmzQCOc+tSZNpF3XpwXQ==
+"@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.11":
+  version "2.1.11"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.11.tgz#a066a34fa281abae319368ae4497642aae1875eb"
+  integrity sha512-Z4wM7Mb0sfTDJNLDFXNKu7ZwSoRhSLsLF9CV7/o+jyWV83COhsSpOr2l3zgA0zyfn0SVaJ8Voi2PgdQKqTa7Aw==
   dependencies:
-    "@terascope/utils" "^0.20.1"
+    "@terascope/utils" "^0.20.3"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
@@ -47,16 +47,16 @@
   integrity sha512-foPas4K4rShs0RxtLNauC9ssXbzWvf5YzCa+6tJ9BAEk+PfjHJhi9bPDL6stXfcHroKtbet49dPwFbFIJJAOHw==
 
 "@terascope/teraslice-state-storage@^0.7.1":
-  version "0.7.5"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.7.5.tgz#2232c4c46881c46598818d6736983714856dce14"
-  integrity sha512-uZ7IDf1U6+AgyNWwnHYhI9UKTahyLjfr+8Pr4ACcyoc/XP6xaeQvWkKz2LV6aElmsT29ZLadlNz3SC6nsxkp/A==
+  version "0.7.8"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.7.8.tgz#5b95d12e6bfd81df49f999ab443d58b508e07d52"
+  integrity sha512-0dYU4PLi1n4vfn1Ncr3HqwOzerE1AB9Dmylbj6rpNBxkDawbWD6B3neGzULZw1VdQlxr7AO2u6h8fwlf71BfXQ==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.1.8"
-    "@terascope/utils" "^0.20.1"
+    "@terascope/elasticsearch-api" "^2.1.11"
+    "@terascope/utils" "^0.20.3"
     bluebird "^3.5.5"
     mnemonist "^0.30.0"
 
-"@terascope/utils@^0.20.1", "@terascope/utils@^0.20.3":
+"@terascope/utils@^0.20.3":
   version "0.20.3"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.20.3.tgz#75df8af61e7efc0e96ea7c525a9f37eb7347cb08"
   integrity sha512-61xyyR2Xus/zk6E1zcv1c9eLBJixTnqC3Jh89ZtP9R6cg4nQSHXcGQJVQbkXiyTlWKqEjsWvmAnIaR0suFc7Cg==
