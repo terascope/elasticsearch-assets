@@ -15,11 +15,11 @@
     defer-to-connect "^1.0.1"
 
 "@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.11":
-  version "2.1.11"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.11.tgz#a066a34fa281abae319368ae4497642aae1875eb"
-  integrity sha512-Z4wM7Mb0sfTDJNLDFXNKu7ZwSoRhSLsLF9CV7/o+jyWV83COhsSpOr2l3zgA0zyfn0SVaJ8Voi2PgdQKqTa7Aw==
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.13.tgz#82abe8d4b40b4ef586eefc4a9d013c55e520d0ab"
+  integrity sha512-ImpqtE9hgERZAtb/ZQfocqV5V06C7/Vdh1COvj5RVpKWxWjTwK3WLRJma9iD9Jv7Uiw7IwwlmMKFPwvDYkg4rw==
   dependencies:
-    "@terascope/utils" "^0.20.3"
+    "@terascope/utils" "^0.20.5"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
@@ -56,13 +56,14 @@
     bluebird "^3.5.5"
     mnemonist "^0.30.0"
 
-"@terascope/utils@^0.20.3":
-  version "0.20.3"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.20.3.tgz#75df8af61e7efc0e96ea7c525a9f37eb7347cb08"
-  integrity sha512-61xyyR2Xus/zk6E1zcv1c9eLBJixTnqC3Jh89ZtP9R6cg4nQSHXcGQJVQbkXiyTlWKqEjsWvmAnIaR0suFc7Cg==
+"@terascope/utils@^0.20.3", "@terascope/utils@^0.20.5":
+  version "0.20.5"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.20.5.tgz#2e1af9de327f566eddf6f6e458dbba925efd7bea"
+  integrity sha512-vyEqOq+OZE4c7RVmyy1/BZU0x4W1eYTc8DE9H4Aqa1jyNWAm5ssFtIrsPjQR6R38kPNRO2tkT5xbnIyA+G/DuA==
   dependencies:
     debug "^4.1.1"
     is-plain-object "^3.0.0"
+    js-string-escape "^1.0.1"
     kind-of "^6.0.2"
     lodash.clonedeep "^4.5.0"
     lodash.get "^4.4.2"
@@ -229,6 +230,11 @@ isobject@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
   integrity sha512-S/2fF5wH8SJA/kmwr6HYhK/RI/OkhD84k8ntalo0iJjZikgq1XFvR5M8NPT1x5F7fBwCG3qHfnzeP/Vh/ZxCUA==
+
+js-string-escape@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
+  integrity sha1-4mJbrbwNZ8dTPp7cEGjFh65BN+8=
 
 json-buffer@3.0.0:
   version "3.0.0"
