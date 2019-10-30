@@ -1,20 +1,32 @@
 'use strict';
 
 module.exports = {
-    rootDir: '.',
     verbose: true,
-    setupFilesAfterEnv: [
-        'jest-extended'
+    testEnvironment: 'node',
+    setupFilesAfterEnv: ['jest-extended'],
+    collectCoverage: true,
+    coverageReporters: ['json', 'lcov', 'text', 'html'],
+    coverageDirectory: 'coverage',
+    collectCoverageFrom: [
+        '<rootDir>/asset/**/*.ts',
+        '!<rootDir>/packages/*/**/*.ts',
+        '!<rootDir>/packages/*/test/**',
+        '!<rootDir>/**/coverage/**',
+        '!<rootDir>/**/*.d.ts',
+        '!<rootDir>/**/dist/**',
+        '!<rootDir>/**/coverage/**'
     ],
     testMatch: [
-        '<rootDir>/test/*-spec.js'
+        '<rootDir>/test/**/*-spec.{ts,js}',
+        '<rootDir>/test/*-spec.{ts,js}',
     ],
-    collectCoverage: true,
-    collectCoverageFrom: [
-        '<rootDir>/asset/**/*.js',
-        '<rootDir>/asset/*/*.js',
-        '!<rootDir>/asset/node_modules',
-    ],
-    coverageReporters: ['lcov', 'text', 'html'],
-    coverageDirectory: '<rootDir>/coverage'
+    preset: 'ts-jest',
+    globals: {
+        'ts-jest': {
+            tsConfig: './tsconfig.json',
+            diagnostics: true,
+        },
+        ignoreDirectories: ['dist'],
+        availableExtensions: ['.js', '.ts']
+    }
 };
