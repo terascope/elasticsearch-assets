@@ -3,6 +3,9 @@
     "description": "bundle of processors for teraslice",
     "version": "1.6.1",
     "scripts": {
+        "asset:build": "yarn run build",
+        "build": "rm -rf asset/dist; tsc --project tsconfig.json",
+        "build:watch": "yarn build --watch",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
         "lint:fix": "yarn lint --fix",
         "test": "jest",
@@ -23,14 +26,22 @@
     "dependencies": {
         "@terascope/eslint-config": "^0.1.5"
     },
+    "engines": {
+        "node": ">=8.0.0"
+    },
     "devDependencies": {
+        "@terascope/eslint-config": "^0.1.5",
         "@terascope/job-components": "^0.23.7",
-        "@terascope/teraslice-op-test-harness": "~1.7.5",
+        "@terascope/teraslice-op-test-harness": "~1.7.0",
+        "@types/jest": "^24.0.19",
+        "@types/node": "^12.11.1",
         "eslint": "^6.5.1",
-        "jest": "^24.9.0",
+        "jest": "^24.8.0",
         "jest-extended": "^0.11.2",
-        "nock": "^11.4.0",
-        "teraslice-test-harness": "^0.8.10",
+        "nock": "^11.5.0",
+        "teraslice-test-harness": "^0.8.1",
+        "ts-jest": "^24.1.0",
+        "ts-node": "^8.4.1",
         "typescript": "^3.6.4"
     }
 }
