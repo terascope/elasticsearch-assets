@@ -2,7 +2,10 @@
     "name": "asset",
     "version": "1.6.1",
     "main": "utils.js",
-    "devDependencies": {},
+    "devDependencies": {
+        "@types/bluebird": "^3.5.28",
+        "@types/got": "^9.6.7"
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
