@@ -1,29 +1,28 @@
-'use strict';
 
-const got = require('got');
-const _ = require('lodash');
-const Promise = require('bluebird');
-const { getOpConfig, TSError } = require('@terascope/job-components');
-const slicerFn = require('../elasticsearch_reader/elasticsearch_date_range/slicer');
-const readerFn = require('../elasticsearch_reader/reader');
-const reader = require('../elasticsearch_reader');
+import { Logger, TSError, get } from '@terascope/job-components';
+import got from 'got';
+import { ApiConfig } from './interfaces';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-const MODULE_NAME = 'simple_api_reader';
-
-function createClient(context, opConfig) {
+export default class ApiClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
-    const { logger } = context;
+    opConfig: ApiConfig;
+    logger: Logger;
 
-    async function makeRequest(uri, query) {
+    constructor(opConfig: ApiConfig, logger: Logger) {
+        this.opConfig = opConfig;
+        this.logger = logger;
+    }
+
+    async makeRequest(uri: string, query: string) {
         try {
             const { body } = await got(uri, {
                 query,
                 json: true,
-                timeout: opConfig.timeout,
+                timeout: this.opConfig.timeout,
                 retry: 0
             });
             return body;
@@ -47,26 +46,27 @@ function createClient(context, opConfig) {
         }
     }
 
-    function apiSearch(queryConfig) {
-        const fields = _.get(queryConfig, '_source', null);
-        const dateFieldName = opConfig.date_field_name;
+    apiSearch(queryConfig: any) {
+        const { logger, opConfig } = this;
+        const fields = get(queryConfig, '_source', null);
+        const dateFieldName = this.opConfig.date_field_name;
         // put in the dateFieldName into fields so date reader can work
         if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
-        const mustQuery = _.get(queryConfig, 'body.query.bool.must', null);
+        const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray) {
+        function parseQueryConfig(mustArray: null | any[]) {
             const queryOptions = {
                 query_string: _parseEsQ,
                 range: _parseDate,
             };
-            const sortQuery = {};
+            const sortQuery: any = {};
             const geoQuery = _parseGeoQuery();
             let luceneQuery = '';
 
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
-                    _.forOwn(queryAction, (config, key) => {
+                    for (const [key, config] of Object.entries(queryAction)) {
                         const queryFn = queryOptions[key];
                         if (queryFn) {
                             let queryStr = queryFn(config);
@@ -78,14 +78,14 @@ function createClient(context, opConfig) {
                                 luceneQuery = queryStr;
                             }
                         }
-                    });
+                    }
                 });
             } else {
                 luceneQuery = _parseEsQ();
             }
             // geo sort will be taken care of in the teraserver search api
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
-                queryConfig.body.sort.forEach((sortType) => {
+                queryConfig.body.sort.forEach((sortType: any) => {
                     // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
                     if (sortType[dateFieldName]) {
                         // there is only one sort allowed
@@ -117,7 +117,7 @@ function createClient(context, opConfig) {
                 geo_sort_order: geoSortOrder,
                 geo_sort_unit: geoSortUnit
             } = opConfig;
-            const geoQuery = {};
+            const geoQuery: any = {};
             if (geoBoxTopLeft) geoQuery.geo_box_top_left = geoBoxTopLeft;
             if (geoBoxBottomRight) geoQuery.geo_box_bottom_right = geoBoxBottomRight;
             if (geoPoint) geoQuery.geo_point = geoPoint;
@@ -128,13 +128,13 @@ function createClient(context, opConfig) {
             return geoQuery;
         }
 
-        function _parseEsQ(op) {
+        function _parseEsQ(op?: any) {
             const { q } = queryConfig;
-            const results = q || _.get(op, 'query', '');
+            const results = q || get(op, 'query', '');
             return results;
         }
 
-        function _parseDate(op) {
+        function _parseDate(op: any) {
             let range;
             if (op) {
                 range = op;
@@ -149,51 +149,50 @@ function createClient(context, opConfig) {
             return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
-        function callTeraserver() {
-            const uri = `${opConfig.endpoint}/${opConfig.index}`;
-            const query = parseQueryConfig(mustQuery);
+        const uri = `${opConfig.endpoint}/${opConfig.index}`;
+        const query = parseQueryConfig(mustQuery);
 
-            return Promise.resolve()
-                .then(() => makeRequest(uri, query))
-                .then((response) => {
-                    let esResults = [];
-                    if (response.results) {
-                        esResults = _.map(response.results, (result) => ({ _source: result }));
+        return Promise.resolve()
+            .then(() => this.makeRequest(uri, query))
+            .then((response) => {
+                let esResults = [];
+                if (response.results) {
+                    esResults = response.results.map((result: any) => ({ _source: result }));
+                }
+
+                return ({
+                    hits: {
+                        hits: esResults,
+                        total: response.total
+                    },
+                    timed_out: false,
+                    _shards: {
+                        total: 1,
+                        successful: 1,
+                        failed: 0
                     }
-
-                    return ({
-                        hits: {
-                            hits: esResults,
-                            total: response.total
-                        },
-                        timed_out: false,
-                        _shards: {
-                            total: 1,
-                            successful: 1,
-                            failed: 0
-                        }
-                    });
-                })
-                .catch((err) => {
-                    logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
-                    return Promise.reject(err);
                 });
-        }
-
-        return callTeraserver();
+            })
+            .catch((err) => {
+                logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
+                return Promise.reject(err);
+            });
     }
 
-    return {
-        search(queryConfig) {
-            return apiSearch(queryConfig);
-        },
-        count(queryConfig) {
-            queryConfig.size = 0;
 
-            return apiSearch(queryConfig);
-        },
-        cluster: {
-            stats() {
+    search(queryConfig: any) {
+        return this.apiSearch(queryConfig);
+    }
+
+    count(queryConfig: any) {
+        queryConfig.size = 0;
+        return this.apiSearch(queryConfig);
+    }
+
+    get cluster() {
+        const { index } = this.opConfig;
+        return {
+            async stats() {
                 return new Promise(((resolve) => {
                     resolve({
                         nodes: {
@@ -202,11 +201,11 @@ function createClient(context, opConfig) {
                     });
                 }));
             },
-            getSettings() {
+            async getSettings() {
                 return new Promise(((resolve) => {
                     const result = {};
 
-                    result[opConfig.index] = {
+                    result[index] = {
                         settings: {
                             index: {
                                 max_result_window: 100000
@@ -217,46 +216,6 @@ function createClient(context, opConfig) {
                     resolve(result);
                 }));
             }
-        }
-    };
+        };
+    }
 }
-
-function newSlicer(context, executionContext, retryData, logger) {
-    const opConfig = getOpConfig(executionContext.config, MODULE_NAME);
-    const client = createClient(context, opConfig);
-    return slicerFn(context, opConfig, executionContext, retryData, logger, client);
-}
-
-function newReader(context, opConfig) {
-    const client = createClient(context, opConfig);
-    return readerFn(opConfig, client);
-}
-
-function schema() {
-    const esSchema = reader.schema();
-    const apiSchema = {
-        endpoint: {
-            doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
-            default: '',
-            format: 'required_String'
-        },
-        token: {
-            doc: 'API access token for making requests',
-            default: '',
-            format: 'required_String'
-        },
-        timeout: {
-            doc: 'Time in milliseconds to wait for a connection to timeout.',
-            default: 300000
-        },
-    };
-
-    return _.assign({}, esSchema, apiSchema);
-}
-
-module.exports = {
-    newReader,
-    newSlicer,
-    schema,
-    createClient
-};

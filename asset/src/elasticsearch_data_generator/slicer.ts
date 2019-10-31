@@ -4,10 +4,6 @@ import { DataGenerator } from './interfaces';
 import Counter from './counter';
 
 export default class DataGeneratorSlicer extends ParallelSlicer<DataGenerator> {
-    maxQueueLength() {
-        return this.workersConnected + 1;
-    }
-
     slicerQueueLength() {
         return 'QUEUE_MINIMUM_SIZE';
     }
