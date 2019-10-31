@@ -1,9 +1,9 @@
-'use strict';
+// @ts-ignore
+import parseError from '@terascope/error-parser';
+import { Logger } from '@terascope/job-components';
+import fs from 'fs';
 
-const parseError = require('@terascope/error-parser');
-const fs = require('fs');
-
-function dateOptions(value) {
+export function dateOptions(value: string) {
     const options = {
         year: 'y',
         years: 'y',
@@ -48,14 +48,16 @@ function dateOptions(value) {
 
 
 // "2016-01-19T13:33:09.356-07:00"
-const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
+export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 
 // 2016-06-29T12:44:57-07:00
-const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
+export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
 
-function retryModule(logger, numOfRetries) {
+type RetryFn = (msg: string) => any
+
+export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
-    return (key, err, fn, msg) => {
+    return (key: string, err: Error, fn: RetryFn, msg: string) => {
         const errMessage = parseError(err);
         logger.error('error while getting next slice', errMessage);
 
@@ -75,7 +77,7 @@ function retryModule(logger, numOfRetries) {
     };
 }
 
-function existsSync(filename) {
+export function existsSync(filename: string) {
     try {
         fs.accessSync(filename);
         return true;
@@ -83,11 +85,3 @@ function existsSync(filename) {
         return false;
     }
 }
-
-module.exports = {
-    dateOptions,
-    dateFormat,
-    dateFormatSeconds,
-    retryModule,
-    existsSync
-};
