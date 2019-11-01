@@ -1,5 +1,5 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, get
+    ConvictSchema, ValidatedJobConfig, getOpConfig, get,
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
 
@@ -13,8 +13,7 @@ export default class Schema extends ConvictSchema<BulkSender> {
         // check to verify if connection map provided is
         // consistent with sysconfig.terafoundation.connectors
         if (opConfig.multisend) {
-            const endpoints = Object.keys(opConfig.connection_map);
-            for (const value of endpoints) {
+            for (const [, value] of Object.entries(opConfig.connection_map)) {
                 if (!elasticConnectors[value]) {
                     throw new Error(`elasticsearch_bulk connection_map specifies a connection for [${value}] but is not found in the system configuration [terafoundation.connectors.elasticsearch]`);
                 }

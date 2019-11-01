@@ -48,8 +48,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         if (this.isMultisend) {
             for (const keyset of Object.keys(connectionMap)) {
                 // TODO: is this missing pertinent keys without rest of opConfig?
-                const connection = getClient(context, { connection: connectionMap[keyset] }, 'elasticsearch');
-                const client = elasticApi(connection, this.logger, this.opConfig);
+                const client = this._createClient({ connection: connectionMap[keyset] });
                 const keys = keyset.split(',');
 
                 for (const key of keys) {
@@ -62,8 +61,9 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         }
     }
 
-    private _createClient() {
-        const client = getClient(this.context, this.opConfig, 'elasticsearch');
+    private _createClient(config: AnyObject = this.opConfig) {
+        const client = getClient(this.context, config, 'elasticsearch');
+        if (client == null) throw new Error(`could not find elasticsearch client for connection: ${this.opConfig.connection}`);
         return elasticApi(client, this.logger, this.opConfig);
     }
 
@@ -80,7 +80,6 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
             if (!meta.delete) {
                 record = data[i + 1];
             }
-
             const realMeta = extractMeta(meta);
 
             // TODO: to really be general there will need to be some options
@@ -162,6 +161,7 @@ function extractMeta(meta: AnyObject) {
     throw new Error('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
 }
 
+// TODO: splicing has bad performance, need to refactor this
 function splitArray(dataArray: AnyObject[], splitLimit: number) {
     const docLimit = splitLimit * 2;
 
