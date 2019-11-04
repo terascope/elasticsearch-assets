@@ -6,6 +6,7 @@ import {
     Logger
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
+import { IDType } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends OpConfig {
     index: string;
@@ -21,7 +22,7 @@ export interface ESReaderConfig extends OpConfig {
     delay: string;
     subslice_by_key: boolean;
     subslice_key_threshold: number;
-    key_type: string;
+    key_type: IDType;
     time_resolution: string;
     geo_field?: string;
     geo_box_top_left?: string;

@@ -1,18 +1,18 @@
 
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber, Logger
+    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber,
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
 // @ts-ignore
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
-import { dateOptions } from '../../helpers';
+import { dateOptions } from '../helpers';
 import { IDType } from '../id_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig) {
-        const logger = new Logger({ name: 'ESReaderSchema' });
+        const { logger } = this.context;
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
         if (opConfig == null) throw new Error('could not find elasticsearch_reader operation in jobConfig');
 
@@ -248,7 +248,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 }
 
 
-function geoPointValidation(point: string) {
+function geoPointValidation(point: string | null) {
     if (point) {
         if (typeof point !== 'string') throw new Error('parameter must be a string IF specified');
 
@@ -262,7 +262,7 @@ function geoPointValidation(point: string) {
     }
 }
 
-function checkUnits(unit: undefined | string) {
+function checkUnits(unit: string | null) {
     if (unit) {
         const unitOptions = {
             mi: true,
@@ -276,7 +276,7 @@ function checkUnits(unit: undefined | string) {
     }
 }
 
-function validGeoDistance(distance: undefined | string) {
+function validGeoDistance(distance: string | null) {
     if (distance) {
         if (typeof distance !== 'string') throw new Error('parameter must be a string IF specified');
         const matches = distance.match(/(\d+)(.*)$/);

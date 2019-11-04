@@ -1,6 +1,6 @@
 
 import {
-    ParallelSlicer, SlicerFn, SlicerRecoveryData
+    ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -8,20 +8,23 @@ import elasticApi from '@terascope/elasticsearch-api';
 import dateMath from 'datemath-parser';
 import MockedClient from './client';
 import DateSlicerFn from '../elasticsearch_reader/elasticsearch_date_range/slicer';
-import { dateOptions, dateFormat } from '../../helpers';
+import { dateOptions, dateFormat } from '../helpers';
 import { ApiConfig } from './interfaces';
 import { SlicerArgs } from '../elasticsearch_reader/interfaces';
 
 // TODO: dedup this from ESReader Slicer
 
 export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
-    api!: elasticApi.Client;
-    retryDataArray!: any;
+    api: elasticApi.Client;
 
-    async initialize(recoveryData: SlicerRecoveryData[]) {
+    constructor(
+        context: WorkerContext,
+        opConfig: ApiConfig,
+        executionConfig: ExecutionConfig
+    ) {
+        super(context, opConfig, executionConfig);
         const client = new MockedClient(this.opConfig, this.logger);
         this.api = elasticApi(client, this.logger, this.opConfig);
-        this.retryDataArray = recoveryData;
     }
 
     async getDates() {
@@ -126,7 +129,11 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
 
     async getInterval(esDates: any) {
         if (this.opConfig.interval !== 'auto') {
-            return Promise.resolve(processInterval(this.opConfig.interval, esDates));
+            return Promise.resolve(processInterval(
+                this.opConfig.time_resolution,
+                this.opConfig.interval,
+                esDates
+            ));
         }
 
         const count = await this.getCount(esDates);
@@ -147,7 +154,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
 
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
-        const retryData = this.retryDataArray[id];
+        const retryData = this.recoveryData[id];
         const slicerFnArgs: Partial<SlicerArgs> = {
             context: this.context,
             opConfig: this.opConfig,
