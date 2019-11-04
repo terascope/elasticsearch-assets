@@ -1,46 +1,52 @@
 
 import {
-    ParallelSlicer, SlicerFn, getClient, SlicerRecoveryData
+    ParallelSlicer,
+    SlicerFn,
+    getClient,
+    WorkerContext,
+    ExecutionConfig
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import idSlicer from './id-slicer';
 import { getKeyArray } from './helpers';
 import { ESIDReaderConfig, ESIDSlicerArgs } from './interfaces';
 
-export default class ESDateSlicer extends ParallelSlicer<ESIDReaderConfig> {
-    api!: elasticApi.Client;
-    retryDataArray!: any;
+export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
+    api: elasticApi.Client;
 
-    async initialize(recoveryData: SlicerRecoveryData[]) {
+    constructor(
+        context: WorkerContext,
+        opConfig: ESIDReaderConfig,
+        executionConfig: ExecutionConfig
+    ) {
+        super(context, opConfig, executionConfig);
         const client = getClient(this.context, this.opConfig, 'elasticsearch');
         this.api = elasticApi(client, this.logger, this.opConfig);
-        this.retryDataArray = recoveryData;
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
         const baseKeyArray = getKeyArray(this.opConfig);
-        const keyArray = this.opConfig.key_range ? this.opConfig.key_range : baseKeyArray.slice();
+        // we slice as not to mutate for when this is called again
+        const keyArray = this.opConfig.key_range ? this.opConfig.key_range.slice() : baseKeyArray.slice();
 
         if (difference(keyArray, baseKeyArray).length > 0) {
             const error = new Error(`key_range specified for id_reader contains keys not found in: ${this.opConfig.key_type}`);
             return Promise.reject(error);
         }
-
-        const keySet = divideKeyArray(keyArray, this.executionConfig.slicers)[id];
-
+        const keySet = divideKeyArray(keyArray, this.executionConfig.slicers);
         const args: Partial<ESIDSlicerArgs> = {
             context: this.context,
             opConfig: this.opConfig,
             executionConfig: this.executionConfig,
             logger: this.logger,
             api: this.api,
-            keySet,
+            keySet: keySet[id],
         };
 
-        if (this.retryDataArray && this.retryDataArray.length > 0) {
+        if (this.recoveryData && this.recoveryData.length > 0) {
             // TODO: verify what retryData is
             // real retry of executionContext here, need to reformat retry data
-            const parsedRetry = this.retryDataArray.map((obj: any) => {
+            const parsedRetry = this.recoveryData.map((obj: any) => {
                 // regex to get str between # and *
                 if (obj.lastSlice) {
                     // eslint-disable-next-line no-useless-escape

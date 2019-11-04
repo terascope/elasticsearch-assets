@@ -4,7 +4,7 @@ import { toString } from '@terascope/job-components';
 import parseError from '@terascope/error-parser';
 import { ESIDSlicerArgs } from './interfaces';
 import { getKeyArray } from './helpers';
-import { retryModule } from '../../helpers';
+import { retryModule } from '../helpers';
 
 interface ESDateSlicerResults {
     start: string;

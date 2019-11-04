@@ -1,24 +1,36 @@
 
 import { AnyObject } from '@terascope/job-components';
 
+function createData() {
+    return {
+        _index: 'test-index',
+        _type: 'test-type',
+        _version: 1,
+        _id: 'someId',
+        _source: { '@timestamp': new Date() }
+    };
+}
+
 export default class MockClient {
     sequence: any[];
     indices: AnyObject;
     cluster: AnyObject;
     deepRecursiveResponseCount: boolean;
+    searchQuery: AnyObject;
 
     constructor(_sequence?: any[]) {
         const defaultSequence = [
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } },
-            { _shards: { failed: 0 }, hits: { total: 100, hits: [{ _id: 'someId', _source: { '@timestamp': new Date() } }] } }
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
+            { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } }
         ];
         this.sequence = _sequence || defaultSequence;
         this.indices = {};
         this.cluster = {};
+        this.searchQuery = {};
         this.deepRecursiveResponseCount = false;
 
         this.indices.getSettings = async () => {
@@ -40,7 +52,8 @@ export default class MockClient {
         };
     }
 
-    async search() {
+    async search(query: AnyObject) {
+        this.searchQuery = query;
         const { sequence } = this;
         if (sequence.length > 0) {
             return sequence.shift();
