@@ -27,7 +27,9 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     async newSlicer(id: number): Promise<SlicerFn> {
         const baseKeyArray = getKeyArray(this.opConfig);
         // we slice as not to mutate for when this is called again
-        const keyArray = this.opConfig.key_range ? this.opConfig.key_range.slice() : baseKeyArray.slice();
+        const keyArray = this.opConfig.key_range
+            ? this.opConfig.key_range.slice()
+            : baseKeyArray.slice();
 
         if (difference(keyArray, baseKeyArray).length > 0) {
             const error = new Error(`key_range specified for id_reader contains keys not found in: ${this.opConfig.key_type}`);
