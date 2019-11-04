@@ -1,6 +1,7 @@
 // @ts-ignore
 import parseError from '@terascope/error-parser';
 import { Logger } from '@terascope/job-components';
+import moment from 'moment';
 import fs from 'fs';
 
 export function dateOptions(value: string) {
@@ -44,6 +45,40 @@ export function dateOptions(value: string) {
     }
 
     throw new Error(`the time descriptor of "${value}" for the interval is malformed`);
+}
+
+export function processInterval(timeResolution: string, str: string, esDates?: any) {
+    if (!moment(new Date(str)).isValid()) {
+        // one or more digits, followed by one or more letters, case-insensitive
+        const regex = /(\d+)(\D+)/i;
+        const interval = regex.exec(str);
+        if (interval === null) {
+            throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
+        }
+
+        // dont need first parameter, its the full string
+        interval.shift();
+        interval[1] = dateOptions(interval[1]);
+        return compareInterval(interval, esDates, timeResolution);
+    }
+
+    throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
+}
+
+function compareInterval(interval: any, esDates: any, timeResolution: string) {
+    if (esDates) {
+        const datesDiff = esDates.limit.diff(esDates.start);
+        const intervalDiff = moment.duration(Number(interval[0]), interval[1]).as('milliseconds');
+
+        if (intervalDiff > datesDiff) {
+            if (timeResolution === 's') {
+                return [Math.ceil(datesDiff / 1000), 's'];
+            }
+            return [datesDiff, 'ms'];
+        }
+    }
+
+    return interval;
 }
 
 

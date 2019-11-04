@@ -15,7 +15,7 @@ export default class MockClient {
     sequence: any[];
     indices: AnyObject;
     cluster: AnyObject;
-    deepRecursiveResponseCount: boolean;
+    deepRecursiveResponseCount: boolean | number;
     searchQuery: AnyObject;
 
     constructor(_sequence?: any[]) {

@@ -25,3 +25,5 @@ export interface DataGenerator extends OpConfig {
     set_id?: IDType;
     id_start_key?: string;
 }
+
+export type CounterResults = null | { count: number }

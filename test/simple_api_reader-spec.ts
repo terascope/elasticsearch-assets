@@ -4,7 +4,6 @@ import nock from 'nock';
 import moment from 'moment';
 import { newTestJobConfig, debugLogger } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
-// import processor from '../asset/src/simple_api_reader/processor';
 import MockedClient from '../asset/src/simple_api_reader/client';
 import { ApiConfig } from '../asset/src/simple_api_reader/interfaces';
 import { IDType } from '../asset/src/id_reader/interfaces';

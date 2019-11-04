@@ -1,23 +1,34 @@
 
-import { ParallelSlicer, SlicerFn } from '@terascope/job-components';
-import { DataGenerator } from './interfaces';
+import {
+    Slicer, WorkerContext, ExecutionConfig
+} from '@terascope/job-components';
+import { DataGenerator, CounterResults } from './interfaces';
 import Counter from './counter';
 
-export default class DataGeneratorSlicer extends ParallelSlicer<DataGenerator> {
+export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
+    countHandle: () => Promise<CounterResults>
+    constructor(
+        context: WorkerContext,
+        opConfig: DataGenerator,
+        executionConfig: ExecutionConfig
+    ) {
+        super(context, opConfig, executionConfig);
+        const { size } = this.opConfig;
+        if (this.executionConfig.lifecycle === 'once') {
+            const opListSize = this.executionConfig.operations.length - 1;
+            const lastOp = this.executionConfig.operations[opListSize];
+            const counter = new Counter(size, lastOp.size);
+            this.countHandle = counter.handle;
+        } else {
+            this.countHandle = async () => ({ count: size });
+        }
+    }
+
     slicerQueueLength() {
         return 'QUEUE_MINIMUM_SIZE';
     }
 
-    async newSlicer(_id: number): Promise<SlicerFn> {
-        const { size } = this.opConfig;
-        if (this.executionConfig.lifecycle === 'once') {
-            const opSize = this.executionConfig.operations.length - 1;
-            const lastOp = this.executionConfig.operations[opSize];
-            const counter = new Counter(size, lastOp.size);
-            // @ts-ignore TODO: fix teraslice types
-            return counter.handle;
-        }
-        // @ts-ignore TODO: fix teraslice types
-        return async () => size;
+    async slice() {
+        return this.countHandle();
     }
 }

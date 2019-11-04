@@ -34,7 +34,7 @@ describe('id_reader', () => {
     afterEach(async () => {
         if (harness) await harness.shutdown();
     });
-    // @ts-ignore TODO: fixme
+
     async function makeFetcherTest(config: any) {
         harness = WorkerTestHarness.testFetcher(config, { assetDir, clients });
         await harness.initialize();
@@ -56,6 +56,7 @@ describe('id_reader', () => {
         await harness.initialize(recoveryData);
         return harness;
     }
+
     describe('schema', () => {
         it('can validateJob to make sure its configured correctly', () => {
             const errorStr1 = 'The number of slicers specified on the job cannot be more the length of key_range';
@@ -302,7 +303,7 @@ describe('id_reader', () => {
     });
 
     describe('fetcher', () => {
-        it('newReader returns a function that queries elasticsearch', async () => {
+        it('can search and fetch data from elasticsearch', async () => {
             const opConfig = {
                 _op: 'id_reader',
                 type: 'events-',

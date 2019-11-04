@@ -1,11 +1,12 @@
 
 import {
-    Fetcher, SliceRequest, WorkerContext, ExecutionConfig, toString
+    Fetcher, WorkerContext, ExecutionConfig, toString
 } from '@terascope/job-components';
 import mocker from 'mocker-data-generator';
 import path from 'path';
 import { existsSync } from 'fs';
 import { DataGenerator } from './interfaces';
+import defaultSchema from './data-schema';
 
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     dataSchema: any;
@@ -15,8 +16,8 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
         this.dataSchema = parsedSchema(opConfig);
     }
     // TODO: is this right type here?
-    async fetch(slice?: SliceRequest) {
-        const numberOfDoc = slice;
+    async fetch(slice?: any) {
+        const { count } = slice;
         if (slice == null) return [];
 
         if (this.opConfig.stress_test) {
@@ -27,16 +28,19 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
                     const results = [];
                     const data = dataObj.schema[0];
                     // @ts-ignore TODO: review this
-                    for (let i = 0; i < numberOfDoc; i += 1) {
+                    for (let i = 0; i < count; i += 1) {
                         results.push(data);
                     }
                     return results;
                 })
-                .catch((err) => Promise.reject(new Error(`could not generate data error: ${toString(err)}`)));
+                .catch((err) => {
+                    console.log('what is this', err);
+                    return Promise.reject(new Error(`could not generate data error: ${toString(err)}`))
+                });
         }
 
         return mocker()
-            .schema('schema', this.dataSchema, slice)
+            .schema('schema', this.dataSchema, count)
             .build()
             .then((dataObj) => dataObj.schema)
             .catch((err) => Promise.reject(new Error(`could not generate data error: ${toString(err)}`)));
@@ -61,6 +65,6 @@ function parsedSchema(opConfig: DataGenerator) {
             throw new Error(`Could not retrieve code for: ${opConfig}\n${e}`);
         }
     } else {
-        return require('./default_schema')(opConfig, dataSchema);
+        return defaultSchema(opConfig, dataSchema);
     }
 }

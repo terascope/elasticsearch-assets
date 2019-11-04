@@ -14,12 +14,12 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.1.0", "@terascope/elasticsearch-api@^2.1.11":
-  version "2.1.11"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.11.tgz#a066a34fa281abae319368ae4497642aae1875eb"
-  integrity sha512-Z4wM7Mb0sfTDJNLDFXNKu7ZwSoRhSLsLF9CV7/o+jyWV83COhsSpOr2l3zgA0zyfn0SVaJ8Voi2PgdQKqTa7Aw==
+"@terascope/elasticsearch-api@^2.1.13":
+  version "2.1.13"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.1.13.tgz#82abe8d4b40b4ef586eefc4a9d013c55e520d0ab"
+  integrity sha512-ImpqtE9hgERZAtb/ZQfocqV5V06C7/Vdh1COvj5RVpKWxWjTwK3WLRJma9iD9Jv7Uiw7IwwlmMKFPwvDYkg4rw==
   dependencies:
-    "@terascope/utils" "^0.20.3"
+    "@terascope/utils" "^0.20.5"
     bluebird "^3.5.5"
     lodash "^4.17.11"
 
@@ -30,13 +30,13 @@
   dependencies:
     lodash.get "^4.4.2"
 
-"@terascope/job-components@^0.23.2":
-  version "0.23.7"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.23.7.tgz#d3eb33ae36a19f62c01819d837442184f1554c96"
-  integrity sha512-Zy+DKsXbiOPKbepAlYrOmhihVxx6Cw89n4TS4i/eAYHWb8pBYawLkkUSYRGH/zuTaJ+O4Nym987qhksVs9pZ8Q==
+"@terascope/job-components@^0.23.9":
+  version "0.23.9"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.23.9.tgz#5a7d7f4161ae449484ba352828a8b66e561fc021"
+  integrity sha512-KEDXadoJW0NhCxCFHHjE+qR4jgNxeklidvtAFN/GX0cXp5Fl9ao+mF5JpYsz5Oh8YNMgWrlaSInRtuf58ON5Aw==
   dependencies:
     "@terascope/queue" "^1.1.7"
-    "@terascope/utils" "^0.20.3"
+    "@terascope/utils" "^0.20.5"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
     uuid "^3.3.3"
@@ -46,28 +46,58 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.7.tgz#26cd3a42747ec802744f9b86c08034b0bbe07091"
   integrity sha512-foPas4K4rShs0RxtLNauC9ssXbzWvf5YzCa+6tJ9BAEk+PfjHJhi9bPDL6stXfcHroKtbet49dPwFbFIJJAOHw==
 
-"@terascope/teraslice-state-storage@^0.7.1":
-  version "0.7.8"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.7.8.tgz#5b95d12e6bfd81df49f999ab443d58b508e07d52"
-  integrity sha512-0dYU4PLi1n4vfn1Ncr3HqwOzerE1AB9Dmylbj6rpNBxkDawbWD6B3neGzULZw1VdQlxr7AO2u6h8fwlf71BfXQ==
+"@terascope/teraslice-state-storage@^0.7.10":
+  version "0.7.10"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.7.10.tgz#fcc6ab91b65534d419c83cdb6d4685ebdc71565f"
+  integrity sha512-DUxpD0thbpYs4QcAboxHKm569UinQvqZmRfbScqnPet911FpHoY9EBvhZIKz3CUHkXE0/o0/+kYHAkwPiZXuIA==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.1.11"
-    "@terascope/utils" "^0.20.3"
+    "@terascope/elasticsearch-api" "^2.1.13"
+    "@terascope/utils" "^0.20.5"
     bluebird "^3.5.5"
     mnemonist "^0.30.0"
 
-"@terascope/utils@^0.20.3":
-  version "0.20.3"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.20.3.tgz#75df8af61e7efc0e96ea7c525a9f37eb7347cb08"
-  integrity sha512-61xyyR2Xus/zk6E1zcv1c9eLBJixTnqC3Jh89ZtP9R6cg4nQSHXcGQJVQbkXiyTlWKqEjsWvmAnIaR0suFc7Cg==
+"@terascope/utils@^0.20.5":
+  version "0.20.5"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.20.5.tgz#2e1af9de327f566eddf6f6e458dbba925efd7bea"
+  integrity sha512-vyEqOq+OZE4c7RVmyy1/BZU0x4W1eYTc8DE9H4Aqa1jyNWAm5ssFtIrsPjQR6R38kPNRO2tkT5xbnIyA+G/DuA==
   dependencies:
     debug "^4.1.1"
     is-plain-object "^3.0.0"
+    js-string-escape "^1.0.1"
     kind-of "^6.0.2"
     lodash.clonedeep "^4.5.0"
     lodash.get "^4.4.2"
     lodash.set "^4.3.2"
     lodash.unset "^4.5.2"
+
+"@types/bluebird@^3.5.28":
+  version "3.5.28"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.28.tgz#04c1a520ff076649236bc8ca21198542ce2bdb09"
+  integrity sha512-0Vk/kqkukxPKSzP9c8WJgisgGDx5oZDbsLLWIP5t70yThO/YleE+GEm2S1GlRALTaack3O7U5OS5qEm7q2kciA==
+
+"@types/got@^9.6.7":
+  version "9.6.7"
+  resolved "https://registry.yarnpkg.com/@types/got/-/got-9.6.7.tgz#33d84c60cba83e3c904634a1ea7ea81d1549bea6"
+  integrity sha512-LMc2ja42bQorKpBxf38ZBPdT3FhYL0lyAqnZBo5vAPCtobYa8AiHwSLH5zDvR19r2Pr5Ojar3hT/QLLb2SoPYA==
+  dependencies:
+    "@types/node" "*"
+    "@types/tough-cookie" "*"
+    form-data "^2.5.0"
+
+"@types/node@*":
+  version "12.12.3"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-12.12.3.tgz#ebfe83507ac506bc3486314a8aa395be66af8d23"
+  integrity sha512-opgSsy+cEF9N8MgaVPnWVtdJ3o4mV2aMHvDq7thkQUFt0EuOHJon4rQpJfhjmNHB+ikl0Cd6WhWIErOyQ+f7tw==
+
+"@types/tough-cookie@*":
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/@types/tough-cookie/-/tough-cookie-2.3.5.tgz#9da44ed75571999b65c37b60c9b2b88db54c585d"
+  integrity sha512-SCcK7mvGi3+ZNz833RRjFIxrn4gI1PPR3NtuIS+6vMkvmsGjosqTJwRt5bAEFLRz+wtJMWv8+uOnZf2hi2QXTg==
+
+asynckit@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/asynckit/-/asynckit-0.4.0.tgz#c79ed97f7f34cb8f2ba1bc9790bcc366474b4b79"
+  integrity sha1-x57Zf380y48robyXkLzDZkdLS3k=
 
 bluebird@^3.5.5:
   version "3.7.1"
@@ -112,6 +142,13 @@ clone-response@^1.0.2:
   dependencies:
     mimic-response "^1.0.0"
 
+combined-stream@^1.0.6:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/combined-stream/-/combined-stream-1.0.8.tgz#c3d45a8b34fd730631a110a8a2520682b31d5a7f"
+  integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
+  dependencies:
+    delayed-stream "~1.0.0"
+
 convict@^4.4.1:
   version "4.4.1"
   resolved "https://registry.yarnpkg.com/convict/-/convict-4.4.1.tgz#87f93c2a4f51bfc961e2873864442d0349a1b0d0"
@@ -155,6 +192,11 @@ defer-to-connect@^1.0.1:
   resolved "https://registry.yarnpkg.com/defer-to-connect/-/defer-to-connect-1.0.2.tgz#4bae758a314b034ae33902b5aac25a8dd6a8633e"
   integrity sha512-k09hcQcTDY+cwgiwa6PYKLm3jlagNzQ+RSvhjzESOGOx+MNOuXkxTfEvPrO1IOQ81tArCFYQgi631clB70RpQw==
 
+delayed-stream@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/delayed-stream/-/delayed-stream-1.0.0.tgz#df3ae199acadfb7d440aaae0b29e2272b24ec619"
+  integrity sha1-3zrhmayt+31ECqrgsp4icrJOxhk=
+
 depd@1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
@@ -181,6 +223,15 @@ faker@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/faker/-/faker-4.1.0.tgz#1e45bbbecc6774b3c195fad2835109c6d748cc3f"
   integrity sha1-HkW7vsxndLPBlfrSg1EJxtdIzD8=
+
+form-data@^2.5.0:
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/form-data/-/form-data-2.5.1.tgz#f2cbec57b5e59e23716e128fe44d4e5dd23895f4"
+  integrity sha512-m21N3WOmEEURgk6B9GLOE4RuWOFf28Lhh9qGYeNlGq4VDXUlJy2th2slBNU8Gp8EzloYZOibZJ7t5ecIrFSjVA==
+  dependencies:
+    asynckit "^0.4.0"
+    combined-stream "^1.0.6"
+    mime-types "^2.1.12"
 
 get-stream@^4.1.0:
   version "4.1.0"
@@ -229,6 +280,11 @@ isobject@^4.0.0:
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
   integrity sha512-S/2fF5wH8SJA/kmwr6HYhK/RI/OkhD84k8ntalo0iJjZikgq1XFvR5M8NPT1x5F7fBwCG3qHfnzeP/Vh/ZxCUA==
+
+js-string-escape@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
+  integrity sha1-4mJbrbwNZ8dTPp7cEGjFh65BN+8=
 
 json-buffer@3.0.0:
   version "3.0.0"
@@ -293,6 +349,18 @@ mersenne-twister@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/mersenne-twister/-/mersenne-twister-1.1.0.tgz#f916618ee43d7179efcf641bec4531eb9670978a"
   integrity sha1-+RZhjuQ9cXnvz2Qb7EUx65Zwl4o=
+
+mime-db@1.40.0:
+  version "1.40.0"
+  resolved "https://registry.yarnpkg.com/mime-db/-/mime-db-1.40.0.tgz#a65057e998db090f732a68f6c276d387d4126c32"
+  integrity sha512-jYdeOMPy9vnxEqFRRo6ZvTZ8d9oPb+k18PKoYNYUe2stVEBPPwsln/qWzdbmaIvnhZ9v2P+CuecK+fpUfsV2mA==
+
+mime-types@^2.1.12:
+  version "2.1.24"
+  resolved "https://registry.yarnpkg.com/mime-types/-/mime-types-2.1.24.tgz#b6f8d0b3e951efb77dedeca194cff6d16f676f81"
+  integrity sha512-WaFHS3MCl5fapm3oLxU4eYDw77IQM2ACcxQ9RIxfaC3ooc6PFuBMGZZsYpvoXS5D5QTWPieo1jjLdAm3TBP3cQ==
+  dependencies:
+    mime-db "1.40.0"
 
 mimic-response@^1.0.0, mimic-response@^1.0.1:
   version "1.0.1"
