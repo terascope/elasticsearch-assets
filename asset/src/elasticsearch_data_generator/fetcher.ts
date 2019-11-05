@@ -33,10 +33,7 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
                     }
                     return results;
                 })
-                .catch((err) => {
-                    console.log('what is this', err);
-                    return Promise.reject(new Error(`could not generate data error: ${toString(err)}`))
-                });
+                .catch((err) => Promise.reject(new Error(`could not generate data error: ${toString(err)}`)));
         }
 
         return mocker()

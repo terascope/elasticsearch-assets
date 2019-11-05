@@ -46,7 +46,7 @@ export default class ApiClient {
         }
     }
 
-    apiSearch(queryConfig: any) {
+    async apiSearch(queryConfig: any) {
         const { logger, opConfig } = this;
         const fields = get(queryConfig, '_source', null);
         const dateFieldName = this.opConfig.date_field_name;
@@ -152,31 +152,30 @@ export default class ApiClient {
         const uri = `${opConfig.endpoint}/${opConfig.index}`;
         const query = parseQueryConfig(mustQuery);
 
-        return Promise.resolve()
-            .then(() => this.makeRequest(uri, query))
-            .then((response) => {
-                let esResults = [];
-                if (response.results) {
-                    esResults = response.results.map((result: any) => ({ _source: result }));
-                }
+        try {
+            const response = await this.makeRequest(uri, query);
 
-                return ({
-                    hits: {
-                        hits: esResults,
-                        total: response.total
-                    },
-                    timed_out: false,
-                    _shards: {
-                        total: 1,
-                        successful: 1,
-                        failed: 0
-                    }
-                });
-            })
-            .catch((err) => {
-                logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
-                return Promise.reject(err);
+            let esResults = [];
+            if (response.results) {
+                esResults = response.results.map((result: any) => ({ _source: result }));
+            }
+
+            return ({
+                hits: {
+                    hits: esResults,
+                    total: response.total
+                },
+                timed_out: false,
+                _shards: {
+                    total: 1,
+                    successful: 1,
+                    failed: 0
+                }
             });
+        } catch (err) {
+            logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
+            return Promise.reject(err);
+        }
     }
 
 

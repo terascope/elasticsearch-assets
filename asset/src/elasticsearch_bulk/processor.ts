@@ -22,7 +22,6 @@ interface BulkContexts {
     [key: string]: Endpoint;
 }
 
-// TODO: check correct way of getting client
 export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     limit: number;
     bulkContexts: BulkContexts = {};
