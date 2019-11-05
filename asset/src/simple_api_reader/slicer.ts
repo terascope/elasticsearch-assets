@@ -4,11 +4,18 @@ import {
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
-// @ts-ignore TODO: check for types
-import dateMath from 'datemath-parser';
+
 import MockedClient from './client';
 import DateSlicerFn from '../elasticsearch_reader/elasticsearch_date_range/slicer';
-import { dateOptions, dateFormat } from '../helpers';
+import {
+    dateFormat,
+    dateFormatSeconds,
+    parseDate,
+    dateOptions,
+    divideRange,
+    getTimes,
+    processInterval
+} from '../helpers';
 import { ApiConfig } from './interfaces';
 import { SlicerArgs } from '../elasticsearch_reader/interfaces';
 
@@ -16,6 +23,7 @@ import { SlicerArgs } from '../elasticsearch_reader/interfaces';
 
 export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
     api: elasticApi.Client;
+    dateFormat: string;
 
     constructor(
         context: WorkerContext,
@@ -25,6 +33,8 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         super(context, opConfig, executionConfig);
         const client = new MockedClient(this.opConfig, this.logger);
         this.api = elasticApi(client, this.logger, this.opConfig);
+        const timeResolution = dateOptions(opConfig.time_resolution);
+        this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
     }
 
     async getDates() {
@@ -165,7 +175,11 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         };
 
         if (isPersistent) {
-            const dataIntervals = getTimes(this.opConfig, this.executionConfig.slicers);
+            const dataIntervals = getTimes(
+                this.opConfig,
+                this.executionConfig.slicers,
+                this.dateFormat
+            );
             slicerFnArgs.dates = dataIntervals[id];
         } else {
             await this.api.version();
@@ -180,7 +194,8 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
             const dateRange = divideRange(
                 esDates.start,
                 esDates.limit,
-                this.executionConfig.slicers
+                this.executionConfig.slicers,
+                this.dateFormat
             );
             this.updateJob(esDates, interval);
             slicerFnArgs.dates = dateRange[id];
@@ -190,101 +205,4 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         // @ts-ignore
         return DateSlicerFn(slicerFnArgs as SlicerArgs);
     }
-}
-
-function parseDate(date: string) {
-    let result;
-
-    if (moment(new Date(date)).isValid()) {
-        result = moment(new Date(date));
-    } else {
-        const ms = dateMath.parse(date);
-        result = moment(ms);
-    }
-
-    return result;
-}
-
-function getTimes(opConfig: ApiConfig, numOfSlicers: number) {
-    const end = processInterval(opConfig.time_resolution, opConfig.interval);
-    const delayInterval = processInterval(opConfig.time_resolution, opConfig.delay);
-    const delayTime = getMilliseconds(end);
-    const delayedEnd = moment().subtract(delayInterval[0], delayInterval[1]).format(dateFormat);
-    const delayedStart = moment(delayedEnd).subtract(end[0], end[1]).format(dateFormat);
-    const dateArray = divideRange(delayedStart, delayedEnd, numOfSlicers);
-
-    return dateArray.map((dates: any) => {
-        dates.delayTime = delayTime;
-        dates.interval = end;
-        return dates;
-    });
-}
-
-function getMilliseconds(interval: any[]) {
-    const times = {
-        d: 86400000,
-        h: 3600000,
-        m: 60000,
-        s: 1000,
-        ms: 1
-    };
-
-    return interval[0] * times[interval[1]];
-}
-
-function compareInterval(interval: any, esDates: any, timeResolution: string) {
-    if (esDates) {
-        const datesDiff = esDates.limit.diff(esDates.start);
-        const intervalDiff = moment.duration(Number(interval[0]), interval[1]).as('milliseconds');
-
-        if (intervalDiff > datesDiff) {
-            if (timeResolution === 's') {
-                return [Math.ceil(datesDiff / 1000), 's'];
-            }
-            return [datesDiff, 'ms'];
-        }
-    }
-
-    return interval;
-}
-
-function processInterval(timeResolution: string, str: string, esDates?: any) {
-    if (!moment(new Date(str)).isValid()) {
-        // one or more digits, followed by one or more letters, case-insensitive
-        const regex = /(\d+)(\D+)/i;
-        const interval = regex.exec(str);
-        if (interval === null) {
-            throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
-        }
-
-        // dont need first parameter, its the full string
-        interval.shift();
-        interval[1] = dateOptions(interval[1]);
-        return compareInterval(interval, esDates, timeResolution);
-    }
-
-    throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
-}
-
-
-function divideRange(start: any, end: any, numOfSlicers: number) {
-    const results = [];
-    const startNum = Number(moment(start).format('x'));
-    const endNum = Number(moment(end).format('x'));
-    const range = (endNum - startNum) / numOfSlicers;
-
-    const step = moment(start);
-
-    for (let i = 0; i < numOfSlicers; i += 1) {
-        const rangeObj = {
-            start: step.format(dateFormat),
-            end: step.add(range).format(dateFormat)
-        };
-        results.push(rangeObj);
-    }
-
-    // make sure that end of last segment is always correct
-    const endingDate = end.format ? end.format(dateFormat) : moment(end).format(dateFormat);
-    results[results.length - 1].end = endingDate;
-    return results;
 }

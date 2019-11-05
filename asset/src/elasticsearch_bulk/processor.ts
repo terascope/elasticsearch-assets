@@ -68,7 +68,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
     private _recursiveSend(client: elasticApi.Client, dataArray: any[]) {
         const slicedData = splitArray(dataArray, this.limit);
-        return Promise.map(slicedData, (data) => client.bulkSend(data));
+        return Promise.map(slicedData, (data: any) => client.bulkSend(data));
     }
 
     private async multiSend(data: any[]) {

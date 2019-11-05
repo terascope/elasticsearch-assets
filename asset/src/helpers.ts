@@ -1,8 +1,10 @@
 // @ts-ignore
 import parseError from '@terascope/error-parser';
-import { Logger } from '@terascope/job-components';
+import { Logger, AnyObject } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
+// @ts-ignore TODO: check for types
+import dateMath from 'datemath-parser';
 
 export function dateOptions(value: string) {
     const options = {
@@ -120,4 +122,69 @@ export function existsSync(filename: string) {
     } catch (ex) {
         return false;
     }
+}
+
+export function getMilliseconds(interval: any[]) {
+    const times = {
+        d: 86400000,
+        h: 3600000,
+        m: 60000,
+        s: 1000,
+        ms: 1
+    };
+
+    return interval[0] * times[interval[1]];
+}
+
+export function parseDate(date: string) {
+    let result;
+
+    if (moment(new Date(date)).isValid()) {
+        result = moment(new Date(date));
+    } else {
+        const ms = dateMath.parse(date);
+        result = moment(ms);
+    }
+
+    return result;
+}
+
+export function divideRange(start: any, end: any, numOfSlicers: number, dateFormatting: string) {
+    const results = [];
+    const startNum = Number(moment(start).format('x'));
+    const endNum = Number(moment(end).format('x'));
+    const range = (endNum - startNum) / numOfSlicers;
+
+    const step = moment(start);
+
+    for (let i = 0; i < numOfSlicers; i += 1) {
+        const rangeObj = {
+            start: step.format(dateFormatting),
+            end: step.add(range).format(dateFormatting)
+        };
+        results.push(rangeObj);
+    }
+
+    // make sure that end of last segment is always correct
+    const endingDate = end.format ? end.format(dateFormatting) : moment(end).format(dateFormatting);
+    results[results.length - 1].end = endingDate;
+    return results;
+}
+
+export function getTimes(opConfig: AnyObject, numOfSlicers: number, dateFormatting: string) {
+    const end = processInterval(opConfig.time_resolution, opConfig.interval);
+    const delayInterval = processInterval(opConfig.time_resolution, opConfig.delay);
+    const delayTime = getMilliseconds(end);
+    const delayedEnd = moment().subtract(
+        delayInterval[0],
+        delayInterval[1]
+    ).format(dateFormatting);
+    const delayedStart = moment(delayedEnd).subtract(end[0], end[1]).format(dateFormatting);
+    const dateArray = divideRange(delayedStart, delayedEnd, numOfSlicers, dateFormatting);
+
+    return dateArray.map((dates: any) => {
+        dates.delayTime = delayTime;
+        dates.interval = end;
+        return dates;
+    });
 }
