@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "1.6.1",
+    "version": "1.7.0",
     "main": "utils.js",
     "devDependencies": {
         "@types/bluebird": "^3.5.28",
