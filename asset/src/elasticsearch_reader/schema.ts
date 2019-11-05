@@ -17,8 +17,8 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         if (opConfig == null) throw new Error('could not find elasticsearch_reader operation in jobConfig');
 
         if (opConfig.subslice_by_key) {
-            if (!opConfig.type) {
-                throw new Error('If subslice_by_key is set to true, the elasticsearch type parameter of the documents must also be set');
+            if (!opConfig.field) {
+                throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
             }
         }
 
@@ -50,8 +50,8 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                     }
                 }
             },
-            type: {
-                doc: 'type of the document in the index, used for key searches',
+            field: {
+                doc: 'field to use for id_slicer if subslice_by_key is set to true',
                 default: '',
                 format: 'optional_String'
             },

@@ -2,21 +2,10 @@
 import { toString } from '@terascope/job-components';
 // @ts-ignore
 import parseError from '@terascope/error-parser';
-import { ESIDSlicerArgs } from './interfaces';
+import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
 import { getKeyArray } from './helpers';
 import { retryModule } from '../helpers';
-
-interface ESDateSlicerResults {
-    start: string;
-    end: string;
-    count: number;
-    key?: string;
-}
-
-interface ESIDSlicerResult {
-    count: number;
-    key: string;
-}
+import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs) {
     const {
@@ -37,7 +26,7 @@ export default function newSlicer(args: ESIDSlicerArgs) {
     async function determineKeySlice(
         generator: any,
         closePath: boolean,
-        rangeObj?: ESDateSlicerResults
+        rangeObj?: SlicerDateResults
     ): Promise<ESIDSlicerResult| null> {
         let data;
         if (closePath) {
@@ -47,9 +36,8 @@ export default function newSlicer(args: ESIDSlicerArgs) {
         }
 
         if (data.done) return null;
-
-        const key = `${opConfig.type}#${data.value}*`;
-        let msg: Partial<ESDateSlicerResults> = { key };
+        const wildcard = { field: opConfig.field, value: `${data.value}*` };
+        let msg: Partial<SlicerDateResults> = { wildcard };
 
         // this is used by elasticsearch slicer if slice is to large and its
         // set to break it up further by key
@@ -57,7 +45,7 @@ export default function newSlicer(args: ESIDSlicerArgs) {
             msg = {
                 start: rangeObj.start,
                 end: rangeObj.end,
-                key
+                wildcard
             };
         }
 
@@ -69,7 +57,7 @@ export default function newSlicer(args: ESIDSlicerArgs) {
             try {
                 count = await api.count(query);
             } catch (err) {
-                return retryError(key, err, getKeySlice, query);
+                return retryError(wildcard, err, getKeySlice, query);
             }
 
             if (count > opConfig.size) {
@@ -81,10 +69,10 @@ export default function newSlicer(args: ESIDSlicerArgs) {
                 // the closing of this path happens at keyGenerator
                 if (range) {
                     range.count = count;
-                    range.key = key;
+                    range.wildcard = wildcard;
                     return range;
                 }
-                return { count, key };
+                return { count, wildcard };
             }
 
             // if count is zero then close path to prevent further iteration
@@ -98,7 +86,7 @@ export default function newSlicer(args: ESIDSlicerArgs) {
         baseArray: string[],
         keysArray: string[],
         retryKey?: string,
-        dateRange?: ESDateSlicerResults
+        dateRange?: SlicerDateResults
     ) {
         // if there is a starting depth, use the key depth generator, if not use default generator
         const gen = startingKeyDepth > 0

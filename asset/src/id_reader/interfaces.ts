@@ -6,7 +6,7 @@ import {
     Logger
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
-import { SlicerResults } from '../elasticsearch_reader/interfaces';
+import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
 export enum IDType {
     base64url = 'base64url',
@@ -17,8 +17,8 @@ export enum IDType {
 
 export interface ESIDReaderConfig extends OpConfig {
     index: string;
-    type: string;
     size: number;
+    field: string;
     full_response: boolean;
     key_type: IDType;
     key_range: null | string[];
@@ -34,7 +34,17 @@ export interface ESIDSlicerArgs {
     executionConfig: ExecutionConfig;
     retryData?: any;
     logger: Logger;
-    range: SlicerResults;
+    range: SlicerDateResults;
     api: elasticApi.Client;
     keySet: string[];
+}
+
+export interface WildCardQuery {
+    field: string;
+    value: string;
+}
+
+export interface ESIDSlicerResult {
+    count: number;
+    wildcard: WildCardQuery;
 }

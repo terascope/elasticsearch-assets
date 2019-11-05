@@ -112,7 +112,7 @@ describe('id_reader', () => {
                 _op: 'id_reader',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                type: 'events-',
+                field: 'someField',
                 index: 'someindex'
             };
 
@@ -126,7 +126,7 @@ describe('id_reader', () => {
                 _op: 'id_reader',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                type: 'events-',
+                field: 'someField',
                 index: 'someindex'
             };
 
@@ -141,7 +141,7 @@ describe('id_reader', () => {
                 _op: 'id_reader',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
-                type: 'events-',
+                field: 'someField',
                 index: 'someindex',
                 size: 200
             };
@@ -149,10 +149,10 @@ describe('id_reader', () => {
             const test = await makeSlicerTest(opConfig);
 
             const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
+            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
 
             const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
+            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
 
             const slice3 = await test.createSlices();
             expect(slice3).toEqual([null]);
@@ -164,7 +164,7 @@ describe('id_reader', () => {
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b', 'c', 'd'],
                 starting_key_depth: 3,
-                type: 'events-',
+                field: 'someField',
                 index: 'someindex',
                 size: 200
             };
@@ -172,19 +172,19 @@ describe('id_reader', () => {
             const test = await makeSlicerTest(opConfig);
 
             const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, key: 'events-#a00*' });
+            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a00*' } });
 
             const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, key: 'events-#a01*' });
+            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a01*' } });
 
             const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 100, key: 'events-#a02*' });
+            expect(slice3).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a02*' } });
         });
 
         it('it produces values even with an initial search error', async () => {
             const opConfig = {
                 _op: 'id_reader',
-                type: 'events-',
+                field: 'someField',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 index: 'someindex',
@@ -204,10 +204,10 @@ describe('id_reader', () => {
             const test = await makeSlicerTest(opConfig);
 
             const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
+            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
 
             const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, key: 'events-#b*' });
+            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
 
             const slice3 = await test.createSlices();
             expect(slice3).toEqual([null]);
@@ -216,7 +216,7 @@ describe('id_reader', () => {
         it('key range gets divided up by number of slicers', async () => {
             const opConfig = {
                 _op: 'id_reader',
-                type: 'events-',
+                field: 'someField',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 index: 'someindex',
@@ -227,8 +227,8 @@ describe('id_reader', () => {
 
             const slices1 = await test.createSlices();
 
-            expect(slices1[0]).toEqual({ count: 100, key: 'events-#a*' });
-            expect(slices1[1]).toEqual({ count: 100, key: 'events-#b*' });
+            expect(slices1[0]).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
+            expect(slices1[1]).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
 
             const slices2 = await test.createSlices();
 
@@ -246,7 +246,7 @@ describe('id_reader', () => {
 
             const opConfig = {
                 _op: 'id_reader',
-                type: 'events-',
+                field: 'someField',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 index: 'someindex',
@@ -257,16 +257,16 @@ describe('id_reader', () => {
             const test = await makeSlicerTest(opConfig);
 
             const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, key: 'events-#a*' });
+            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
 
             const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 200, key: 'events-#b0*' });
+            expect(slice2).toEqual({ count: 200, wildcard: { field: 'someField', value: 'b0*' } });
 
             const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 200, key: 'events-#b1*' });
+            expect(slice3).toEqual({ count: 200, wildcard: { field: 'someField', value: 'b1*' } });
 
             const [slice4] = await test.createSlices();
-            expect(slice4).toEqual({ count: 100, key: 'events-#b2*' });
+            expect(slice4).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b2*' } });
 
             const slice5 = await test.createSlices();
             expect(slice5).toEqual([null]);
@@ -276,7 +276,7 @@ describe('id_reader', () => {
             const retryData = [{ lastSlice: { key: 'events-#a6*' } }];
             const opConfig = {
                 _op: 'id_reader',
-                type: 'events-',
+                field: 'someField',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 index: 'someindex',
@@ -286,19 +286,19 @@ describe('id_reader', () => {
             const test = await makeSlicerTest(opConfig, 1, retryData);
 
             const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, key: 'events-#a7*' });
+            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a7*' } });
 
             const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, key: 'events-#a8*' });
+            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a8*' } });
 
             const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 100, key: 'events-#a9*' });
+            expect(slice3).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a9*' } });
 
             const [slice4] = await test.createSlices();
-            expect(slice4).toEqual({ count: 100, key: 'events-#aa*' });
+            expect(slice4).toEqual({ count: 100, wildcard: { field: 'someField', value: 'aa*' } });
 
             const [slice5] = await test.createSlices();
-            expect(slice5).toEqual({ count: 100, key: 'events-#ab*' });
+            expect(slice5).toEqual({ count: 100, wildcard: { field: 'someField', value: 'ab*' } });
         });
     });
 
@@ -306,13 +306,13 @@ describe('id_reader', () => {
         it('can search and fetch data from elasticsearch', async () => {
             const opConfig = {
                 _op: 'id_reader',
-                type: 'events-',
+                field: 'someField',
                 key_type: 'hexadecimal',
                 key_range: ['a', 'b'],
                 index: 'someindex',
                 size: 200
             };
-            const slice = { count: 100, key: 'events-#a*' };
+            const slice = { count: 100, wildcard: { field: 'someField', value: 'a*' } };
             const finalQuery = {
                 index: 'someindex',
                 size: 100,
@@ -321,7 +321,7 @@ describe('id_reader', () => {
                         bool: {
                             must: [
                                 {
-                                    wildcard: { _uid: 'events-#a*' }
+                                    wildcard: { [opConfig.field]: 'a*' }
                                 }
                             ]
                         }

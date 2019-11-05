@@ -6,11 +6,11 @@ import {
     Logger
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
-import { IDType } from '../id_reader/interfaces';
+import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends OpConfig {
     index: string;
-    type?: string;
+    field?: string;
     size: number;
     start: null | string;
     end: null | string;
@@ -46,9 +46,9 @@ export interface SlicerArgs {
     api: elasticApi.Client;
 }
 
-export interface SlicerResults {
+export interface SlicerDateResults {
     start: string;
     end: string;
     count: number;
-    key?: string;
+    wildcard?: WildCardQuery;
 }

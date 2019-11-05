@@ -34,11 +34,6 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 format: 'required_String'
 
             },
-            type: {
-                doc: 'type of the document in the index, used for key searches',
-                default: '',
-                format: 'required_String'
-            },
             size: {
                 doc: 'The keys will attempt to recurse until the chunk will be <= size',
                 default: 10000,
@@ -49,6 +44,11 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                         throw new Error('size parameter for id_reader must be greater than zero');
                     }
                 }
+            },
+            field: {
+                doc: 'The field in which searches will be queryed from',
+                default: '',
+                format: 'required_String'
             },
             full_response: {
                 doc: 'Set to true to receive the full Elasticsearch query response including index metadata.',

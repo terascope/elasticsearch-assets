@@ -92,9 +92,10 @@ type RetryFn = (msg: string) => any
 
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
-    return (key: string, err: Error, fn: RetryFn, msg: string) => {
+    return (_key: string | object, err: Error, fn: RetryFn, msg: string) => {
         const errMessage = parseError(err);
         logger.error('error while getting next slice', errMessage);
+        const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
 
         if (!retry[key]) {
             retry[key] = 1;

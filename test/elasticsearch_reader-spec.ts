@@ -24,13 +24,6 @@ describe('elasticsearch_reader', () => {
                 create: () => ({
                     client: defaultClient
                 }),
-            },
-            {
-                type: 'elasticsearch',
-                endpoint: 'otherConnection',
-                create: () => ({
-                    client: new MockClient()
-                }),
             }
         ];
     });
@@ -136,10 +129,10 @@ describe('elasticsearch_reader', () => {
 
         it('subslice_by_key configuration validation', async () => {
             expect.hasAssertions();
-            const errorString = 'If subslice_by_key is set to true, the elasticsearch type parameter of the documents must also be set';
+            const errorString = 'If subslice_by_key is set to true, the field parameter of the documents must also be set';
             const badOP = { subslice_by_key: true };
-            const goodOP = { subslice_by_key: true, type: 'events-' };
-            const otherGoodOP = { subslice_by_key: false, type: 'events-' };
+            const goodOP = { subslice_by_key: true, field: 'events-' };
+            const otherGoodOP = { subslice_by_key: false, other: 'events-' };
             // NOTE: geo self validations are tested in elasticsearch_api module
 
             const testOpConfig = {
@@ -683,7 +676,7 @@ describe('elasticsearch_reader', () => {
                 subslice_by_key: true,
                 subslice_key_threshold: 50,
                 key_type: IDType.hexadecimal,
-                type: 'test'
+                field: 'test'
             };
             const hexadecimal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'];
             defaultClient.deepRecursiveResponseCount = 10;
@@ -707,7 +700,7 @@ describe('elasticsearch_reader', () => {
             const results = await test.createSlices();
 
             hexadecimal.forEach((char) => {
-                const subslice = results.find((s) => s.key === `test#${char}*`);
+                const subslice = results.find((s) => s.wildcard.value === `${char}*`);
                 expect(subslice).not.toBeUndefined();
                 expect(subslice!.start!.format() === firstDate.format()).toEqual(true);
                 expect(subslice!.end!.format() === closingDate.format()).toEqual(true);
