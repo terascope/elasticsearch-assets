@@ -1,17 +1,42 @@
 
 import 'jest-extended';
 import nock from 'nock';
+import path from 'path';
 import moment from 'moment';
-import { newTestJobConfig, debugLogger } from '@terascope/job-components';
+import {
+    newTestJobConfig, debugLogger, get, pDelay
+} from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
-import MockedClient from '../asset/src/simple_api_reader/client';
+import ApiMockedClient from '../asset/src/simple_api_reader/client';
 import { ApiConfig } from '../asset/src/simple_api_reader/interfaces';
 import { IDType } from '../asset/src/id_reader/interfaces';
+import MockClient from './mock_client';
 
 describe('simple_api_reader', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
     const logger = debugLogger('simple_api_reader');
+    const assetDir = path.join(__dirname, '..');
+    let clients: any;
+    let defaultClient: MockClient;
+
+    interface EventHook {
+        event: string;
+        fn: (event?: any) => void;
+    }
+
+    beforeEach(() => {
+        defaultClient = new MockClient();
+        clients = [
+            {
+                type: 'elasticsearch',
+                endpoint: 'default',
+                create: () => ({
+                    client: defaultClient
+                }),
+            }
+        ];
+    });
 
     let scope: nock.Scope;
     beforeEach(() => {
@@ -43,7 +68,7 @@ describe('simple_api_reader', () => {
             connection: 'default',
             time_resolution: 's'
         };
-        const client = new MockedClient(opConfig, logger);
+        const client = new ApiMockedClient(opConfig, logger);
 
         expect(client.search).toBeDefined();
         expect(client.count).toBeDefined();
@@ -282,76 +307,162 @@ describe('simple_api_reader', () => {
         });
     });
 
-    describe('when testing the Slicer', () => {
-        const start = moment('2012-12-12T00:00:00.000Z');
-        const end = moment(start.toISOString()).add(1, 'minute');
-        const harness = new SlicerTestHarness(newTestJobConfig({
-            name: 'simple-api-reader-job',
-            lifecycle: 'once',
-            max_retries: 0,
-            operations: [
-                {
-                    _op: 'simple_api_reader',
-                    query: 'slicer:query',
-                    index: testIndex,
-                    endpoint: baseUri,
-                    token: 'test-token',
-                    size: 2,
-                    interval: '1m',
-                    start: start.toISOString(),
-                    end: end.toISOString(),
-                    delay: '0s',
-                    date_field_name: 'created',
-                    timeout: 50
-                },
-                {
-                    _op: 'noop'
-                }
-            ]
-        }), {});
+    describe('slicer', () => {
+        describe('will behave like elasticsearch date reader', () => {
+            const start = moment('2012-12-12T00:00:00.000Z');
+            const end = moment(start.toISOString()).add(1, 'minute');
+            let harness: SlicerTestHarness;
+            let updatedConfig: any;
 
-        beforeEach(async () => {
-            const query = {
+            async function makeSlicerTest(
+                config: any, numOfSlicers = 1,
+                recoveryData?: object[],
+                eventHook?: EventHook
+            ) {
+                const job = newTestJobConfig({
+                    analytics: true,
+                    slicers: numOfSlicers,
+                    operations: [
+                        config,
+                        {
+                            _op: 'noop'
+                        }
+                    ]
+                });
+                const myTest = new SlicerTestHarness(job, { assetDir, clients });
+                if (eventHook) myTest.events.on(eventHook.event, eventHook.fn);
+                await myTest.initialize(recoveryData);
+                return myTest;
+            }
+
+            const opConfig = {
+                _op: 'simple_api_reader',
+                date_field_name: 'created',
+                time_resolution: 's',
+                size: 100,
+                index: 'someindex',
+                interval: 'auto',
+                start: start.toISOString(),
+                end: end.toISOString(),
+                endpoint: baseUri,
                 token: 'test-token',
-                q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
             };
 
-            scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 1 }, query))
-                .reply(200, {
-                    results: [{ created: start.toISOString() }],
-                    total: 1
-                });
+            async function waitForUpdate(config: any) {
+                const test = await makeSlicerTest(config, 1, [], { event: 'slicer:execution:update', fn: checkUpdate });
+                await pDelay(100);
+                return test;
+            }
 
-            scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 1 }, query))
-                .reply(200, {
-                    results: [{ created: end.toISOString() }],
-                    total: 1
-                });
 
-            scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 0 }, query))
-                .reply(200, {
-                    results: [],
-                    total: 2
-                });
+            function checkUpdate(updateObj: any) {
+                updatedConfig = get(updateObj, 'update[0]');
+                return true;
+            }
 
-            await harness.initialize([]);
-        });
+            beforeEach(async () => {
+                scope.get(/.*/)
+                    .reply(200, {
+                        results: [{ created: start.toISOString() }],
+                        total: 1
+                    });
 
-        afterEach(async () => {
-            await harness.shutdown();
-        });
+                scope.get(/.*/)
+                    .query(true)
+                    .reply(200, {
+                        results: [{ created: end.toISOString() }],
+                        total: 1
+                    });
 
-        it('should be able to generate slices', async () => {
-            const slices = await harness.createSlices();
-
-            expect(slices).toBeArrayOfSize(1);
-            expect(slices[0]).toMatchObject({
-                count: 2,
+                scope.get(/.*/)
+                    .query(true)
+                    .reply(200, {
+                        results: [{ created: end.toISOString() }],
+                        total: 1
+                    });
             });
-            expect(scope.isDone()).toBeTrue();
+
+            afterEach(async () => {
+                if (harness) await harness.shutdown();
+            });
+
+            it('will convert auto to proper interval and update the opConfig', async () => {
+                harness = await waitForUpdate(opConfig);
+                expect(updatedConfig.interval).toEqual([60, 's']);
+            });
+        });
+
+        describe('when testing the Slicer', () => {
+            const start = moment('2012-12-12T00:00:00.000Z');
+            const end = moment(start.toISOString()).add(1, 'minute');
+            const harness = new SlicerTestHarness(newTestJobConfig({
+                name: 'simple-api-reader-job',
+                lifecycle: 'once',
+                max_retries: 0,
+                operations: [
+                    {
+                        _op: 'simple_api_reader',
+                        query: 'slicer:query',
+                        index: testIndex,
+                        endpoint: baseUri,
+                        token: 'test-token',
+                        size: 2,
+                        interval: '1m',
+                        start: start.toISOString(),
+                        end: end.toISOString(),
+                        delay: '0s',
+                        date_field_name: 'created',
+                        timeout: 50
+                    },
+                    {
+                        _op: 'noop'
+                    }
+                ]
+            }), {});
+
+            beforeEach(async () => {
+                const query = {
+                    token: 'test-token',
+                    q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
+                };
+
+                scope.get(`/${testIndex}`)
+                    .query(Object.assign({ size: 1 }, query))
+                    .reply(200, {
+                        results: [{ created: start.toISOString() }],
+                        total: 1
+                    });
+
+                scope.get(`/${testIndex}`)
+                    .query(Object.assign({ size: 1 }, query))
+                    .reply(200, {
+                        results: [{ created: end.toISOString() }],
+                        total: 1
+                    });
+
+                scope.get(`/${testIndex}`)
+                    .query(Object.assign({ size: 0 }, query))
+                    .reply(200, {
+                        results: [],
+                        total: 2
+                    });
+
+                await harness.initialize([]);
+            });
+
+            afterEach(async () => {
+                await harness.shutdown();
+            });
+
+            it('should be able to generate slices', async () => {
+                const slices = await harness.createSlices();
+
+                expect(slices).toBeArrayOfSize(1);
+                expect(slices[0]).toMatchObject({
+                    count: 2,
+                });
+                expect(scope.isDone()).toBeTrue();
+            });
         });
     });
 });

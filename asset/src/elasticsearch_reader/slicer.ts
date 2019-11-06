@@ -104,10 +104,9 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
 
     updateJob(dates: any, interval: any) {
         const opName = this.opConfig._op;
-
         // this sends actual dates to execution context so that it can keep
         // track of them for recoveries
-        if (!this.opConfig.start || !this.opConfig.end) {
+        if (!this.opConfig.start || !this.opConfig.end || this.opConfig.interval === 'auto') {
             const { operations } = this.executionConfig;
             const opIndex = operations.findIndex((config) => config._op === opName);
             const update = {
@@ -193,6 +192,9 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 this.dateFormat
             );
             this.updateJob(esDates, interval);
+            // we set so auto is replaced with correct interval
+            // mutation needs to be after the updateJob fn call
+            slicerFnArgs.opConfig.interval = interval;
             slicerFnArgs.dates = dateRange[id];
 
             if (this.recoveryData && this.recoveryData.length > 0) {

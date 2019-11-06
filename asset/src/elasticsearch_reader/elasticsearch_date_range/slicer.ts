@@ -188,10 +188,7 @@ export default function newSlicer(args: SlicerArgs) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
 
-        const [intervalNum, intervalUnit] = helpers.processInterval(
-            opConfig.time_resolution,
-            opConfig.interval
-        );
+        const [intervalNum, intervalUnit] = opConfig.interval;
         const dateParams: any = {};
 
         dateParams.size = opConfig.size;

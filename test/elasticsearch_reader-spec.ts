@@ -293,6 +293,39 @@ describe('elasticsearch_reader', () => {
             await test4.shutdown();
         });
 
+        it('will convert auto to proper interval and update the opConfig', async () => {
+            const firstDate = moment();
+            const laterDate = moment(firstDate).add(5, 'm');
+            let updatedConfig: any;
+
+            function checkUpdate(updateObj: any) {
+                updatedConfig = get(updateObj, 'update[0]');
+                return true;
+            }
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                index: 'someindex',
+                interval: 'auto',
+                start: firstDate.format(),
+                end: moment(laterDate).add(1, 's').format()
+            };
+
+            async function waitForUpdate(config: any) {
+                const test = await makeSlicerTest(config, 1, [], { event: 'slicer:execution:update', fn: checkUpdate });
+                await pDelay(100);
+                return test;
+            }
+
+            const test = await waitForUpdate(opConfig);
+
+            expect(updatedConfig.interval).toEqual([301, 's']);
+            await test.shutdown();
+        });
+
         it('slicer will not error out if query returns no results', async () => {
             const opConfig = {
                 _op: 'elasticsearch_reader',
@@ -441,7 +474,6 @@ describe('elasticsearch_reader', () => {
             const results3 = await test.createSlices();
             expect(results3).toEqual([null]);
         });
-
 
         it('slicer can do an expansion of date slices up to find data even when none is returned', async () => {
             const firstDate = moment();
@@ -724,7 +756,7 @@ describe('elasticsearch_reader', () => {
             expect(test).toBeDefined();
         });
 
-        it('newReader can return formated data', async () => {
+        it('fetcher can return formated data', async () => {
             const firstDate = moment();
             const laterDate = moment(firstDate).add(5, 'm');
 

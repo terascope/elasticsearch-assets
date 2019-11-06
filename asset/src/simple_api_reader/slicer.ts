@@ -80,6 +80,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         // using this query to catch potential errors even if a date is given already
         const results = await this.api.search(query);
         const data = results[0];
+
         if (data == null) {
             this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.opConfig.index}`);
             return null;
@@ -108,7 +109,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
 
         // this sends actual dates to execution context so that it can keep
         // track of them for recoveries
-        if (!this.opConfig.start || !this.opConfig.end) {
+        if (!this.opConfig.start || !this.opConfig.end || this.opConfig.interval === 'auto') {
             const { operations } = this.executionConfig;
             const opIndex = operations.findIndex((config) => config._op === opName);
             const update = {
@@ -191,6 +192,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
                 return async () => null;
             }
             const interval = await this.getInterval(esDates);
+
             const dateRange = divideRange(
                 esDates.start,
                 esDates.limit,
@@ -198,6 +200,8 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
                 this.dateFormat
             );
             this.updateJob(esDates, interval);
+            // we set so auto is replaced with correct interval
+            slicerFnArgs.opConfig.interval = interval;
             slicerFnArgs.dates = dateRange[id];
             slicerFnArgs.retryData = retryData;
         }
