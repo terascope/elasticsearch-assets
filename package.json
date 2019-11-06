@@ -24,14 +24,14 @@
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
     "dependencies": {
-        "@types/bluebird": "^3.5.28",
-        "@types/got": "^9.6.8"
+        "@terascope/eslint-config": "^0.1.6"
     },
     "engines": {
         "node": ">=8.0.0"
     },
     "devDependencies": {
-        "@terascope/eslint-config": "^0.1.6",
+        "@types/bluebird": "^3.5.28",
+        "@types/got": "^9.6.8",
         "@terascope/job-components": "^0.23.9",
         "@types/jest": "^24.0.21",
         "@types/node": "^12.12.5",
