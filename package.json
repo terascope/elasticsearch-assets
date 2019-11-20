@@ -24,7 +24,7 @@
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
     "dependencies": {
-        "@terascope/eslint-config": "^0.1.6"
+        "@terascope/eslint-config": "^0.1.7"
     },
     "engines": {
         "node": ">=8.0.0"
@@ -32,14 +32,14 @@
     "devDependencies": {
         "@types/bluebird": "^3.5.28",
         "@types/got": "^9.6.8",
-        "@terascope/job-components": "^0.23.9",
+        "@terascope/job-components": "^0.23.10",
         "@types/jest": "^24.0.21",
         "@types/node": "^12.12.5",
         "eslint": "^6.6.0",
-        "jest": "^24.8.0",
+        "jest": "^24.9.0",
         "jest-extended": "^0.11.2",
         "nock": "^11.7.0",
-        "teraslice-test-harness": "^0.8.12",
+        "teraslice-test-harness": "^0.8.13",
         "ts-jest": "^24.1.0",
         "ts-node": "^8.4.1",
         "typescript": "^3.7.2"
