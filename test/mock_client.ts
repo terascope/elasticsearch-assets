@@ -16,9 +16,14 @@ function validateQuery(obj: AnyObject) {
     if (!obj.index || typeof obj.index !== 'string') throw new Error('query must specify an index');
 }
 
-function validateBulk(arr: AnyObject[]) {
-    if (!Array.isArray(arr)) throw new Error('bulk data must be an array');
-    const areObjects = arr.every(isSimpleObject);
+interface BulkData {
+    body: AnyObject[]
+}
+
+function validateBulk(data: BulkData) {
+    if (!data.body) throw new Error('bulk must have a body field');
+    if (!Array.isArray(data.body)) throw new Error('bulk data must be an array');
+    const areObjects = data.body.every(isSimpleObject);
     if (!areObjects) throw new Error('bulk data must be an array of objects');
 }
 
@@ -90,7 +95,7 @@ export default class MockClient {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    async bulk(data: AnyObject[]) {
+    async bulk(data: BulkData) {
         validateBulk(data);
         return data;
     }
