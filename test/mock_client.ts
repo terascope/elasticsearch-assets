@@ -1,5 +1,5 @@
 
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, isPlainObject, isSimpleObject } from '@terascope/job-components';
 
 function createData() {
     return {
@@ -9,6 +9,17 @@ function createData() {
         _id: 'someId',
         _source: { '@timestamp': new Date() }
     };
+}
+
+function validateQuery(obj: AnyObject) {
+    if (!isPlainObject(obj)) throw new Error('query must be an object');
+    if (!obj.index || typeof obj.index !== 'string') throw new Error('query must specify an index');
+}
+
+function validateBulk(arr: AnyObject[]) {
+    if (!Array.isArray(arr)) throw new Error('bulk data must be an array');
+    const areObjects = arr.every(isSimpleObject);
+    if (!areObjects) throw new Error('bulk data must be an array of objects');
 }
 
 export default class MockClient {
@@ -53,6 +64,7 @@ export default class MockClient {
     }
 
     async search(query: AnyObject) {
+        validateQuery(query);
         this.searchQuery = query;
         const { sequence } = this;
         if (sequence.length > 0) {
@@ -78,5 +90,8 @@ export default class MockClient {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    async bulk(data: any) { return data; }
+    async bulk(data: AnyObject[]) {
+        validateBulk(data);
+        return data;
+    }
 }
