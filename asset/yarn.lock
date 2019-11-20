@@ -14,10 +14,10 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.2.0":
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.2.0.tgz#46429578a987afb432a50d2152fb99ca8d1b7fce"
-  integrity sha512-hFOkAqu04nMukVk0VLPInAiBm1tZrI986lYYggTVd7z66wZtb7YLXOzHby00afoMLmbeQ23fTUGDTDQOHRkyXA==
+"@terascope/elasticsearch-api@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.2.1.tgz#d924cb08b4e9f21d2f7a04021dfed8645345a383"
+  integrity sha512-5RA7tkdqTTIoHqkckRncDfXIaptMwliFPn/6C8SGGz4bGBm6iZw6rL5sT22RnKH4GdLbKkUS1PtsGxTyUYEsoA==
   dependencies:
     "@terascope/utils" "^0.20.6"
     bluebird "^3.5.5"
@@ -30,10 +30,10 @@
   dependencies:
     lodash.get "^4.4.2"
 
-"@terascope/job-components@^0.23.9":
-  version "0.23.9"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.23.9.tgz#5a7d7f4161ae449484ba352828a8b66e561fc021"
-  integrity sha512-KEDXadoJW0NhCxCFHHjE+qR4jgNxeklidvtAFN/GX0cXp5Fl9ao+mF5JpYsz5Oh8YNMgWrlaSInRtuf58ON5Aw==
+"@terascope/job-components@^0.23.10":
+  version "0.23.10"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.23.10.tgz#5fed72df0cf9a9c88c2a63a6dfa88cec85f82749"
+  integrity sha512-M0hhyyPZOUtfco7Vl47VfjNR0kpwH8fFQDCX1KvvhBWgnnvcM2AZ2j2hWq+qH6AmAgIXrCFkv/vIP6hFoOH58g==
   dependencies:
     "@terascope/queue" "^1.1.7"
     "@terascope/utils" "^0.20.6"
@@ -46,13 +46,13 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.7.tgz#26cd3a42747ec802744f9b86c08034b0bbe07091"
   integrity sha512-foPas4K4rShs0RxtLNauC9ssXbzWvf5YzCa+6tJ9BAEk+PfjHJhi9bPDL6stXfcHroKtbet49dPwFbFIJJAOHw==
 
-"@terascope/teraslice-state-storage@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.8.0.tgz#1f2e52ed8626b75c8c67b1d38ad481048ae91b4e"
-  integrity sha512-PzJukC1fUZf1AUIrmshDC7tbQZ4Ccf28ghRcDY3ycLs5/rEEMSG5PdJXi2Sj9JlGkSQhzyz6iqDVoNK6C/vTcg==
+"@terascope/teraslice-state-storage@^0.8.1":
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.8.1.tgz#ecf1f3138d45af037a26fd9bfee0dcc07fea0851"
+  integrity sha512-1Z8vj3AF3PtVt1v8X+MOYDS75Z9tG3zCn0tW2p/Vt6a+E7S9bMOGvyByuCDSUCexho7alqG/Wx9SfBgnKw/FkQ==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.2.0"
-    "@terascope/utils" "^0.20.5"
+    "@terascope/elasticsearch-api" "^2.2.1"
+    "@terascope/utils" "^0.20.6"
     bluebird "^3.5.5"
     mnemonist "^0.30.0"
 
