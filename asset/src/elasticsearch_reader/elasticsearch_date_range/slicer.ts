@@ -1,10 +1,12 @@
 
-import { cloneDeep, toString } from '@terascope/job-components';
+import {
+    cloneDeep, toString, parseError, TSError
+} from '@terascope/job-components';
 import moment from 'moment';
-// @ts-ignore
-import parseError from '@terascope/error-parser';
 import idSlicer from '../../id_reader/id-slicer';
-import { SlicerArgs } from '../interfaces';
+import {
+    SlicerArgs, SlicerDateResults, DateConfig, ParsedInterval
+} from '../interfaces';
 import * as helpers from '../../helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
@@ -14,6 +16,14 @@ interface SliceResults {
     end: moment.Moment;
     count: number;
     key?: string;
+}
+
+interface DateParams {
+    start: moment.Moment;
+    end: moment.Moment;
+    limit: moment.Moment;
+    interval: ParsedInterval;
+    size: number;
 }
 
 export default function newSlicer(args: SlicerArgs) {
@@ -34,7 +44,7 @@ export default function newSlicer(args: SlicerArgs) {
     const dateFormat = timeResolution === 'ms' ? helpers.dateFormat : helpers.dateFormatSeconds;
     // This could be different since we have another op that uses this module
 
-    function splitTime(start: any, end: any, limit: any) {
+    function splitTime(start: moment.Moment, end: moment.Moment, limit: moment.Moment) {
         let diff = Math.floor(end.diff(start) / 2);
 
         if (moment(start).add(diff, 'ms').isAfter(limit)) {
@@ -50,8 +60,11 @@ export default function newSlicer(args: SlicerArgs) {
     }
 
     async function determineSlice(
-        dateParams: any, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
+        dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
     ): Promise<SliceResults> {
+        const intervalNum = dateParams.interval[0];
+        const intervalUnit = dateParams.interval[1];
+
         let count: number;
         try {
             count = await getCount(dateParams);
@@ -62,26 +75,24 @@ export default function newSlicer(args: SlicerArgs) {
             return Promise.reject(error);
         }
 
-        const intervalNum = dateParams.interval[0];
-        const intervalUnit = dateParams.interval[1];
         if (count > dateParams.size) {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
             // recurse down to the appropriate size
-                const cloneDates: any = {
-                    interval: dateParams.interval,
-                    limit: dateParams.limit
-                };
                 const newStart = moment(dateParams.end).subtract(intervalNum, intervalUnit);
-                cloneDates.start = newStart;
-
                 // get diff from new start
-                const diff = splitTime(cloneDates.start, dateParams.end, dateParams.limit);
-                cloneDates.end = moment(cloneDates.start).add(diff, timeResolution);
-                // return the zero range start with the correct end
+                const diff = splitTime(newStart, dateParams.end, dateParams.limit);
+                const newEnd = moment(newStart).add(diff, timeResolution);
+                const cloneDates: DateParams = {
+                    interval: dateParams.interval,
+                    limit: dateParams.limit,
+                    size: dateParams.size,
+                    start: newStart,
+                    end: newEnd,
+                };
 
                 const data: SliceResults = await determineSlice(cloneDates, slicerId, false);
-
+                // return the zero range start with the correct end
                 return {
                     start: dateParams.start,
                     end: data.end,
@@ -145,7 +156,9 @@ export default function newSlicer(args: SlicerArgs) {
                         // retries happen at the idSlicer level
                         const errMessage = parseError(err);
                         logger.error('error trying to subslice by key on getIdData:', errMessage);
-                        reject(errMessage);
+                        reject(new TSError(err, {
+                            reason: 'error trying to subslice by key'
+                        }));
                     });
             }
 
@@ -153,15 +166,19 @@ export default function newSlicer(args: SlicerArgs) {
         }));
     }
 
-    function makeKeyList(data: any) {
+    function makeKeyList(data: SliceResults) {
         const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
+        const range: SlicerDateResults = Object.assign(
+            data,
+            { start: data.start.format(), end: data.end.format() }
+        );
         const idSlicerArs: ESIDSlicerArgs = {
             context,
             opConfig: idConfig,
             executionConfig,
             logger,
             api,
-            range: data,
+            range,
             keySet: getKeyArray(opConfig)
         };
         const idSlicers = idSlicer(idSlicerArs);
@@ -169,39 +186,38 @@ export default function newSlicer(args: SlicerArgs) {
         return getIdData(idSlicers);
     }
 
-    async function getCount(dates: any, key?: string) {
+    async function getCount(dates: DateParams) {
         const end = dates.end ? dates.end : dates.limit;
         const range: any = {
             start: dates.start.format(dateFormat),
             end: end.format(dateFormat)
         };
-
-        if (key) {
-            range.key = key;
-        }
-
         const query = api.buildQuery(opConfig, range);
+
         return api.count(query);
     }
 
-    function nextChunk(dates: any, slicerId: number, retryDataObj: any) {
+    function nextChunk(dates: DateConfig, slicerId: number, retryDataObj: any) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
-
         const [intervalNum, intervalUnit] = opConfig.interval;
-        const dateParams: any = {};
-
-        dateParams.size = opConfig.size;
-        dateParams.interval = opConfig.interval;
-        dateParams.start = moment(dates.start);
+        const limit = moment(dates.end);
+        let start = moment(dates.start);
 
         if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
-            dateParams.start = moment(retryDataObj.lastSlice.end);
+            start = moment(retryDataObj.lastSlice.end);
         }
 
-        dateParams.limit = moment(dates.end);
-        dateParams.end = moment(dateParams.start.format(dateFormat)).add(intervalNum, intervalUnit);
-        if (dateParams.end.isSameOrAfter(dateParams.limit)) dateParams.end = dateParams.limit;
+        let end = moment(start.format(dateFormat)).add(intervalNum, intervalUnit);
+        if (end.isSameOrAfter(limit)) end = limit;
+
+        const dateParams: DateParams = {
+            size: opConfig.size,
+            interval: opConfig.interval,
+            start,
+            end,
+            limit
+        };
 
         logger.debug('all date configurations for date slicer', dateParams);
 
@@ -245,30 +261,39 @@ export default function newSlicer(args: SlicerArgs) {
         };
     }
 
-    function awaitChunk(slicerDates: any, slicerId: number) {
+    function awaitChunk(slicerDates: DateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
 
-        const dateParams: any = {};
-        dateParams.size = opConfig.size;
-        dateParams.start = moment(slicerDates.start);
-        dateParams.end = moment(slicerDates.end);
+        const start = moment(slicerDates.start);
+        const end = moment(slicerDates.end);
 
         const { delayTime, interval } = slicerDates;
+        const [step, unit] = interval as ParsedInterval;
         let startPoint = moment(slicerDates.start);
         let limit = moment(slicerDates.end);
         const dateArray: any[] = [];
 
+        const dateParams: DateParams = {
+            size: opConfig.size,
+            interval: opConfig.interval,
+            start,
+            end,
+            limit
+        };
+
         logger.debug('all date configurations for date slicer', dateParams);
 
         // set a timer to add the next set it should process
-        setInterval(() => {
+        const injector = setInterval(() => {
             // keep a list of next batches in cases current batch is still running
             dateArray.push({
-                startPoint: moment(startPoint).add(interval[0], interval[1]),
-                limit: moment(limit).add(interval[0], interval[1])
+                startPoint: moment(startPoint).add(step, unit),
+                limit: moment(limit).add(step, unit)
             });
-        }, delayTime);
+        }, delayTime as number);
+
+        events.on('worker:shutdown', () => clearInterval(injector));
 
         return async function sliceDate(msg: any) {
             if (dateParams.start.isSameOrAfter(limit)) {
@@ -279,8 +304,9 @@ export default function newSlicer(args: SlicerArgs) {
                     // make separate references to prevent mutating both at same time
                     dateParams.start = moment(newRange.startPoint);
                     dateParams.end = moment(newRange.limit);
+                } else {
+                    return null;
                 }
-                return null;
             }
             let data: any;
             try {
@@ -291,11 +317,11 @@ export default function newSlicer(args: SlicerArgs) {
             }
 
             dateParams.start = data.end;
-            if (moment(data.end).add(interval[0], interval[1]).isAfter(limit)) {
+            if (moment(data.end).add(step, unit).isAfter(limit)) {
                 // @ts-ignore
                 dateParams.end = moment(data.end).add(limit - data.end);
             } else {
-                dateParams.end = moment(data.end).add(interval[0], interval[1]);
+                dateParams.end = moment(data.end).add(step, unit);
             }
 
             if (shouldDivideByID && data.count >= threshold) {

@@ -20,6 +20,13 @@ import {
 } from '../helpers';
 import { ESReaderConfig, SlicerArgs } from './interfaces';
 
+interface DateSegments {
+    start: moment.Moment;
+    limit: moment.Moment;
+}
+
+type FetchDate = moment.Moment | null;
+
 export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
     api: elasticApi.Client;
     dateFormat: string;
@@ -45,7 +52,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         return finalDates;
     }
 
-    async getIndexDate(date: null | string, order: string) {
+    async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
         const sortObj = {};
         let givenDate: any = null;
         let query: any = null;
@@ -78,7 +85,8 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
 
         // using this query to catch potential errors even if a date is given already
         const results = await this.api.search(query);
-        const data = results[0];
+        const [data] = results;
+
         if (data == null) {
             this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.opConfig.index}`);
             return null;
@@ -102,7 +110,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         return parseDate(time.format(this.dateFormat));
     }
 
-    updateJob(dates: any, interval: any) {
+    updateJob(dates: DateSegments, interval: any) {
         const opName = this.opConfig._op;
         // this sends actual dates to execution context so that it can keep
         // track of them for recoveries
@@ -135,7 +143,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         return this.api.count(query);
     }
 
-    async getInterval(esDates: any) {
+    async getInterval(esDates: DateSegments) {
         if (this.opConfig.interval !== 'auto') {
             return processInterval(this.opConfig.time_resolution, this.opConfig.interval, esDates);
         }
@@ -179,19 +187,19 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             await this.api.version();
             const esDates = await this.getDates();
             // query with no results
-            if (esDates.start == null) {
+            if (esDates.start == null || esDates.limit == null) {
                 this.logger.warn(`No data was found in index: ${this.opConfig.index} using query: ${this.opConfig.query}`);
                 // slicer will run and complete when a null is returned
                 return async () => null;
             }
-            const interval = await this.getInterval(esDates);
+            const interval = await this.getInterval(esDates as DateSegments);
             const dateRange = divideRange(
                 esDates.start,
                 esDates.limit,
                 this.executionConfig.slicers,
                 this.dateFormat
             );
-            this.updateJob(esDates, interval);
+            this.updateJob(esDates as DateSegments, interval);
             // we set so auto is replaced with correct interval
             // mutation needs to be after the updateJob fn call
             slicerFnArgs.opConfig.interval = interval;

@@ -1,6 +1,6 @@
 
 import {
-    DataEntity, BatchProcessor, AnyObject, set
+    DataEntity, BatchProcessor, AnyObject, set, getValidDate
 } from '@terascope/job-components';
 import { IndexSelectorConfig } from './interfaces';
 
@@ -17,7 +17,7 @@ const offsets = {
 interface BulkMeta {
     _index: string;
     _type: string;
-    _id: string;
+    _id: string | number;
     retry_on_conflict: number;
 }
 
@@ -45,14 +45,9 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         const { date_field: dateField, timeseries } = this.opConfig;
         let end = 10;
 
-        // date check
-        let date;
-
-        try {
-            date = new Date(record[dateField as string]).toISOString();
-        } catch (err) {
-            throw new Error(`opConfig date field: ${dateField} either does not exists or is not a valid date on the records processed`);
-        }
+        const recordData = getValidDate(record[dateField as string]);
+        if (!recordData) throw new Error(`opConfig date field: ${dateField} either does not exists or is not a valid date on the records processed`);
+        let date = recordData.toISOString();
 
         if (timeseries && typeof timeseries === 'string') {
             if (timeseries === 'weekly') {
@@ -85,7 +80,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
             _type: this.opConfig.type
         };
 
-        if (this.opConfig.preserve_id) meta._id = DataEntity.getMetadata(record, '_key');
+        if (this.opConfig.preserve_id) meta._id = record.getKey();
         if (this.opConfig.id_field) meta._id = record[this.opConfig.id_field];
 
         if (this.opConfig.update || this.opConfig.upsert) {

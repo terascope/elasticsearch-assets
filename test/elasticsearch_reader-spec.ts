@@ -1,6 +1,7 @@
 
+import 'jest-extended';
 import {
-    TestContext, DataEntity, startsWith, get, pDelay
+    TestContext, DataEntity, get, pDelay, LifeCycle
 } from '@terascope/job-components';
 import path from 'path';
 import moment from 'moment';
@@ -29,7 +30,10 @@ describe('elasticsearch_reader', () => {
     });
 
     afterEach(async () => {
-        if (harness) await harness.shutdown();
+        if (harness) {
+            harness.events.emit('worker:shutdown');
+            await harness.shutdown();
+        }
     });
 
     async function makeFetcherTest(config: any) {
@@ -43,16 +47,27 @@ describe('elasticsearch_reader', () => {
         fn: (event?: any) => void;
     }
 
-    async function makeSlicerTest(
-        config: any, numOfSlicers = 1,
-        recoveryData?: object[],
-        eventHook?: EventHook
-    ) {
+    interface SlicerTestArgs {
+        opConfig: any;
+        numOfSlicers?: number;
+        recoveryData?: any;
+        eventHook?: EventHook;
+        lifecycle?: LifeCycle;
+    }
+
+    async function makeSlicerTest({
+        opConfig,
+        numOfSlicers = 1,
+        recoveryData,
+        eventHook,
+        lifecycle = 'once'
+    }: SlicerTestArgs) {
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
+            lifecycle,
             operations: [
-                config,
+                opConfig,
                 {
                     _op: 'noop'
                 }
@@ -169,7 +184,7 @@ describe('elasticsearch_reader', () => {
                 end: new Date().getTime()
             };
 
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const slicer = test.slicer();
 
             expect(slicer.slicers()).toEqual(1);
@@ -186,8 +201,8 @@ describe('elasticsearch_reader', () => {
                 start: new Date().getTime(),
                 end: new Date().getTime()
             };
-
-            const test = await makeSlicerTest(opConfig, 2);
+            const numOfSlicers = 2;
+            const test = await makeSlicerTest({ opConfig, numOfSlicers });
             const slicer = test.slicer();
 
             expect(slicer.slicers()).toEqual(2);
@@ -209,9 +224,9 @@ describe('elasticsearch_reader', () => {
             const errMsg = 'date_field_name: "date" for index: someindex does not exist';
 
             try {
-                await makeSlicerTest(opConfig);
+                await makeSlicerTest({ opConfig });
             } catch (err) {
-                expect(startsWith(err.message, errMsg)).toEqual(true);
+                expect(err.message).toStartWith(errMsg);
             }
         });
 
@@ -267,7 +282,12 @@ describe('elasticsearch_reader', () => {
 
             async function waitForUpdate(config: any, endDate?: any) {
                 defaultClient.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }]);
-                const test = await makeSlicerTest(config, 1, [], { event: 'slicer:execution:update', fn: checkUpdate });
+                const eventHook = { event: 'slicer:execution:update', fn: checkUpdate };
+                const test = await makeSlicerTest({
+                    opConfig: config,
+                    eventHook
+                });
+
                 await pDelay(30);
                 return test;
             }
@@ -315,7 +335,11 @@ describe('elasticsearch_reader', () => {
             };
 
             async function waitForUpdate(config: any) {
-                const test = await makeSlicerTest(config, 1, [], { event: 'slicer:execution:update', fn: checkUpdate });
+                const eventHook = { event: 'slicer:execution:update', fn: checkUpdate };
+                const test = await makeSlicerTest({
+                    opConfig: config,
+                    eventHook
+                });
                 await pDelay(100);
                 return test;
             }
@@ -339,7 +363,7 @@ describe('elasticsearch_reader', () => {
 
             // setting sequence data to an empty array to simulate a query with no results
             defaultClient.setSequenceData([]);
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const results = await test.createSlices();
 
             expect(results).toEqual([null]);
@@ -366,7 +390,7 @@ describe('elasticsearch_reader', () => {
                 { '@timestamp': laterDate },
             ]);
 
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const [results] = await test.createSlices();
 
             expect(results.start).toEqual(firstDate.format());
@@ -375,6 +399,37 @@ describe('elasticsearch_reader', () => {
 
             const [results2] = await test.createSlices();
             expect(results2).toEqual(null);
+        });
+
+
+        it('can run a persistent reader', async () => {
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                index: 'someindex',
+                interval: '100ms'
+            };
+
+            const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
+
+            const [results] = await test.createSlices();
+            expect(results).toBeDefined();
+            expect(results.start).toBeDefined();
+            expect(results.end).toBeDefined();
+            expect(results.count).toBeDefined();
+
+            const [results2] = await test.createSlices();
+            expect(results2).toEqual(null);
+
+            await pDelay(110);
+
+            const [results3] = await test.createSlices();
+            expect(results3).toBeDefined();
+            expect(results3.start).toBeDefined();
+            expect(results3.end).toBeDefined();
+            expect(results3.count).toBeDefined();
         });
 
         it('slicer can reduce date slices down to size', async () => {
@@ -409,7 +464,11 @@ describe('elasticsearch_reader', () => {
                 hasRecursed = true;
             }
 
-            const test = await makeSlicerTest(opConfig, 1, [], { event: 'slicer:slice:recursion', fn: hasRecursedEvent });
+            const eventHook = { event: 'slicer:slice:recursion', fn: hasRecursedEvent };
+            const test = await makeSlicerTest({
+                opConfig,
+                eventHook
+            });
 
             const [results] = await test.createSlices();
 
@@ -453,11 +512,17 @@ describe('elasticsearch_reader', () => {
             ]);
 
             let hasExpanded = false;
+
             function hasExpandedFn() {
                 hasExpanded = true;
             }
 
-            const test = await makeSlicerTest(opConfig, 1, [], { event: 'slicer:slice:range_expansion', fn: hasExpandedFn });
+            const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
+
+            const test = await makeSlicerTest({
+                opConfig,
+                eventHook
+            });
             const [results] = await test.createSlices();
 
             expect(results.start).toEqual(firstDate.format());
@@ -505,7 +570,11 @@ describe('elasticsearch_reader', () => {
                 hasExpanded = true;
             }
 
-            const test = await makeSlicerTest(opConfig, 1, [], { event: 'slicer:slice:range_expansion', fn: hasExpandedFn });
+            const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
+            const test = await makeSlicerTest({
+                opConfig,
+                eventHook
+            });
             const [results] = await test.createSlices();
 
             expect(results.start).toEqual(firstDate.format());
@@ -549,8 +618,8 @@ describe('elasticsearch_reader', () => {
             function hasExpandedFn() {
                 hasExpanded = true;
             }
-
-            const test = await makeSlicerTest(opConfig, 1, [], { event: 'slicer:slice:range_expansion', fn: hasExpandedFn });
+            const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
+            const test = await makeSlicerTest({ opConfig, eventHook });
             const [results] = await test.createSlices();
 
             expect(results.start).toEqual(firstDate.format());
@@ -603,7 +672,8 @@ describe('elasticsearch_reader', () => {
                 hasExpanded = true;
             }
 
-            const test = await makeSlicerTest(opConfig, 1, [], { event: 'slicer:slice:range_expansion', fn: hasExpandedFn });
+            const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
+            const test = await makeSlicerTest({ opConfig, eventHook });
             const [results] = await test.createSlices();
 
             expect(results.start).toEqual(firstDate.format());
@@ -650,7 +720,7 @@ describe('elasticsearch_reader', () => {
                 { '@timestamp': endDate, count: 100 },
             ]);
 
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const [resultsS] = await test.createSlices();
 
             expect(resultsS.start).toEqual(firstDateS.format());
@@ -682,7 +752,7 @@ describe('elasticsearch_reader', () => {
             ]);
 
             // Need to run them seperatly so they get a different client
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const [resultsMS] = await test.createSlices();
 
 
@@ -728,14 +798,14 @@ describe('elasticsearch_reader', () => {
                 { '@timestamp': endDate, count: 100 },
             ]);
 
-            const test = await makeSlicerTest(opConfig);
+            const test = await makeSlicerTest({ opConfig });
             const results = await test.createSlices();
 
             hexadecimal.forEach((char) => {
                 const subslice = results.find((s) => s.wildcard.value === `${char}*`);
                 expect(subslice).not.toBeUndefined();
-                expect(subslice!.start!.format() === firstDate.format()).toEqual(true);
-                expect(subslice!.end!.format() === closingDate.format()).toEqual(true);
+                expect(subslice!.start === firstDate.format()).toEqual(true);
+                expect(subslice!.end === closingDate.format()).toEqual(true);
             });
         });
     });

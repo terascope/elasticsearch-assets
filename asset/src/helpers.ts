@@ -1,12 +1,11 @@
-// @ts-ignore
-import parseError from '@terascope/error-parser';
-import { Logger, AnyObject } from '@terascope/job-components';
+
+import { Logger, AnyObject, parseError } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
-// @ts-ignore TODO: check for types
+// @ts-ignore
 import dateMath from 'datemath-parser';
 
-export function dateOptions(value: string) {
+export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
         year: 'y',
         years: 'y',

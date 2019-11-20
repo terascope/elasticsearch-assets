@@ -1,5 +1,6 @@
 
-import { DataEntity, startsWith } from '@terascope/job-components';
+import 'jest-extended';
+import { DataEntity } from '@terascope/job-components';
 import path from 'path';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 
@@ -39,7 +40,7 @@ describe('elasticsearch index selector', () => {
     });
 
     it('will throw if other config options are not present with timeseries', async () => {
-        expect.hasAssertions();
+        expect.assertions(3);
 
         const op1 = { _op: 'elasticsearch_index_selector', timeseries: 'daily' };
         const op2 = { _op: 'elasticsearch_index_selector', timeseries: 'daily', index_prefix: 'hello' };
@@ -54,13 +55,13 @@ describe('elasticsearch index selector', () => {
         try {
             await makeTest(op1);
         } catch (err) {
-            expect(startsWith(err.message, errMsg)).toEqual(true);
+            expect(err.message).toStartWith(errMsg);
         }
 
         try {
             await makeTest(op2);
         } catch (err) {
-            expect(startsWith(err.message, errMsg)).toEqual(true);
+            expect(err.message).toStartWith(errMsg);
         }
 
         const test = await makeTest(op3);
@@ -79,7 +80,7 @@ describe('elasticsearch index selector', () => {
             harness = WorkerTestHarness.testProcessor(opConfig, { assetDir, clients });
             await harness.initialize();
         } catch (err) {
-            expect(startsWith(err.message, errMsg)).toEqual(true);
+            expect(err.message).toStartWith(errMsg);
         }
     });
 

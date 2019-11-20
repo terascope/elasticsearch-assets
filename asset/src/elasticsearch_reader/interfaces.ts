@@ -6,6 +6,7 @@ import {
     Logger
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
+import moment from 'moment';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends OpConfig {
@@ -35,13 +36,22 @@ export interface ESReaderConfig extends OpConfig {
     connection: string;
 }
 
+export type ParsedInterval = [number, moment.unitOfTime.Base];
+
+export interface DateConfig {
+    start: string;
+    end: string;
+    interval?: ParsedInterval;
+    delayTime?: number;
+}
+
 export interface SlicerArgs {
     context: WorkerContext;
     opConfig: any;
     executionConfig: ExecutionConfig;
     retryData?: any;
     logger: Logger;
-    dates: any;
+    dates: DateConfig;
     id: number;
     api: elasticApi.Client;
 }

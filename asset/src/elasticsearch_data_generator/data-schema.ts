@@ -1,9 +1,9 @@
 
 import moment from 'moment';
-import { DataGenerator } from './interfaces';
+import { DataGenerator, DateOptions, IDType } from './interfaces';
 import { dateFormat } from '../helpers';
 
-function regexID(type: any) {
+function regexID(type: IDType) {
     const reg = { randexp: '' };
 
     if (type === 'base64url') {
@@ -16,6 +16,7 @@ function regexID(type: any) {
     if (type === 'HEXADECIMAL') {
         reg.randexp = '[0-9A-F]{8}';
     }
+
     return reg;
 }
 
@@ -34,7 +35,7 @@ function isoBetween(start: number, diff: number) {
 
 function utcBetween(start: number, diff: number) {
     // ex.   "2016-01-19T20:48:08.426Z"  , compare to isoBetween, same dates
-    return () => moment(start + (Math.random() * diff)).toISOString();
+    return () => new Date(start + (Math.random() * diff)).toISOString();
 }
 
 const formatOptions = {
@@ -76,12 +77,14 @@ interface FormatOptions {
     end?: number;
     diff?: number;
 }
-// TODO: use enum
-function getFormatFunction(format: string, options: FormatOptions = {}) {
+
+function getFormatFunction(format: DateOptions, options: FormatOptions = {}) {
     const { start, diff } = options;
-    if (format === 'isoBetween' || format === 'utcBetween') {
+
+    if (format === DateOptions.isoBetween || format === DateOptions.utcBetween) {
         return formatOptions[format](start as number, diff as number);
     }
+
     return formatOptions[format];
 }
 
