@@ -27,7 +27,6 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
                 .then((dataObj) => {
                     const results = [];
                     const data = dataObj.schema[0];
-                    // @ts-ignore TODO: review this
                     for (let i = 0; i < count; i += 1) {
                         results.push(data);
                     }

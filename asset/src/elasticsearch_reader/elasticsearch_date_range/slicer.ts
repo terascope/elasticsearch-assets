@@ -236,8 +236,7 @@ export default function newSlicer(args: SlicerArgs) {
             dateParams.start = data.end;
 
             if (moment(data.end).add(intervalNum, intervalUnit) > dateParams.limit) {
-                // @ts-ignore
-                dateParams.end = moment(data.end).add(dateParams.limit - data.end);
+                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end));
             } else {
                 dateParams.end = moment(data.end).add(intervalNum, intervalUnit);
             }
@@ -318,8 +317,7 @@ export default function newSlicer(args: SlicerArgs) {
 
             dateParams.start = data.end;
             if (moment(data.end).add(step, unit).isAfter(limit)) {
-                // @ts-ignore
-                dateParams.end = moment(data.end).add(limit - data.end);
+                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end));
             } else {
                 dateParams.end = moment(data.end).add(step, unit);
             }
