@@ -81,16 +81,16 @@ describe('elasticsearch_bulk', () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 50, multisend: false };
         const incData = [];
 
-        for (let i = 0; i < 120; i += 1) {
-            incData.push({ some: 'data' });
+        for (let i = 0; i < 51; i += 1) {
+            incData.push({ index: {} }, { some: 'data' });
         }
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(incData);
 
         expect(results.length).toEqual(2);
-        expect(results[0].body.length).toEqual(101);
-        expect(results[1].body.length).toEqual(19);
+        expect(results[0].body.length).toEqual(100);
+        expect(results[1].body.length).toEqual(2);
     });
 
     it('it splits the array up properly when there are delete operations (not a typical doubling of data)', async () => {

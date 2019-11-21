@@ -4,7 +4,8 @@ import {
     SlicerFn,
     getClient,
     WorkerContext,
-    ExecutionConfig
+    ExecutionConfig,
+    TSError
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import idSlicer from './id-slicer';
@@ -32,7 +33,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             : baseKeyArray.slice();
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            const error = new Error(`key_range specified for id_reader contains keys not found in: ${this.opConfig.key_type}`);
+            const error = new TSError(`key_range specified for id_reader contains keys not found in: ${this.opConfig.key_type}`);
             return Promise.reject(error);
         }
         const keySet = divideKeyArray(keyArray, this.executionConfig.slicers);

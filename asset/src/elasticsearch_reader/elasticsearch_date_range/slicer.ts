@@ -1,7 +1,5 @@
 
-import {
-    cloneDeep, toString, parseError, TSError
-} from '@terascope/job-components';
+import { cloneDeep, TSError } from '@terascope/job-components';
 import moment from 'moment';
 import idSlicer from '../../id_reader/id-slicer';
 import {
@@ -69,9 +67,7 @@ export default function newSlicer(args: SlicerArgs) {
         try {
             count = await getCount(dateParams);
         } catch (err) {
-            const errMessage = parseError(err);
-            logger.error('error with determine slice:', errMessage);
-            const error = new Error(`Failure to determine slice: ${toString(err)}`);
+            const error = new TSError(err, { reason: `Unable to count slice ${JSON.stringify(dateParams)}` });
             return Promise.reject(error);
         }
 
@@ -154,8 +150,6 @@ export default function newSlicer(args: SlicerArgs) {
                     })
                     .catch((err) => {
                         // retries happen at the idSlicer level
-                        const errMessage = parseError(err);
-                        logger.error('error trying to subslice by key on getIdData:', errMessage);
                         reject(new TSError(err, {
                             reason: 'error trying to subslice by key'
                         }));
@@ -245,11 +239,7 @@ export default function newSlicer(args: SlicerArgs) {
                 logger.debug('date slicer is recursing by keylist');
                 return Promise.resolve(makeKeyList(data))
                     .then((results) => results)
-                    .catch((err) => {
-                        const errMsg = parseError(err);
-                        logger.error('error while subslicing by key', errMsg);
-                        return Promise.reject(err);
-                    });
+                    .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
             }
 
             return {
@@ -326,11 +316,7 @@ export default function newSlicer(args: SlicerArgs) {
                 logger.debug('date slicer is recursing by keylist');
                 return Promise.resolve(makeKeyList(data))
                     .then((results) => results)
-                    .catch((err) => {
-                        const errMsg = parseError(err);
-                        logger.error('error while subslicing by key', errMsg);
-                        return Promise.reject(err);
-                    });
+                    .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
             }
 
             return {

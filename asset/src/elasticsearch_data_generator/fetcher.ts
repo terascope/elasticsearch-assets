@@ -1,6 +1,6 @@
 
 import {
-    Fetcher, WorkerContext, ExecutionConfig, toString
+    Fetcher, WorkerContext, ExecutionConfig, TSError
 } from '@terascope/job-components';
 import mocker from 'mocker-data-generator';
 import path from 'path';
@@ -32,14 +32,14 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
                     }
                     return results;
                 })
-                .catch((err) => Promise.reject(new Error(`could not generate data error: ${toString(err)}`)));
+                .catch((err) => Promise.reject(new TSError(err, { reason: 'could not generate mocked data' })));
         }
 
         return mocker()
             .schema('schema', this.dataSchema, count)
             .build()
             .then((dataObj) => dataObj.schema)
-            .catch((err) => Promise.reject(new Error(`could not generate data error: ${toString(err)}`)));
+            .catch((err) => Promise.reject(new TSError(err, { reason: 'could not generate mocked data' })));
     }
 }
 
@@ -57,8 +57,8 @@ function parsedSchema(opConfig: DataGenerator) {
                 dataSchema = require(nextPath);
             }
             return dataSchema;
-        } catch (e) {
-            throw new Error(`Could not retrieve code for: ${opConfig}\n${e}`);
+        } catch (err) {
+            throw new TSError(err, { reason: `Could not retrieve code for: ${opConfig._op}` });
         }
     } else {
         return defaultSchema(opConfig, dataSchema);

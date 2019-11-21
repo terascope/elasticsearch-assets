@@ -1,5 +1,5 @@
 
-import { parseError, TSError } from '@terascope/job-components';
+import { TSError } from '@terascope/job-components';
 import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
 import { getKeyArray } from './helpers';
 import { retryModule } from '../helpers';
@@ -120,10 +120,8 @@ export default function newSlicer(args: ESIDSlicerArgs) {
                 closePath = true;
                 return results;
             } catch (err) {
-                const errMessage = parseError(err);
-                logger.error('id_slicer errored while making slice', errMessage);
                 const error = new TSError(err, {
-                    reason: 'Failure to make slice'
+                    reason: 'Failure to make slice for id_slicer'
                 });
                 return Promise.reject(error);
             }

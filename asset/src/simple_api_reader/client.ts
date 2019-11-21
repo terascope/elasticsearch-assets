@@ -47,7 +47,7 @@ export default class ApiClient {
     }
 
     async apiSearch(queryConfig: any) {
-        const { logger, opConfig } = this;
+        const { opConfig } = this;
         const fields = get(queryConfig, '_source', null);
         const dateFieldName = this.opConfig.date_field_name;
         // put in the dateFieldName into fields so date reader can work
@@ -173,8 +173,7 @@ export default class ApiClient {
                 }
             });
         } catch (err) {
-            logger.error(`error while calling endpoint ${uri}, error: ${err.message}`);
-            return Promise.reject(err);
+            return Promise.reject(new TSError(err, { reason: `error while calling endpoint ${uri}` }));
         }
     }
 

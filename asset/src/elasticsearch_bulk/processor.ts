@@ -9,7 +9,8 @@ import {
     ExecutionConfig,
     AnyObject,
     has,
-    flatten
+    flatten,
+    TSError
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
 
@@ -62,7 +63,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
     private _createClient(config: AnyObject = this.opConfig) {
         const client = getClient(this.context, config, 'elasticsearch');
-        if (client == null) throw new Error(`could not find elasticsearch client for connection: ${this.opConfig.connection}`);
+        if (client == null) throw new TSError(`could not find elasticsearch client for connection: ${this.opConfig.connection}`);
         return elasticApi(client, this.logger, this.opConfig);
     }
 
@@ -109,7 +110,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
                     this.logger.error(`elasticsearch_bulk: invalid connection selector extracted from key: ${realMeta._id}`);
                 }
             } else {
-                throw new Error('elasticsearch_bulk: multisend is set but records do not have _id in the bulk request input.');
+                throw new TSError('elasticsearch_bulk: multisend is set but records do not have _id in the bulk request input.');
             }
 
             i += 1; // skip over the metadata
@@ -157,7 +158,7 @@ function extractMeta(meta: AnyObject) {
     if (meta.update) return meta.update;
     if (meta.delete) return meta.delete;
 
-    throw new Error('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
+    throw new TSError('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
 }
 
 // TODO: splicing has bad performance, need to refactor this

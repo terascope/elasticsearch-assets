@@ -340,7 +340,7 @@ describe('simple_api_reader', () => {
                 date_field_name: 'created',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: testIndex,
                 interval: 'auto',
                 start: start.toISOString(),
                 end: end.toISOString(),
@@ -361,20 +361,20 @@ describe('simple_api_reader', () => {
             }
 
             beforeEach(async () => {
-                scope.get(/.*/)
+                scope.get(new RegExp(testIndex))
                     .reply(200, {
                         results: [{ created: start.toISOString() }],
                         total: 1
                     });
 
-                scope.get(/.*/)
+                scope.get(new RegExp(testIndex))
                     .query(true)
                     .reply(200, {
                         results: [{ created: end.toISOString() }],
                         total: 1
                     });
 
-                scope.get(/.*/)
+                scope.get(new RegExp(testIndex))
                     .query(true)
                     .reply(200, {
                         results: [{ created: end.toISOString() }],

@@ -1,6 +1,6 @@
 
 import {
-    ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig
+    ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig, TSError
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -87,7 +87,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         }
 
         if (data[this.opConfig.date_field_name] == null) {
-            throw new Error(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist, data: ${JSON.stringify(data)}, results: ${JSON.stringify(results)}`);
+            throw new TSError(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist`);
         }
 
         if (givenDate) {

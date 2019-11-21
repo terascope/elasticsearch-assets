@@ -157,11 +157,9 @@ describe('elasticsearch_reader', () => {
                 date_field_name: 'created'
             };
 
-            try {
-                await makeFetcherTest(Object.assign({}, testOpConfig, badOP));
-            } catch (err) {
-                expect(err.message).toEqual(errorString);
-            }
+            await expect(makeFetcherTest(Object.assign({}, testOpConfig, badOP)))
+                .rejects
+                .toThrowError(errorString);
 
             const goodOp = await makeFetcherTest(Object.assign({}, testOpConfig, goodOP));
             expect(goodOp).toBeDefined();

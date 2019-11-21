@@ -1,6 +1,11 @@
 
 import {
-    DataEntity, BatchProcessor, AnyObject, set, getValidDate
+    DataEntity,
+    BatchProcessor,
+    AnyObject,
+    set,
+    getValidDate,
+    TSError
 } from '@terascope/job-components';
 import { IndexSelectorConfig } from './interfaces';
 
@@ -46,7 +51,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         let end = 10;
 
         const recordData = getValidDate(record[dateField as string]);
-        if (!recordData) throw new Error(`opConfig date field: ${dateField} either does not exists or is not a valid date on the records processed`);
+        if (!recordData) throw new TSError(`opConfig date field: ${dateField} either does not exists or is not a valid date on the records processed`);
         let date = recordData.toISOString();
 
         if (timeseries && typeof timeseries === 'string') {

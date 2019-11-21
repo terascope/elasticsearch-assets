@@ -4,11 +4,12 @@ import {
     SlicerFn,
     getClient,
     WorkerContext,
-    ExecutionConfig
+    ExecutionConfig,
+    TSError
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
-import DateSlicerFn from './elasticsearch_date_range/slicer';
+import dateSlicerFn from './elasticsearch_date_range/slicer';
 import {
     processInterval,
     dateFormat,
@@ -93,7 +94,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         }
 
         if (data[this.opConfig.date_field_name] == null) {
-            throw new Error(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist, data: ${JSON.stringify(data)}, results: ${JSON.stringify(results)}`);
+            throw new TSError(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist}`);
         }
 
         if (givenDate) {
@@ -209,7 +210,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 slicerFnArgs.retryData = this.recoveryData[id];
             }
         }
-        // @ts-ignore
-        return DateSlicerFn(slicerFnArgs as SlicerArgs);
+
+        return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;
     }
 }
