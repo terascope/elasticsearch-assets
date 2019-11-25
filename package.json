@@ -21,7 +21,7 @@
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
     "dependencies": {
-        "@terascope/eslint-config": "^0.1.7"
+        "@terascope/eslint-config": "^0.1.8"
     },
     "devDependencies": {
         "@terascope/job-components": "^0.23.10",
