@@ -16,6 +16,7 @@ export default class ESReader extends Fetcher<ESReaderConfig> {
     }
 
     async fetch(slice: SliceRequest) {
+        this.logger.info('slice', { slice });
         return this.esDateFetcher.fetch(slice);
     }
 }

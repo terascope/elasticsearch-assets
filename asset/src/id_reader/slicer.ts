@@ -25,6 +25,11 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         this.api = elasticApi(client, this.logger, this.opConfig);
     }
 
+    isRecoverable() {
+        if (this.executionConfig.lifecycle === 'once') return true;
+        return false;
+    }
+
     async newSlicer(id: number): Promise<SlicerFn> {
         const baseKeyArray = getKeyArray(this.opConfig);
         // we slice as not to mutate for when this is called again

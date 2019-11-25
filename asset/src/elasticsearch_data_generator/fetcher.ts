@@ -17,7 +17,7 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     }
     // TODO: is this right type here?
     async fetch(slice?: any) {
-        const { count } = slice;
+        const count = typeof slice === 'number' ? slice : slice.count;
         if (slice == null) return [];
 
         if (this.opConfig.stress_test) {

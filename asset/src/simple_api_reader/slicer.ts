@@ -163,6 +163,11 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         return [millisecondInterval, 'ms'];
     }
 
+    isRecoverable() {
+        if (this.executionConfig.lifecycle === 'once') return true;
+        return false;
+    }
+
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
         const retryData = this.recoveryData[id];

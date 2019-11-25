@@ -28,6 +28,11 @@ export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
         return 'QUEUE_MINIMUM_SIZE';
     }
 
+    isRecoverable() {
+        if (this.executionConfig.lifecycle === 'once') return true;
+        return false;
+    }
+
     async slice() {
         return this.countHandle();
     }

@@ -56,11 +56,22 @@ describe('elasticsearch_data_generator', () => {
     }
 
     describe('fetcher', () => {
-        it('newReader returns a function that produces generated data', async () => {
+        it('returns a function that produces generated data', async () => {
             const opConfig = { _op: 'elasticsearch_data_generator' };
 
             const test = await makeFetcherTest(opConfig);
             const results = await test.runSlice({ count: 1 });
+
+            expect(results.length).toEqual(1);
+            expect(Object.keys(results[0]).length).toBeGreaterThan(1);
+        });
+
+        it('is backward compatable', async () => {
+            const opConfig = { _op: 'elasticsearch_data_generator' };
+
+            const test = await makeFetcherTest(opConfig);
+            // @ts-ignore
+            const results = await test.runSlice(1);
 
             expect(results.length).toEqual(1);
             expect(Object.keys(results[0]).length).toBeGreaterThan(1);
