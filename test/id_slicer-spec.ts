@@ -41,7 +41,11 @@ describe('id_reader', () => {
         return harness;
     }
 
-    async function makeSlicerTest(config: any, numOfSlicers = 1, recoveryData?: SlicerRecoveryData[]) {
+    async function makeSlicerTest(
+        config: any,
+        numOfSlicers = 1,
+        recoveryData?: SlicerRecoveryData[]
+    ) {
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
