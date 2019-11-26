@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 
+import { SlicerRecoveryData } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
 import MockClient from './mock_client';
@@ -36,7 +37,7 @@ describe('elasticsearch_data_generator', () => {
     async function makeSlicerTest(
         config: any,
         numOfSlicers = 1,
-        recoveryData?: object[],
+        recoveryData?: SlicerRecoveryData[],
         size?: number
     ) {
         const job = newTestJobConfig({

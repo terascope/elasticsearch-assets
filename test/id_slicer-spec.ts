@@ -1,6 +1,6 @@
 
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, DataEntity } from '@terascope/job-components';
+import { AnyObject, DataEntity, SlicerRecoveryData } from '@terascope/job-components';
 import path from 'path';
 import MockClient from './mock_client';
 import Schema from '../asset/src/id_reader/schema';
@@ -41,7 +41,7 @@ describe('id_reader', () => {
         return harness;
     }
 
-    async function makeSlicerTest(config: any, numOfSlicers = 1, recoveryData?: object[]) {
+    async function makeSlicerTest(config: any, numOfSlicers = 1, recoveryData?: SlicerRecoveryData[]) {
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,

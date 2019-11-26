@@ -4,7 +4,7 @@ import nock from 'nock';
 import path from 'path';
 import moment from 'moment';
 import {
-    newTestJobConfig, debugLogger, get, pDelay
+    newTestJobConfig, debugLogger, get, pDelay, SlicerRecoveryData
 } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
 import ApiMockedClient from '../asset/src/simple_api_reader/client';
@@ -316,7 +316,7 @@ describe('simple_api_reader', () => {
 
             async function makeSlicerTest(
                 config: any, numOfSlicers = 1,
-                recoveryData?: object[],
+                recoveryData?: SlicerRecoveryData[],
                 eventHook?: EventHook
             ) {
                 const job = newTestJobConfig({
