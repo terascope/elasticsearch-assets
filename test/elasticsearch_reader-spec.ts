@@ -408,7 +408,8 @@ describe('elasticsearch_reader', () => {
                 time_resolution: 's',
                 size: 100,
                 index: 'someindex',
-                interval: '100ms'
+                interval: '100ms',
+                delay: '3s'
             };
 
             const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
@@ -429,6 +430,64 @@ describe('elasticsearch_reader', () => {
             expect(results3.start).toBeDefined();
             expect(results3.end).toBeDefined();
             expect(results3.count).toBeDefined();
+
+            const [results4] = await test.createSlices();
+            expect(results4).toEqual(null);
+        });
+
+        it('persistent reader will work correctly when no data is present', async () => {
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                index: 'someindex',
+                interval: '100ms',
+                delay: '3s'
+            };
+            // we do this to simulate no return data
+            defaultClient.setSequenceData([]);
+            const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
+
+            const [results] = await test.createSlices();
+            expect(results).toBeDefined();
+            expect(results.start).toBeDefined();
+            expect(results.end).toBeDefined();
+            expect(results.count).toBeDefined();
+
+            const [results2] = await test.createSlices();
+            expect(results2).toEqual(null);
+
+            const [results3] = await test.createSlices();
+            expect(results3).toEqual(null);
+
+            await pDelay(110);
+
+            const [results4] = await test.createSlices();
+            expect(results4).toBeDefined();
+            expect(results4.start).toBeDefined();
+            expect(results4.end).toBeDefined();
+            expect(results4.count).toBeDefined();
+
+            const [results5] = await test.createSlices();
+            expect(results5).toEqual(null);
+
+            const [results6] = await test.createSlices();
+            expect(results6).toEqual(null);
+
+            await pDelay(110);
+
+            const [results7] = await test.createSlices();
+            expect(results7).toBeDefined();
+            expect(results7.start).toBeDefined();
+            expect(results7.end).toBeDefined();
+            expect(results7.count).toBeDefined();
+
+            const [results8] = await test.createSlices();
+            expect(results8).toEqual(null);
+
+            const [results9] = await test.createSlices();
+            expect(results9).toEqual(null);
         });
 
         it('slicer can reduce date slices down to size', async () => {
