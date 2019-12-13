@@ -1,4 +1,3 @@
-
 import { OpConfig } from '@terascope/job-components';
 
 export enum DateOptions {

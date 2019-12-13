@@ -1,4 +1,3 @@
-
 import { Fetcher, SliceRequest, getClient } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import { ESReaderConfig } from './interfaces';

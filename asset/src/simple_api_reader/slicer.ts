@@ -1,4 +1,3 @@
-
 import {
     ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig, TSError
 } from '@terascope/job-components';
@@ -140,11 +139,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
 
     async getInterval(esDates: any) {
         if (this.opConfig.interval !== 'auto') {
-            return Promise.resolve(processInterval(
-                this.opConfig.time_resolution,
-                this.opConfig.interval,
-                esDates
-            ));
+            return processInterval(this.opConfig.interval, this.opConfig.time_resolution, esDates);
         }
 
         const count = await this.getCount(esDates);
@@ -164,13 +159,11 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
     }
 
     isRecoverable() {
-        if (this.executionConfig.lifecycle === 'once') return true;
-        return false;
+        return true;
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
-        const retryData = this.recoveryData[id];
         const slicerFnArgs: Partial<SlicerArgs> = {
             context: this.context,
             opConfig: this.opConfig,
@@ -180,6 +173,12 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
             api: this.api
         };
 
+        await this.api.version();
+
+        if (this.recoveryData && this.recoveryData.length > 0) {
+            slicerFnArgs.retryData = this.recoveryData[id];
+        }
+
         if (isPersistent) {
             const dataIntervals = getTimes(
                 this.opConfig,
@@ -188,7 +187,6 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
             );
             slicerFnArgs.dates = dataIntervals[id];
         } else {
-            await this.api.version();
             const esDates = await this.getDates();
             // query with no results
             if (esDates.start == null) {
@@ -197,7 +195,6 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
                 return async () => null;
             }
             const interval = await this.getInterval(esDates);
-
             const dateRange = divideRange(
                 esDates.start,
                 esDates.limit,
@@ -208,7 +205,6 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
             // we set so auto is replaced with correct interval
             slicerFnArgs.opConfig.interval = interval;
             slicerFnArgs.dates = dateRange[id];
-            slicerFnArgs.retryData = retryData;
         }
 
         // @ts-ignore

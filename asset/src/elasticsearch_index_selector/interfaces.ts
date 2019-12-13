@@ -1,4 +1,3 @@
-
 import { AnyObject } from '@terascope/job-components';
 
 export interface IndexSelectorConfig {

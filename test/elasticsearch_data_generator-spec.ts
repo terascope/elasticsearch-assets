@@ -80,7 +80,7 @@ describe('elasticsearch_data_generator', () => {
     });
 
     describe('slicer', () => {
-        it('in "once" mode will return number based off total size of last op ', async () => {
+        it('in "once" mode will return number based off total size of last op', async () => {
             const opConfig = { _op: 'elasticsearch_data_generator', size: 15 };
             const test = await makeSlicerTest(opConfig, 1, [], 5);
 

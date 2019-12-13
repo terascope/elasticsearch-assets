@@ -1,4 +1,3 @@
-
 import 'jest-extended';
 import nock from 'nock';
 import path from 'path';
@@ -353,7 +352,6 @@ describe('simple_api_reader', () => {
                 await pDelay(100);
                 return test;
             }
-
 
             function checkUpdate(updateObj: any) {
                 updatedConfig = get(updateObj, 'update[0]');

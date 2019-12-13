@@ -1,4 +1,3 @@
-
 import { SliceRequest, AnyObject, DataEntity } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 

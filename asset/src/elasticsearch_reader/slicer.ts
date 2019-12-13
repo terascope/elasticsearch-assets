@@ -1,4 +1,3 @@
-
 import {
     ParallelSlicer,
     SlicerFn,
@@ -146,7 +145,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
 
     async getInterval(esDates: DateSegments) {
         if (this.opConfig.interval !== 'auto') {
-            return processInterval(this.opConfig.time_resolution, this.opConfig.interval, esDates);
+            return processInterval(this.opConfig.interval, this.opConfig.time_resolution, esDates);
         }
 
         const count = await this.getCount(esDates);
@@ -166,13 +165,11 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
     }
 
     isRecoverable() {
-        if (this.executionConfig.lifecycle === 'once') return true;
-        return false;
+        return true;
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
-
         const slicerFnArgs: Partial<SlicerArgs> = {
             context: this.context,
             opConfig: this.opConfig,
@@ -182,6 +179,12 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             api: this.api
         };
 
+        await this.api.version();
+
+        if (this.recoveryData && this.recoveryData.length > 0) {
+            slicerFnArgs.retryData = this.recoveryData[id];
+        }
+
         if (isPersistent) {
             const dataIntervals = getTimes(
                 this.opConfig,
@@ -190,7 +193,6 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             );
             slicerFnArgs.dates = dataIntervals[id];
         } else {
-            await this.api.version();
             const esDates = await this.getDates();
             // query with no results
             if (esDates.start == null || esDates.limit == null) {
@@ -210,10 +212,6 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             // mutation needs to be after the updateJob fn call
             slicerFnArgs.opConfig.interval = interval;
             slicerFnArgs.dates = dateRange[id];
-
-            if (this.recoveryData && this.recoveryData.length > 0) {
-                slicerFnArgs.retryData = this.recoveryData[id];
-            }
         }
 
         return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;

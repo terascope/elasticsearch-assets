@@ -1,4 +1,3 @@
-
 import moment from 'moment';
 import { DataGenerator, DateOptions, IDType } from './interfaces';
 import { dateFormat } from '../helpers';

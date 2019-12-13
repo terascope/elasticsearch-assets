@@ -1,4 +1,3 @@
-
 import {
     OpConfig,
     WorkerContext,
@@ -24,7 +23,7 @@ export interface ESReaderConfig extends OpConfig {
     subslice_by_key: boolean;
     subslice_key_threshold: number;
     key_type: IDType;
-    time_resolution: string;
+    time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
     geo_box_top_left?: string;
     geo_box_bottom_right?: string;

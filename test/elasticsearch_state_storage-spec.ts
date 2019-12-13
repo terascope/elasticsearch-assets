@@ -1,4 +1,3 @@
-
 import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { DataEntity, AnyObject } from '@terascope/job-components';

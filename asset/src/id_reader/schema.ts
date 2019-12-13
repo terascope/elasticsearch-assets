@@ -1,4 +1,3 @@
-
 import {
     ConvictSchema, isString, ValidatedJobConfig, getOpConfig
 } from '@terascope/job-components';

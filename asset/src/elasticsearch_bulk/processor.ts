@@ -1,4 +1,3 @@
-
 import Promise from 'bluebird';
 import elasticApi from '@terascope/elasticsearch-api';
 import {

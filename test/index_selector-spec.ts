@@ -1,4 +1,3 @@
-
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import path from 'path';

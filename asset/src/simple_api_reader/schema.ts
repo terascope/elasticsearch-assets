@@ -1,4 +1,3 @@
-
 import { ConvictSchema } from '@terascope/job-components';
 import ReaderSchema from '../elasticsearch_reader/schema';
 import { ApiConfig } from './interfaces';

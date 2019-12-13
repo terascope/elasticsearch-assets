@@ -1,4 +1,3 @@
-
 import { CounterResults } from './interfaces';
 
 export default class Counter {

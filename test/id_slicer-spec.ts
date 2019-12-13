@@ -1,4 +1,3 @@
-
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject, DataEntity, SlicerRecoveryData } from '@terascope/job-components';
 import path from 'path';
@@ -162,7 +161,7 @@ describe('id_reader', () => {
             expect(slice3).toEqual([null]);
         });
 
-        it('it produces values starting at a specific depth', async () => {
+        it('produces values starting at a specific depth', async () => {
             const opConfig = {
                 _op: 'id_reader',
                 key_type: 'hexadecimal',
@@ -185,7 +184,7 @@ describe('id_reader', () => {
             expect(slice3).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a02*' } });
         });
 
-        it('it produces values even with an initial search error', async () => {
+        it('produces values even with an initial search error', async () => {
             const opConfig = {
                 _op: 'id_reader',
                 field: 'someField',

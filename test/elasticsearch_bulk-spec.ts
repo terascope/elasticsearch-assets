@@ -1,4 +1,3 @@
-
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { startsWith, cloneDeep, isPlainObject } from '@terascope/job-components';
 import path from 'path';
@@ -75,7 +74,7 @@ describe('elasticsearch_bulk', () => {
         expect(results[0].body.length).toEqual(100);
     });
 
-    it('it does split if the size is greater than 2 * size in opConfig', async () => {
+    it('does split if the size is greater than 2 * size in opConfig', async () => {
         // usually each doc is paired with metadata, thus doubling the size of incoming array,
         // hence we double size
         const opConfig = { _op: 'elasticsearch_bulk', size: 50, multisend: false };
@@ -93,7 +92,7 @@ describe('elasticsearch_bulk', () => {
         expect(results[1].body.length).toEqual(2);
     });
 
-    it('it splits the array up properly when there are delete operations (not a typical doubling of data)', async () => {
+    it('splits the array up properly when there are delete operations (not a typical doubling of data)', async () => {
         const opConfig = { _op: 'elasticsearch_bulk', size: 2, multisend: false };
         const incData = [{ create: {} }, { some: 'data' }, { update: {} }, { other: 'data' }, { delete: {} }, { index: {} }, { final: 'data' }];
         const copy = cloneDeep(incData);
@@ -106,7 +105,7 @@ describe('elasticsearch_bulk', () => {
         expect(results[1].body).toEqual(copy.slice(5));
     });
 
-    it('multisend will send based off of _id ', async () => {
+    it('multisend will send based off of _id', async () => {
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -145,8 +144,7 @@ describe('elasticsearch_bulk', () => {
         }
     });
 
-
-    it('it can multisend to several places', async () => {
+    it('can multisend to several places', async () => {
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -169,7 +167,7 @@ describe('elasticsearch_bulk', () => {
         expect(results[1].body).toEqual(copy.slice(4));
     });
 
-    it('multisend_index_append will change outgoing _id ', async () => {
+    it('multisend_index_append will change outgoing _id', async () => {
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,

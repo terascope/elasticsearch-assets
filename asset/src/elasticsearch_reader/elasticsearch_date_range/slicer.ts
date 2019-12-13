@@ -1,4 +1,3 @@
-
 import { cloneDeep, TSError } from '@terascope/job-components';
 import moment from 'moment';
 import idSlicer from '../../id_reader/id-slicer';
@@ -250,12 +249,16 @@ export default function newSlicer(args: SlicerArgs) {
         };
     }
 
-    function awaitChunk(slicerDates: DateConfig, slicerId: number) {
+    function awaitChunk(slicerDates: DateConfig, slicerId: number, retryDataObj: any) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
 
-        const start = moment(slicerDates.start);
+        let start = moment(slicerDates.start);
         const end = moment(slicerDates.end);
+
+        if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
+            start = moment(retryDataObj.lastSlice.end);
+        }
 
         const { delayTime, interval } = slicerDates;
         const [step, unit] = interval as ParsedInterval;
@@ -328,7 +331,7 @@ export default function newSlicer(args: SlicerArgs) {
     }
 
     if (executionConfig.lifecycle === 'persistent') {
-        return awaitChunk(sliceDates, id);
+        return awaitChunk(sliceDates, id, retryData);
     }
 
     return nextChunk(sliceDates, id, retryData);

@@ -1,4 +1,3 @@
-
 import {
     Slicer, WorkerContext, ExecutionConfig
 } from '@terascope/job-components';

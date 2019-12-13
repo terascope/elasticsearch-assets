@@ -1,4 +1,3 @@
-
 import { Fetcher, SliceRequest } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import ESDateFetcher from '../elasticsearch_reader/elasticsearch_date_range/reader';

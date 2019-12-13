@@ -1,4 +1,3 @@
-
 import { Logger, TSError, get } from '@terascope/job-components';
 import got from 'got';
 import { ApiConfig } from './interfaces';
@@ -176,7 +175,6 @@ export default class ApiClient {
             return Promise.reject(new TSError(err, { reason: `error while calling endpoint ${uri}` }));
         }
     }
-
 
     search(queryConfig: any) {
         return this.apiSearch(queryConfig);

@@ -1,4 +1,3 @@
-
 import {
     ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber,
 } from '@terascope/job-components';
@@ -26,6 +25,10 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
         if (job.lifecycle === 'persistent') {
             if (opConfig.interval === 'auto') {
+                throw new Error('interval for reader must be manually set while job is in persistent mode');
+            }
+
+            if (opConfig.delay === 'auto') {
                 throw new Error('interval for reader must be manually set while job is in persistent mode');
             }
         }
@@ -246,7 +249,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         };
     }
 }
-
 
 function geoPointValidation(point: string | null) {
     if (point) {

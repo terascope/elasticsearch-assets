@@ -1,4 +1,3 @@
-
 import 'jest-extended';
 import {
     TestContext, DataEntity, get, pDelay, LifeCycle
@@ -9,7 +8,7 @@ import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslic
 import MockClient from './mock_client';
 import Schema from '../asset/src/elasticsearch_reader/schema';
 import { IDType } from '../asset/src/id_reader/interfaces';
-import { dateFormatSeconds } from '../asset/src/helpers';
+import { dateFormatSeconds, dateFormat } from '../asset/src/helpers';
 
 describe('elasticsearch_reader', () => {
     const assetDir = path.join(__dirname, '..');
@@ -400,15 +399,15 @@ describe('elasticsearch_reader', () => {
             expect(results2).toEqual(null);
         });
 
-
         it('can run a persistent reader', async () => {
             const opConfig = {
                 _op: 'elasticsearch_reader',
                 date_field_name: '@timestamp',
-                time_resolution: 's',
+                time_resolution: 'ms',
                 size: 100,
                 index: 'someindex',
-                interval: '100ms'
+                interval: '100ms',
+                delay: '2000ms'
             };
 
             const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
@@ -418,6 +417,8 @@ describe('elasticsearch_reader', () => {
             expect(results.start).toBeDefined();
             expect(results.end).toBeDefined();
             expect(results.count).toBeDefined();
+            const now1 = moment();
+            expect(moment(results.end).isBetween(moment(now1).subtract(2, 'm'), now1)).toEqual(true);
 
             const [results2] = await test.createSlices();
             expect(results2).toEqual(null);
@@ -429,6 +430,8 @@ describe('elasticsearch_reader', () => {
             expect(results3.start).toBeDefined();
             expect(results3.end).toBeDefined();
             expect(results3.count).toBeDefined();
+            const now2 = moment();
+            expect(moment(results.end).isBetween(moment(now2).subtract(2, 'm'), now2)).toEqual(true);
         });
 
         it('slicer can reduce date slices down to size', async () => {
@@ -665,7 +668,6 @@ describe('elasticsearch_reader', () => {
                 { count: 100 }
             ]);
 
-
             let hasExpanded = false;
             function hasExpandedFn() {
                 hasExpanded = true;
@@ -753,7 +755,6 @@ describe('elasticsearch_reader', () => {
             // Need to run them seperatly so they get a different client
             const test = await makeSlicerTest({ opConfig });
             const [resultsMS] = await test.createSlices();
-
 
             const startMsIsSame = moment(resultsMS.start).isSame(moment(firstDateMS));
             const endMsIsSame = moment(resultsMS.end).isSame(moment(closingDateMS));
@@ -850,7 +851,6 @@ describe('elasticsearch_reader', () => {
             expect(results2).toEqual(null);
         });
 
-
         it('multiple slicers can enter recovery and return to the last slice state', async () => {
             const firstDate = moment();
             const firstMiddleDate = moment(firstDate).add(5, 'm');
@@ -910,6 +910,41 @@ describe('elasticsearch_reader', () => {
             const [resultsSlicer3, resultsSlicer4] = await test.createSlices();
             expect(resultsSlicer3).toEqual(null);
             expect(resultsSlicer4).toEqual(null);
+        });
+
+        it('slicer can enter recovery and return to the last slice state in persistent mode', async () => {
+            const delay: [number, moment.unitOfTime.Base] = [30, 's'];
+            const currentDate = moment();
+            const startDate = moment(currentDate).subtract(10, 'm');
+            const middleDate = moment(currentDate).subtract(5, 'm');
+            // end is delayed by setting
+            const endingData = moment(currentDate).subtract(delay[0], delay[1]);
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                index: 'someindex',
+                interval: '5m',
+                delay: delay.join('')
+            };
+
+            const recoveryData = [
+                {
+                    lastSlice: {
+                        start: startDate.format(dateFormatSeconds),
+                        end: middleDate.format(dateFormatSeconds),
+                        count: 2445
+                    }
+                }
+            ];
+
+            const test = await makeSlicerTest({ opConfig, recoveryData, lifecycle: 'persistent' });
+
+            const [{ start, end }] = await test.createSlices();
+            expect(start).toEqual(middleDate.format(dateFormatSeconds));
+            expect(end).toEqual(endingData.format(dateFormatSeconds));
         });
     });
 

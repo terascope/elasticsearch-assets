@@ -1,4 +1,3 @@
-
 import { Logger, AnyObject, parseError } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
@@ -48,22 +47,24 @@ export function dateOptions(value: string): moment.unitOfTime.Base {
     throw new Error(`the time descriptor of "${value}" for the interval is malformed`);
 }
 
-export function processInterval(timeResolution: string, str: string, esDates?: any) {
-    if (!moment(new Date(str)).isValid()) {
-        // one or more digits, followed by one or more letters, case-insensitive
-        const regex = /(\d+)(\D+)/i;
-        const interval = regex.exec(str);
-        if (interval === null) {
-            throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
-        }
+export function processInterval(
+    interval: string,
+    timeResolution: moment.unitOfTime.Base,
+    esDates?: any
+) {
+    // one or more digits, followed by one or more letters, case-insensitive
+    const regex = /(\d+)(\D+)/i;
+    const intervalMatch = regex.exec(interval);
 
-        // dont need first parameter, its the full string
-        interval.shift();
-        interval[1] = dateOptions(interval[1]);
-        return compareInterval(interval, esDates, timeResolution);
+    if (intervalMatch === null) {
+        throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
     }
 
-    throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
+    // dont need first parameter, its the full string
+    intervalMatch.shift();
+
+    intervalMatch[1] = dateOptions(intervalMatch[1]);
+    return compareInterval(intervalMatch, esDates, timeResolution);
 }
 
 function compareInterval(interval: any, esDates: any, timeResolution: string) {
@@ -81,7 +82,6 @@ function compareInterval(interval: any, esDates: any, timeResolution: string) {
 
     return interval;
 }
-
 
 // "2016-01-19T13:33:09.356-07:00"
 export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
@@ -171,8 +171,8 @@ export function divideRange(start: any, end: any, numOfSlicers: number, dateForm
 }
 
 export function getTimes(opConfig: AnyObject, numOfSlicers: number, dateFormatting: string) {
-    const end = processInterval(opConfig.time_resolution, opConfig.interval);
-    const delayInterval = processInterval(opConfig.time_resolution, opConfig.delay);
+    const end = processInterval(opConfig.interval, opConfig.time_resolution,);
+    const delayInterval = processInterval(opConfig.delay, opConfig.time_resolution);
     const delayTime = getMilliseconds(end);
     const delayedEnd = moment().subtract(
         delayInterval[0],
