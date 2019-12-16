@@ -230,7 +230,7 @@ export default function newSlicer(args: SlicerArgs) {
             dateParams.start = data.end;
 
             if (moment(data.end).add(intervalNum, intervalUnit) > dateParams.limit) {
-                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end));
+                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
             } else {
                 dateParams.end = moment(data.end).add(intervalNum, intervalUnit);
             }
@@ -253,51 +253,36 @@ export default function newSlicer(args: SlicerArgs) {
     function awaitChunk(slicerDates: DateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
+        const { delayTime, interval } = slicerDates;
+        const [step, unit] = interval as ParsedInterval;
 
         const start = moment(slicerDates.start);
         const end = moment(slicerDates.end);
-
-        const { delayTime, interval } = slicerDates;
-        const [step, unit] = interval as ParsedInterval;
-        let startPoint = moment(slicerDates.start);
         let limit = moment(slicerDates.end);
-        const dateArray: any[] = [];
 
         const dateParams: DateParams = {
             size: opConfig.size,
-            interval: opConfig.interval,
+            interval: interval as ParsedInterval,
             start,
             end,
             limit
         };
 
-        logger.debug('all date configurations for date slicer', dateParams);
-
         // set a timer to add the next set it should process
         const injector = setInterval(() => {
             // keep a list of next batches in cases current batch is still running
-            dateArray.push({
-                startPoint: moment(startPoint).add(step, unit),
-                limit: moment(limit).add(step, unit)
-            });
+            const newLimit = moment(limit).add(step, unit);
+            dateParams.limit = newLimit;
+            dateParams.end = newLimit;
+            limit = newLimit;
         }, delayTime as number);
 
         events.on('worker:shutdown', () => clearInterval(injector));
 
         return async function sliceDate(msg: any) {
-            if (dateParams.start.isSameOrAfter(limit)) {
-                // all done processing current chunk range, check for next range
-                if (dateArray.length > 0) {
-                    const newRange = dateArray.shift();
-                    ({ startPoint, limit } = newRange);
-                    // make separate references to prevent mutating both at same time
-                    dateParams.start = moment(newRange.startPoint);
-                    dateParams.end = moment(newRange.limit);
-                } else {
-                    return null;
-                }
-            }
-            let data: any;
+            if (dateParams.start.isSameOrAfter(limit)) return null;
+            let data: SliceResults;
+
             try {
                 data = await determineSlice(dateParams, slicerId, false);
             } catch (err) {
@@ -306,8 +291,9 @@ export default function newSlicer(args: SlicerArgs) {
             }
 
             dateParams.start = data.end;
+
             if (moment(data.end).add(step, unit).isAfter(limit)) {
-                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end));
+                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
             } else {
                 dateParams.end = moment(data.end).add(step, unit);
             }
