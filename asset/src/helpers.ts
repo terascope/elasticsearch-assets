@@ -150,6 +150,7 @@ export function parseDate(date: string) {
 
 export function divideRange(start: any, end: any, numOfSlicers: number, dateFormatting: string) {
     const results = [];
+    // 'x' is Unix Millisecond Timestamp format
     const startNum = Number(moment(start).format('x'));
     const endNum = Number(moment(end).format('x'));
     const range = (endNum - startNum) / numOfSlicers;
@@ -159,7 +160,7 @@ export function divideRange(start: any, end: any, numOfSlicers: number, dateForm
     for (let i = 0; i < numOfSlicers; i += 1) {
         const rangeObj = {
             start: step.format(dateFormatting),
-            end: step.add(range).format(dateFormatting)
+            end: step.add(range, 'ms').format(dateFormatting)
         };
         results.push(rangeObj);
     }
