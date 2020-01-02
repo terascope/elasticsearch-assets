@@ -15,12 +15,12 @@
     defer-to-connect "^1.0.1"
 
 "@terascope/elasticsearch-api@^2.2.2":
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.2.2.tgz#9d22c2ded3147dffbfdde22c5b20f46b9f52a497"
-  integrity sha512-W4Bqu9e2x0JUEGniXyR4jS8cS/qqrvfz4H/T3PT8yfP/RBP+GDwvCCBoxTS5dBO42UJ2Akxe6vuCP8zPFbOx9g==
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.3.0.tgz#bb890246d98c210e8b33231b15dd9aa317b14844"
+  integrity sha512-EcG/8ljBKwdYuPQzd1GcwHez1pJsVHGRCHScDhf7GCDojK4BfXz6s9hrJ2IqclOzLrQeHXcfLe+h3G1SbRfZqg==
   dependencies:
-    "@terascope/utils" "^0.20.7"
-    bluebird "^3.5.5"
+    "@terascope/utils" "^0.21.0"
+    bluebird "^3.7.2"
     lodash "^4.17.11"
 
 "@terascope/error-parser@^1.0.1":
@@ -70,7 +70,21 @@
     lodash.set "^4.3.2"
     lodash.unset "^4.5.2"
 
-bluebird@^3.5.5:
+"@terascope/utils@^0.21.0":
+  version "0.21.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.21.0.tgz#1e2c7effbfec62d10479805a7b89340630caae96"
+  integrity sha512-sHl+yM0w0WWc89A5R0BjOA0d9j39IsKWwvUmcErzdkdVwibI9mLMDv9Mdqr811ylsFWK25Gtuw5HRveDF+FCmg==
+  dependencies:
+    debug "^4.1.1"
+    is-plain-object "^3.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.2"
+    lodash.clonedeep "^4.5.0"
+    lodash.get "^4.4.2"
+    lodash.set "^4.3.2"
+    lodash.unset "^4.5.2"
+
+bluebird@^3.5.5, bluebird@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
