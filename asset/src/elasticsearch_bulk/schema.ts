@@ -6,7 +6,7 @@ import { BulkSender } from './interfaces';
 export default class Schema extends ConvictSchema<BulkSender> {
     validateJob(job: ValidatedJobConfig) {
         const opConfig = getOpConfig(job, 'elasticsearch_bulk');
-        if (opConfig == null) throw new Error('could not find elasticsearch_bulk operation in jobConfig');
+        if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
         const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
@@ -15,7 +15,7 @@ export default class Schema extends ConvictSchema<BulkSender> {
         if (opConfig.multisend) {
             for (const [, value] of Object.entries(opConfig.connection_map)) {
                 if (!elasticConnectors[value]) {
-                    throw new Error(`elasticsearch_bulk connection_map specifies a connection for [${value}] but is not found in the system configuration [terafoundation.connectors.elasticsearch]`);
+                    throw new Error(`A connection for [${value}] was set on the elasticsearch_bulk connection_map but is not found in the system configuration [terafoundation.connectors.elasticsearch]`);
                 }
             }
         }
@@ -29,9 +29,9 @@ export default class Schema extends ConvictSchema<BulkSender> {
                 default: 500,
                 format(val: any) {
                     if (isNaN(val)) {
-                        throw new Error('size parameter for elasticsearch_bulk must be a number');
+                        throw new Error('Invalid size parameter for elasticsearch_bulk opConfig, it must be a number');
                     } else if (val <= 0) {
-                        throw new Error('size parameter for elasticsearch_bulk must be greater than zero');
+                        throw new Error('Invalid size parameter for elasticsearch_bulk, it must be greater than zero');
                     }
                 }
             },

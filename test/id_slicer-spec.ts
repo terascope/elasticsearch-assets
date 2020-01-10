@@ -238,7 +238,7 @@ describe('id_reader', () => {
             expect(slices2).toEqual([null, null]);
         });
 
-        it('key range gets divided up by number of slicers', async () => {
+        it('key range gets divided up by number of slicers by size', async () => {
             const newSequence = [
                 { _shards: { failed: 0 }, hits: { total: 100 } },
                 { _shards: { failed: 0 }, hits: { total: 500 } },
@@ -276,7 +276,7 @@ describe('id_reader', () => {
         });
 
         it('can return to previous position', async () => {
-            const retryData = [{ lastSlice: { key: 'events-#a6*' } }];
+            const retryData = [{ lastSlice: { key: 'events-#a6*' }, slicer_id: 0 }];
             const opConfig = {
                 _op: 'id_reader',
                 field: 'someField',

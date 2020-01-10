@@ -6,7 +6,7 @@ import { ESIDReaderConfig, IDType } from './interfaces';
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig) {
         const opConfig = getOpConfig(job, 'id_reader');
-        if (opConfig == null) throw new Error('could not find elasticsearch_reader operation in jobConfig');
+        if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
         if (opConfig.key_range && job.slicers > opConfig.key_range.length) {
             throw new Error('The number of slicers specified on the job cannot be more the length of key_range');
@@ -38,9 +38,9 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 default: 10000,
                 format(val: any) {
                     if (isNaN(val)) {
-                        throw new Error('size parameter for id_reader must be a number');
+                        throw new Error('Invalid size parameter, must be a number');
                     } else if (val <= 0) {
-                        throw new Error('size parameter for id_reader must be greater than zero');
+                        throw new Error('Invalid size parameter, must be greater than zero');
                     }
                 }
             },
@@ -65,7 +65,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 format(val: any) {
                     if (val) {
                         if (!Array.isArray(val) && val.length === 0) {
-                            throw new Error('key_range for id_reader must be an array with length > 0');
+                            throw new Error('Invalid key_range parameter, must be an array with length > 0');
                         }
                     }
                 }
@@ -76,9 +76,9 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 format(val: any) {
                     if (val) {
                         if (isNaN(val)) {
-                            throw new Error('starting_key_depth parameter for id_reader must be a number');
+                            throw new Error('Invalid starting_key_depth parameter, must be a number');
                         } else if (val <= 0) {
-                            throw new Error('starting_key_depth parameter for id_reader must be greater than zero');
+                            throw new Error('Invalid starting_key_depth parameter, must be greater than zero');
                         }
                     }
                 }
@@ -97,7 +97,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                         throw new Error('Fields parameter must be an array');
                     }
                     if (!val.every(isString)) {
-                        throw new Error('the values listed in the fields array must be of type string');
+                        throw new Error('Invalid fields parameter, the values listed in the fields array must be of type string');
                     }
                 }
             },

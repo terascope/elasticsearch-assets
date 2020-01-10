@@ -62,7 +62,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
     private _createClient(config: AnyObject = this.opConfig) {
         const client = getClient(this.context, config, 'elasticsearch');
-        if (client == null) throw new TSError(`could not find elasticsearch client for connection: ${this.opConfig.connection}`);
+        if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${this.opConfig.connection}`);
         return elasticApi(client, this.logger, this.opConfig);
     }
 
@@ -106,10 +106,10 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
                         this.bulkContexts['*'].data.push(record);
                     }
                 } else {
-                    this.logger.error(`elasticsearch_bulk: invalid connection selector extracted from key: ${realMeta._id}`);
+                    this.logger.error(`Invalid connection selector extracted from key: ${realMeta._id}`);
                 }
             } else {
-                throw new TSError('elasticsearch_bulk: multisend is set but records do not have _id in the bulk request input.');
+                throw new TSError('Input records must have _id metadata on them if elasticsearch_bulk: multisend parameter is set.');
             }
 
             i += 1; // skip over the metadata

@@ -1,6 +1,6 @@
 import 'jest-extended';
 import {
-    TestContext, DataEntity, get, pDelay, LifeCycle
+    TestContext, DataEntity, get, pDelay, LifeCycle, SlicerRecoveryData
 } from '@terascope/job-components';
 import path from 'path';
 import moment from 'moment';
@@ -50,7 +50,7 @@ describe('elasticsearch_reader', () => {
     interface SlicerTestArgs {
         opConfig: any;
         numOfSlicers?: number;
-        recoveryData?: any;
+        recoveryData?: SlicerRecoveryData[];
         eventHook?: EventHook;
         lifecycle?: LifeCycle;
     }
@@ -126,19 +126,19 @@ describe('elasticsearch_reader', () => {
             expect(() => validGeoDistance(null)).not.toThrowError();
             expect(() => geoSortOrder(null)).not.toThrowError();
             // @ts-ignore
-            expect(() => geoPointValidation(19.1234)).toThrowError('parameter must be a string IF specified');
+            expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
             expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
-            expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('latitude parameter is incorrect, was given 190.1234, should be >= -90 and <= 90');
-            expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('longitutde parameter is incorrect, was given 185.2134, should be >= -180 and <= 180');
+            expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
+            expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitutde parameter, was given 185.2134, should be >= -180 and <= 180');
             expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
             // @ts-ignore
-            expect(() => validGeoDistance(19.1234)).toThrowError('parameter must be a string IF specified');
-            expect(() => validGeoDistance(' ')).toThrowError('geo_distance paramter is formatted incorrectly');
-            expect(() => validGeoDistance('200something')).toThrowError('unit type did not have a proper unit of measuerment (ie m, km, yd, ft)');
+            expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
+            expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
+            expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');
             expect(() => validGeoDistance('200km')).not.toThrowError();
 
-            expect(() => geoSortOrder(1234)).toThrowError('parameter must be a string IF specified');
-            expect(() => geoSortOrder('hello')).toThrowError('if geo_sort_order is specified it must be either "asc" or "desc"');
+            expect(() => geoSortOrder(1234)).toThrowError('Invalid geo_sort_order parameter, must be a string IF specified');
+            expect(() => geoSortOrder('hello')).toThrowError('If geo_sort_order is specified it must be either "asc" or "desc"');
             expect(() => geoSortOrder('asc')).not.toThrowError();
         });
 
@@ -219,7 +219,7 @@ describe('elasticsearch_reader', () => {
                 start: '2015-08-25T00:00:00',
                 end: '2015-08-25T00:02:00'
             };
-            const errMsg = 'date_field_name: "date" for index: someindex does not exist';
+            const errMsg = 'Invalid date_field_name: "date" for index: someindex, field does not exist on record';
 
             try {
                 await makeSlicerTest({ opConfig });
@@ -891,7 +891,8 @@ describe('elasticsearch_reader', () => {
                         start: middleDate.format(dateFormatSeconds),
                         end: endDate.format(dateFormatSeconds),
                         count: 2445
-                    }
+                    },
+                    slicer_id: 0
                 }
             ];
 
@@ -934,14 +935,16 @@ describe('elasticsearch_reader', () => {
                         start: firstDate.format(dateFormatSeconds),
                         end: firstMiddleDate.format(dateFormatSeconds),
                         count: 2445
-                    }
+                    },
+                    slicer_id: 0
                 },
                 {
                     lastSlice: {
                         start: firstFinalDate.format(dateFormatSeconds),
                         end: secondMiddleDate.format(dateFormatSeconds),
                         count: 2445
-                    }
+                    },
+                    slicer_id: 1
                 }
             ];
 
@@ -995,7 +998,8 @@ describe('elasticsearch_reader', () => {
                         start: startDate.format(dateFormatSeconds),
                         end: middleDate.format(dateFormatSeconds),
                         count: 2445
-                    }
+                    },
+                    slicer_id: 0
                 }
             ];
 

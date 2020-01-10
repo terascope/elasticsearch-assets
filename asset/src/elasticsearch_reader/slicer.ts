@@ -93,7 +93,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         }
 
         if (data[this.opConfig.date_field_name] == null) {
-            throw new TSError(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist}`);
+            throw new TSError(`Invalid date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index}, field does not exist on record`);
         }
 
         if (givenDate) {
@@ -125,6 +125,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             const updatedOpConfig = Object.assign({}, this.opConfig, update, { interval });
             operations[opIndex] = updatedOpConfig;
             this.events.emit('slicer:execution:update', { update: operations });
+            // context.apis.executionContext.setMetadata(key, value): Promise<void>
         }
     }
 

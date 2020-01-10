@@ -86,7 +86,7 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         }
 
         if (data[this.opConfig.date_field_name] == null) {
-            throw new TSError(`date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index} does not exist`);
+            throw new TSError(`Invalid date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index}, field was not found on record`);
         }
 
         if (givenDate) {

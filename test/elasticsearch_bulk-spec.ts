@@ -1,5 +1,5 @@
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { startsWith, cloneDeep, isPlainObject } from '@terascope/job-components';
+import { cloneDeep, isPlainObject } from '@terascope/job-components';
 import path from 'path';
 import MockClient from './mock_client';
 
@@ -127,7 +127,6 @@ describe('elasticsearch_bulk', () => {
     });
 
     it('will throw if connection_map values do not exists in connector config', async () => {
-        expect.hasAssertions();
         const opConfig = {
             _op: 'elasticsearch_bulk',
             size: 5,
@@ -136,12 +135,9 @@ describe('elasticsearch_bulk', () => {
                 a: 'NotInConnector'
             }
         };
-        const errMsg = 'elasticsearch_bulk connection_map specifies a connection for';
-        try {
-            await makeTest(opConfig);
-        } catch (err) {
-            expect(startsWith(err.message, errMsg)).toEqual(true);
-        }
+        const errMsg = 'A connection for [NotInConnector] was set on the elasticsearch_bulk connection_map but is not found in the system configuration [terafoundation.connectors.elasticsearch]';
+
+        await expect(makeTest(opConfig)).rejects.toThrowError(errMsg);
     });
 
     it('can multisend to several places', async () => {
