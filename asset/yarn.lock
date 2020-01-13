@@ -14,12 +14,12 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.2.2", "@terascope/elasticsearch-api@^2.3.0":
-  version "2.3.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.3.0.tgz#bb890246d98c210e8b33231b15dd9aa317b14844"
-  integrity sha512-EcG/8ljBKwdYuPQzd1GcwHez1pJsVHGRCHScDhf7GCDojK4BfXz6s9hrJ2IqclOzLrQeHXcfLe+h3G1SbRfZqg==
+"@terascope/elasticsearch-api@^2.2.2", "@terascope/elasticsearch-api@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.4.0.tgz#77845ab4bad57eff5783dbbc5c6038fb3db93386"
+  integrity sha512-apKCX3CyH+hGC/dEnUNDpBA0oCxFvPI4XxGOai5+qUlEVAN6+KJw+Onxge9asStYDGtCYeMAGKB02PBcjUIHaA==
   dependencies:
-    "@terascope/utils" "^0.21.0"
+    "@terascope/utils" "^0.22.0"
     bluebird "^3.7.2"
     lodash "^4.17.11"
 
@@ -46,15 +46,15 @@
   resolved "https://registry.yarnpkg.com/@terascope/queue/-/queue-1.1.7.tgz#26cd3a42747ec802744f9b86c08034b0bbe07091"
   integrity sha512-foPas4K4rShs0RxtLNauC9ssXbzWvf5YzCa+6tJ9BAEk+PfjHJhi9bPDL6stXfcHroKtbet49dPwFbFIJJAOHw==
 
-"@terascope/teraslice-state-storage@^0.9.0":
-  version "0.9.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.9.0.tgz#fdbee5e3e3079499b8d47a25fa54e2ffef078e45"
-  integrity sha512-wMBpW5pa1BYS07bC6NQMOG/IC4HZdMna+Hm1aUBPCwjhSeY2097Hb2qLALKP8wdOev+mxxKMWl2ZCIbg1VfWzw==
+"@terascope/teraslice-state-storage@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.10.0.tgz#5b83396f0f17099a7fd1ccc6e23c8a0d3c8cda0b"
+  integrity sha512-ITvNnt1SCh8GMB9q1825KHxOCo2h+vKZNhBQn9Iq3TnjL2/Qb+KuReZTxdm7GfOURGfY8hLM6uteGASFbsxHnQ==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.3.0"
-    "@terascope/utils" "^0.21.0"
+    "@terascope/elasticsearch-api" "^2.4.0"
+    "@terascope/utils" "^0.22.0"
     bluebird "^3.7.2"
-    mnemonist "^0.31.3"
+    mnemonist "^0.32.0"
 
 "@terascope/utils@^0.20.7":
   version "0.20.7"
@@ -70,10 +70,10 @@
     lodash.set "^4.3.2"
     lodash.unset "^4.5.2"
 
-"@terascope/utils@^0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.21.0.tgz#1e2c7effbfec62d10479805a7b89340630caae96"
-  integrity sha512-sHl+yM0w0WWc89A5R0BjOA0d9j39IsKWwvUmcErzdkdVwibI9mLMDv9Mdqr811ylsFWK25Gtuw5HRveDF+FCmg==
+"@terascope/utils@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.22.0.tgz#ce65b2659dbe23bf8ce6a5a1b114211ad9cd420f"
+  integrity sha512-jjB5Lr/ISKzC9TmgEnMpFU42YDHViRjqWu7WzXidVKk6oIq4hxv1kCW/G+xnzSx21yMev40yE2X2NFyQi1z1Hw==
   dependencies:
     debug "^4.1.1"
     is-plain-object "^3.0.0"
@@ -324,10 +324,10 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.0.tgz#a35008b20f41383eec1fb914f4cd5df79a264284"
   integrity sha1-o1AIsg9BOD7sH7kU9M1d95omQoQ=
 
-mnemonist@^0.31.3:
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.31.3.tgz#bb2857ad8c00891c23684af67d7ad39676780178"
-  integrity sha512-COyTIeUNrltQ5e08mxkJmzagJF6c6vwYl2dI6DtsH8qtutFEgoIsJ/jqXtS57M52DreGKVtOusINzDRk2r3YMA==
+mnemonist@^0.32.0:
+  version "0.32.0"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.32.0.tgz#2c6d1dd12cb69ca2ed79a636ba9ffe5a6e9f2573"
+  integrity sha512-WMVGPpT8guWwnsnw+WibOvInBnPfXFG+9SD+mg2+YgPEuW9Gdz9D2MEi05ko6RG1ui0RHljc+yYAvOHQn3GbbQ==
   dependencies:
     obliterator "^1.5.0"
 
