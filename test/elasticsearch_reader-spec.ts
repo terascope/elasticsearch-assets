@@ -1,6 +1,6 @@
 import 'jest-extended';
 import {
-    TestContext, DataEntity, get, pDelay, LifeCycle, SlicerRecoveryData
+    TestContext, DataEntity, pDelay, LifeCycle, SlicerRecoveryData,
 } from '@terascope/job-components';
 import path from 'path';
 import moment from 'moment';
@@ -42,6 +42,11 @@ describe('elasticsearch_reader', () => {
         return harness;
     }
 
+    async function getMeta(test: SlicerTestHarness) {
+        // @ts-ignore
+        return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
+    }
+
     interface EventHook {
         event: string;
         fn: (event?: any) => void;
@@ -71,7 +76,7 @@ describe('elasticsearch_reader', () => {
                 {
                     _op: 'noop'
                 }
-            ]
+            ],
         });
         harness = new SlicerTestHarness(job, { assetDir, clients });
         if (eventHook) harness.events.on(eventHook.event, eventHook.fn);
@@ -231,12 +236,6 @@ describe('elasticsearch_reader', () => {
         it('slicers will emit updated operations for start and end', async () => {
             const firstDate = moment();
             const laterDate = moment(firstDate).add(5, 'm');
-            let updatedConfig: any;
-
-            function checkUpdate(updateObj: any) {
-                updatedConfig = get(updateObj, 'update[0]');
-                return true;
-            }
 
             const opConfig = {
                 _op: 'elasticsearch_reader',
@@ -280,46 +279,52 @@ describe('elasticsearch_reader', () => {
 
             async function waitForUpdate(config: any, endDate?: any) {
                 defaultClient.setSequenceData([{ '@timestamp': firstDate }, { '@timestamp': endDate || laterDate }]);
-                const eventHook = { event: 'slicer:execution:update', fn: checkUpdate };
-                const test = await makeSlicerTest({
-                    opConfig: config,
-                    eventHook
-                });
 
-                await pDelay(30);
-                return test;
+                return makeSlicerTest({
+                    opConfig: config,
+                });
             }
 
             const test1 = await waitForUpdate(opConfig, firstDate);
-            expect(updatedConfig.start).toEqual(firstDate.format());
-            expect(updatedConfig.end).toEqual(moment(firstDate).add(1, 's').format());
+            const update1 = await getMeta(test1);
+
+            expect(update1.start).toEqual(firstDate.format());
+            expect(update1.end).toEqual(moment(firstDate).add(1, 's').format());
+            expect(update1.interval).toEqual([1, 's']);
+
             await test1.shutdown();
 
             const test2 = await waitForUpdate(opConfig2);
-            expect(updatedConfig.start).toEqual(firstDate.format());
-            expect(updatedConfig.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            const update2 = await getMeta(test2);
+
+            expect(update2.start).toEqual(firstDate.format());
+            expect(update2.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            expect(update1.interval).toEqual([1, 's']);
+
             await test2.shutdown();
 
             const test3 = await waitForUpdate(opConfig3);
-            expect(updatedConfig.start).toEqual(firstDate.format());
-            expect(updatedConfig.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            const update3 = await getMeta(test3);
+
+            expect(update3.start).toEqual(firstDate.format());
+            expect(update3.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            expect(update1.interval).toEqual([1, 's']);
+
             await test3.shutdown();
 
             const test4 = await waitForUpdate(opConfig4);
-            expect(updatedConfig.start).toEqual(firstDate.format());
-            expect(updatedConfig.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            const update4 = await getMeta(test4);
+
+            expect(update4.start).toEqual(firstDate.format());
+            expect(update4.end).toEqual(moment(firstDate).add(5, 'm').add(1, 's').format());
+            expect(update1.interval).toEqual([1, 's']);
+
             await test4.shutdown();
         });
 
         it('will convert auto to proper interval and update the opConfig', async () => {
             const firstDate = moment();
             const laterDate = moment(firstDate).add(5, 'm');
-            let updatedConfig: any;
-
-            function checkUpdate(updateObj: any) {
-                updatedConfig = get(updateObj, 'update[0]');
-                return true;
-            }
 
             const opConfig = {
                 _op: 'elasticsearch_reader',
@@ -333,18 +338,17 @@ describe('elasticsearch_reader', () => {
             };
 
             async function waitForUpdate(config: any) {
-                const eventHook = { event: 'slicer:execution:update', fn: checkUpdate };
                 const test = await makeSlicerTest({
                     opConfig: config,
-                    eventHook
                 });
                 await pDelay(100);
                 return test;
             }
 
             const test = await waitForUpdate(opConfig);
+            const update = await getMeta(test);
 
-            expect(updatedConfig.interval).toEqual([301, 's']);
+            expect(update.interval).toEqual([301, 's']);
             await test.shutdown();
         });
 

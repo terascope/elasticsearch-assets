@@ -13,7 +13,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig) {
         const { logger } = this.context;
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
-        if (opConfig == null) throw new Error('could not find elasticsearch_reader operation in jobConfig');
+        if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
         if (opConfig.subslice_by_key) {
             if (!opConfig.field) {

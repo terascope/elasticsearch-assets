@@ -4,7 +4,8 @@ import {
     getClient,
     WorkerContext,
     ExecutionConfig,
-    TSError
+    TSError,
+    AnyObject
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -110,23 +111,8 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         return parseDate(time.format(this.dateFormat));
     }
 
-    updateJob(dates: DateSegments, interval: any) {
-        const opName = this.opConfig._op;
-        // this sends actual dates to execution context so that it can keep
-        // track of them for recoveries
-        if (!this.opConfig.start || !this.opConfig.end || this.opConfig.interval === 'auto') {
-            const { operations } = this.executionConfig;
-            const opIndex = operations.findIndex((config) => config._op === opName);
-            const update = {
-                start: dates.start.format(this.dateFormat),
-                end: dates.limit.format(this.dateFormat)
-            };
-
-            const updatedOpConfig = Object.assign({}, this.opConfig, update, { interval });
-            operations[opIndex] = updatedOpConfig;
-            this.events.emit('slicer:execution:update', { update: operations });
-            // context.apis.executionContext.setMetadata(key, value): Promise<void>
-        }
+    async updateJob(data: AnyObject) {
+        return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
     }
 
     async getCount(dates: any, key?: string) {
@@ -208,7 +194,13 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 this.executionConfig.slicers,
                 this.dateFormat
             );
-            this.updateJob(esDates as DateSegments, interval);
+
+            await this.updateJob({
+                start: esDates.start.format(this.dateFormat),
+                end: esDates.limit.format(this.dateFormat),
+                interval
+            });
+
             // we set so auto is replaced with correct interval
             // mutation needs to be after the updateJob fn call
             slicerFnArgs.opConfig.interval = interval;

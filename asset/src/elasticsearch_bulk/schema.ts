@@ -3,10 +3,15 @@ import {
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
 
+function fetchConfig(job: ValidatedJobConfig) {
+    const opConfig = getOpConfig(job, 'elasticsearch_bulk');
+    if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
+    return opConfig as BulkSender;
+}
+
 export default class Schema extends ConvictSchema<BulkSender> {
     validateJob(job: ValidatedJobConfig) {
-        const opConfig = getOpConfig(job, 'elasticsearch_bulk');
-        if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
+        const opConfig = fetchConfig(job);
         const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
