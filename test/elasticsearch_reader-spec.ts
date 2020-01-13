@@ -903,6 +903,7 @@ describe('elasticsearch_reader', () => {
             const expectedSlice = {
                 start: endDate.format(dateFormatSeconds),
                 end: closingDate.format(dateFormatSeconds),
+                limit: closingDate.format(dateFormatSeconds),
                 count: 100
             };
 
@@ -964,12 +965,14 @@ describe('elasticsearch_reader', () => {
             expect(resultsSlicer1).toEqual({
                 start: firstMiddleDate.format(dateFormatSeconds),
                 end: firstFinalDate.format(dateFormatSeconds),
+                limit: firstFinalDate.format(dateFormatSeconds),
                 count: 100
             });
 
             expect(resultsSlicer2).toEqual({
                 start: secondMiddleDate.format(dateFormatSeconds),
                 end: secondFinalDate.format(dateFormatSeconds),
+                limit: secondFinalDate.format(dateFormatSeconds),
                 count: 100
             });
 
@@ -1041,7 +1044,12 @@ describe('elasticsearch_reader', () => {
                 size: 50,
                 index: 'someindex'
             };
-            const slice = { count: 100, start: firstDate.format(), end: laterDate.format() };
+
+            const slice = {
+                count: 100,
+                start: firstDate.format(),
+                end: laterDate.format()
+            };
 
             const test = await makeFetcherTest(opConfig);
             const results = await test.runSlice(slice);

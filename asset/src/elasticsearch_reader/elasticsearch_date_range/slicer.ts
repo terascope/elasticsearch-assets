@@ -101,7 +101,11 @@ export default function newSlicer(args: SlicerArgs) {
 
             // prevent recursive call if difference is one millisecond
             if (diff <= 0) {
-                return { start: dateParams.start, end: dateParams.end, count };
+                return {
+                    start: dateParams.start,
+                    end: dateParams.end,
+                    count
+                };
             }
 
             // recurse to find smaller chunk
@@ -131,7 +135,11 @@ export default function newSlicer(args: SlicerArgs) {
             return determineSlice(dateParams, slicerId, true, makeLimitQuery);
         }
 
-        return { start: dateParams.start, end: dateParams.end, count };
+        return {
+            start: dateParams.start,
+            end: dateParams.end,
+            count
+        };
     }
 
     async function getIdData(slicerFn: any) {
@@ -159,12 +167,17 @@ export default function newSlicer(args: SlicerArgs) {
         }));
     }
 
-    function makeKeyList(data: SliceResults) {
+    function makeKeyList(data: SliceResults, limit: string) {
         const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
         const range: SlicerDateResults = Object.assign(
             data,
-            { start: data.start.format(), end: data.end.format() }
+            {
+                start: data.start.format(),
+                end: data.end.format(),
+                limit
+            }
         );
+
         const idSlicerArs: ESIDSlicerArgs = {
             context,
             opConfig: idConfig,
@@ -236,7 +249,7 @@ export default function newSlicer(args: SlicerArgs) {
 
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');
-                return Promise.resolve(makeKeyList(data))
+                return Promise.resolve(makeKeyList(data, limit.format(dateFormat)))
                     .then((results) => results)
                     .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
             }
@@ -244,6 +257,7 @@ export default function newSlicer(args: SlicerArgs) {
             return {
                 start: data.start.format(dateFormat),
                 end: data.end.format(dateFormat),
+                limit: limit.format(dateFormat),
                 count: data.count
             };
         };
@@ -304,7 +318,7 @@ export default function newSlicer(args: SlicerArgs) {
 
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');
-                return Promise.resolve(makeKeyList(data))
+                return Promise.resolve(makeKeyList(data, limit.format(dateFormat)))
                     .then((results) => results)
                     .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
             }
@@ -312,6 +326,7 @@ export default function newSlicer(args: SlicerArgs) {
             return {
                 start: data.start.format(dateFormat),
                 end: data.end.format(dateFormat),
+                limit: limit.format(dateFormat),
                 count: data.count
             };
         };
