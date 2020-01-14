@@ -8,7 +8,7 @@ import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslic
 import MockClient from './mock_client';
 import Schema from '../asset/src/elasticsearch_reader/schema';
 import { IDType } from '../asset/src/id_reader/interfaces';
-import { dateFormatSeconds } from '../asset/src/helpers';
+import { dateFormatSeconds, divideRange } from '../asset/src/helpers';
 
 describe('elasticsearch_reader', () => {
     const assetDir = path.join(__dirname, '..');
@@ -894,6 +894,7 @@ describe('elasticsearch_reader', () => {
                     lastSlice: {
                         start: middleDate.format(dateFormatSeconds),
                         end: endDate.format(dateFormatSeconds),
+                        limit: closingDate.format(dateFormatSeconds),
                         count: 2445
                     },
                     slicer_id: 0
@@ -939,6 +940,7 @@ describe('elasticsearch_reader', () => {
                     lastSlice: {
                         start: firstDate.format(dateFormatSeconds),
                         end: firstMiddleDate.format(dateFormatSeconds),
+                        limit: firstFinalDate.format(dateFormatSeconds),
                         count: 2445
                     },
                     slicer_id: 0
@@ -947,6 +949,7 @@ describe('elasticsearch_reader', () => {
                     lastSlice: {
                         start: firstFinalDate.format(dateFormatSeconds),
                         end: secondMiddleDate.format(dateFormatSeconds),
+                        limit: secondFinalDate.format(dateFormatSeconds),
                         count: 2445
                     },
                     slicer_id: 1
@@ -1004,6 +1007,7 @@ describe('elasticsearch_reader', () => {
                     lastSlice: {
                         start: startDate.format(dateFormatSeconds),
                         end: middleDate.format(dateFormatSeconds),
+                        limit: endingData.format(dateFormatSeconds),
                         count: 2445
                     },
                     slicer_id: 0
@@ -1015,6 +1019,60 @@ describe('elasticsearch_reader', () => {
             const [{ start, end }] = await test.createSlices();
             expect(start).toEqual(middleDate.format(dateFormatSeconds));
             expect(end).toEqual(endingData.format(dateFormatSeconds));
+        });
+
+        it('slicer can enter recovery and return to the last slice state when number of slicers have increased (1 => 2, even increase)', async () => {
+            const firstDate = moment();
+            const middleDate = moment(firstDate).add(5, 'm');
+            const endDate = moment(firstDate).add(10, 'm');
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                start: firstDate.format(dateFormatSeconds),
+                end: endDate.format(dateFormatSeconds),
+                index: 'someindex',
+                interval: '5m',
+            };
+
+            const recoveryData = [
+                {
+                    lastSlice: {
+                        start: firstDate.format(dateFormatSeconds),
+                        end: middleDate.format(dateFormatSeconds),
+                        limit: endDate.format(dateFormatSeconds),
+                        count: 2445
+                    },
+                    slicer_id: 0
+                }
+            ];
+
+            const newRange = divideRange(middleDate, endDate, 2);
+
+            const expectedSlice1 = {
+                start: newRange[0].start.format(dateFormatSeconds),
+                end: newRange[0].limit.format(dateFormatSeconds),
+                limit: newRange[0].limit.format(dateFormatSeconds),
+                count: 100
+            };
+
+            const expectedSlice2 = {
+                start: newRange[1].start.format(dateFormatSeconds),
+                end: newRange[1].limit.format(dateFormatSeconds),
+                limit: newRange[1].limit.format(dateFormatSeconds),
+                count: 100
+            };
+
+            const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 2 });
+
+            const [results, results2] = await test.createSlices();
+            expect(results).toEqual(expectedSlice1);
+            expect(results2).toEqual(expectedSlice2);
+
+            const [results3] = await test.createSlices();
+            expect(results3).toEqual(null);
         });
     });
 

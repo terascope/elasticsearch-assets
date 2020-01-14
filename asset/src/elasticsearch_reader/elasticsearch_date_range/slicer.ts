@@ -8,7 +8,7 @@ import * as helpers from '../../helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
 
-interface SliceResults {
+interface DetermineSliceResults {
     start: moment.Moment;
     end: moment.Moment;
     count: number;
@@ -22,6 +22,8 @@ interface DateParams {
     interval: ParsedInterval;
     size: number;
 }
+
+type SlicerFnResults = SlicerDateResults|SlicerDateResults[]|null;
 
 export default function newSlicer(args: SlicerArgs) {
     const {
@@ -60,7 +62,7 @@ export default function newSlicer(args: SlicerArgs) {
 
     async function determineSlice(
         dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
-    ): Promise<SliceResults> {
+    ): Promise<DetermineSliceResults> {
         const intervalNum = dateParams.interval[0];
         const intervalUnit = dateParams.interval[1];
 
@@ -88,7 +90,11 @@ export default function newSlicer(args: SlicerArgs) {
                     end: newEnd,
                 };
 
-                const data: SliceResults = await determineSlice(cloneDates, slicerId, false);
+                const data: DetermineSliceResults = await determineSlice(
+                    cloneDates,
+                    slicerId,
+                    false
+                );
                 // return the zero range start with the correct end
                 return {
                     start: dateParams.start,
@@ -144,8 +150,8 @@ export default function newSlicer(args: SlicerArgs) {
         };
     }
 
-    async function getIdData(slicerFn: any) {
-        const list: any[] = [];
+    async function getIdData(slicerFn: any): Promise<Partial<SlicerDateResults>[]> {
+        const list: Partial<SlicerDateResults>[] = [];
         return new Promise(((resolve, reject) => {
             const slicer = slicerFn;
             function iterate() {
@@ -169,7 +175,7 @@ export default function newSlicer(args: SlicerArgs) {
         }));
     }
 
-    function makeKeyList(data: SliceResults, limit: string) {
+    async function makeKeyList(data: DetermineSliceResults, limit: string) {
         const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
         const range: SlicerDateResults = Object.assign(
             data,
@@ -229,11 +235,11 @@ export default function newSlicer(args: SlicerArgs) {
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        return async function sliceDate(msg: any) {
+        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
             if (dateParams.start.isSameOrAfter(dateParams.limit)) {
                 return null;
             }
-            let data: SliceResults;
+            let data: DetermineSliceResults;
             try {
                 data = await determineSlice(dateParams, slicerId, false);
             } catch (err) {
@@ -251,9 +257,15 @@ export default function newSlicer(args: SlicerArgs) {
 
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');
-                return Promise.resolve(makeKeyList(data, limit.format(dateFormat)))
-                    .then((results) => results)
-                    .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
+                try {
+                    const list = await makeKeyList(data, limit.format(dateFormat));
+                    return list.map((obj) => {
+                        obj.limit = limit.format(dateFormat);
+                        return obj;
+                    }) as SlicerDateResults[];
+                } catch (err) {
+                    return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
+                }
             }
 
             return {
@@ -298,9 +310,9 @@ export default function newSlicer(args: SlicerArgs) {
 
         events.on('worker:shutdown', () => clearInterval(injector));
 
-        return async function sliceDate(msg: any) {
+        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
             if (dateParams.start.isSameOrAfter(limit)) return null;
-            let data: SliceResults;
+            let data: DetermineSliceResults;
 
             try {
                 data = await determineSlice(dateParams, slicerId, false);
@@ -319,9 +331,15 @@ export default function newSlicer(args: SlicerArgs) {
 
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');
-                return Promise.resolve(makeKeyList(data, limit.format(dateFormat)))
-                    .then((results) => results)
-                    .catch((err) => Promise.reject(new TSError(err, { reason: 'error while subslicing by key' })));
+                try {
+                    const list = await makeKeyList(data, limit.format(dateFormat));
+                    return list.map((obj) => {
+                        obj.limit = limit.format(dateFormat);
+                        return obj;
+                    }) as SlicerDateResults[];
+                } catch (err) {
+                    return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
+                }
             }
 
             return {

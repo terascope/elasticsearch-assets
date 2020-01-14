@@ -73,10 +73,11 @@ export interface SlicerArgs {
     id: number;
     api: elasticApi.Client;
 }
-
+// TODO: this is most likely wrong
 export interface SlicerDateResults {
     start: string;
     end: string;
+    limit: string;
     count: number;
     wildcard?: WildCardQuery;
 }

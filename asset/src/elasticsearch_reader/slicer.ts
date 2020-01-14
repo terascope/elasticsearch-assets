@@ -204,13 +204,6 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
             };
 
             slicerFnArgs.dates = await determineStartingPoint(config);
-
-            // const dataIntervals = getTimes(
-            //     this.opConfig,
-            //     this.executionConfig.slicers,
-            //     this.dateFormat
-            // );
-            // slicerFnArgs.dates = dataIntervals[id];
         } else {
             const esDates = await this.getDates();
             // query with no results
