@@ -1,6 +1,6 @@
 import 'jest-extended';
 import {
-    TestContext, DataEntity, pDelay, LifeCycle, SlicerRecoveryData,
+    TestContext, DataEntity, pDelay, LifeCycle, SlicerRecoveryData, times,
 } from '@terascope/job-components';
 import path from 'path';
 import moment from 'moment';
@@ -1073,6 +1073,93 @@ describe('elasticsearch_reader', () => {
 
             const [results3] = await test.createSlices();
             expect(results3).toEqual(null);
+        });
+
+        it('slicer can enter recovery and return to the last slice state when number of slicers have increased (3 => 5, odd increase)', async () => {
+            const firstDate = moment();
+            const endDate = moment(firstDate).add(20, 'm');
+
+            const oldRange = divideRange(firstDate, endDate, 3);
+
+            defaultClient.setSequenceData(times(30, () => ({ count: 100, '@timestamp': new Date() })));
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 10000,
+                start: firstDate.format(dateFormatSeconds),
+                end: endDate.format(dateFormatSeconds),
+                index: 'someindex',
+                interval: '5m',
+            };
+
+            const recoveryData = oldRange.map((segment, index) => {
+                const obj = {
+                    start: moment(segment.start).format(dateFormatSeconds),
+                    end: moment(segment.start).add(2, 'm').format(dateFormatSeconds),
+                    limit: moment(segment.limit).format(dateFormatSeconds),
+                    count: 1234,
+                };
+
+                return { lastSlice: obj, slicer_id: index };
+            });
+
+            const rs1Start = moment(recoveryData[0].lastSlice.end);
+            const rs1End = moment(recoveryData[0].lastSlice.limit);
+
+            const rs2Start = moment(recoveryData[1].lastSlice.end);
+            const rs2End = moment(recoveryData[1].lastSlice.limit);
+
+            const rs3Start = recoveryData[2].lastSlice.end;
+            const rs3End = recoveryData[2].lastSlice.limit;
+
+            const newRangeSegment1 = divideRange(rs1Start, rs1End, 2);
+            const newRangeSegment2 = divideRange(rs2Start, rs2End, 2);
+
+            const expectedSlice1 = {
+                start: newRangeSegment1[0].start.format(dateFormatSeconds),
+                end: newRangeSegment1[0].limit.format(dateFormatSeconds),
+                limit: newRangeSegment1[0].limit.format(dateFormatSeconds),
+                count: 100
+            };
+            const expectedSlice2 = {
+                start: newRangeSegment1[1].start.format(dateFormatSeconds),
+                end: newRangeSegment1[1].limit.format(dateFormatSeconds),
+                limit: newRangeSegment1[1].limit.format(dateFormatSeconds),
+                count: 100
+            };
+            const expectedSlice3 = {
+                start: newRangeSegment2[0].start.format(dateFormatSeconds),
+                end: newRangeSegment2[0].limit.format(dateFormatSeconds),
+                limit: newRangeSegment2[0].limit.format(dateFormatSeconds),
+                count: 100
+            };
+            const expectedSlice4 = {
+                start: newRangeSegment2[1].start.format(dateFormatSeconds),
+                end: newRangeSegment2[1].limit.format(dateFormatSeconds),
+                limit: newRangeSegment2[1].limit.format(dateFormatSeconds),
+                count: 100
+            };
+            const expectedSlice5 = {
+                start: rs3Start,
+                end: rs3End,
+                limit: rs3End,
+                count: 100
+            };
+
+            const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 5 });
+
+            const [results, results2, results3, results4, results5] = await test.createSlices();
+
+            expect(results).toEqual(expectedSlice1);
+            expect(results2).toEqual(expectedSlice2);
+            expect(results3).toEqual(expectedSlice3);
+            expect(results4).toEqual(expectedSlice4);
+            expect(results5).toEqual(expectedSlice5);
+
+            const [results6] = await test.createSlices();
+            expect(results6).toEqual(null);
         });
     });
 

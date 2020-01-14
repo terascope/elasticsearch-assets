@@ -120,7 +120,7 @@ export default class MockClient {
         };
     }
 
-    setSequenceData(data: any) {
+    setSequenceData(data: AnyObject[]) {
         this.sequence = data.map(
             (obj: any) => ({
                 _shards: { failed: 0 },

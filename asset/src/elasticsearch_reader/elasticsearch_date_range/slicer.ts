@@ -216,11 +216,11 @@ export default function newSlicer(args: SlicerArgs) {
         const threshold = opConfig.subslice_key_threshold;
         const [intervalNum, intervalUnit] = opConfig.interval;
         const limit = moment(dates.limit);
-        let start = moment(dates.start);
+        const start = moment(dates.start);
 
-        if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
-            start = moment(retryDataObj.lastSlice.end);
-        }
+        // if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
+        //     start = moment(retryDataObj.lastSlice.end);
+        // }
 
         let end = moment(start.format(dateFormat)).add(intervalNum, intervalUnit);
         if (end.isSameOrAfter(limit)) end = moment(limit);
