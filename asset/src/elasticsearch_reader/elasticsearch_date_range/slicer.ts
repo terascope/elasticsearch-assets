@@ -2,7 +2,7 @@ import { cloneDeep, TSError } from '@terascope/job-components';
 import moment from 'moment';
 import idSlicer from '../../id_reader/id-slicer';
 import {
-    SlicerArgs, SlicerDateResults, DateConfig, ParsedInterval
+    SlicerArgs, SlicerDateResults, DateSegments, ParsedInterval
 } from '../interfaces';
 import * as helpers from '../../helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
@@ -32,7 +32,9 @@ export default function newSlicer(args: SlicerArgs) {
         logger,
         api,
         dates: sliceDates,
-        id
+        id,
+        interval,
+        delayTime
     } = args;
 
     const events = context.apis.foundation.getSystemEvents();
@@ -203,11 +205,11 @@ export default function newSlicer(args: SlicerArgs) {
         return api.count(query);
     }
 
-    function nextChunk(dates: DateConfig, slicerId: number, retryDataObj: any) {
+    function boundedSlicer(dates: DateSegments, slicerId: number, retryDataObj: any) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const [intervalNum, intervalUnit] = opConfig.interval;
-        const limit = moment(dates.end);
+        const limit = moment(dates.limit);
         let start = moment(dates.start);
 
         if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
@@ -215,7 +217,7 @@ export default function newSlicer(args: SlicerArgs) {
         }
 
         let end = moment(start.format(dateFormat)).add(intervalNum, intervalUnit);
-        if (end.isSameOrAfter(limit)) end = limit;
+        if (end.isSameOrAfter(limit)) end = moment(limit);
 
         const dateParams: DateParams = {
             size: opConfig.size,
@@ -263,20 +265,19 @@ export default function newSlicer(args: SlicerArgs) {
         };
     }
 
-    function awaitChunk(slicerDates: DateConfig, slicerId: number, retryDataObj: any) {
+    function streamSlicer(slicerDates: DateSegments, slicerId: number, retryDataObj: any) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
-        const { delayTime, interval } = slicerDates;
         const [step, unit] = interval as ParsedInterval;
 
         let start = moment(slicerDates.start);
-        const end = moment(slicerDates.end);
+        const end = moment(slicerDates.limit);
 
         if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
             start = moment(retryDataObj.lastSlice.end);
         }
 
-        let limit = moment(slicerDates.end);
+        let limit = moment(slicerDates.limit);
 
         const dateParams: DateParams = {
             size: opConfig.size,
@@ -333,8 +334,8 @@ export default function newSlicer(args: SlicerArgs) {
     }
 
     if (executionConfig.lifecycle === 'persistent') {
-        return awaitChunk(sliceDates, id, retryData);
+        return streamSlicer(sliceDates, id, retryData);
     }
 
-    return nextChunk(sliceDates, id, retryData);
+    return boundedSlicer(sliceDates, id, retryData);
 }

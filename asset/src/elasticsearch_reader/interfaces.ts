@@ -2,7 +2,8 @@ import {
     OpConfig,
     WorkerContext,
     ExecutionConfig,
-    Logger
+    Logger,
+    SlicerRecoveryData
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -35,22 +36,40 @@ export interface ESReaderConfig extends OpConfig {
     connection: string;
 }
 
+export interface DateSegments {
+    start: moment.Moment;
+    limit: moment.Moment;
+}
+
+export interface SlicerDateConfig extends DateSegments {
+    end: moment.Moment;
+}
+
+export interface StartPointConfig {
+    dates: DateSegments;
+    id: number;
+    numOfSlicers: number;
+    interval: ParsedInterval;
+    recoveryData?: SlicerRecoveryData[];
+}
+
 export type ParsedInterval = [number, moment.unitOfTime.Base];
 
+// TODO: delete?
 export interface DateConfig {
     start: string;
     end: string;
-    interval?: ParsedInterval;
-    delayTime?: number;
 }
 
 export interface SlicerArgs {
     context: WorkerContext;
     opConfig: any;
+    interval: ParsedInterval;
+    delayTime?: number;
     executionConfig: ExecutionConfig;
     retryData?: any;
     logger: Logger;
-    dates: DateConfig;
+    dates: SlicerDateConfig;
     id: number;
     api: elasticApi.Client;
 }

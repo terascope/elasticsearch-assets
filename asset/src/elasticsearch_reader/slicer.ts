@@ -16,15 +16,15 @@ import {
     dateOptions,
     dateFormatSeconds,
     parseDate,
-    divideRange,
-    getTimes
+    getMilliseconds,
+    determineStartingPoint
 } from '../helpers';
-import { ESReaderConfig, SlicerArgs } from './interfaces';
-
-interface DateSegments {
-    start: moment.Moment;
-    limit: moment.Moment;
-}
+import {
+    ESReaderConfig,
+    SlicerArgs,
+    DateSegments,
+    StartPointConfig
+} from './interfaces';
 
 type FetchDate = moment.Moment | null;
 
@@ -130,10 +130,11 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         return this.api.count(query);
     }
 
-    async getInterval(esDates: DateSegments) {
+    async getInterval(interval: string, esDates?: DateSegments) {
         if (this.opConfig.interval !== 'auto') {
-            return processInterval(this.opConfig.interval, this.opConfig.time_resolution, esDates);
+            return processInterval(interval, this.opConfig.time_resolution, esDates);
         }
+        if (esDates == null) throw new Error('must provide dates to create interval');
 
         const count = await this.getCount(esDates);
         const numOfSlices = Math.ceil(count / this.opConfig.size);
@@ -173,12 +174,43 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         }
 
         if (isPersistent) {
-            const dataIntervals = getTimes(
-                this.opConfig,
-                this.executionConfig.slicers,
-                this.dateFormat
+            // we need to interval to get starting dates
+            const [interval, delayInterval] = await Promise.all([
+                this.getInterval(this.opConfig.interval),
+                this.getInterval(this.opConfig.delay)
+            ]);
+
+            const delayTime = getMilliseconds(interval);
+
+            slicerFnArgs.interval = interval;
+            slicerFnArgs.delayTime = delayTime;
+
+            const delayedLimit = moment().subtract(
+                delayInterval[0],
+                delayInterval[1]
             );
-            slicerFnArgs.dates = dataIntervals[id];
+
+            const delayedStart = moment(delayedLimit).subtract(
+                interval[0],
+                interval[1]
+            );
+
+            const config: StartPointConfig = {
+                dates: { start: delayedStart, limit: delayedLimit },
+                id,
+                numOfSlicers: this.executionConfig.slicers,
+                recoveryData: this.recoveryData,
+                interval
+            };
+
+            slicerFnArgs.dates = await determineStartingPoint(config);
+
+            // const dataIntervals = getTimes(
+            //     this.opConfig,
+            //     this.executionConfig.slicers,
+            //     this.dateFormat
+            // );
+            // slicerFnArgs.dates = dataIntervals[id];
         } else {
             const esDates = await this.getDates();
             // query with no results
@@ -187,13 +219,12 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 // slicer will run and complete when a null is returned
                 return async () => null;
             }
-            const interval = await this.getInterval(esDates as DateSegments);
-            const dateRange = divideRange(
-                esDates.start,
-                esDates.limit,
-                this.executionConfig.slicers,
-                this.dateFormat
+            // @ts-ignore TODO: fixme:
+            const interval = await this.getInterval(
+                this.opConfig.interval,
+                esDates as DateSegments
             );
+            slicerFnArgs.interval = interval;
 
             await this.updateJob({
                 start: esDates.start.format(this.dateFormat),
@@ -201,10 +232,16 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 interval
             });
 
-            // we set so auto is replaced with correct interval
-            // mutation needs to be after the updateJob fn call
-            slicerFnArgs.opConfig.interval = interval;
-            slicerFnArgs.dates = dateRange[id];
+            const config: StartPointConfig = {
+                // @ts-ignore FIXME:
+                dates: esDates,
+                id,
+                numOfSlicers: this.executionConfig.slicers,
+                recoveryData: this.recoveryData,
+                interval
+            };
+
+            slicerFnArgs.dates = await determineStartingPoint(config);
         }
 
         return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;

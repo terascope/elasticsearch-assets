@@ -1,8 +1,10 @@
-import { Logger, AnyObject, parseError } from '@terascope/job-components';
+import { Logger, parseError } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-ignore
 import dateMath from 'datemath-parser';
+
+import { StartPointConfig, SlicerDateConfig } from './elasticsearch_reader/interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -148,43 +150,86 @@ export function parseDate(date: string) {
     return result;
 }
 
-export function divideRange(start: any, end: any, numOfSlicers: number, dateFormatting: string) {
+export function divideRange(
+    startTime: moment.Moment,
+    endTime: moment.Moment,
+    numOfSlicers: number,
+) {
     const results = [];
     // 'x' is Unix Millisecond Timestamp format
-    const startNum = Number(moment(start).format('x'));
-    const endNum = Number(moment(end).format('x'));
-    const range = (endNum - startNum) / numOfSlicers;
+    const startNum = Number(moment(startTime).format('x'));
+    const limitNum = Number(moment(endTime).format('x'));
+    const range = (limitNum - startNum) / numOfSlicers;
 
-    const step = moment(start);
+    const step = moment(startTime);
 
     for (let i = 0; i < numOfSlicers; i += 1) {
-        const rangeObj = {
-            start: step.format(dateFormatting),
-            end: step.add(range, 'ms').format(dateFormatting)
-        };
-        results.push(rangeObj);
+        // TODO: this mutates step
+        const start = moment(step);
+        const limit = moment(step.add(range, 'ms'));
+        results.push({ start, limit });
     }
 
     // make sure that end of last segment is always correct
-    const endingDate = end.format ? end.format(dateFormatting) : moment(end).format(dateFormatting);
-    results[results.length - 1].end = endingDate;
+    const endingDate = moment(endTime);
+    results[results.length - 1].limit = endingDate;
     return results;
 }
 
-export function getTimes(opConfig: AnyObject, numOfSlicers: number, dateFormatting: string) {
-    const end = processInterval(opConfig.interval, opConfig.time_resolution,);
-    const delayInterval = processInterval(opConfig.delay, opConfig.time_resolution);
-    const delayTime = getMilliseconds(end);
-    const delayedEnd = moment().subtract(
-        delayInterval[0],
-        delayInterval[1]
-    ).format(dateFormatting);
-    const delayedStart = moment(delayedEnd).subtract(end[0], end[1]).format(dateFormatting);
-    const dateArray = divideRange(delayedStart, delayedEnd, numOfSlicers, dateFormatting);
+// export function getTimes(opConfig: AnyObject, numOfSlicers: number, dateFormatting: string) {
+//     const end = processInterval(opConfig.interval, opConfig.time_resolution,);
+//     const delayInterval = processInterval(opConfig.delay, opConfig.time_resolution);
+//     const delayTime = getMilliseconds(end);
+//     const delayedEnd = moment().subtract(
+//         delayInterval[0],
+//         delayInterval[1]
+//     ).format(dateFormatting);
+//     const delayedStart = moment(delayedEnd).subtract(end[0], end[1]).format(dateFormatting);
+//     const dateArray = divideRange(delayedStart, delayedEnd, numOfSlicers, dateFormatting);
 
-    return dateArray.map((dates: any) => {
-        dates.delayTime = delayTime;
-        dates.interval = end;
-        return dates;
-    });
+//     return dateArray.map((dates: any) => {
+//         dates.delayTime = delayTime;
+//         dates.interval = end;
+//         return dates;
+//     });
+// }
+
+export function determineStartingPoint(config: StartPointConfig): SlicerDateConfig {
+    const {
+        dates,
+        id,
+        numOfSlicers,
+        interval,
+        recoveryData
+    } = config;
+    // we need to split up times
+    const [intervalNum, intervalUnit] = interval;
+
+    if (recoveryData && recoveryData.length > 0) {
+        const newDates: Partial<SlicerDateConfig> = divideRange(
+            dates.start,
+            dates.limit,
+            numOfSlicers
+        )[id];
+        // @ts-ignore FIXME:
+        const recoveryEnd = moment(recoveryData[id].lastSlice.end);
+        newDates.start = recoveryEnd;
+
+        let end = moment(newDates.start).add(intervalNum, intervalUnit);
+        if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
+        newDates.end = end;
+        return newDates as SlicerDateConfig;
+    }
+
+    const newDates: Partial<SlicerDateConfig> = divideRange(
+        dates.start,
+        dates.limit,
+        numOfSlicers
+    )[id];
+
+    let end = moment(newDates.start).add(intervalNum, intervalUnit);
+    if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
+    newDates.end = end;
+
+    return newDates as SlicerDateConfig;
 }
