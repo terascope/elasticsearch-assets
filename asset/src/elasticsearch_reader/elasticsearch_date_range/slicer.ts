@@ -73,7 +73,7 @@ export default function newSlicer(args: SlicerArgs) {
         dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
     ): Promise<DetermineSliceResults> {
         const {
-            start, end, limit, size, holes, interval: [intervalNum, intervalUnit]
+            start, end, limit, size, holes, interval: [step, unit]
         } = dateParams;
 
         let count: number;
@@ -88,7 +88,7 @@ export default function newSlicer(args: SlicerArgs) {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
             // recurse down to the appropriate size
-                const newStart = moment(end).subtract(intervalNum, intervalUnit);
+                const newStart = moment(end).subtract(step, unit);
                 // get diff from new start
                 const diff = splitTime(newStart, end, limit, timeResolution);
                 const newEnd = moment(newStart).add(diff, timeResolution);
@@ -139,7 +139,7 @@ export default function newSlicer(args: SlicerArgs) {
             // increase the slice range to find documents
             let makeLimitQuery = false;
 
-            const newEnd = moment(dateParams.end).add(intervalNum, intervalUnit);
+            const newEnd = moment(dateParams.end).add(step, unit);
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;
@@ -226,7 +226,7 @@ export default function newSlicer(args: SlicerArgs) {
     function boundedSlicer(dates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
-        const [intervalNum, intervalUnit] = opConfig.interval;
+        const [step, unit] = opConfig.interval;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
 
         const limit = moment(dates.limit);
@@ -265,7 +265,7 @@ export default function newSlicer(args: SlicerArgs) {
                 dateParams.start = moment(hole.end);
             }
 
-            const newEnd = moment(dateParams.start).add(intervalNum, intervalUnit);
+            const newEnd = moment(dateParams.start).add(step, unit);
 
             if (newEnd.isAfter(dateParams.limit)) {
                 dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');

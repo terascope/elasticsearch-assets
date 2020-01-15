@@ -181,7 +181,7 @@ function compactDivisions(
     interval: ParsedInterval,
     id: number
 ): SlicerDateConfig {
-    const [intervalNum, intervalUnit] = interval;
+    const [step, unit] = interval;
     const holes: DateConfig[] = [];
     // we condense recoveryDate to the appopriate buckets
     const compactedDivision = buckets.reduce<SlicerDateResults[][]>((list, num) => {
@@ -209,7 +209,7 @@ function compactDivisions(
         }
     });
 
-    let end = moment(results.start).add(intervalNum, intervalUnit);
+    let end = moment(results.start).add(step, unit);
     if (end.isSameOrAfter(results.limit)) end = moment(results.limit);
 
     if (holes.length > 0) {
@@ -233,13 +233,13 @@ function expandDivisions(
     interval: ParsedInterval,
     id: number
 ) {
-    const [intervalNum, intervalUnit] = interval;
+    const [step, unit] = interval;
 
     const newRanges = buckets.reduce<SlicerDateConfig[]>((list, newDivisions, index) => {
         const dates = recoveryData[index];
         const range = divideRange(moment(dates.end), moment(dates.limit), newDivisions)
             .map((val: Partial<SlicerDateConfig>) => {
-                let end = moment(val.start).add(intervalNum, intervalUnit);
+                let end = moment(val.start).add(step, unit);
                 if (end.isSameOrAfter(val.limit)) end = moment(val.limit);
                 // TODO: check for holes here
                 val.end = end;
@@ -304,7 +304,7 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
         recoveryData
     } = config;
     // we need to split up times
-    const [intervalNum, intervalUnit] = interval;
+    const [step, unit] = interval;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
         // TODO: review SlicerDateConfig
@@ -326,7 +326,7 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
         const recoveryEnd = moment(recoveryData[id].end);
         newDates.start = recoveryEnd;
 
-        let end = moment(newDates.start).add(intervalNum, intervalUnit);
+        let end = moment(newDates.start).add(step, unit);
         if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
         newDates.end = end;
 
@@ -339,7 +339,7 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
         numOfSlicers
     )[id];
 
-    let end = moment(newDates.start).add(intervalNum, intervalUnit);
+    let end = moment(newDates.start).add(step, unit);
     if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
     newDates.end = end;
 
