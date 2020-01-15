@@ -2,7 +2,11 @@ import { cloneDeep, TSError } from '@terascope/job-components';
 import moment from 'moment';
 import idSlicer from '../../id_reader/id-slicer';
 import {
-    SlicerArgs, SlicerDateResults, DateSegments, ParsedInterval
+    SlicerArgs,
+    SlicerDateResults,
+    SlicerDateConfig,
+    ParsedInterval,
+    DateConfig
 } from '../interfaces';
 import * as helpers from '../../helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
@@ -19,8 +23,29 @@ interface DateParams {
     start: moment.Moment;
     end: moment.Moment;
     limit: moment.Moment;
+    holes: DateConfig[];
     interval: ParsedInterval;
     size: number;
+}
+
+function splitTime(
+    start: moment.Moment,
+    end: moment.Moment,
+    limit: moment.Moment,
+    timeResolution: string
+) {
+    let diff = Math.floor(end.diff(start) / 2);
+
+    if (moment(start).add(diff, 'ms').isAfter(limit)) {
+        diff = moment(limit).diff(start);
+    }
+
+    if (timeResolution === 'ms') {
+        return diff;
+    }
+
+    const secondDiff = Math.floor(diff / 1000);
+    return secondDiff;
 }
 
 type SlicerFnResults = SlicerDateResults|SlicerDateResults[]|null;
@@ -30,7 +55,6 @@ export default function newSlicer(args: SlicerArgs) {
         context,
         opConfig,
         executionConfig,
-        retryData,
         logger,
         api,
         dates: sliceDates,
@@ -45,26 +69,12 @@ export default function newSlicer(args: SlicerArgs) {
     const dateFormat = timeResolution === 'ms' ? helpers.dateFormat : helpers.dateFormatSeconds;
     // This could be different since we have another op that uses this module
 
-    function splitTime(start: moment.Moment, end: moment.Moment, limit: moment.Moment) {
-        let diff = Math.floor(end.diff(start) / 2);
-
-        if (moment(start).add(diff, 'ms').isAfter(limit)) {
-            diff = moment(limit).diff(start);
-        }
-
-        if (timeResolution === 'ms') {
-            return diff;
-        }
-
-        const secondDiff = Math.floor(diff / 1000);
-        return secondDiff;
-    }
-
     async function determineSlice(
         dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
     ): Promise<DetermineSliceResults> {
-        const intervalNum = dateParams.interval[0];
-        const intervalUnit = dateParams.interval[1];
+        const {
+            start, end, limit, size, holes, interval: [intervalNum, intervalUnit]
+        } = dateParams;
 
         let count: number;
         try {
@@ -74,18 +84,19 @@ export default function newSlicer(args: SlicerArgs) {
             return Promise.reject(error);
         }
 
-        if (count > dateParams.size) {
+        if (count > size) {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
             // recurse down to the appropriate size
-                const newStart = moment(dateParams.end).subtract(intervalNum, intervalUnit);
+                const newStart = moment(end).subtract(intervalNum, intervalUnit);
                 // get diff from new start
-                const diff = splitTime(newStart, dateParams.end, dateParams.limit);
+                const diff = splitTime(newStart, end, limit, timeResolution);
                 const newEnd = moment(newStart).add(diff, timeResolution);
                 const cloneDates: DateParams = {
                     interval: dateParams.interval,
-                    limit: dateParams.limit,
-                    size: dateParams.size,
+                    limit,
+                    size,
+                    holes,
                     start: newStart,
                     end: newEnd,
                 };
@@ -97,29 +108,26 @@ export default function newSlicer(args: SlicerArgs) {
                 );
                 // return the zero range start with the correct end
                 return {
-                    start: dateParams.start,
+                    start,
                     end: data.end,
                     count: data.count
                 };
             }
 
             // find difference in milliseconds and divide in half
-            const diff = splitTime(dateParams.start, dateParams.end, dateParams.limit);
-            const newEnd = moment(dateParams.start).add(diff, timeResolution);
+            const diff = splitTime(start, end, limit, timeResolution);
+            const newEnd = moment(start).add(diff, timeResolution);
 
             // prevent recursive call if difference is one millisecond
             if (diff <= 0) {
-                return {
-                    start: dateParams.start,
-                    end: dateParams.end,
-                    count
-                };
+                return { start, end, count };
             }
 
             // recurse to find smaller chunk
             dateParams.end = newEnd;
             events.emit('slicer:slice:recursion');
-            logger.trace(`slicer: ${slicerId} is recursing ${JSON.stringify(dateParams)}`);
+
+            if (logger.level() === 10) logger.trace(`slicer: ${slicerId} is recursing ${JSON.stringify(dateParams)}`);
 
             return determineSlice(dateParams, slicerId, isExpandedSlice);
         }
@@ -136,9 +144,13 @@ export default function newSlicer(args: SlicerArgs) {
                 // set to limit
                 makeLimitQuery = true;
                 dateParams.end = dateParams.limit;
+            } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
+                makeLimitQuery = true;
+                dateParams.end = moment(holes[0].start);
             } else {
                 dateParams.end = newEnd;
             }
+
             events.emit('slicer:slice:range_expansion');
             return determineSlice(dateParams, slicerId, true, makeLimitQuery);
         }
@@ -211,35 +223,32 @@ export default function newSlicer(args: SlicerArgs) {
         return api.count(query);
     }
 
-    function boundedSlicer(dates: DateSegments, slicerId: number, retryDataObj: any) {
+    function boundedSlicer(dates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const [intervalNum, intervalUnit] = opConfig.interval;
+        const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
+
         const limit = moment(dates.limit);
         const start = moment(dates.start);
-
-        // if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
-        //     start = moment(retryDataObj.lastSlice.end);
-        // }
-
-        let end = moment(start.format(dateFormat)).add(intervalNum, intervalUnit);
-        if (end.isSameOrAfter(limit)) end = moment(limit);
+        const end = moment(dates.end);
 
         const dateParams: DateParams = {
             size: opConfig.size,
             interval: opConfig.interval,
             start,
             end,
+            holes,
             limit
         };
 
         logger.debug('all date configurations for date slicer', dateParams);
 
         return async function sliceDate(msg: any): Promise<SlicerFnResults> {
-            if (dateParams.start.isSameOrAfter(dateParams.limit)) {
-                return null;
-            }
             let data: DetermineSliceResults;
+
+            if (dateParams.start.isSameOrAfter(dateParams.limit)) return null;
+
             try {
                 data = await determineSlice(dateParams, slicerId, false);
             } catch (err) {
@@ -247,12 +256,23 @@ export default function newSlicer(args: SlicerArgs) {
                 return retryError(retryInput, err, sliceDate, msg);
             }
 
-            dateParams.start = data.end;
+            dateParams.start = moment(data.end);
 
-            if (moment(data.end).add(intervalNum, intervalUnit) > dateParams.limit) {
+            if (holes.length > 0 && dateParams.start.isSameOrAfter(holes[0].start)) {
+                // we are in a hole, need to shift where it is looking at
+                // we mutate on pupose, eject hole that is already passed
+                const hole = holes.shift() as DateConfig;
+                dateParams.start = moment(hole.end);
+            }
+
+            const newEnd = moment(dateParams.start).add(intervalNum, intervalUnit);
+
+            if (newEnd.isAfter(dateParams.limit)) {
                 dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
+            } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
+                dateParams.end = moment(holes[0].start);
             } else {
-                dateParams.end = moment(data.end).add(intervalNum, intervalUnit);
+                dateParams.end = newEnd;
             }
 
             if (shouldDivideByID && data.count >= threshold) {
@@ -267,27 +287,25 @@ export default function newSlicer(args: SlicerArgs) {
                     return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
                 }
             }
-
+            // TODO: do we need dataParams.holes here? where should mutate
             return {
                 start: data.start.format(dateFormat),
                 end: data.end.format(dateFormat),
                 limit: limit.format(dateFormat),
+                holes: dateParams.holes,
                 count: data.count
             };
         };
     }
 
-    function streamSlicer(slicerDates: DateSegments, slicerId: number, retryDataObj: any) {
+    function streamSlicer(slicerDates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
+        const holes: DateConfig[] = slicerDates.holes ? slicerDates.holes.slice() : [];
         const [step, unit] = interval as ParsedInterval;
 
-        let start = moment(slicerDates.start);
+        const start = moment(slicerDates.start);
         const end = moment(slicerDates.limit);
-
-        if (retryDataObj && retryDataObj.lastSlice && retryDataObj.lastSlice.end) {
-            start = moment(retryDataObj.lastSlice.end);
-        }
 
         let limit = moment(slicerDates.limit);
 
@@ -296,6 +314,7 @@ export default function newSlicer(args: SlicerArgs) {
             interval: interval as ParsedInterval,
             start,
             end,
+            holes,
             limit
         };
 
@@ -352,8 +371,8 @@ export default function newSlicer(args: SlicerArgs) {
     }
 
     if (executionConfig.lifecycle === 'persistent') {
-        return streamSlicer(sliceDates, id, retryData);
+        return streamSlicer(sliceDates, id);
     }
 
-    return boundedSlicer(sliceDates, id, retryData);
+    return boundedSlicer(sliceDates, id);
 }

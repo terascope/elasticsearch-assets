@@ -905,6 +905,7 @@ describe('elasticsearch_reader', () => {
                 start: endDate.format(dateFormatSeconds),
                 end: closingDate.format(dateFormatSeconds),
                 limit: closingDate.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
 
@@ -969,6 +970,7 @@ describe('elasticsearch_reader', () => {
                 start: firstMiddleDate.format(dateFormatSeconds),
                 end: firstFinalDate.format(dateFormatSeconds),
                 limit: firstFinalDate.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             });
 
@@ -976,6 +978,7 @@ describe('elasticsearch_reader', () => {
                 start: secondMiddleDate.format(dateFormatSeconds),
                 end: secondFinalDate.format(dateFormatSeconds),
                 limit: secondFinalDate.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             });
 
@@ -1055,6 +1058,7 @@ describe('elasticsearch_reader', () => {
                 start: newRange[0].start.format(dateFormatSeconds),
                 end: newRange[0].limit.format(dateFormatSeconds),
                 limit: newRange[0].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
 
@@ -1062,6 +1066,7 @@ describe('elasticsearch_reader', () => {
                 start: newRange[1].start.format(dateFormatSeconds),
                 end: newRange[1].limit.format(dateFormatSeconds),
                 limit: newRange[1].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
 
@@ -1121,30 +1126,35 @@ describe('elasticsearch_reader', () => {
                 start: newRangeSegment1[0].start.format(dateFormatSeconds),
                 end: newRangeSegment1[0].limit.format(dateFormatSeconds),
                 limit: newRangeSegment1[0].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
             const expectedSlice2 = {
                 start: newRangeSegment1[1].start.format(dateFormatSeconds),
                 end: newRangeSegment1[1].limit.format(dateFormatSeconds),
                 limit: newRangeSegment1[1].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
             const expectedSlice3 = {
                 start: newRangeSegment2[0].start.format(dateFormatSeconds),
                 end: newRangeSegment2[0].limit.format(dateFormatSeconds),
                 limit: newRangeSegment2[0].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
             const expectedSlice4 = {
                 start: newRangeSegment2[1].start.format(dateFormatSeconds),
                 end: newRangeSegment2[1].limit.format(dateFormatSeconds),
                 limit: newRangeSegment2[1].limit.format(dateFormatSeconds),
+                holes: [],
                 count: 100
             };
             const expectedSlice5 = {
                 start: rs3Start,
                 end: rs3End,
                 limit: rs3End,
+                holes: [],
                 count: 100
             };
 
@@ -1160,6 +1170,138 @@ describe('elasticsearch_reader', () => {
 
             const [results6] = await test.createSlices();
             expect(results6).toEqual(null);
+        });
+
+        it('slicer can enter recovery and return to the last slice state when number of slicers have decreased (2 => 1, even increase)', async () => {
+            const firstDate = moment();
+            const endDate = moment(firstDate).add(11, 'm');
+
+            defaultClient.setSequenceData(times(30, () => ({ count: 100, '@timestamp': new Date() })));
+
+            const oldRange = divideRange(firstDate, endDate, 2);
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 's',
+                size: 100,
+                start: firstDate.format(dateFormatSeconds),
+                end: endDate.format(dateFormatSeconds),
+                index: 'someindex',
+                interval: '2m',
+            };
+
+            const recoveryData = oldRange.map((segment, index) => {
+                const obj = {
+                    start: moment(segment.start).format(dateFormatSeconds),
+                    end: moment(segment.start).add(1, 'm').format(dateFormatSeconds),
+                    limit: moment(segment.limit).format(dateFormatSeconds),
+                    count: 1234,
+                };
+
+                return { lastSlice: obj, slicer_id: index };
+            });
+
+            const hole = {
+                start: recoveryData[0].lastSlice.limit,
+                end: recoveryData[1].lastSlice.end
+            };
+
+            const limit = moment(recoveryData[1].lastSlice.limit);
+
+            // we slice 2 mins
+            const rs1Start = moment(recoveryData[0].lastSlice.end);
+            const rs1End = moment(rs1Start).add(2, 'm');
+
+            // we slice 2 mins
+            const rs2Start = moment(rs1End);
+            const rs2End = moment(rs2Start).add(2, 'm');
+
+            // we are up against the hole now
+            const rs3Start = moment(rs2End);
+            const rs3End = moment(hole.start);
+
+            // we jump over the hole
+            const rs4Start = moment(hole.end);
+            const rs4End = moment(rs4Start).add(2, 'm');
+
+            // we slice 2 mins
+            const rs5Start = moment(rs4End);
+            const rs5End = moment(rs5Start).add(2, 'm');
+
+            // we slice 2 mins
+            const rs6Start = moment(rs5End);
+
+            const expectedSlice1 = {
+                start: rs1Start.format(dateFormatSeconds),
+                end: rs1End.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [hole],
+                count: 100
+            };
+            // we slice 2 mins
+            const expectedSlice2 = {
+                start: rs2Start.format(dateFormatSeconds),
+                end: rs2End.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [hole],
+                count: 100
+            };
+            // we are up against the hole so we can drop it, internally it jumps pass the hole
+            const expectedSlice3 = {
+                start: rs3Start.format(dateFormatSeconds),
+                end: rs3End.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [],
+                count: 100
+            };
+
+            const expectedSlice4 = {
+                start: rs4Start.format(dateFormatSeconds),
+                end: rs4End.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [],
+                count: 100
+            };
+
+            const expectedSlice5 = {
+                start: rs5Start.format(dateFormatSeconds),
+                end: rs5End.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [],
+                count: 100
+            };
+
+            const expectedSlice6 = {
+                start: rs6Start.format(dateFormatSeconds),
+                end: limit.format(dateFormatSeconds),
+                limit: limit.format(dateFormatSeconds),
+                holes: [],
+                count: 100
+            };
+
+            const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 1 });
+
+            const [results] = await test.createSlices();
+            expect(results).toEqual(expectedSlice1);
+
+            const [results2] = await test.createSlices();
+            expect(results2).toEqual(expectedSlice2);
+
+            const [results3] = await test.createSlices();
+            expect(results3).toEqual(expectedSlice3);
+
+            const [results4] = await test.createSlices();
+            expect(results4).toEqual(expectedSlice4);
+
+            const [results5] = await test.createSlices();
+            expect(results5).toEqual(expectedSlice5);
+
+            const [results6] = await test.createSlices();
+            expect(results6).toEqual(expectedSlice6);
+
+            const [results7] = await test.createSlices();
+            expect(results7).toEqual(null);
         });
     });
 

@@ -3,7 +3,6 @@ import {
     WorkerContext,
     ExecutionConfig,
     Logger,
-    SlicerRecoveryData
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -43,6 +42,7 @@ export interface DateSegments {
 
 export interface SlicerDateConfig extends DateSegments {
     end: moment.Moment;
+    holes?: DateConfig[];
 }
 
 export interface StartPointConfig {
@@ -50,7 +50,7 @@ export interface StartPointConfig {
     id: number;
     numOfSlicers: number;
     interval: ParsedInterval;
-    recoveryData?: SlicerRecoveryData[];
+    recoveryData?: SlicerDateResults[];
 }
 
 export type ParsedInterval = [number, moment.unitOfTime.Base];
@@ -67,7 +67,6 @@ export interface SlicerArgs {
     interval: ParsedInterval;
     delayTime?: number;
     executionConfig: ExecutionConfig;
-    retryData?: any;
     logger: Logger;
     dates: SlicerDateConfig;
     id: number;
@@ -79,5 +78,6 @@ export interface SlicerDateResults {
     end: string;
     limit: string;
     count: number;
+    holes?: DateConfig[];
     wildcard?: WildCardQuery;
 }

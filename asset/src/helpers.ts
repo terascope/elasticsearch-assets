@@ -1,5 +1,5 @@
 import {
-    Logger, parseError, SlicerRecoveryData, times
+    Logger, parseError, times
 } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
@@ -10,7 +10,9 @@ import {
     StartPointConfig,
     SlicerDateConfig,
     DateSegments,
-    SlicerDateResults
+    SlicerDateResults,
+    ParsedInterval,
+    DateConfig
 } from './elasticsearch_reader/interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
@@ -157,10 +159,10 @@ export function parseDate(date: string) {
     return result;
 }
 
-function determineDivisions(startingNum: number, endingNum: number) {
-    const buckets = times(startingNum, () => 1);
-    const length = startingNum - 1;
-    let remaining = endingNum - startingNum;
+function determineDivisions(numOfDivisions: number, endingNum: number) {
+    const buckets = times(numOfDivisions, () => 1);
+    const length = numOfDivisions - 1;
+    let remaining = endingNum - numOfDivisions;
     let index = 0;
 
     while (remaining > 0) {
@@ -173,26 +175,98 @@ function determineDivisions(startingNum: number, endingNum: number) {
     return buckets;
 }
 
-function redistributeDates(
-    recoveryData: SlicerRecoveryData[],
-    numOfSlicers: number,
+function compactDivisions(
+    recoveryData: SlicerDateResults[],
+    buckets: number[],
+    interval: ParsedInterval,
+    id: number
+): SlicerDateConfig {
+    const [intervalNum, intervalUnit] = interval;
+    const holes: DateConfig[] = [];
+    // we condense recoveryDate to the appopriate buckets
+    const compactedDivision = buckets.reduce<SlicerDateResults[][]>((list, num) => {
+        const pocket: SlicerDateResults[] = [];
+        for (let i = 0; i < num; i += 1) {
+            const data = recoveryData.shift() as SlicerDateResults;
+            pocket.push(data);
+        }
+        list.push(pocket);
+        return list;
+    }, []);
+
+    const segment = compactedDivision[id];
+
+    const results: Partial<SlicerDateConfig> = {
+        start: moment(segment[0].end),
+        limit: moment(segment[segment.length - 1].limit)
+    };
+
+    segment.forEach((dates, index, arr) => {
+        if (arr[index + 1] !== undefined) {
+            // we save existing holes
+            if (dates.holes) holes.push(...dates.holes);
+            holes.push({ start: dates.limit, end: arr[index + 1].end });
+        }
+    });
+
+    let end = moment(results.start).add(intervalNum, intervalUnit);
+    if (end.isSameOrAfter(results.limit)) end = moment(results.limit);
+
+    if (holes.length > 0) {
+        results.holes = holes;
+        // we check to see if end is in a hole
+        holes.forEach((hole) => {
+            if (moment(end).isSameOrAfter(hole.start)) {
+                // we stop at the start of a hole
+                end = moment(hole.start);
+            }
+        });
+    }
+
+    results.end = end;
+    return results as SlicerDateConfig;
+}
+
+function expandDivisions(
+    recoveryData: SlicerDateResults[],
+    buckets: number[],
+    interval: ParsedInterval,
     id: number
 ) {
+    const [intervalNum, intervalUnit] = interval;
+
+    const newRanges = buckets.reduce<SlicerDateConfig[]>((list, newDivisions, index) => {
+        const dates = recoveryData[index];
+        const range = divideRange(moment(dates.end), moment(dates.limit), newDivisions)
+            .map((val: Partial<SlicerDateConfig>) => {
+                let end = moment(val.start).add(intervalNum, intervalUnit);
+                if (end.isSameOrAfter(val.limit)) end = moment(val.limit);
+                // TODO: check for holes here
+                val.end = end;
+                return val as SlicerDateConfig;
+            });
+
+        list.push(...range);
+        return list;
+    }, []);
+
+    return newRanges[id];
+}
+
+function redistributeDates(
+    recoveryData: SlicerDateResults[],
+    numOfSlicers: number,
+    id: number,
+    interval: ParsedInterval
+): SlicerDateConfig {
     // we are creating more ranges
     if (numOfSlicers > recoveryData.length) {
         const buckets = determineDivisions(recoveryData.length, numOfSlicers);
-
-        const newRanges = buckets.reduce<DateSegments[]>((list, newDivisions, index) => {
-            const dates = recoveryData[index].lastSlice as SlicerDateResults;
-            const range = divideRange(moment(dates.end), moment(dates.limit), newDivisions);
-            list.push(...range);
-            return list;
-        }, []);
-
-        return newRanges[id];
+        return expandDivisions(recoveryData, buckets, interval, id);
     }
-    // we need to makes less ranges
-    return { start: moment(), limit: moment() };
+    // we are compacting ranges
+    const buckets = determineDivisions(numOfSlicers, recoveryData.length);
+    return compactDivisions(recoveryData, buckets, interval, id);
 }
 
 export function divideRange(
@@ -233,27 +307,29 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
     const [intervalNum, intervalUnit] = interval;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
+        // TODO: review SlicerDateConfig
         let newDates: Partial<SlicerDateConfig> = {};
 
         // our number of slicers have changed
         if (numOfSlicers !== recoveryData.length) {
-            newDates = redistributeDates(recoveryData, numOfSlicers, id);
-        } else {
-            // numOfSlicers are the same so we can distribute normally
-            // TODO: this is probably faulty behavior
-            newDates = divideRange(
-                dates.start,
-                dates.limit,
-                numOfSlicers
-            )[id];
-            // @ts-ignore FIXME:
-            const recoveryEnd = moment(recoveryData[id].lastSlice.end);
-            newDates.start = recoveryEnd;
+            newDates = redistributeDates(recoveryData, numOfSlicers, id, interval);
+            return newDates as SlicerDateConfig;
         }
+        // numOfSlicers are the same so we can distribute normally
+        // TODO: this is probably faulty behavior
+        newDates = divideRange(
+            dates.start,
+            dates.limit,
+            numOfSlicers
+        )[id];
+        // @ts-ignore FIXME:
+        const recoveryEnd = moment(recoveryData[id].end);
+        newDates.start = recoveryEnd;
 
         let end = moment(newDates.start).add(intervalNum, intervalUnit);
         if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
         newDates.end = end;
+
         return newDates as SlicerDateConfig;
     }
 

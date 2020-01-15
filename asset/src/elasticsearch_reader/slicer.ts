@@ -23,7 +23,8 @@ import {
     ESReaderConfig,
     SlicerArgs,
     DateSegments,
-    StartPointConfig
+    StartPointConfig,
+    SlicerDateResults
 } from './interfaces';
 
 type FetchDate = moment.Moment | null;
@@ -169,9 +170,9 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
 
         await this.api.version();
 
-        if (this.recoveryData && this.recoveryData.length > 0) {
-            slicerFnArgs.retryData = this.recoveryData[id];
-        }
+        const recoveryData = this.recoveryData.map(
+            (slice) => slice.lastSlice
+        ) as SlicerDateResults[];
 
         if (isPersistent) {
             // we need to interval to get starting dates
@@ -199,7 +200,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 dates: { start: delayedStart, limit: delayedLimit },
                 id,
                 numOfSlicers: this.executionConfig.slicers,
-                recoveryData: this.recoveryData,
+                recoveryData,
                 interval
             };
 
@@ -230,7 +231,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 dates: esDates,
                 id,
                 numOfSlicers: this.executionConfig.slicers,
-                recoveryData: this.recoveryData,
+                recoveryData,
                 interval
             };
 
