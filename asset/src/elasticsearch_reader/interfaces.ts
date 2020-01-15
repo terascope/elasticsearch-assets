@@ -65,7 +65,7 @@ export interface SlicerArgs {
     context: WorkerContext;
     opConfig: any;
     interval: ParsedInterval;
-    delayTime?: number;
+    intervalMS?: number;
     executionConfig: ExecutionConfig;
     logger: Logger;
     dates: SlicerDateConfig;

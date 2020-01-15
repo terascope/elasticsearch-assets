@@ -176,19 +176,21 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
 
         if (isPersistent) {
             // we need to interval to get starting dates
-            const [interval, delayInterval] = await Promise.all([
+            const [interval, latencyInterval] = await Promise.all([
                 this.getInterval(this.opConfig.interval),
                 this.getInterval(this.opConfig.delay)
             ]);
 
-            const delayTime = getMilliseconds(interval);
+            const intervalMS = getMilliseconds(interval);
 
             slicerFnArgs.interval = interval;
-            slicerFnArgs.delayTime = delayTime;
+            slicerFnArgs.intervalMS = intervalMS;
 
-            const delayedLimit = moment().subtract(
-                delayInterval[0],
-                delayInterval[1]
+            const now = moment();
+
+            const delayedLimit = moment(now).subtract(
+                latencyInterval[0],
+                latencyInterval[1]
             );
 
             const delayedStart = moment(delayedLimit).subtract(
@@ -213,7 +215,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 // slicer will run and complete when a null is returned
                 return async () => null;
             }
-            // @ts-ignore TODO: fixme:
+
             const interval = await this.getInterval(
                 this.opConfig.interval,
                 esDates as DateSegments

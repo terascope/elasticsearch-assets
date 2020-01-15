@@ -60,7 +60,7 @@ export default function newSlicer(args: SlicerArgs) {
         dates: sliceDates,
         id,
         interval,
-        delayTime
+        intervalMS
     } = args;
 
     const events = context.apis.foundation.getSystemEvents();
@@ -235,7 +235,7 @@ export default function newSlicer(args: SlicerArgs) {
 
         const dateParams: DateParams = {
             size: opConfig.size,
-            interval: opConfig.interval,
+            interval,
             start,
             end,
             holes,
@@ -249,12 +249,14 @@ export default function newSlicer(args: SlicerArgs) {
             const injector = setInterval(() => {
                 // keep a list of next batches in cases current batch is still running
                 const newLimit = moment(limit).add(step, unit);
-                dateParams.limit = newLimit;
-                dateParams.end = newLimit;
+                dateParams.limit = moment(newLimit);
+                dateParams.end = moment(newLimit);
                 limit = newLimit;
-            }, delayTime as number);
+            }, intervalMS);
 
-            events.on('worker:shutdown', () => clearInterval(injector));
+            events.on('worker:shutdown', () => {
+                clearInterval(injector);
+            });
         }
 
         return async function sliceDate(msg: any): Promise<SlicerFnResults> {
