@@ -223,15 +223,15 @@ export default function newSlicer(args: SlicerArgs) {
         return api.count(query);
     }
 
-    function boundedSlicer(dates: SlicerDateConfig, slicerId: number) {
+    function dateSlicer(dates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
-        const [step, unit] = opConfig.interval;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
+        const [step, unit] = interval as ParsedInterval;
 
-        const limit = moment(dates.limit);
         const start = moment(dates.start);
         const end = moment(dates.end);
+        let limit = moment(dates.limit);
 
         const dateParams: DateParams = {
             size: opConfig.size,
@@ -244,10 +244,22 @@ export default function newSlicer(args: SlicerArgs) {
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
-            let data: DetermineSliceResults;
+        if (executionConfig.lifecycle === 'persistent') {
+            // set a timer to add the next set it should process
+            const injector = setInterval(() => {
+                // keep a list of next batches in cases current batch is still running
+                const newLimit = moment(limit).add(step, unit);
+                dateParams.limit = newLimit;
+                dateParams.end = newLimit;
+                limit = newLimit;
+            }, delayTime as number);
 
+            events.on('worker:shutdown', () => clearInterval(injector));
+        }
+
+        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
             if (dateParams.start.isSameOrAfter(dateParams.limit)) return null;
+            let data: DetermineSliceResults;
 
             try {
                 data = await determineSlice(dateParams, slicerId, false);
@@ -298,81 +310,5 @@ export default function newSlicer(args: SlicerArgs) {
         };
     }
 
-    function streamSlicer(slicerDates: SlicerDateConfig, slicerId: number) {
-        const shouldDivideByID = opConfig.subslice_by_key;
-        const threshold = opConfig.subslice_key_threshold;
-        const holes: DateConfig[] = slicerDates.holes ? slicerDates.holes.slice() : [];
-        const [step, unit] = interval as ParsedInterval;
-
-        const start = moment(slicerDates.start);
-        const end = moment(slicerDates.limit);
-
-        let limit = moment(slicerDates.limit);
-
-        const dateParams: DateParams = {
-            size: opConfig.size,
-            interval: interval as ParsedInterval,
-            start,
-            end,
-            holes,
-            limit
-        };
-
-        // set a timer to add the next set it should process
-        const injector = setInterval(() => {
-            // keep a list of next batches in cases current batch is still running
-            const newLimit = moment(limit).add(step, unit);
-            dateParams.limit = newLimit;
-            dateParams.end = newLimit;
-            limit = newLimit;
-        }, delayTime as number);
-
-        events.on('worker:shutdown', () => clearInterval(injector));
-
-        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
-            if (dateParams.start.isSameOrAfter(limit)) return null;
-            let data: DetermineSliceResults;
-
-            try {
-                data = await determineSlice(dateParams, slicerId, false);
-            } catch (err) {
-                const retryInput = dateParams.start.format(dateFormat);
-                return retryError(retryInput, err, sliceDate, msg);
-            }
-
-            dateParams.start = data.end;
-
-            if (moment(data.end).add(step, unit).isAfter(limit)) {
-                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
-            } else {
-                dateParams.end = moment(data.end).add(step, unit);
-            }
-
-            if (shouldDivideByID && data.count >= threshold) {
-                logger.debug('date slicer is recursing by keylist');
-                try {
-                    const list = await makeKeyList(data, limit.format(dateFormat));
-                    return list.map((obj) => {
-                        obj.limit = limit.format(dateFormat);
-                        return obj;
-                    }) as SlicerDateResults[];
-                } catch (err) {
-                    return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
-                }
-            }
-
-            return {
-                start: data.start.format(dateFormat),
-                end: data.end.format(dateFormat),
-                limit: limit.format(dateFormat),
-                count: data.count
-            };
-        };
-    }
-
-    if (executionConfig.lifecycle === 'persistent') {
-        return streamSlicer(sliceDates, id);
-    }
-
-    return boundedSlicer(sliceDates, id);
+    return dateSlicer(sliceDates, id);
 }
