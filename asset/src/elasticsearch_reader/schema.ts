@@ -6,7 +6,7 @@ import moment from 'moment';
 // @ts-ignore
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
-import { dateOptions } from '../helpers';
+import { dateOptions } from '../__lib';
 import { IDType } from '../id_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {

@@ -301,6 +301,15 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
+"@terascope/elasticsearch-api@^2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.4.0.tgz#77845ab4bad57eff5783dbbc5c6038fb3db93386"
+  integrity sha512-apKCX3CyH+hGC/dEnUNDpBA0oCxFvPI4XxGOai5+qUlEVAN6+KJw+Onxge9asStYDGtCYeMAGKB02PBcjUIHaA==
+  dependencies:
+    "@terascope/utils" "^0.22.0"
+    bluebird "^3.7.2"
+    lodash "^4.17.11"
+
 "@terascope/eslint-config@^0.2.2":
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/@terascope/eslint-config/-/eslint-config-0.2.2.tgz#423c4053a09fa8a0aea5a2873c67d99160dc2523"
@@ -3075,7 +3084,7 @@ moment@2.22.2:
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
   integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
-moment@^2.22.2:
+moment@^2.22.2, moment@^2.24.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==

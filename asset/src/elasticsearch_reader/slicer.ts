@@ -5,7 +5,7 @@ import {
     WorkerContext,
     ExecutionConfig,
     TSError,
-    AnyObject
+    AnyObject,
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -16,22 +16,24 @@ import {
     dateOptions,
     dateFormatSeconds,
     parseDate,
-    getMilliseconds,
-    determineStartingPoint
-} from '../helpers';
+    determineStartingPoint,
+    delayedStreamSegment,
+} from '../__lib';
 import {
     ESReaderConfig,
     SlicerArgs,
     DateSegments,
     StartPointConfig,
-    SlicerDateResults
+    SlicerDateResults,
 } from './interfaces';
+import WindowState from './window-state';
 
 type FetchDate = moment.Moment | null;
 
 export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
     api: elasticApi.Client;
     dateFormat: string;
+    windowState: WindowState
 
     constructor(
         context: WorkerContext,
@@ -43,6 +45,7 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
         this.api = elasticApi(client, this.logger, this.opConfig);
         const timeResolution = dateOptions(opConfig.time_resolution);
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
+        this.windowState = new WindowState(executionConfig.slicers);
     }
 
     async getDates() {
@@ -160,12 +163,12 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
         const slicerFnArgs: Partial<SlicerArgs> = {
-            context: this.context,
             opConfig: this.opConfig,
             executionConfig: this.executionConfig,
             logger: this.logger,
             id,
-            api: this.api
+            api: this.api,
+            events: this.context.apis.foundation.getSystemEvents()
         };
 
         await this.api.version();
@@ -181,32 +184,23 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 this.getInterval(this.opConfig.delay)
             ]);
 
-            const intervalMS = getMilliseconds(interval);
-
             slicerFnArgs.interval = interval;
-            slicerFnArgs.intervalMS = intervalMS;
+            slicerFnArgs.latencyInterval = latencyInterval;
+            slicerFnArgs.windowState = this.windowState;
 
-            const now = moment();
-
-            const delayedLimit = moment(now).subtract(
-                latencyInterval[0],
-                latencyInterval[1]
-            );
-
-            const delayedStart = moment(delayedLimit).subtract(
-                interval[0],
-                interval[1]
-            );
+            const { start, limit } = delayedStreamSegment(interval, latencyInterval);
 
             const config: StartPointConfig = {
-                dates: { start: delayedStart, limit: delayedLimit },
+                dates: { start, limit },
                 id,
                 numOfSlicers: this.executionConfig.slicers,
                 recoveryData,
                 interval
             };
+            const { dates, range } = await determineStartingPoint(config);
 
-            slicerFnArgs.dates = await determineStartingPoint(config);
+            slicerFnArgs.dates = dates;
+            slicerFnArgs.primaryRange = range;
         } else {
             const esDates = await this.getDates();
             // query with no results
@@ -237,7 +231,9 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 interval
             };
 
-            slicerFnArgs.dates = await determineStartingPoint(config);
+            // we do not care for range for once jobs
+            const { dates } = await determineStartingPoint(config);
+            slicerFnArgs.dates = dates;
         }
 
         return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;

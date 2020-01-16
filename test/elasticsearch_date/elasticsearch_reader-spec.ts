@@ -5,11 +5,11 @@ import {
 import path from 'path';
 import moment from 'moment';
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import MockClient from './mock_client';
-import Schema from '../asset/src/elasticsearch_reader/schema';
-import { IDType } from '../asset/src/id_reader/interfaces';
+import MockClient from '../mock_client';
+import Schema from '../../asset/src/elasticsearch_reader/schema';
+import { IDType } from '../../asset/src/id_reader/interfaces';
 // @ts-ignore TODO: fixme:
-import { dateFormatSeconds, divideRange, dateFormat } from '../asset/src/helpers';
+import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/__lib';
 
 describe('elasticsearch_reader', () => {
     const assetDir = path.join(__dirname, '..');
@@ -403,7 +403,7 @@ describe('elasticsearch_reader', () => {
             expect(results2).toEqual(null);
         });
 
-        it('can run a persistent reader', async () => {
+        fit('can run a persistent reader', async () => {
             const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
             const start = moment();
             const delayedBoundary = moment(start).subtract(delay[0], delay[1]);

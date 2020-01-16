@@ -1,11 +1,8 @@
-import {
-    OpConfig,
-    WorkerContext,
-    ExecutionConfig,
-    Logger,
-} from '@terascope/job-components';
+import { EventEmitter } from 'events';
+import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
+import WindowState from './window-state';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends OpConfig {
@@ -62,15 +59,17 @@ export interface DateConfig {
 }
 
 export interface SlicerArgs {
-    context: WorkerContext;
     opConfig: any;
     interval: ParsedInterval;
-    intervalMS?: number;
+    latencyInterval?: ParsedInterval;
     executionConfig: ExecutionConfig;
     logger: Logger;
     dates: SlicerDateConfig;
+    primaryRange?: DateSegments;
     id: number;
     api: elasticApi.Client;
+    events: EventEmitter;
+    windowState: WindowState;
 }
 // TODO: this is most likely wrong
 export interface SlicerDateResults {

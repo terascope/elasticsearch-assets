@@ -42,7 +42,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         }
         const keySet = divideKeyArray(keyArray, this.executionConfig.slicers);
         const args: Partial<ESIDSlicerArgs> = {
-            context: this.context,
+            events: this.context.foundation.getEventEmitter(),
             opConfig: this.opConfig,
             executionConfig: this.executionConfig,
             logger: this.logger,

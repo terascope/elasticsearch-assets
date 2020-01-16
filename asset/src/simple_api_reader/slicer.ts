@@ -1,22 +1,24 @@
 import {
-    ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig, TSError
+    ParallelSlicer, SlicerFn, WorkerContext, ExecutionConfig, TSError, AnyObject
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
 
 import MockedClient from './client';
+// @ts-ignore
 import DateSlicerFn from '../elasticsearch_reader/elasticsearch_date_range/slicer';
 import {
     dateFormat,
     dateFormatSeconds,
     parseDate,
     dateOptions,
+    // @ts-ignore
     divideRange,
-    getTimes,
     processInterval
-} from '../helpers';
+} from '../__lib';
 import { ApiConfig } from './interfaces';
-import { SlicerArgs } from '../elasticsearch_reader/interfaces';
+// @ts-ignore
+
 
 // TODO: dedup this from ESReader Slicer
 
@@ -103,23 +105,8 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
         return parseDate(time.format(dateFormat));
     }
 
-    updateJob(dates: any, interval: any) {
-        const opName = this.opConfig._op;
-
-        // this sends actual dates to execution context so that it can keep
-        // track of them for recoveries
-        if (!this.opConfig.start || !this.opConfig.end || this.opConfig.interval === 'auto') {
-            const { operations } = this.executionConfig;
-            const opIndex = operations.findIndex((config) => config._op === opName);
-            const update = {
-                start: dates.start.format(dateFormat),
-                end: dates.limit.format(dateFormat)
-            };
-
-            const updatedOpConfig = Object.assign({}, this.opConfig, update, { interval });
-            operations[opIndex] = updatedOpConfig;
-            this.events.emit('slicer:execution:update', { update: operations });
-        }
+    async updateJob(data: AnyObject) {
+        return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
     }
 
     async getCount(dates: any, key?: string) {
@@ -161,53 +148,60 @@ export default class ESDateSlicer extends ParallelSlicer<ApiConfig> {
     isRecoverable() {
         return true;
     }
-
-    async newSlicer(id: number): Promise<SlicerFn> {
-        const isPersistent = this.executionConfig.lifecycle === 'persistent';
-        const slicerFnArgs: Partial<SlicerArgs> = {
-            context: this.context,
-            opConfig: this.opConfig,
-            executionConfig: this.executionConfig,
-            logger: this.logger,
-            id,
-            api: this.api
-        };
-
-        await this.api.version();
-
-        if (this.recoveryData && this.recoveryData.length > 0) {
-            slicerFnArgs.retryData = this.recoveryData[id];
-        }
-
-        if (isPersistent) {
-            const dataIntervals = getTimes(
-                this.opConfig,
-                this.executionConfig.slicers,
-                this.dateFormat
-            );
-            slicerFnArgs.dates = dataIntervals[id];
-        } else {
-            const esDates = await this.getDates();
-            // query with no results
-            if (esDates.start == null) {
-                this.logger.warn(`No data was found in index: ${this.opConfig.index} using query: ${this.opConfig.query}`);
-                // slicer will run and complete when a null is returned
-                return async () => null;
-            }
-            const interval = await this.getInterval(esDates);
-            const dateRange = divideRange(
-                esDates.start,
-                esDates.limit,
-                this.executionConfig.slicers,
-                this.dateFormat
-            );
-            this.updateJob(esDates, interval);
-            // we set so auto is replaced with correct interval
-            slicerFnArgs.opConfig.interval = interval;
-            slicerFnArgs.dates = dateRange[id];
-        }
-
+    // @ts-ignore
+    async newSlicer(_id: number): Promise<SlicerFn> {
         // @ts-ignore
-        return DateSlicerFn(slicerFnArgs as SlicerArgs);
+        return () => null;
+        // const isPersistent = this.executionConfig.lifecycle === 'persistent';
+        // const slicerFnArgs: Partial<SlicerArgs> = {
+        //     context: this.context,
+        //     opConfig: this.opConfig,
+        //     executionConfig: this.executionConfig,
+        //     logger: this.logger,
+        //     id,
+        //     api: this.api
+        // };
+
+        // await this.api.version();
+
+        // if (this.recoveryData && this.recoveryData.length > 0) {
+        //     slicerFnArgs.retryData = this.recoveryData[id];
+        // }
+
+        // if (isPersistent) {
+        //     const dataIntervals = getTimes(
+        //         this.opConfig,
+        //         this.executionConfig.slicers,
+        //         this.dateFormat
+        //     );
+        //     slicerFnArgs.dates = dataIntervals[id];
+        // } else {
+        //     const esDates = await this.getDates();
+        //     // query with no results
+        //     if (esDates.start == null) {
+        //         this.logger.warn(`No data was found in index: ${this.opConfig.index} using query: ${this.opConfig.query}`);
+        //         // slicer will run and complete when a null is returned
+        //         return async () => null;
+        //     }
+        //     const interval = await this.getInterval(esDates);
+        //     const dateRange = divideRange(
+        //         esDates.start,
+        //         esDates.limit,
+        //         this.executionConfig.slicers,
+        //         this.dateFormat
+        //     );
+
+        //     await this.updateJob({
+        //         start: esDates.start.format(this.dateFormat),
+        //         end: esDates.limit.format(this.dateFormat),
+        //         interval
+        //     });
+        //     // we set so auto is replaced with correct interval
+        //     slicerFnArgs.opConfig.interval = interval;
+        //     slicerFnArgs.dates = dateRange[id];
+        // }
+
+        // // @ts-ignore
+        // return DateSlicerFn(slicerFnArgs as SlicerArgs);
     }
 }

@@ -1,12 +1,12 @@
 import { TSError } from '@terascope/job-components';
 import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
 import { getKeyArray } from './helpers';
-import { retryModule } from '../helpers';
+import { retryModule } from '../__lib';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs) {
     const {
-        context,
+        events,
         opConfig,
         executionConfig,
         retryData,
@@ -18,7 +18,6 @@ export default function newSlicer(args: ESIDSlicerArgs) {
     const baseKeyArray = getKeyArray(opConfig);
     const startingKeyDepth = opConfig.starting_key_depth;
     const retryError = retryModule(logger, executionConfig.max_retries);
-    const events = context.apis.foundation.getSystemEvents();
 
     async function determineKeySlice(
         generator: any,

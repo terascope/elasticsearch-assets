@@ -6,9 +6,17 @@ import {
     SlicerDateResults,
     SlicerDateConfig,
     ParsedInterval,
-    DateConfig
+    DateConfig,
+    StartPointConfig,
+    DateSegments
 } from '../interfaces';
-import * as helpers from '../../helpers';
+import {
+    dateFormat as dFormat,
+    dateFormatSeconds,
+    dateOptions,
+    retryModule,
+    determineStartingPoint
+} from '../../__lib';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
 
@@ -52,7 +60,7 @@ type SlicerFnResults = SlicerDateResults|SlicerDateResults[]|null;
 
 export default function newSlicer(args: SlicerArgs) {
     const {
-        context,
+        events,
         opConfig,
         executionConfig,
         logger,
@@ -60,14 +68,19 @@ export default function newSlicer(args: SlicerArgs) {
         dates: sliceDates,
         id,
         interval,
-        intervalMS
+        latencyInterval,
+        primaryRange,
+        windowState
     } = args;
 
-    const events = context.apis.foundation.getSystemEvents();
-    const timeResolution = helpers.dateOptions(opConfig.time_resolution);
-    const retryError = helpers.retryModule(logger, executionConfig.max_retries);
-    const dateFormat = timeResolution === 'ms' ? helpers.dateFormat : helpers.dateFormatSeconds;
-    // This could be different since we have another op that uses this module
+    const timeResolution = dateOptions(opConfig.time_resolution);
+    const retryError = retryModule(logger, executionConfig.max_retries);
+    const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
+    const currentWindow = primaryRange;
+
+    if (executionConfig.lifecycle === 'persistent' && windowState == null) {
+        throw new Error('WindowState must be provided if lifecyle is persistent');
+    }
 
     async function determineSlice(
         dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
@@ -199,7 +212,7 @@ export default function newSlicer(args: SlicerArgs) {
         );
 
         const idSlicerArs: ESIDSlicerArgs = {
-            context,
+            events,
             opConfig: idConfig,
             executionConfig,
             logger,
@@ -223,44 +236,67 @@ export default function newSlicer(args: SlicerArgs) {
         return api.count(query);
     }
 
+    async function nextRange() {
+        if (executionConfig.lifecycle === 'persistent') {
+            const canProcessNextRange = windowState?.checkin(id);
+
+            if (!canProcessNextRange) return null;
+
+            const [lStep, lUnit] = latencyInterval as ParsedInterval;
+            const delayedBarrier = moment().subtract(lStep, lUnit);
+            const { start, limit } = currentWindow as DateSegments;
+            const newStart = moment(start);
+            const newlimit = moment(limit);
+
+            const config: StartPointConfig = {
+                dates: { start: newStart, limit: newlimit },
+                id,
+                numOfSlicers: executionConfig.slicers,
+                interval
+            };
+            const dates = await determineStartingPoint(config);
+
+            if (dates.limit.isSameOrBefore(delayedBarrier)) {
+                return dates;
+            }
+
+            return null;
+        }
+        return null;
+    }
+
     function dateSlicer(dates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
         const [step, unit] = interval as ParsedInterval;
 
-        const start = moment(dates.start);
-        const end = moment(dates.end);
-        let limit = moment(dates.limit);
-
         const dateParams: DateParams = {
             size: opConfig.size,
             interval,
-            start,
-            end,
+            start: moment(dates.start),
+            end: moment(dates.end),
             holes,
-            limit
+            limit: moment(dates.limit)
         };
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        if (executionConfig.lifecycle === 'persistent') {
-            // set a timer to add the next set it should process
-            const injector = setInterval(() => {
-                // keep a list of next batches in cases current batch is still running
-                const newLimit = moment(limit).add(step, unit);
-                dateParams.limit = moment(newLimit);
-                dateParams.end = moment(newLimit);
-                limit = newLimit;
-            }, intervalMS);
-
-            events.on('worker:shutdown', () => {
-                clearInterval(injector);
-            });
-        }
-
         return async function sliceDate(msg: any): Promise<SlicerFnResults> {
-            if (dateParams.start.isSameOrAfter(dateParams.limit)) return null;
+            if (dateParams.start.isSameOrAfter(dateParams.limit)) {
+                // if steaming and there is more work, then continue
+                const next = await nextRange();
+                // return null to finish or if unable to start new segment
+                if (!next) return next;
+
+                windowState.slicerIsRestarting(id);
+                const { start, end, limit } = next;
+
+                dateParams.start = start;
+                dateParams.end = end;
+                dateParams.limit = limit;
+            }
+
             let data: DetermineSliceResults;
 
             try {
@@ -292,20 +328,20 @@ export default function newSlicer(args: SlicerArgs) {
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');
                 try {
-                    const list = await makeKeyList(data, limit.format(dateFormat));
+                    const list = await makeKeyList(data, dateParams.limit.format(dateFormat));
                     return list.map((obj) => {
-                        obj.limit = limit.format(dateFormat);
+                        obj.limit = dateParams.limit.format(dateFormat);
                         return obj;
                     }) as SlicerDateResults[];
                 } catch (err) {
                     return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
                 }
             }
-            // TODO: do we need dataParams.holes here? where should mutate
+
             return {
                 start: data.start.format(dateFormat),
                 end: data.end.format(dateFormat),
-                limit: limit.format(dateFormat),
+                limit: dateParams.limit.format(dateFormat),
                 holes: dateParams.holes,
                 count: data.count
             };

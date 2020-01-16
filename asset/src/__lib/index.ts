@@ -13,7 +13,7 @@ import {
     SlicerDateResults,
     ParsedInterval,
     DateConfig
-} from './elasticsearch_reader/interfaces';
+} from '../elasticsearch_reader/interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -105,7 +105,6 @@ type RetryFn = (msg: string) => any
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
     return (_key: string | object, err: Error, fn: RetryFn, msg: string) => {
-        console.log('what is the error', err)
         const errMessage = parseError(err);
         logger.error('error while getting next slice', errMessage);
         const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
@@ -295,8 +294,32 @@ export function divideRange(
     results[results.length - 1].limit = endingDate;
     return results;
 }
+// used by stream processing
+export function delayedStreamSegment(
+    processingInterval: ParsedInterval,
+    latencyInterval: ParsedInterval
+) {
+    const now = moment();
 
-export function determineStartingPoint(config: StartPointConfig): SlicerDateConfig {
+    const delayedLimit = moment(now).subtract(
+        latencyInterval[0],
+        latencyInterval[1]
+    );
+
+    const delayedStart = moment(delayedLimit).subtract(
+        processingInterval[0],
+        processingInterval[1]
+    );
+
+    return { start: delayedStart, limit: delayedLimit };
+}
+
+interface StartingConfig {
+    dates: SlicerDateConfig;
+    range: DateSegments;
+}
+
+export function determineStartingPoint(config: StartPointConfig): StartingConfig {
     const {
         dates,
         id,
@@ -304,6 +327,7 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
         interval,
         recoveryData
     } = config;
+    // TODO: take into account if dates start/limit are in holes
     // we need to split up times
     const [step, unit] = interval;
     // we are running in recovery
@@ -314,7 +338,7 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
         // our number of slicers have changed
         if (numOfSlicers !== recoveryData.length) {
             newDates = redistributeDates(recoveryData, numOfSlicers, id, interval);
-            return newDates as SlicerDateConfig;
+            return { dates: newDates as SlicerDateConfig, range: dates };
         }
         // numOfSlicers are the same so we can distribute normally
         // TODO: this is probably faulty behavior
@@ -323,26 +347,28 @@ export function determineStartingPoint(config: StartPointConfig): SlicerDateConf
             dates.limit,
             numOfSlicers
         )[id];
+        // TODO: check for holes in recovery data for end
         // @ts-ignore FIXME:
         const recoveryEnd = moment(recoveryData[id].end);
         newDates.start = recoveryEnd;
-
         let end = moment(newDates.start).add(step, unit);
         if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
         newDates.end = end;
 
-        return newDates as SlicerDateConfig;
+        return { dates: newDates as SlicerDateConfig, range: dates };
     }
 
-    const newDates: Partial<SlicerDateConfig> = divideRange(
-        dates.start,
-        dates.limit,
+    const dateRange: Partial<SlicerDateConfig>[] = divideRange(
+        moment(dates.start),
+        moment(dates.limit),
         numOfSlicers
-    )[id];
+    );
+
+    const newDates = dateRange[id];
 
     let end = moment(newDates.start).add(step, unit);
     if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
     newDates.end = end;
 
-    return newDates as SlicerDateConfig;
+    return { dates: newDates as SlicerDateConfig, range: dates };
 }

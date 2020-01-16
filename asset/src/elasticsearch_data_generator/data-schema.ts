@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { DataGenerator, DateOptions, IDType } from './interfaces';
-import { dateFormat } from '../helpers';
+import { dateFormat } from '../__lib';
 
 function regexID(type: IDType) {
     const reg = { randexp: '' };
