@@ -319,6 +319,47 @@ interface StartingConfig {
     range: DateSegments;
 }
 
+function checkForHoles(
+    newDates: SlicerDateConfig,
+    rData: SlicerDateResults,
+    interval: ParsedInterval
+): SlicerDateConfig {
+    const [step, unit] = interval;
+    if (rData.holes && rData.holes.length > 0) {
+        const holes = [...rData.holes];
+
+        const finalHole = holes[holes.length - 1];
+
+        if (newDates.limit?.isSame(finalHole.end)) {
+            newDates.limit = moment(finalHole.start);
+            // we encapsulate the hole so we can drop it
+            holes.pop();
+        } else if (newDates.limit?.isBefore(finalHole.end)) {
+            // we keep hole for future boundry increase
+            newDates.limit = moment(finalHole.start);
+        }
+
+        // this would happen if previous end was next to hole
+        if (holes[0] && newDates.start.isSameOrAfter(holes[0].start)) {
+            newDates.start = moment(holes[0].end);
+            // we get rid of old hole since we jumped it
+            holes.shift();
+        }
+        let end = moment(newDates.start).add(step, unit);
+        // we check again because we could have jump the hole already
+        if (holes.length > 0) {
+            if (end.isSameOrAfter(holes[0].start)) end = moment(holes[0].start);
+        }
+
+        newDates.end = end;
+        newDates.holes = holes;
+    }
+
+    if (newDates.end.isSameOrAfter(newDates.limit)) newDates.end = moment(newDates.limit);
+
+    return newDates as SlicerDateConfig;
+}
+
 export function determineStartingPoint(config: StartPointConfig): StartingConfig {
     const {
         dates,
@@ -327,35 +368,35 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
         interval,
         recoveryData
     } = config;
+    // console.log('recovery coming in', recoveryData)
     // TODO: take into account if dates start/limit are in holes
     // we need to split up times
     const [step, unit] = interval;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
-        // TODO: review SlicerDateConfig
+        const rData = recoveryData[id];
+        const recoveryEnd = moment(rData.end);
         let newDates: Partial<SlicerDateConfig> = {};
 
         // our number of slicers have changed
         if (numOfSlicers !== recoveryData.length) {
+            // console.log('not in here')
             newDates = redistributeDates(recoveryData, numOfSlicers, id, interval);
-            return { dates: newDates as SlicerDateConfig, range: dates };
+        } else {
+            // numOfSlicers are the same so we can distribute normally
+            newDates = divideRange(
+                dates.start,
+                dates.limit,
+                numOfSlicers
+            )[id];
         }
-        // numOfSlicers are the same so we can distribute normally
-        // TODO: this is probably faulty behavior
-        newDates = divideRange(
-            dates.start,
-            dates.limit,
-            numOfSlicers
-        )[id];
-        // TODO: check for holes in recovery data for end
-        // @ts-ignore FIXME:
-        const recoveryEnd = moment(recoveryData[id].end);
-        newDates.start = recoveryEnd;
-        let end = moment(newDates.start).add(step, unit);
-        if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
-        newDates.end = end;
 
-        return { dates: newDates as SlicerDateConfig, range: dates };
+        newDates.start = recoveryEnd;
+        newDates.end = moment(newDates.start).add(step, unit);
+
+        const correctDates = checkForHoles(newDates as SlicerDateConfig, rData, interval);
+
+        return { dates: correctDates, range: dates };
     }
 
     const dateRange: Partial<SlicerDateConfig>[] = divideRange(
