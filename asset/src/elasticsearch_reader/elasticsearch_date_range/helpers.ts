@@ -13,7 +13,7 @@ import {
     SlicerDateResults,
     ParsedInterval,
     DateConfig
-} from '../elasticsearch_reader/interfaces';
+} from '../interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -259,7 +259,6 @@ export function divideRange(
     const step = moment(startTime);
 
     for (let i = 0; i < numOfSlicers; i += 1) {
-        // TODO: this mutates step, see if we can make this better, but it works as is
         const start = moment(step);
         const limit = moment(step.add(range, 'ms'));
         results.push({ start, limit });

@@ -23,7 +23,7 @@ import {
 } from '../../asset/src/elasticsearch_reader/interfaces';
 import MockClient from '../mock_client';
 // @ts-ignore
-import { dateFormatSeconds, dateFormat, divideRange } from '../../asset/src/__lib';
+import { dateFormatSeconds, dateFormat, divideRange } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 
 interface TestConfig {
     slicers?: number;

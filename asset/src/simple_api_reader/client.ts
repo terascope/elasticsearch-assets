@@ -1,6 +1,6 @@
 import { Logger, TSError, get } from '@terascope/job-components';
 import got from 'got';
-import { ApiConfig } from './interfaces';
+import { ApiConfig } from '../elasticsearch_reader/interfaces';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';

@@ -63,7 +63,8 @@ describe('simple_api_reader', () => {
             fields: null,
             key_type: IDType.base64,
             connection: 'default',
-            time_resolution: 's'
+            time_resolution: 's',
+            full_response: true
         };
         const client = new ApiMockedClient(opConfig, logger);
 

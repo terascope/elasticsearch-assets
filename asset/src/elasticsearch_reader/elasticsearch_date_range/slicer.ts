@@ -5,6 +5,7 @@ import {
     ExecutionConfig,
     TSError,
     AnyObject,
+    get
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -17,9 +18,9 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment,
-} from '../../__lib';
+} from './helpers';
 import {
-    DateSlicerConfig,
+    ESDateConfig,
     SlicerArgs,
     DateSegments,
     StartPointConfig,
@@ -29,14 +30,14 @@ import WindowState from '../window-state';
 
 type FetchDate = moment.Moment | null;
 
-export default class DateSlicer extends ParallelSlicer<DateSlicerConfig> {
+export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     api: elasticApi.Client;
     dateFormat: string;
     windowState: WindowState
 
     constructor(
         context: WorkerContext,
-        opConfig: DateSlicerConfig,
+        opConfig: ESDateConfig,
         executionConfig: ExecutionConfig,
         client: any
     ) {
@@ -88,7 +89,8 @@ export default class DateSlicer extends ParallelSlicer<DateSlicerConfig> {
         }
 
         // using this query to catch potential errors even if a date is given already
-        const results = await this.api.search(query);
+        const searchResults = await this.api.search(query);
+        const results = get(searchResults, 'hits.hits', []).map((obj: any) => obj._source);
         const [data] = results;
 
         if (data == null) {
@@ -222,8 +224,7 @@ export default class DateSlicer extends ParallelSlicer<DateSlicerConfig> {
             });
 
             const config: StartPointConfig = {
-                // @ts-ignore FIXME:
-                dates: esDates,
+                dates: esDates as DateSegments,
                 id,
                 numOfSlicers: this.executionConfig.slicers,
                 recoveryData,

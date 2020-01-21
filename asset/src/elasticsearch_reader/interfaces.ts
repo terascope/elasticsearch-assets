@@ -30,6 +30,7 @@ export interface ESReaderConfig extends OpConfig {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
+    full_response: boolean;
 }
 
 export interface DateSegments {
@@ -87,4 +88,4 @@ export interface ApiConfig extends ESReaderConfig {
     timeout: number;
 }
 
-export type DateSlicerConfig = ESReaderConfig | ApiConfig;
+export type ESDateConfig = ESReaderConfig | ApiConfig;

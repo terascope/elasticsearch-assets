@@ -1,7 +1,7 @@
 import { TSError } from '@terascope/job-components';
 import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
 import { getKeyArray } from './helpers';
-import { retryModule } from '../__lib';
+import { retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs) {

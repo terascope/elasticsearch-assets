@@ -10,7 +10,7 @@ import MockClient from '../mock_client';
 import Schema from '../../asset/src/elasticsearch_reader/schema';
 import { IDType } from '../../asset/src/id_reader/interfaces';
 // @ts-ignore TODO: fixme:
-import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/__lib';
+import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 
 describe('elasticsearch_reader', () => {
     const assetDir = path.join(__dirname, '../..');

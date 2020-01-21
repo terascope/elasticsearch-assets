@@ -50,9 +50,11 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 format: 'required_String'
             },
             full_response: {
-                doc: 'Set to true to receive the full Elasticsearch query response including index metadata.',
-                default: false,
-                format: Boolean
+                doc: 'used internally for api, must be set to true',
+                default: true,
+                format: (val: any) => {
+                    if (val !== true) throw new Error('Parameter full_response must be set to true');
+                }
             },
             key_type: {
                 doc: 'The type of id used in index',

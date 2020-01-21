@@ -6,7 +6,7 @@ import moment from 'moment';
 // @ts-ignore
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
-import { dateOptions } from '../__lib';
+import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
@@ -245,6 +245,13 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             },
             connection: {
                 default: 'default'
+            },
+            full_response: {
+                doc: 'used internally for api, must be set to true',
+                default: true,
+                format: (val: any) => {
+                    if (val !== true) throw new Error('Parameter full_response must be set to true');
+                }
             }
         };
     }

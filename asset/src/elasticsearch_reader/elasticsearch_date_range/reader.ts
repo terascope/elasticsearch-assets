@@ -1,17 +1,28 @@
-import { SliceRequest, AnyObject, DataEntity } from '@terascope/job-components';
+import {
+    Fetcher,
+    SliceRequest,
+    DataEntity,
+    WorkerContext,
+    ExecutionConfig
+} from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
+import { ESDateConfig } from '../interfaces';
 
-export default class ESReader {
+export default class DateReader extends Fetcher<ESDateConfig> {
     api: elasticApi.Client;
-    queryConfig: AnyObject;
 
-    constructor(api: elasticApi.Client, queryConfig: AnyObject) {
-        this.api = api;
-        this.queryConfig = queryConfig;
+    constructor(
+        context: WorkerContext,
+        opConfig: ESDateConfig,
+        executionConfig: ExecutionConfig,
+        client: any
+    ) {
+        super(context, opConfig, executionConfig);
+        this.api = elasticApi(client, this.logger, this.opConfig);
     }
 
     async fetch(slice: SliceRequest) {
-        const query = this.api.buildQuery(this.queryConfig, slice);
+        const query = this.api.buildQuery(this.opConfig, slice);
         const results = await this.api.search(query);
         // TODO: better typeing of doc
         return results.hits.hits.map((doc: any) => {

@@ -16,7 +16,7 @@ import {
     dateOptions,
     retryModule,
     determineStartingPoint,
-} from '../../__lib';
+} from './helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
 
@@ -316,8 +316,13 @@ export default function newSlicer(args: SlicerArgs) {
                 // we are in a hole, need to shift where it is looking at
                 // we mutate on pupose, eject hole that is already passed
                 const hole = holes.shift() as DateConfig;
-                dateParams.start = moment(hole.end);
-                // TODO: check for limit here
+                let newStart = moment(hole.end);
+
+                if (newStart.isAfter(dateParams.limit)) {
+                    newStart = moment(dateParams.limit);
+                }
+
+                dateParams.start = newStart;
             }
 
             const newEnd = moment(dateParams.start).add(step, unit);
@@ -355,5 +360,3 @@ export default function newSlicer(args: SlicerArgs) {
 
     return dateSlicer(sliceDates, id);
 }
-
-

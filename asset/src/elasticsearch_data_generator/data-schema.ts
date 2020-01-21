@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { DataGenerator, DateOptions, IDType } from './interfaces';
-import { dateFormat } from '../__lib';
+import { dateFormat } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 
 function regexID(type: IDType) {
     const reg = { randexp: '' };

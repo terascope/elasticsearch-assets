@@ -1,6 +1,6 @@
 import 'jest-extended';
 import moment from 'moment';
-import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../asset/src/__lib';
+import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 import { StartPointConfig, ParsedInterval } from '../../asset/src/elasticsearch_reader/interfaces';
 
 function makeDate(format: string) {
