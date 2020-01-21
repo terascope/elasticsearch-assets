@@ -1,357 +1,239 @@
-import { cloneDeep, TSError } from '@terascope/job-components';
+import {
+    ParallelSlicer,
+    SlicerFn,
+    WorkerContext,
+    ExecutionConfig,
+    TSError,
+    AnyObject,
+} from '@terascope/job-components';
 import moment from 'moment';
-import idSlicer from '../../id_reader/id-slicer';
+import elasticApi from '@terascope/elasticsearch-api';
+import dateSlicerFn from './slicer-fn';
 import {
-    SlicerArgs,
-    SlicerDateResults,
-    SlicerDateConfig,
-    ParsedInterval,
-    DateConfig,
-    StartPointConfig,
-    DateSegments
-} from '../interfaces';
-import {
-    dateFormat as dFormat,
-    dateFormatSeconds,
+    processInterval,
+    dateFormat,
     dateOptions,
-    retryModule,
+    dateFormatSeconds,
+    parseDate,
     determineStartingPoint,
+    delayedStreamSegment,
 } from '../../__lib';
-import { ESIDSlicerArgs } from '../../id_reader/interfaces';
-import { getKeyArray } from '../../id_reader/helpers';
+import {
+    DateSlicerConfig,
+    SlicerArgs,
+    DateSegments,
+    StartPointConfig,
+    SlicerDateResults,
+} from '../interfaces';
+import WindowState from '../window-state';
 
-interface DetermineSliceResults {
-    start: moment.Moment;
-    end: moment.Moment;
-    count: number;
-    key?: string;
-}
+type FetchDate = moment.Moment | null;
 
-interface DateParams {
-    start: moment.Moment;
-    end: moment.Moment;
-    limit: moment.Moment;
-    holes: DateConfig[];
-    interval: ParsedInterval;
-    size: number;
-}
+export default class DateSlicer extends ParallelSlicer<DateSlicerConfig> {
+    api: elasticApi.Client;
+    dateFormat: string;
+    windowState: WindowState
 
-type SliceResults = SlicerDateResults | SlicerDateResults[] | null;
-
-function splitTime(
-    start: moment.Moment,
-    end: moment.Moment,
-    limit: moment.Moment,
-    timeResolution: string
-) {
-    let diff = Math.floor(end.diff(start) / 2);
-
-    if (moment(start).add(diff, 'ms').isAfter(limit)) {
-        diff = moment(limit).diff(start);
+    constructor(
+        context: WorkerContext,
+        opConfig: DateSlicerConfig,
+        executionConfig: ExecutionConfig,
+        client: any
+    ) {
+        super(context, opConfig, executionConfig);
+        this.api = elasticApi(client, this.logger, this.opConfig);
+        const timeResolution = dateOptions(opConfig.time_resolution);
+        this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
+        this.windowState = new WindowState(executionConfig.slicers);
     }
 
-    if (timeResolution === 'ms') {
-        return diff;
-    }
-
-    const secondDiff = Math.floor(diff / 1000);
-    return secondDiff;
-}
-
-export default function newSlicer(args: SlicerArgs) {
-    const {
-        events,
-        opConfig,
-        executionConfig,
-        logger,
-        api,
-        dates: sliceDates,
-        id,
-        interval,
-        latencyInterval,
-        primaryRange,
-        windowState
-    } = args;
-
-    const timeResolution = dateOptions(opConfig.time_resolution);
-    const retryError = retryModule(logger, executionConfig.max_retries);
-    const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
-    const currentWindow = primaryRange || {} as DateSegments;
-
-    if (executionConfig.lifecycle === 'persistent' && windowState == null) {
-        throw new Error('WindowState must be provided if lifecyle is persistent');
-    }
-
-    async function determineSlice(
-        dateParams: DateParams, slicerId: number, isExpandedSlice?: boolean, isLimitQuery?: boolean
-    ): Promise<DetermineSliceResults> {
-        const {
-            start, end, limit, size, holes, interval: [step, unit]
-        } = dateParams;
-
-        let count: number;
-        try {
-            count = await getCount(dateParams);
-        } catch (err) {
-            const error = new TSError(err, { reason: `Unable to count slice ${JSON.stringify(dateParams)}` });
-            return Promise.reject(error);
+    async getDates() {
+        const [startDate, endDate] = await Promise.all([this.getIndexDate(this.opConfig.start, 'start'), this.getIndexDate(this.opConfig.end, 'end')]);
+        const finalDates = { start: startDate, limit: endDate };
+        if (startDate && endDate) {
+            this.logger.info(`execution: ${this.executionConfig.ex_id} start and end range times are ${startDate.format(this.dateFormat)} and ${endDate.format(this.dateFormat)}`);
         }
-
-        if (count > size) {
-            // if size is to big after increasing slice, use alternative division behavior
-            if (isExpandedSlice) {
-            // recurse down to the appropriate size
-                const newStart = moment(end).subtract(step, unit);
-                // get diff from new start
-                const diff = splitTime(newStart, end, limit, timeResolution);
-                const newEnd = moment(newStart).add(diff, timeResolution);
-                const cloneDates: DateParams = {
-                    interval: dateParams.interval,
-                    limit,
-                    size,
-                    holes,
-                    start: newStart,
-                    end: newEnd,
-                };
-
-                const data: DetermineSliceResults = await determineSlice(
-                    cloneDates,
-                    slicerId,
-                    false
-                );
-                // return the zero range start with the correct end
-                return {
-                    start,
-                    end: data.end,
-                    count: data.count
-                };
-            }
-
-            // find difference in milliseconds and divide in half
-            const diff = splitTime(start, end, limit, timeResolution);
-            const newEnd = moment(start).add(diff, timeResolution);
-
-            // prevent recursive call if difference is one millisecond
-            if (diff <= 0) {
-                return { start, end, count };
-            }
-
-            // recurse to find smaller chunk
-            dateParams.end = newEnd;
-            events.emit('slicer:slice:recursion');
-
-            if (logger.level() === 10) logger.trace(`slicer: ${slicerId} is recursing ${JSON.stringify(dateParams)}`);
-
-            return determineSlice(dateParams, slicerId, isExpandedSlice);
-        }
-
-        // interval is only passed in with once mode, it will expand slices to prevent
-        // counts of 0, if the limit is reached it will run once more for the correct count
-        // then it should return and not recurse further if there is still no data
-        if (!isLimitQuery && count === 0 && dateParams.interval) {
-            // increase the slice range to find documents
-            let makeLimitQuery = false;
-
-            const newEnd = moment(dateParams.end).add(step, unit);
-            if (newEnd.isSameOrAfter(dateParams.limit)) {
-                // set to limit
-                makeLimitQuery = true;
-                dateParams.end = dateParams.limit;
-            } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
-                makeLimitQuery = true;
-                dateParams.end = moment(holes[0].start);
-            } else {
-                dateParams.end = newEnd;
-            }
-
-            events.emit('slicer:slice:range_expansion');
-            return determineSlice(dateParams, slicerId, true, makeLimitQuery);
-        }
-
-        return {
-            start: dateParams.start,
-            end: dateParams.end,
-            count
-        };
+        return finalDates;
     }
 
-    async function getIdData(slicerFn: any): Promise<Partial<SlicerDateResults>[]> {
-        const list: Partial<SlicerDateResults>[] = [];
-        return new Promise(((resolve, reject) => {
-            const slicer = slicerFn;
-            function iterate() {
-                Promise.resolve(slicer())
-                    .then((data) => {
-                        if (data) {
-                            list.push(cloneDeep(data));
-                            return iterate();
-                        }
-                        return resolve(list);
-                    })
-                    .catch((err) => {
-                        // retries happen at the idSlicer level
-                        reject(new TSError(err, {
-                            reason: 'error trying to subslice by key'
-                        }));
-                    });
-            }
+    async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
+        const sortObj = {};
+        let givenDate: any = null;
+        let query: any = null;
 
-            iterate();
-        }));
-    }
+        if (date) {
+            givenDate = parseDate(date);
+            query = this.api.buildQuery(
+                this.opConfig,
+                { count: 1, start: this.opConfig.start, end: this.opConfig.end }
+            );
+        } else {
+            const sortOrder = order === 'start' ? 'asc' : 'desc';
 
-    async function makeKeyList(data: DetermineSliceResults, limit: string) {
-        const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
-        const range: SlicerDateResults = Object.assign(
-            data,
-            {
-                start: data.start.format(),
-                end: data.end.format(),
-                limit
-            }
-        );
+            sortObj[this.opConfig.date_field_name] = { order: sortOrder };
 
-        const idSlicerArs: ESIDSlicerArgs = {
-            events,
-            opConfig: idConfig,
-            executionConfig,
-            logger,
-            api,
-            range,
-            keySet: getKeyArray(opConfig)
-        };
-        const idSlicers = idSlicer(idSlicerArs);
-
-        return getIdData(idSlicers);
-    }
-
-    async function getCount(dates: DateParams) {
-        const end = dates.end ? dates.end : dates.limit;
-        const range: any = {
-            start: dates.start.format(dateFormat),
-            end: end.format(dateFormat)
-        };
-        const query = api.buildQuery(opConfig, range);
-
-        return api.count(query);
-    }
-
-    async function nextRange() {
-        if (executionConfig.lifecycle === 'persistent') {
-            const canProcessNextRange = windowState?.checkin(id);
-            if (!canProcessNextRange) return null;
-
-            const [step, unit] = interval as ParsedInterval;
-            const [lStep, lUnit] = latencyInterval as ParsedInterval;
-            const delayedBarrier = moment().subtract(lStep, lUnit);
-
-            const { start, limit } = currentWindow as DateSegments;
-
-            const newStart = moment(start).add(step, unit);
-            const newLimit = moment(limit).add(step, unit);
-
-            const config: StartPointConfig = {
-                dates: { start: moment(newStart), limit: moment(newLimit) },
-                id,
-                numOfSlicers: executionConfig.slicers,
-                interval
+            query = {
+                index: this.opConfig.index,
+                size: 1,
+                body: {
+                    sort: [
+                        sortObj
+                    ]
+                }
             };
 
-            const { dates } = await determineStartingPoint(config);
-            if (dates.limit.isSameOrBefore(delayedBarrier)) {
-                // we have succesfuly jumped, move window
-                currentWindow.start = newStart;
-                currentWindow.limit = newLimit;
-                return dates;
+            if (this.opConfig.query) {
+                query.q = this.opConfig.query;
             }
+        }
+
+        // using this query to catch potential errors even if a date is given already
+        const results = await this.api.search(query);
+        const [data] = results;
+
+        if (data == null) {
+            this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.opConfig.index}`);
             return null;
         }
-        return null;
+
+        if (data[this.opConfig.date_field_name] == null) {
+            throw new TSError(`Invalid date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index}, field does not exist on record`);
+        }
+
+        if (givenDate) {
+            return givenDate;
+        }
+
+        if (order === 'start') {
+            return parseDate(data[this.opConfig.date_field_name]);
+        }
+        // end date is non-inclusive, adding 1s so range will cover it
+        const newDate = data[this.opConfig.date_field_name];
+        // @ts-ignore
+        const time = moment(newDate).add(1, this.opConfig.time_resolution);
+        return parseDate(time.format(this.dateFormat));
     }
 
-    function dateSlicer(dates: SlicerDateConfig, slicerId: number) {
-        const shouldDivideByID = opConfig.subslice_by_key;
-        const threshold = opConfig.subslice_key_threshold;
-        const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
-        const [step, unit] = interval as ParsedInterval;
+    async updateJob(data: AnyObject) {
+        return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
+    }
 
-        const dateParams: DateParams = {
-            size: opConfig.size,
-            interval,
-            start: moment(dates.start),
-            end: moment(dates.end),
-            holes,
-            limit: moment(dates.limit)
+    async getCount(dates: any, key?: string) {
+        const end = dates.end ? dates.end : dates.limit;
+        const range: any = {
+            start: dates.start.format(this.dateFormat),
+            end: end.format(this.dateFormat)
         };
 
-        logger.debug('all date configurations for date slicer', dateParams);
+        if (key) {
+            range.key = key;
+        }
 
-        return async function sliceDate(msg: any): Promise<SliceResults> {
-            if (dateParams.start.isSameOrAfter(dateParams.limit)) {
-                // we are done
-                // if steaming and there is more work, then continue
-                const next = await nextRange();
-                // return null to finish or if unable to start new segment
-                if (!next) return next;
+        const query = this.api.buildQuery(this.opConfig, range);
+        return this.api.count(query);
+    }
 
-                const { start, end, limit } = next;
-                // TODO: check if we jumped a hole here at start, remove hole
-                dateParams.start = moment(start);
-                dateParams.end = moment(end);
-                dateParams.limit = moment(limit);
+    async getInterval(interval: string, esDates?: DateSegments) {
+        if (this.opConfig.interval !== 'auto') {
+            return processInterval(interval, this.opConfig.time_resolution, esDates);
+        }
+        if (esDates == null) throw new Error('must provide dates to create interval');
+
+        const count = await this.getCount(esDates);
+        const numOfSlices = Math.ceil(count / this.opConfig.size);
+        const timeRangeMilliseconds = esDates.limit.diff(esDates.start);
+        const millisecondInterval = Math.floor(timeRangeMilliseconds / numOfSlices);
+
+        if (this.opConfig.time_resolution === 's') {
+            let seconds = Math.floor(millisecondInterval / 1000);
+            if (seconds < 1) {
+                seconds = 1;
             }
+            return [seconds, 's'];
+        }
 
-            let data: DetermineSliceResults;
+        return [millisecondInterval, 'ms'];
+    }
 
-            try {
-                data = await determineSlice(dateParams, slicerId, false);
-            } catch (err) {
-                const retryInput = dateParams.start.format(dateFormat);
-                return retryError(retryInput, err, sliceDate, msg);
-            }
+    isRecoverable() {
+        return true;
+    }
 
-            dateParams.start = moment(data.end);
+    async newSlicer(id: number): Promise<SlicerFn> {
+        const isPersistent = this.executionConfig.lifecycle === 'persistent';
+        const slicerFnArgs: Partial<SlicerArgs> = {
+            opConfig: this.opConfig,
+            executionConfig: this.executionConfig,
+            logger: this.logger,
+            id,
+            api: this.api,
+            events: this.context.apis.foundation.getSystemEvents()
+        };
 
-            if (holes.length > 0 && dateParams.start.isSameOrAfter(holes[0].start)) {
-                // we are in a hole, need to shift where it is looking at
-                // we mutate on pupose, eject hole that is already passed
-                const hole = holes.shift() as DateConfig;
-                dateParams.start = moment(hole.end);
-                // TODO: check for limit here
-            }
+        await this.api.version();
 
-            const newEnd = moment(dateParams.start).add(step, unit);
+        const recoveryData = this.recoveryData.map(
+            (slice) => slice.lastSlice
+        ) as SlicerDateResults[];
 
-            if (newEnd.isAfter(dateParams.limit)) {
-                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
-            } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
-                dateParams.end = moment(holes[0].start);
-            } else {
-                dateParams.end = newEnd;
-            }
+        if (isPersistent) {
+            // we need to interval to get starting dates
+            const [interval, latencyInterval] = await Promise.all([
+                this.getInterval(this.opConfig.interval),
+                this.getInterval(this.opConfig.delay)
+            ]);
 
-            if (shouldDivideByID && data.count >= threshold) {
-                logger.debug('date slicer is recursing by keylist');
-                try {
-                    const list = await makeKeyList(data, dateParams.limit.format(dateFormat));
-                    return list.map((obj) => {
-                        obj.limit = dateParams.limit.format(dateFormat);
-                        return obj;
-                    }) as SlicerDateResults[];
-                } catch (err) {
-                    return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
-                }
-            }
+            slicerFnArgs.interval = interval;
+            slicerFnArgs.latencyInterval = latencyInterval;
+            slicerFnArgs.windowState = this.windowState;
 
-            return {
-                start: data.start.format(dateFormat),
-                end: data.end.format(dateFormat),
-                limit: dateParams.limit.format(dateFormat),
-                holes: dateParams.holes,
-                count: data.count
+            const { start, limit } = delayedStreamSegment(interval, latencyInterval);
+
+            const config: StartPointConfig = {
+                dates: { start, limit },
+                id,
+                numOfSlicers: this.executionConfig.slicers,
+                recoveryData,
+                interval
             };
-        };
-    }
+            const { dates, range } = await determineStartingPoint(config);
 
-    return dateSlicer(sliceDates, id);
+            slicerFnArgs.dates = dates;
+            slicerFnArgs.primaryRange = range;
+        } else {
+            const esDates = await this.getDates();
+            // query with no results
+            if (esDates.start == null || esDates.limit == null) {
+                this.logger.warn(`No data was found in index: ${this.opConfig.index} using query: ${this.opConfig.query}`);
+                // slicer will run and complete when a null is returned
+                return async () => null;
+            }
+
+            const interval = await this.getInterval(
+                this.opConfig.interval,
+                esDates as DateSegments
+            );
+            slicerFnArgs.interval = interval;
+
+            await this.updateJob({
+                start: esDates.start.format(this.dateFormat),
+                end: esDates.limit.format(this.dateFormat),
+                interval
+            });
+
+            const config: StartPointConfig = {
+                // @ts-ignore FIXME:
+                dates: esDates,
+                id,
+                numOfSlicers: this.executionConfig.slicers,
+                recoveryData,
+                interval
+            };
+            // we do not care for range for once jobs
+            const { dates } = await determineStartingPoint(config);
+            slicerFnArgs.dates = dates;
+        }
+
+        return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;
+    }
 }

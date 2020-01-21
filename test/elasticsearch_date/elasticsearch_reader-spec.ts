@@ -1395,7 +1395,7 @@ describe('elasticsearch_reader', () => {
             expect(results7).toEqual(null);
         });
 
-        xit('slicer can enter recovery and return to the last slice state in persistent mode with slicer changes (1 => 2)', async () => {
+        it('slicer can enter recovery and return to the last slice state in persistent mode with slicer changes (1 => 2)', async () => {
             const delay: [number, moment.unitOfTime.Base] = [30, 's'];
             const currentDate = makeDate(dateFormatSeconds);
             const startDate = moment(currentDate).subtract(10, 'm');

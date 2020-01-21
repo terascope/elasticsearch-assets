@@ -9,7 +9,6 @@ describe('WindowState', () => {
         expect(Object.keys(state._windowState)).toBeArrayOfSize(numOfSlicers);
         expect(state._allReachedLimit).toEqual(false);
         expect(state.checkin).toBeDefined();
-        expect(state.isRestarting).toBeDefined();
     });
 
     it('can checkin for one slicer', () => {
@@ -17,48 +16,22 @@ describe('WindowState', () => {
         const state = new WindowState(numOfSlicers);
 
         expect(state.checkin(0)).toEqual(true);
-        expect(state._allReachedLimit).toEqual(true);
-        // We have not yet reset
-        expect(state.checkin(0)).toEqual(false);
+        // as soon as one is done, it may continue
+        expect(state.checkin(0)).toEqual(true);
     });
 
     it('can checkin for two slicer', () => {
         const numOfSlicers = 2;
         const state = new WindowState(numOfSlicers);
 
-        expect(state.checkin(0)).toEqual(false);
+        expect(state.checkin(0)).toEqual(true);
         expect(state._allReachedLimit).toEqual(false);
         // We have not yet reset
         expect(state.checkin(0)).toEqual(false);
 
         expect(state.checkin(1)).toEqual(true);
-        expect(state._allReachedLimit).toEqual(true);
-        // We have not yet reset
-        expect(state.checkin(1)).toEqual(false);
-    });
-
-    it('can restart', () => {
-        const numOfSlicers = 2;
-        const state = new WindowState(numOfSlicers);
-
-        expect(state.checkin(0)).toEqual(false);
-        expect(state._allReachedLimit).toEqual(false);
-        // We have not yet reset
-        expect(state.checkin(0)).toEqual(false);
-        expect(state._windowState[0]).toEqual(true);
-
+        // we reset now
+        expect(state.checkin(0)).toEqual(true);
         expect(state.checkin(1)).toEqual(true);
-        expect(state._allReachedLimit).toEqual(true);
-        // We have not yet reset
-        expect(state.checkin(1)).toEqual(false);
-        expect(state.checkin(0)).toEqual(false);
-
-        state.slicerIsRestarting(0);
-        expect(state._windowState[0]).toEqual(false);
-        expect(state._allReachedLimit).toEqual(true);
-
-        state.slicerIsRestarting(1);
-        expect(state._windowState[1]).toEqual(false);
-        expect(state._allReachedLimit).toEqual(false);
     });
 });

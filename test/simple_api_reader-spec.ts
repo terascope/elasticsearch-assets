@@ -2,12 +2,10 @@ import 'jest-extended';
 import nock from 'nock';
 import path from 'path';
 import moment from 'moment';
-import {
-    newTestJobConfig, debugLogger, get, pDelay, SlicerRecoveryData
-} from '@terascope/job-components';
+import { newTestJobConfig, debugLogger, SlicerRecoveryData } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
 import ApiMockedClient from '../asset/src/simple_api_reader/client';
-import { ApiConfig } from '../asset/src/simple_api_reader/interfaces';
+import { ApiConfig } from '../asset/src/elasticsearch_reader/interfaces';
 import { IDType } from '../asset/src/id_reader/interfaces';
 import MockClient from './mock_client';
 
@@ -296,7 +294,7 @@ describe('simple_api_reader', () => {
             it('should throw a timeout error', async () => {
                 try {
                     await harness.runSlice({ count: 5000 });
-                    fail('Expected slice to fail');
+                    throw new Error('Expected slice to fail');
                 } catch (err) {
                     expect(err.message).toInclude('HTTP request timed out connecting to API endpoint.');
                 }
@@ -311,7 +309,6 @@ describe('simple_api_reader', () => {
             const start = moment('2012-12-12T00:00:00.000Z');
             const end = moment(start.toISOString()).add(1, 'minute');
             let harness: SlicerTestHarness;
-            let updatedConfig: any;
 
             async function makeSlicerTest(
                 config: any, numOfSlicers = 1,
@@ -346,16 +343,13 @@ describe('simple_api_reader', () => {
                 endpoint: baseUri,
                 token: 'test-token',
             };
-
-            async function waitForUpdate(config: any) {
-                const test = await makeSlicerTest(config, 1, [], { event: 'slicer:execution:update', fn: checkUpdate });
-                await pDelay(100);
-                return test;
+            async function getMeta(test: SlicerTestHarness) {
+                // @ts-ignore
+                return test.context.apis.executionContext.getMetadata('simple_api_reader');
             }
 
-            function checkUpdate(updateObj: any) {
-                updatedConfig = get(updateObj, 'update[0]');
-                return true;
+            async function waitForUpdate(config: any) {
+                return makeSlicerTest(config, 1, []);
             }
 
             beforeEach(async () => {
@@ -386,6 +380,7 @@ describe('simple_api_reader', () => {
 
             it('will convert auto to proper interval and update the opConfig', async () => {
                 harness = await waitForUpdate(opConfig);
+                const updatedConfig = await getMeta(harness);
                 expect(updatedConfig.interval).toEqual([60, 's']);
             });
         });

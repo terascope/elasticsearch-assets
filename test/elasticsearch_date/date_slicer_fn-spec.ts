@@ -13,7 +13,7 @@ import {
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
 import WindowState from '../../asset/src/elasticsearch_reader/window-state';
-import slicerFn from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/slicer';
+import slicerFn from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/slicer-fn';
 import {
     SlicerArgs,
     ParsedInterval,

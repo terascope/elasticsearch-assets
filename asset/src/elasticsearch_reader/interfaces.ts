@@ -80,3 +80,11 @@ export interface SlicerDateResults {
     holes?: DateConfig[];
     wildcard?: WildCardQuery;
 }
+
+export interface ApiConfig extends ESReaderConfig {
+    endpoint: string;
+    token: string;
+    timeout: number;
+}
+
+export type DateSlicerConfig = ESReaderConfig | ApiConfig;
