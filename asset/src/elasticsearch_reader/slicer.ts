@@ -230,7 +230,6 @@ export default class ESDateSlicer extends ParallelSlicer<ESReaderConfig> {
                 recoveryData,
                 interval
             };
-
             // we do not care for range for once jobs
             const { dates } = await determineStartingPoint(config);
             slicerFnArgs.dates = dates;

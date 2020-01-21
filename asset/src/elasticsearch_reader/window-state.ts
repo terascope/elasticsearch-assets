@@ -16,22 +16,18 @@ export default class WindowState {
     }
 
     checkin(id: number): boolean {
-        if (!this._allReachedLimit) {
+        if (!this._windowState[id]) {
             this._windowState[id] = true;
+
             const allDone = this._checkState(true);
+
             if (allDone) {
-                this._allReachedLimit = true;
-                return true;
+                for (const key of Object.keys(this._windowState)) {
+                    this._windowState[key] = false;
+                }
             }
+            return true;
         }
         return false;
-    }
-
-    slicerIsRestarting(id: number): void {
-        this._windowState[id] = false;
-        const allRestarted = this._checkState(false);
-        if (allRestarted) {
-            this._allReachedLimit = false;
-        }
     }
 }

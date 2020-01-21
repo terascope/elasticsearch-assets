@@ -15,7 +15,7 @@ import {
     dateFormatSeconds,
     dateOptions,
     retryModule,
-    determineStartingPoint
+    determineStartingPoint,
 } from '../../__lib';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
@@ -35,6 +35,8 @@ interface DateParams {
     interval: ParsedInterval;
     size: number;
 }
+
+type SliceResults = SlicerDateResults | SlicerDateResults[] | null;
 
 function splitTime(
     start: moment.Moment,
@@ -56,8 +58,6 @@ function splitTime(
     return secondDiff;
 }
 
-type SlicerFnResults = SlicerDateResults|SlicerDateResults[]|null;
-
 export default function newSlicer(args: SlicerArgs) {
     const {
         events,
@@ -76,7 +76,7 @@ export default function newSlicer(args: SlicerArgs) {
     const timeResolution = dateOptions(opConfig.time_resolution);
     const retryError = retryModule(logger, executionConfig.max_retries);
     const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
-    const currentWindow = primaryRange;
+    const currentWindow = primaryRange || {} as DateSegments;
 
     if (executionConfig.lifecycle === 'persistent' && windowState == null) {
         throw new Error('WindowState must be provided if lifecyle is persistent');
@@ -239,27 +239,31 @@ export default function newSlicer(args: SlicerArgs) {
     async function nextRange() {
         if (executionConfig.lifecycle === 'persistent') {
             const canProcessNextRange = windowState?.checkin(id);
-
             if (!canProcessNextRange) return null;
 
+            const [step, unit] = interval as ParsedInterval;
             const [lStep, lUnit] = latencyInterval as ParsedInterval;
             const delayedBarrier = moment().subtract(lStep, lUnit);
+
             const { start, limit } = currentWindow as DateSegments;
-            const newStart = moment(start);
-            const newlimit = moment(limit);
+
+            const newStart = moment(start).add(step, unit);
+            const newLimit = moment(limit).add(step, unit);
 
             const config: StartPointConfig = {
-                dates: { start: newStart, limit: newlimit },
+                dates: { start: moment(newStart), limit: moment(newLimit) },
                 id,
                 numOfSlicers: executionConfig.slicers,
                 interval
             };
-            const dates = await determineStartingPoint(config);
 
+            const { dates } = await determineStartingPoint(config);
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
+                // we have succesfuly jumped, move window
+                currentWindow.start = newStart;
+                currentWindow.limit = newLimit;
                 return dates;
             }
-
             return null;
         }
         return null;
@@ -282,19 +286,19 @@ export default function newSlicer(args: SlicerArgs) {
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        return async function sliceDate(msg: any): Promise<SlicerFnResults> {
+        return async function sliceDate(msg: any): Promise<SliceResults> {
             if (dateParams.start.isSameOrAfter(dateParams.limit)) {
+                // we are done
                 // if steaming and there is more work, then continue
                 const next = await nextRange();
                 // return null to finish or if unable to start new segment
                 if (!next) return next;
 
-                windowState.slicerIsRestarting(id);
                 const { start, end, limit } = next;
-
-                dateParams.start = start;
-                dateParams.end = end;
-                dateParams.limit = limit;
+                // TODO: check if we jumped a hole here at start, remove hole
+                dateParams.start = moment(start);
+                dateParams.end = moment(end);
+                dateParams.limit = moment(limit);
             }
 
             let data: DetermineSliceResults;
@@ -313,6 +317,7 @@ export default function newSlicer(args: SlicerArgs) {
                 // we mutate on pupose, eject hole that is already passed
                 const hole = holes.shift() as DateConfig;
                 dateParams.start = moment(hole.end);
+                // TODO: check for limit here
             }
 
             const newEnd = moment(dateParams.start).add(step, unit);

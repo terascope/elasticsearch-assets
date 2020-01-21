@@ -54,8 +54,8 @@ export type ParsedInterval = [number, moment.unitOfTime.Base];
 
 // TODO: delete?
 export interface DateConfig {
-    start: string;
-    end: string;
+    start: string | moment.Moment;
+    end: string | moment.Moment;
 }
 
 export interface SlicerArgs {

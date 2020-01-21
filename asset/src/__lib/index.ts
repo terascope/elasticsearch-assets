@@ -176,12 +176,11 @@ function determineDivisions(numOfDivisions: number, endingNum: number) {
 }
 
 function compactDivisions(
-    recoveryData: SlicerDateResults[],
+    _recoveryData: SlicerDateResults[],
     buckets: number[],
-    interval: ParsedInterval,
     id: number
-): SlicerDateConfig {
-    const [step, unit] = interval;
+): DateRanges {
+    const recoveryData = _recoveryData.slice();
     const holes: DateConfig[] = [];
     // we condense recoveryDate to the appopriate buckets
     const compactedDivision = buckets.reduce<SlicerDateResults[][]>((list, num) => {
@@ -196,56 +195,34 @@ function compactDivisions(
 
     const segment = compactedDivision[id];
 
-    const results: Partial<SlicerDateConfig> = {
+    const results: Partial<DateRanges> = {
         start: moment(segment[0].end),
         limit: moment(segment[segment.length - 1].limit)
     };
 
     segment.forEach((dates, index, arr) => {
         if (arr[index + 1] !== undefined) {
-            // we save existing holes
-            if (dates.holes) holes.push(...dates.holes);
             holes.push({ start: dates.limit, end: arr[index + 1].end });
+            // we save existing holes, we do this second to maintain order
+            if (dates.holes) holes.push(...dates.holes);
         }
     });
 
-    let end = moment(results.start).add(step, unit);
-    if (end.isSameOrAfter(results.limit)) end = moment(results.limit);
-
     if (holes.length > 0) {
         results.holes = holes;
-        // we check to see if end is in a hole
-        holes.forEach((hole) => {
-            if (moment(end).isSameOrAfter(hole.start)) {
-                // we stop at the start of a hole
-                end = moment(hole.start);
-            }
-        });
     }
 
-    results.end = end;
-    return results as SlicerDateConfig;
+    return results as DateRanges;
 }
 
 function expandDivisions(
     recoveryData: SlicerDateResults[],
     buckets: number[],
-    interval: ParsedInterval,
     id: number
-) {
-    const [step, unit] = interval;
-
-    const newRanges = buckets.reduce<SlicerDateConfig[]>((list, newDivisions, index) => {
+): DateRanges {
+    const newRanges = buckets.reduce<DateRanges[]>((list, newDivisions, index) => {
         const dates = recoveryData[index];
-        const range = divideRange(moment(dates.end), moment(dates.limit), newDivisions)
-            .map((val: Partial<SlicerDateConfig>) => {
-                let end = moment(val.start).add(step, unit);
-                if (end.isSameOrAfter(val.limit)) end = moment(val.limit);
-                // TODO: check for holes here
-                val.end = end;
-                return val as SlicerDateConfig;
-            });
-
+        const range = divideRange(moment(dates.end), moment(dates.limit), newDivisions);
         list.push(...range);
         return list;
     }, []);
@@ -257,16 +234,15 @@ function redistributeDates(
     recoveryData: SlicerDateResults[],
     numOfSlicers: number,
     id: number,
-    interval: ParsedInterval
-): SlicerDateConfig {
+) {
     // we are creating more ranges
     if (numOfSlicers > recoveryData.length) {
         const buckets = determineDivisions(recoveryData.length, numOfSlicers);
-        return expandDivisions(recoveryData, buckets, interval, id);
+        return expandDivisions(recoveryData, buckets, id);
     }
     // we are compacting ranges
     const buckets = determineDivisions(numOfSlicers, recoveryData.length);
-    return compactDivisions(recoveryData, buckets, interval, id);
+    return compactDivisions(recoveryData, buckets, id);
 }
 
 export function divideRange(
@@ -283,7 +259,7 @@ export function divideRange(
     const step = moment(startTime);
 
     for (let i = 0; i < numOfSlicers; i += 1) {
-        // TODO: this mutates step
+        // TODO: this mutates step, see if we can make this better, but it works as is
         const start = moment(step);
         const limit = moment(step.add(range, 'ms'));
         results.push({ start, limit });
@@ -294,6 +270,7 @@ export function divideRange(
     results[results.length - 1].limit = endingDate;
     return results;
 }
+
 // used by stream processing
 export function delayedStreamSegment(
     processingInterval: ParsedInterval,
@@ -319,46 +296,117 @@ interface StartingConfig {
     range: DateSegments;
 }
 
-function checkForHoles(
-    newDates: SlicerDateConfig,
-    rData: SlicerDateResults,
-    interval: ParsedInterval
+function convertToHole(rRecord: SlicerDateResults): DateConfig {
+    return { start: moment(rRecord.start), end: moment(rRecord.end) };
+}
+
+function holeAffectsRange(dates: DateRanges, hRange: DateConfig): boolean {
+    if (moment(hRange.start).isBetween(dates.start, dates.limit)) return true;
+    if (moment(hRange.end).isBetween(dates.start, dates.limit)) return true;
+    if (dates.limit.isBetween(hRange.start, hRange.end)) return true;
+
+    if (moment(hRange.start).isSame(dates.start) || moment(hRange.end).isSame(dates.limit)) {
+        return true;
+    }
+
+    return false;
+}
+
+function compareDatesToLimit(dates: SlicerDateConfig) {
+    if (dates.end.isSameOrAfter(dates.limit)) dates.end = moment(dates.limit);
+    if (dates.start.isSameOrAfter(dates.limit)) dates.start = moment(dates.limit);
+    return dates;
+}
+
+function compareRangeToRecoveryData(
+    newDates: DateRanges,
+    recoveryData: SlicerDateResults[],
+    interval: ParsedInterval,
+    id: number,
+    numOfSlicers: number
 ): SlicerDateConfig {
     const [step, unit] = interval;
-    if (rData.holes && rData.holes.length > 0) {
-        const holes = [...rData.holes];
+    const rData: RDate = recoveryData[id] as RDate;
+    const finalDates = Object.assign({}, newDates) as Partial<SlicerDateConfig> & DateRanges;
+    const holes = [];
 
+    // expasnion of slicers already takes into account the end
+    // we need this for exact match and compaction
+    if (rData && recoveryData.length >= numOfSlicers) {
+        finalDates.start = moment(recoveryData[id].end);
+        finalDates.end = moment(finalDates.start).add(step, unit);
+        if (rData.holes) holes.push(...rData.holes);
+    } else {
+        finalDates.end = moment(finalDates.start).add(step, unit);
+        const tempHole: DateConfig[] = [];
+
+        recoveryData.forEach((rDates) => {
+            tempHole.push(convertToHole(rDates));
+            if (rDates.holes) tempHole.push(...rDates.holes);
+        });
+        // we don't have a specific recoveryData, so we compare holes on all of them
+        const holesForDates = tempHole.filter((rRange) => holeAffectsRange(finalDates, rRange));
+        holes.push(...holesForDates);
+    }
+
+    if (holes.length > 0) {
         const finalHole = holes[holes.length - 1];
 
-        if (newDates.limit?.isSame(finalHole.end)) {
-            newDates.limit = moment(finalHole.start);
+        if (finalDates.limit.isSame(finalHole.end)) {
+            finalDates.limit = moment(finalHole.start);
             // we encapsulate the hole so we can drop it
             holes.pop();
-        } else if (newDates.limit?.isBefore(finalHole.end)) {
+        } else if (finalDates.limit.isBefore(finalHole.end)) {
             // we keep hole for future boundry increase
-            newDates.limit = moment(finalHole.start);
+            finalDates.limit = moment(finalHole.start);
+
+            if (finalDates.start.isSameOrAfter(finalDates.limit)) {
+                finalDates.start = moment(finalDates.limit);
+                finalDates.end = moment(finalDates.limit);
+            }
         }
 
         // this would happen if previous end was next to hole
-        if (holes[0] && newDates.start.isSameOrAfter(holes[0].start)) {
-            newDates.start = moment(holes[0].end);
+        if (holes[0] && finalDates.start.isSameOrAfter(holes[0].start)) {
+            let newStart = moment(holes[0].end);
+            // we hole exists beyond limit, we preserve it
+            if (newStart.isAfter(finalDates.limit)) {
+                newStart = moment(holes[0].start);
+            } else {
+                // we encapsulate hole so toss it
+                holes.shift();
+            }
+
+            if (newStart.isSame(finalDates.limit)) {
+                newStart = moment(holes[0].start);
+            }
+
+            finalDates.start = newStart;
             // we get rid of old hole since we jumped it
-            holes.shift();
         }
-        let end = moment(newDates.start).add(step, unit);
+
+        let end = moment(finalDates.start).add(step, unit);
         // we check again because we could have jump the hole already
         if (holes.length > 0) {
-            if (end.isSameOrAfter(holes[0].start)) end = moment(holes[0].start);
+            if (end.isSameOrAfter(holes[0].start)) {
+                end = moment(holes[0].start);
+            }
         }
 
-        newDates.end = end;
-        newDates.holes = holes;
+        finalDates.end = end;
+        finalDates.holes = holes;
     }
 
-    if (newDates.end.isSameOrAfter(newDates.limit)) newDates.end = moment(newDates.limit);
-
-    return newDates as SlicerDateConfig;
+    return compareDatesToLimit(finalDates as SlicerDateConfig);
 }
+
+interface DateRanges {
+    start: moment.Moment;
+    limit: moment.Moment;
+    holes?: DateConfig[];
+}
+
+type RDate = SlicerDateResults|undefined;
 
 export function determineStartingPoint(config: StartPointConfig): StartingConfig {
     const {
@@ -368,20 +416,15 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
         interval,
         recoveryData
     } = config;
-    // console.log('recovery coming in', recoveryData)
-    // TODO: take into account if dates start/limit are in holes
     // we need to split up times
     const [step, unit] = interval;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
-        const rData = recoveryData[id];
-        const recoveryEnd = moment(rData.end);
-        let newDates: Partial<SlicerDateConfig> = {};
+        let newDates: DateRanges;
 
         // our number of slicers have changed
         if (numOfSlicers !== recoveryData.length) {
-            // console.log('not in here')
-            newDates = redistributeDates(recoveryData, numOfSlicers, id, interval);
+            newDates = redistributeDates(recoveryData, numOfSlicers, id);
         } else {
             // numOfSlicers are the same so we can distribute normally
             newDates = divideRange(
@@ -390,23 +433,20 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
                 numOfSlicers
             )[id];
         }
-
-        newDates.start = recoveryEnd;
-        newDates.end = moment(newDates.start).add(step, unit);
-
-        const correctDates = checkForHoles(newDates as SlicerDateConfig, rData, interval);
+        const correctDates = compareRangeToRecoveryData(
+            newDates, recoveryData, interval, id, numOfSlicers
+        );
 
         return { dates: correctDates, range: dates };
     }
 
     const dateRange: Partial<SlicerDateConfig>[] = divideRange(
-        moment(dates.start),
-        moment(dates.limit),
+        dates.start,
+        dates.limit,
         numOfSlicers
     );
 
     const newDates = dateRange[id];
-
     let end = moment(newDates.start).add(step, unit);
     if (end.isSameOrAfter(newDates.limit)) end = moment(newDates.limit);
     newDates.end = end;

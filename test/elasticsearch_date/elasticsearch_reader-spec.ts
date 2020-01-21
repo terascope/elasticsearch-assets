@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'jest-extended';
 import {
     TestContext, DataEntity, pDelay, LifeCycle, SlicerRecoveryData, times,
@@ -12,7 +13,7 @@ import { IDType } from '../../asset/src/id_reader/interfaces';
 import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/__lib';
 
 describe('elasticsearch_reader', () => {
-    const assetDir = path.join(__dirname, '..');
+    const assetDir = path.join(__dirname, '../..');
     let harness: WorkerTestHarness | SlicerTestHarness;
     let clients: any;
     let defaultClient: MockClient;
@@ -36,6 +37,10 @@ describe('elasticsearch_reader', () => {
             await harness.shutdown();
         }
     });
+
+    function makeDate(format: string) {
+        return moment(moment().format(format));
+    }
 
     async function makeFetcherTest(config: any) {
         harness = WorkerTestHarness.testFetcher(config, { assetDir, clients });
@@ -235,7 +240,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicers will emit updated operations for start and end', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const laterDate = moment(firstDate).add(5, 'm');
 
             const opConfig = {
@@ -324,7 +329,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('will convert auto to proper interval and update the opConfig', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const laterDate = moment(firstDate).add(5, 'm');
 
             const opConfig = {
@@ -372,7 +377,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can produce date slices', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const laterDate = moment(firstDate).add(5, 'm');
             const closingDate = moment(laterDate).add(1, 's');
             const opConfig = {
@@ -403,9 +408,9 @@ describe('elasticsearch_reader', () => {
             expect(results2).toEqual(null);
         });
 
-        fit('can run a persistent reader', async () => {
+        it('can run a persistent reader', async () => {
             const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
-            const start = moment();
+            const start = makeDate(dateFormat);
             const delayedBoundary = moment(start).subtract(delay[0], delay[1]);
 
             const opConfig = {
@@ -427,7 +432,7 @@ describe('elasticsearch_reader', () => {
             expect(results.start).toBeDefined();
             expect(results.end).toBeDefined();
             expect(results.count).toBeDefined();
-            const now1 = moment();
+            const now1 = makeDate(dateFormat);
             expect(moment(results.end).isBetween(delayedBoundary, now1)).toEqual(true);
 
             const [results2] = await test.createSlices();
@@ -544,7 +549,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can reduce date slices down to size', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const middleDate = moment(firstDate).add(5, 'm');
             const endDate = moment(firstDate).add(10, 'm');
             const closingDate = moment(endDate).add(1, 's');
@@ -599,7 +604,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can do a simple expansion of date slices up to find data', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const endDate = moment(firstDate).add(10, 'm');
             const closingDate = moment(endDate).add(1, 's');
             const opConfig = {
@@ -652,7 +657,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can do an expansion of date slices up to find data even when none is returned', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const endDate = moment(firstDate).add(10, 'm');
             const closingDate = moment(endDate).add(1, 's');
 
@@ -699,7 +704,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can do expansion of date slices with large slices', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const middleDate = moment(firstDate).add(5, 'm');
             const endDate = moment(firstDate).add(10, 'm');
             const closingDate = moment(endDate).add(1, 's');
@@ -748,7 +753,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can expand date slices properly in uneven data distribution', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const midDate = moment(firstDate).add(8, 'm');
             const endDate = moment(firstDate).add(16, 'm');
             const closingDate = moment(endDate).add(1, 's');
@@ -808,7 +813,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can will recurse down to smallest factor using "s" format', async () => {
-            const firstDateMS = moment().toISOString();
+            const firstDateMS = makeDate(dateFormatSeconds).toISOString();
             const firstDateS = moment(firstDateMS);
             const closingDateS = moment(firstDateS).add(1, 's');
             const endDate = moment(firstDateMS).add(5, 'm');
@@ -839,7 +844,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can will recurse down to smallest factor using "ms" format', async () => {
-            const firstDateMS = moment().toISOString();
+            const firstDateMS = makeDate(dateFormatSeconds).toISOString();
             const firstDateS = moment(firstDateMS);
             const closingDateMS = moment(firstDateMS).add(1, 'ms');
             const endDate = moment(firstDateMS).add(5, 'm');
@@ -874,7 +879,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can will recurse down to smallest factor and subslice by key', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const closingDate = moment(firstDate).add(1, 's');
             const endDate = moment(firstDate).add(5, 'm');
             const opConfig = {
@@ -919,7 +924,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can enter recovery and return to the last slice state', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const middleDate = moment(firstDate).add(5, 'm');
             const endDate = moment(firstDate).add(10, 'm');
             const closingDate = moment(endDate).add(10, 's');
@@ -965,7 +970,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('multiple slicers can enter recovery and return to the last slice state', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const firstMiddleDate = moment(firstDate).add(5, 'm');
             const firstFinalDate = moment(firstDate).add(10, 'm');
             const secondMiddleDate = moment(firstDate).add(15, 'm');
@@ -1035,7 +1040,7 @@ describe('elasticsearch_reader', () => {
 
         it('slicer can enter recovery and return to the last slice state in persistent mode', async () => {
             const delay: [number, moment.unitOfTime.Base] = [30, 's'];
-            const currentDate = moment();
+            const currentDate = makeDate(dateFormatSeconds);
             const startDate = moment(currentDate).subtract(10, 'm');
             const middleDate = moment(currentDate).subtract(5, 'm');
             // end is delayed by setting
@@ -1078,7 +1083,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can enter recovery and return to the last slice state when number of slicers have increased (1 => 2, even increase)', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const middleDate = moment(firstDate).add(5, 'm');
             const endDate = moment(firstDate).add(10, 'm');
 
@@ -1134,7 +1139,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('slicer can enter recovery and return to the last slice state when number of slicers have increased (3 => 5, odd increase)', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const endDate = moment(firstDate).add(20, 'm');
 
             const oldRange = divideRange(firstDate, endDate, 3);
@@ -1169,8 +1174,8 @@ describe('elasticsearch_reader', () => {
             const rs2Start = moment(recoveryData[1].lastSlice.end);
             const rs2End = moment(recoveryData[1].lastSlice.limit);
 
-            const rs3Start = recoveryData[2].lastSlice.end;
-            const rs3End = recoveryData[2].lastSlice.limit;
+            const rs3Start = moment(recoveryData[2].lastSlice.end);
+            const rs3End = moment(recoveryData[2].lastSlice.limit);
 
             const newRangeSegment1 = divideRange(rs1Start, rs1End, 2);
             const newRangeSegment2 = divideRange(rs2Start, rs2End, 2);
@@ -1216,17 +1221,32 @@ describe('elasticsearch_reader', () => {
             const [results, results2, results3, results4, results5] = await test.createSlices();
 
             expect(results).toEqual(expectedSlice1);
-            expect(results2).toEqual(expectedSlice2);
-            expect(results3).toEqual(expectedSlice3);
-            expect(results4).toEqual(expectedSlice4);
-            expect(results5).toEqual(expectedSlice5);
+            expect(moment(results.start).isSame(expectedSlice1.start)).toBeTrue();
+            expect(moment(results.end).isSame(moment(expectedSlice1.end))).toBeTrue();
+            expect(moment(results.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
+
+            expect(moment(results2.start).isSame(expectedSlice2.start)).toBeTrue();
+            expect(moment(results2.end).isSame(moment(expectedSlice2.end))).toBeTrue();
+            expect(moment(results2.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
+
+            expect(moment(results3.start).isSame(expectedSlice3.start)).toBeTrue();
+            expect(moment(results3.end).isSame(moment(expectedSlice3.end))).toBeTrue();
+            expect(moment(results3.limit).isSame(moment(expectedSlice3.limit))).toBeTrue();
+
+            expect(moment(results4.start).isSame(expectedSlice4.start)).toBeTrue();
+            expect(moment(results4.end).isSame(moment(expectedSlice4.end))).toBeTrue();
+            expect(moment(results4.limit).isSame(moment(expectedSlice4.limit))).toBeTrue();
+
+            expect(moment(results5.start).isSame(expectedSlice5.start)).toBeTrue();
+            expect(moment(results5.end).isSame(moment(expectedSlice5.end))).toBeTrue();
+            expect(moment(results5.limit).isSame(moment(expectedSlice5.limit))).toBeTrue();
 
             const [results6] = await test.createSlices();
             expect(results6).toEqual(null);
         });
 
         it('slicer can enter recovery and return to the last slice state when number of slicers have decreased (2 => 1, even increase)', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const endDate = moment(firstDate).add(11, 'm');
 
             defaultClient.setSequenceData(times(30, () => ({ count: 100, '@timestamp': new Date() })));
@@ -1256,8 +1276,8 @@ describe('elasticsearch_reader', () => {
             });
 
             const hole = {
-                start: recoveryData[0].lastSlice.limit,
-                end: recoveryData[1].lastSlice.end
+                start: moment(recoveryData[0].lastSlice.limit).format(dateFormat),
+                end: moment(recoveryData[1].lastSlice.end).format(dateFormat)
             };
 
             const limit = moment(recoveryData[1].lastSlice.limit);
@@ -1336,10 +1356,28 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 1 });
 
             const [results] = await test.createSlices();
-            expect(results).toEqual(expectedSlice1);
+
+            expect(moment(results.start).isSame(expectedSlice1.start)).toBeTrue();
+            expect(moment(results.end).isSame(moment(expectedSlice1.end))).toBeTrue();
+            expect(moment(results.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
+            expect(
+                moment(results.holes[0].start).isSame(moment(expectedSlice1.holes[0].start))
+            ).toBeTrue();
+            expect(
+                moment(results.holes[0].end).isSame(moment(expectedSlice1.holes[0].end))
+            ).toBeTrue();
 
             const [results2] = await test.createSlices();
-            expect(results2).toEqual(expectedSlice2);
+
+            expect(moment(results2.start).isSame(expectedSlice2.start)).toBeTrue();
+            expect(moment(results2.end).isSame(moment(expectedSlice2.end))).toBeTrue();
+            expect(moment(results2.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
+            expect(
+                moment(results2.holes[0].start).isSame(moment(expectedSlice2.holes[0].start))
+            ).toBeTrue();
+            expect(
+                moment(results2.holes[0].end).isSame(moment(expectedSlice2.holes[0].end))
+            ).toBeTrue();
 
             const [results3] = await test.createSlices();
             expect(results3).toEqual(expectedSlice3);
@@ -1359,7 +1397,7 @@ describe('elasticsearch_reader', () => {
 
         xit('slicer can enter recovery and return to the last slice state in persistent mode with slicer changes (1 => 2)', async () => {
             const delay: [number, moment.unitOfTime.Base] = [30, 's'];
-            const currentDate = moment();
+            const currentDate = makeDate(dateFormatSeconds);
             const startDate = moment(currentDate).subtract(10, 'm');
             const middleDate = moment(currentDate).subtract(5, 'm');
             // end is delayed by setting
@@ -1419,7 +1457,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('fetcher can return formated data', async () => {
-            const firstDate = moment();
+            const firstDate = makeDate(dateFormatSeconds);
             const laterDate = moment(firstDate).add(5, 'm');
 
             const opConfig = {

@@ -1,6 +1,6 @@
 import 'jest-extended';
 import moment from 'moment';
-import { determineStartingPoint, dateFormatSeconds } from '../../asset/src/__lib';
+import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../asset/src/__lib';
 import { StartPointConfig, ParsedInterval } from '../../asset/src/elasticsearch_reader/interfaces';
 
 function makeDate(format: string) {
@@ -74,8 +74,8 @@ describe('determineStartingPoint', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const config: StartPointConfig = {
@@ -106,8 +106,8 @@ describe('determineStartingPoint', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment(recoveryEnd).add(10, 's').format(dateFormatSeconds);
@@ -143,8 +143,8 @@ describe('determineStartingPoint', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment(recoveryEnd).format(dateFormatSeconds);
@@ -180,8 +180,8 @@ describe('determineStartingPoint', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment(recoveryEnd).add(10, 's').format(dateFormatSeconds);
@@ -219,8 +219,8 @@ describe('determineStartingPoint', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment(recoveryEnd).add(10, 's').format(dateFormatSeconds);
@@ -254,16 +254,15 @@ describe('determineStartingPoint', () => {
             expect(range.limit.isSame(config.dates.limit)).toBeTrue();
         });
 
-        it('can return point and range when recovery (1 point, with hole covering all alloted range) is given for single slicer', () => {
+        it('can return point and range when recovery (1 point, with hole covering whats left of slice range) is given for single slicer', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment(recoveryEnd).format(dateFormatSeconds);
-            // hole jumps past limit
             const holeEnd = moment(limit).format(dateFormatSeconds);
             const holes = [{ start: holeStart, end: holeEnd }];
 
@@ -287,6 +286,43 @@ describe('determineStartingPoint', () => {
             expect(dates.end.isSame(moment(holeStart))).toBeTrue();
             expect(dates.limit.isSame(moment(holeStart))).toBeTrue();
             expect(dates.holes).toEqual([]);
+
+            expect(range.start.isSame(config.dates.start)).toBeTrue();
+            expect(range.limit.isSame(config.dates.limit)).toBeTrue();
+        });
+
+        it('can return point and range when recovery (1 point, with hole covering all alloted range) is given for single slicer', () => {
+            const interval: ParsedInterval = [1, 'm'];
+            const limit = makeDate(dateFormatSeconds);
+            const start = moment(limit).subtract(2, 'm');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+            const recoveryStart = moment(halfWay).subtract(30, 's');
+            const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
+
+            const holeStart = moment(recoveryEnd).format(dateFormatSeconds);
+            const holeEnd = moment(limit).add(interval[0], interval[1]).format(dateFormatSeconds);
+            const holes = [{ start: holeStart, end: holeEnd }];
+
+            const config: StartPointConfig = {
+                id: 0,
+                numOfSlicers: 1,
+                dates: { start, limit },
+                interval,
+                recoveryData: [{
+                    start: recoveryStart.format(dateFormatSeconds),
+                    end: recoveryEnd.format(dateFormatSeconds),
+                    limit: moment(limit).format(dateFormatSeconds),
+                    holes,
+                    count: 100
+                }]
+            };
+
+            const { dates, range } = determineStartingPoint(config);
+
+            expect(dates.start.isSame(moment(holeStart))).toBeTrue();
+            expect(dates.end.isSame(moment(holeStart))).toBeTrue();
+            expect(dates.limit.isSame(moment(holeStart))).toBeTrue();
+            expect(dates.holes).toEqual(holes);
 
             expect(range.start.isSame(config.dates.start)).toBeTrue();
             expect(range.limit.isSame(config.dates.limit)).toBeTrue();
@@ -347,13 +383,16 @@ describe('determineStartingPoint', () => {
     });
 
     describe('for different slicer counts', () => {
-        it('can return point and range when no recovery is given from 1 => slicers no holes', () => {
+        it('can return point and range when no recovery is given from 1 => 2 slicers no holes', () => {
             const interval: ParsedInterval = [1, 'm'];
             const limit = makeDate(dateFormatSeconds);
             const start = moment(limit).subtract(2, 'm');
-            const end = moment(start).add(interval[0], interval[1]);
-            const recoveryStart = moment(end).subtract(30, 's');
+            const halfWay = moment(start).add(interval[0], interval[1]);
+
+            const recoveryStart = moment(halfWay).subtract(30, 's');
             const recoveryEnd = moment(recoveryStart).add(interval[0], interval[1]);
+
+            const expectedRange = divideRange(recoveryEnd, limit, 2);
 
             const config: StartPointConfig = {
                 id: 0,
@@ -369,14 +408,74 @@ describe('determineStartingPoint', () => {
                 }]
             };
 
+            const config2 = Object.assign({}, config, { id: 1 });
+
             const { dates, range } = determineStartingPoint(config);
 
             expect(dates.start.isSame(moment(recoveryEnd))).toBeTrue();
-            expect(dates.end.isSame(moment(limit))).toBeTrue();
-            expect(dates.limit.isSame(moment(limit))).toBeTrue();
+            expect(dates.end.isSame(moment(expectedRange[0].limit))).toBeTrue();
+            expect(dates.limit.isSame(moment(expectedRange[0].limit))).toBeTrue();
 
             expect(range.start.isSame(config.dates.start)).toBeTrue();
             expect(range.limit.isSame(config.dates.limit)).toBeTrue();
+
+            const { dates: dates2, range: range2 } = determineStartingPoint(config2);
+
+            expect(dates2.start.isSame(moment(expectedRange[1].start))).toBeTrue();
+            expect(dates2.end.isSame(moment(expectedRange[1].limit))).toBeTrue();
+            expect(dates2.limit.isSame(moment(expectedRange[1].limit))).toBeTrue();
+
+            expect(range2.start.isSame(config.dates.start)).toBeTrue();
+            expect(range2.limit.isSame(config.dates.limit)).toBeTrue();
+        });
+
+        it('can return point and range when no recovery is given from 1 => 2 slicers with holes covering all ranges', () => {
+            const interval: ParsedInterval = [2, 'm'];
+            const limit = makeDate(dateFormatSeconds);
+            const start = moment(limit).subtract(6, 'm');
+            const step = moment(start).add(interval[0], interval[1]);
+
+            const recoveryStart = moment(step).subtract(40, 's');
+            const recoveryEnd = moment(step).subtract(20, 's');
+
+            const holeStart = moment(recoveryEnd).format(dateFormatSeconds);
+            const holeEnd = moment(limit).format(dateFormatSeconds);
+            const holes = [{ start: holeStart, end: holeEnd }];
+
+            const config: StartPointConfig = {
+                id: 0,
+                numOfSlicers: 2,
+                dates: { start, limit },
+                interval,
+                recoveryData: [{
+                    start: recoveryStart.format(dateFormatSeconds),
+                    end: recoveryEnd.format(dateFormatSeconds),
+                    limit: moment(limit).format(dateFormatSeconds),
+                    holes,
+                    count: 100
+                }]
+            };
+
+            const config2 = Object.assign({}, config, { id: 1 });
+
+            const { dates, range } = determineStartingPoint(config);
+
+            expect(dates.start.isSame(moment(holeStart))).toBeTrue();
+            expect(dates.end.isSame(moment(holeStart))).toBeTrue();
+            expect(dates.limit.isSame(moment(holeStart))).toBeTrue();
+
+            expect(range.start.isSame(config.dates.start)).toBeTrue();
+            expect(range.limit.isSame(config.dates.limit)).toBeTrue();
+
+            const { dates: dates2, range: range2 } = determineStartingPoint(config2);
+            // if we cannot process anything we go straight to limit
+            expect(dates2.start.isSame(moment(holeStart))).toBeTrue();
+            expect(dates2.end.isSame(moment(holeStart))).toBeTrue();
+            expect(dates2.limit.isSame(moment(holeStart))).toBeTrue();
+            expect(dates2.holes).toEqual([]);
+
+            expect(range2.start.isSame(config.dates.start)).toBeTrue();
+            expect(range2.limit.isSame(config.dates.limit)).toBeTrue();
         });
     });
 });
