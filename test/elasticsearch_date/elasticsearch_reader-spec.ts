@@ -1,7 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import 'jest-extended';
 import {
-    TestContext, DataEntity, pDelay, LifeCycle, SlicerRecoveryData, times,
+    TestContext,
+    DataEntity,
+    pDelay,
+    LifeCycle,
+    SlicerRecoveryData,
+    times,
 } from '@terascope/job-components';
 import path from 'path';
 import moment from 'moment';
@@ -456,7 +461,7 @@ describe('elasticsearch_reader', () => {
         });
 
         it('can run a persistent reader with multiple slicers', async () => {
-            const delay: [number, moment.unitOfTime.Base] = [200, 'ms'];
+            const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
 
             const opConfig = {
                 _op: 'elasticsearch_reader',
@@ -464,31 +469,44 @@ describe('elasticsearch_reader', () => {
                 time_resolution: 'ms',
                 size: 100,
                 index: 'someindex',
-                interval: '100ms',
+                interval: '200ms',
                 delay: delay.join('')
             };
 
+            defaultClient.setSequenceData(times(50, () => ({ count: 100, '@timestamp': new Date() })));
+
             const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent', numOfSlicers: 2 });
+
+            await pDelay(210);
 
             const [results, results2] = await test.createSlices();
 
             expect(results).not.toEqual(null);
             expect(results2).not.toEqual(null);
+            expect(results.limit).toEqual(results2.start);
+            expect(moment(results2.limit).diff(results.start)).toEqual(200);
 
             const [results3, results4] = await test.createSlices();
+
             expect(results3).toEqual(null);
             expect(results4).toEqual(null);
-            await pDelay(110);
+
+            await pDelay(210);
 
             const [results5, results6] = await test.createSlices();
+
             expect(results5).not.toEqual(null);
             expect(results6).not.toEqual(null);
+            expect(results5.limit).toEqual(results6.start);
+            expect(moment(results6.limit).diff(results5.start)).toEqual(200);
 
             const [results7, results8] = await test.createSlices();
+
             expect(results7).toEqual(null);
             expect(results8).toEqual(null);
 
             const [results9, results10] = await test.createSlices();
+
             expect(results9).toEqual(null);
             expect(results10).toEqual(null);
         });

@@ -239,6 +239,7 @@ export default function newSlicer(args: SlicerArgs) {
     async function nextRange() {
         if (executionConfig.lifecycle === 'persistent') {
             const canProcessNextRange = windowState?.checkin(id);
+
             if (!canProcessNextRange) return null;
 
             const [step, unit] = interval as ParsedInterval;
@@ -258,6 +259,7 @@ export default function newSlicer(args: SlicerArgs) {
             };
 
             const { dates } = await determineStartingPoint(config);
+
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have succesfuly jumped, move window
                 currentWindow.start = newStart;

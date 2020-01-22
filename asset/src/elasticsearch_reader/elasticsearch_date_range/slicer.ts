@@ -33,6 +33,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     api: elasticApi.Client;
     dateFormat: string;
     windowState: WindowState
+    startTime = moment();
 
     constructor(
         context: WorkerContext,
@@ -161,6 +162,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
 
     async newSlicer(id: number): Promise<SlicerFn> {
         const isPersistent = this.executionConfig.lifecycle === 'persistent';
+        const { startTime } = this;
         const slicerFnArgs: Partial<SlicerArgs> = {
             opConfig: this.opConfig,
             executionConfig: this.executionConfig,
@@ -187,7 +189,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             slicerFnArgs.latencyInterval = latencyInterval;
             slicerFnArgs.windowState = this.windowState;
 
-            const { start, limit } = delayedStreamSegment(interval, latencyInterval);
+            const { start, limit } = delayedStreamSegment(startTime, interval, latencyInterval);
 
             const config: StartPointConfig = {
                 dates: { start, limit },

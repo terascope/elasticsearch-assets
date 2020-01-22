@@ -269,10 +269,11 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
+    startTime: moment.Moment,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
 ) {
-    const now = moment();
+    const now = moment(startTime);
 
     const delayedLimit = moment(now).subtract(
         latencyInterval[0],
