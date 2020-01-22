@@ -1,7 +1,6 @@
 import 'jest-extended';
 import EventEmitter from 'events';
 import {
-    getTypeOf,
     newTestExecutionConfig,
     LifeCycle,
     AnyObject,
@@ -22,7 +21,6 @@ import {
     SlicerDateResults
 } from '../../asset/src/elasticsearch_reader/interfaces';
 import MockClient from '../mock_client';
-// @ts-ignore
 import { dateFormatSeconds, dateFormat, divideRange } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 
 interface TestConfig {
@@ -83,8 +81,7 @@ describe('date slicer function', () => {
 
         const executionConfig = newTestExecutionConfig(job);
         const opConfig = executionConfig.operations[0];
-        // @ts-ignore
-        const api = elasticApi(client, logger, opConfig);
+        const api = elasticApi(client, logger, opConfig as any);
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
         const slicerArgs: SlicerArgs = {
@@ -124,7 +121,7 @@ describe('date slicer function', () => {
         };
         const fn = makeSlicer(testConfig);
 
-        expect(getTypeOf(fn)).toEqual('Function');
+        expect(fn).toBeFunction();
     });
 
     it('can run a persistently with one slicer', async () => {

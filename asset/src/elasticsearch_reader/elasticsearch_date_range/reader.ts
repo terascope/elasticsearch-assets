@@ -9,6 +9,7 @@ import elasticApi from '@terascope/elasticsearch-api';
 import { ESDateConfig } from '../interfaces';
 
 export default class DateReader extends Fetcher<ESDateConfig> {
+    apiConfig: elasticApi.Config;
     api: elasticApi.Client;
 
     constructor(
@@ -18,11 +19,12 @@ export default class DateReader extends Fetcher<ESDateConfig> {
         client: any
     ) {
         super(context, opConfig, executionConfig);
-        this.api = elasticApi(client, this.logger, this.opConfig);
+        this.apiConfig = Object.assign({}, this.opConfig, { full_response: true });
+        this.api = elasticApi(client, this.logger, this.apiConfig);
     }
 
     async fetch(slice: SliceRequest) {
-        const query = this.api.buildQuery(this.opConfig, slice);
+        const query = this.api.buildQuery(this.apiConfig, slice);
         const results = await this.api.search(query);
         // TODO: better typeing of doc
         return results.hits.hits.map((doc: any) => {

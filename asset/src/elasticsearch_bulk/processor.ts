@@ -1,4 +1,3 @@
-import Promise from 'bluebird';
 import elasticApi from '@terascope/elasticsearch-api';
 import {
     getClient,
@@ -67,8 +66,9 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     }
 
     private _recursiveSend(client: elasticApi.Client, dataArray: any[]) {
-        const slicedData = splitArray(dataArray, this.limit);
-        return Promise.map(slicedData, (data: any) => client.bulkSend(data));
+        const slicedData = splitArray(dataArray, this.limit)
+            .map((data: any) => client.bulkSend(data));
+        return Promise.all(slicedData);
     }
 
     private async multiSend(data: any[]) {
@@ -130,7 +130,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     async onBatch(data: DataEntity[]) {
         // bulk throws an error if you send an empty array
         if (data == null || data.length === 0) {
-            return Promise.resolve(data);
+            return data;
         }
 
         if (this.isMultisend) {

@@ -1,6 +1,4 @@
-import {
-    Logger, parseError, times
-} from '@terascope/job-components';
+import { Logger, times } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-ignore
@@ -64,7 +62,7 @@ export function processInterval(
     esDates?: any
 ) {
     // one or more digits, followed by one or more letters, case-insensitive
-    const regex = /(\d+)(\D+)/i;
+    const regex = /(\d+)(\w+)/i;
     const intervalMatch = regex.exec(interval);
 
     if (intervalMatch === null) {
@@ -105,8 +103,7 @@ type RetryFn = (msg: string) => any
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
     return (_key: string | object, err: Error, fn: RetryFn, msg: string) => {
-        const errMessage = parseError(err);
-        logger.error('error while getting next slice', errMessage);
+        logger.error(err, 'error while getting next slice');
         const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
 
         if (!retry[key]) {

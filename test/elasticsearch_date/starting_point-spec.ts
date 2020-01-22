@@ -1,5 +1,6 @@
 import 'jest-extended';
 import moment from 'moment';
+import { cloneDeep } from '@terascope/job-components';
 import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 import { StartPointConfig, ParsedInterval } from '../../asset/src/elasticsearch_reader/interfaces';
 
@@ -360,7 +361,7 @@ describe('determineStartingPoint', () => {
                 }]
             };
 
-            const config2: StartPointConfig = Object.assign({}, config1, { id: 1 });
+            const config2: StartPointConfig = Object.assign({}, cloneDeep(config1), { id: 1 });
 
             const { dates: dates1, range: range1 } = determineStartingPoint(config1);
 
@@ -408,7 +409,7 @@ describe('determineStartingPoint', () => {
                 }]
             };
 
-            const config2 = Object.assign({}, config, { id: 1 });
+            const config2 = Object.assign({}, cloneDeep(config), { id: 1 });
 
             const { dates, range } = determineStartingPoint(config);
 
@@ -456,7 +457,7 @@ describe('determineStartingPoint', () => {
                 }]
             };
 
-            const config2 = Object.assign({}, config, { id: 1 });
+            const config2 = Object.assign({}, cloneDeep(config), { id: 1 });
 
             const { dates, range } = determineStartingPoint(config);
 

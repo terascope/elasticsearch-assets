@@ -1,6 +1,4 @@
-import {
-    Slicer, WorkerContext, ExecutionConfig
-} from '@terascope/job-components';
+import { Slicer, WorkerContext, ExecutionConfig } from '@terascope/job-components';
 import { DataGenerator, CounterResults } from './interfaces';
 import Counter from './counter';
 
@@ -23,13 +21,12 @@ export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
         }
     }
 
-    slicerQueueLength() {
-        return 'QUEUE_MINIMUM_SIZE';
+    maxQueueLength() {
+        return this.workersConnected * 3;
     }
 
     isRecoverable() {
-        if (this.executionConfig.lifecycle === 'once') return true;
-        return false;
+        return true;
     }
 
     async slice() {

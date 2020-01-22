@@ -5,7 +5,6 @@ import {
     ExecutionConfig,
     TSError,
     AnyObject,
-    get
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -89,8 +88,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
 
         // using this query to catch potential errors even if a date is given already
-        const searchResults = await this.api.search(query);
-        const results = get(searchResults, 'hits.hits', []).map((obj: any) => obj._source);
+        const results = await this.api.search(query);
         const [data] = results;
 
         if (data == null) {
@@ -176,7 +174,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
 
         const recoveryData = this.recoveryData.map(
             (slice) => slice.lastSlice
-        ) as SlicerDateResults[];
+        ).filter(Boolean) as SlicerDateResults[];
 
         if (isPersistent) {
             // we need to interval to get starting dates

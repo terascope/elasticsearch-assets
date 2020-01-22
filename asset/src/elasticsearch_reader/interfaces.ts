@@ -30,7 +30,6 @@ export interface ESReaderConfig extends OpConfig {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
-    full_response: boolean;
 }
 
 export interface DateSegments {
@@ -72,7 +71,6 @@ export interface SlicerArgs {
     events: EventEmitter;
     windowState: WindowState;
 }
-// TODO: this is most likely wrong
 export interface SlicerDateResults {
     start: string;
     end: string;

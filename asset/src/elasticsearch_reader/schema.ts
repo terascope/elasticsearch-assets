@@ -246,13 +246,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             connection: {
                 default: 'default'
             },
-            full_response: {
-                doc: 'used internally for api, must be set to true',
-                default: true,
-                format: (val: any) => {
-                    if (val !== true) throw new Error('Parameter full_response must be set to true');
-                }
-            }
         };
     }
 }

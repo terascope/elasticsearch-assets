@@ -11,7 +11,7 @@ branches:
   only:
   - master
   - /^v\d+\.\d+\.\d+/
-if: NOT (branch = master AND type = push AND os = osx)
+if: NOT (branch = master AND type = push AND tag IS blank AND os = osx)
 cache:
   npm: false
   yarn: false
