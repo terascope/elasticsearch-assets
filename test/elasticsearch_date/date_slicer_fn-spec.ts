@@ -1,5 +1,5 @@
 import 'jest-extended';
-import EventEmitter from 'events';
+import { EventEmitter } from 'events';
 import {
     newTestExecutionConfig,
     LifeCycle,

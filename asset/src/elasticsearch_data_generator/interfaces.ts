@@ -25,4 +25,4 @@ export interface DataGenerator extends OpConfig {
     id_start_key?: string;
 }
 
-export type CounterResults = null | { count: number }
+export type CounterResults = null | { count: number; processed: number }
