@@ -1,4 +1,3 @@
-
 import { OperationAPI, WorkerContext, ExecutionConfig } from '@terascope/job-components';
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
 import { ESStateStorageConfig } from './interfaces';

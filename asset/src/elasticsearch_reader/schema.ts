@@ -1,4 +1,3 @@
-
 import {
     ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber,
 } from '@terascope/job-components';
@@ -7,14 +6,14 @@ import moment from 'moment';
 // @ts-ignore
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
-import { dateOptions } from '../helpers';
+import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig) {
         const { logger } = this.context;
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
-        if (opConfig == null) throw new Error('could not find elasticsearch_reader operation in jobConfig');
+        if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
         if (opConfig.subslice_by_key) {
             if (!opConfig.field) {
@@ -26,7 +25,11 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
         if (job.lifecycle === 'persistent') {
             if (opConfig.interval === 'auto') {
-                throw new Error('interval for reader must be manually set while job is in persistent mode');
+                throw new Error('Invalid interval parameter, must be manually set while job is in persistent mode');
+            }
+
+            if (opConfig.delay === 'auto') {
+                throw new Error('Invalid delay parameter, must be manually set while job is in persistent mode');
             }
         }
     }
@@ -38,15 +41,15 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 default: '',
                 format(val: any) {
                     if (typeof val !== 'string') {
-                        throw new Error('index must be of type string');
+                        throw new Error('Invalid index parameter, must be of type string');
                     }
 
                     if (val.length === 0) {
-                        throw new Error('index must not be an empty string');
+                        throw new Error('Invalid index parameter, must not be an empty string');
                     }
 
                     if (val.match(/[A-Z]/)) {
-                        throw new Error('index must be lowercase');
+                        throw new Error('Invalid index parameter, must be lowercase');
                     }
                 }
             },
@@ -60,9 +63,9 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 default: 5000,
                 format(val: any) {
                     if (isNaN(val)) {
-                        throw new Error('size parameter for elasticsearch_reader must be a number');
+                        throw new Error('Invalid size parameter, must be a number');
                     } else if (val <= 0) {
-                        throw new Error('size parameter for elasticsearch_reader must be greater than zero');
+                        throw new Error('Invalid size parameter, must be greater than zero');
                     }
                 }
             },
@@ -76,11 +79,11 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                                 try {
                                     dateMath.parse(val);
                                 } catch (err) {
-                                    throw new Error(`value: "${val}" cannot be coerced into a proper date`);
+                                    throw new Error(`Invalid start parameter, value: "${val}" cannot be coerced into a proper date`);
                                 }
                             }
                         } else {
-                            throw new Error('parameter must be a string or number IF specified');
+                            throw new Error('Invalid start parameter, must be a string or number IF specified');
                         }
                     }
                 }
@@ -95,11 +98,11 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                                 try {
                                     dateMath.parse(val);
                                 } catch (err) {
-                                    throw new Error(`value: "${val}" cannot be coerced into a proper date`);
+                                    throw new Error(`Invalid end parameter, value: "${val}" cannot be coerced into a proper date`);
                                 }
                             }
                         } else {
-                            throw new Error('parameter must be a string or number IF specified');
+                            throw new Error('Invalid end parameter, must be a string or number IF specified');
                         }
                     }
                 }
@@ -111,7 +114,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                     if (val === 'auto') return;
                     const regex = /(\d+)(\D+)/i;
                     const interval = regex.exec(val);
-                    if (!interval) throw new Error('date interval is not formatted correctly');
+                    if (!interval) throw new Error('Invalid date interval, it is not formatted correctly');
                     dateOptions(interval[2]);
                 }
             },
@@ -144,7 +147,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                         throw new Error('Fields parameter must be an array');
                     }
                     if (!val.every(isString)) {
-                        throw new Error('the values listed in the fields array must be of type string');
+                        throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
                     }
                     return true;
                 }
@@ -164,9 +167,9 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 default: 50000,
                 format(val: any) {
                     if (isNaN(val)) {
-                        throw new Error('subslice_key_threshold parameter for elasticsearch_reader must be a number');
+                        throw new Error('Invalid subslice_key_threshold parameter, must be a number');
                     } else if (val <= 0) {
-                        throw new Error('subslice_key_threshold parameter for elasticsearch_reader must be greater than zero');
+                        throw new Error('Invalid subslice_key_threshold parameter, must be greater than zero');
                     }
                 }
             },
@@ -188,7 +191,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                         ms: 'ms'
                     };
                     if (!obj[val]) {
-                        throw new Error('time_resolution for elasticsearch_reader must be set in either "s"[seconds] or "ms"[milliseconds]');
+                        throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
                     } else {
                         return obj[val];
                     }
@@ -230,8 +233,8 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 format: (val: any) => {
                     if (val) {
                         const options = { asc: true, desc: true };
-                        if (typeof val !== 'string') throw new Error('parameter must be a string IF specified');
-                        if (!options[val]) throw new Error('if geo_sort_order is specified it must be either "asc" or "desc"');
+                        if (typeof val !== 'string') throw new Error('Invalid geo_sort_order parameter, must be a string IF specified');
+                        if (!options[val]) throw new Error('If geo_sort_order is specified it must be either "asc" or "desc"');
                     }
                 }
             },
@@ -242,23 +245,22 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             },
             connection: {
                 default: 'default'
-            }
+            },
         };
     }
 }
 
-
 function geoPointValidation(point: string | null) {
     if (point) {
-        if (typeof point !== 'string') throw new Error('parameter must be a string IF specified');
+        if (typeof point !== 'string') throw new Error('Invalid geo_point, must be a string IF specified');
 
         const pieces = point.split(',');
         if (pieces.length !== 2) throw new Error(`Invalid geo_point, received ${point}`);
         const latitude = toNumber(pieces[0]);
         const longitutde = toNumber(pieces[1]);
 
-        if (latitude > 90 || latitude < -90) throw new Error(`latitude parameter is incorrect, was given ${latitude}, should be >= -90 and <= 90`);
-        if (longitutde > 180 || longitutde < -180) throw new Error(`longitutde parameter is incorrect, was given ${longitutde}, should be >= -180 and <= 180`);
+        if (latitude > 90 || latitude < -90) throw new Error(`Invalid latitude parameter, was given ${latitude}, should be >= -90 and <= 90`);
+        if (longitutde > 180 || longitutde < -180) throw new Error(`Invalid longitutde parameter, was given ${longitutde}, should be >= -180 and <= 180`);
     }
 }
 
@@ -271,19 +273,19 @@ function checkUnits(unit: string | null) {
             km: true,
             m: true
         };
-        if (typeof unit !== 'string') throw new Error('parameter must be a string IF specified');
-        if (!unitOptions[unit]) throw new Error('unit type did not have a proper unit of measuerment (ie m, km, yd, ft)');
+        if (typeof unit !== 'string') throw new Error('Invalid parameter, must be a string IF specified');
+        if (!unitOptions[unit]) throw new Error('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');
     }
 }
 
 function validGeoDistance(distance: string | null) {
     if (distance) {
-        if (typeof distance !== 'string') throw new Error('parameter must be a string IF specified');
+        if (typeof distance !== 'string') throw new Error('Invalid geo_distance parameter, must be a string IF specified');
         const matches = distance.match(/(\d+)(.*)$/);
-        if (!matches) throw new Error('geo_distance paramter is formatted incorrectly');
+        if (!matches) throw new Error('Invalid geo_distance paramter, is formatted incorrectly');
 
         const number = matches[1];
-        if (!number) throw new Error('geo_distance paramter is formatted incorrectly, it must include a number');
+        if (!number) throw new Error('Invalid geo_distance paramter, it must include a number');
 
         const unit = matches[2];
         checkUnits(unit);

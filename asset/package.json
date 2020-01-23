@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "main": "utils.js",
     "devDependencies": {},
     "scripts": {
@@ -10,14 +10,11 @@
     "license": "MIT",
     "description": "",
     "dependencies": {
-        "@terascope/elasticsearch-api": "^2.2.2",
-        "@terascope/error-parser": "^1.0.1",
-        "@terascope/job-components": "^0.24.0",
-        "@terascope/teraslice-state-storage": "^0.9.0",
-        "bluebird": "^3.5.5",
+        "@terascope/elasticsearch-api": "^2.4.0",
+        "@terascope/job-components": "^0.27.0",
+        "@terascope/teraslice-state-storage": "^0.10.0",
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
-        "lodash": "^4.17.15",
         "mocker-data-generator": "^2.6.6",
         "moment": "^2.24.0"
     }

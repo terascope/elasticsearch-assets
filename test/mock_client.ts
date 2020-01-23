@@ -1,4 +1,3 @@
-
 import {
     AnyObject,
     isPlainObject,
@@ -26,7 +25,7 @@ interface BulkData {
     body: AnyObject[];
 }
 
-function getMeta(meta: AnyObject) {
+function getMeta(meta: AnyObject|undefined) {
     if (meta == null) return false;
     if (meta.index) return 'index';
     if (meta.create) return 'create';
@@ -42,21 +41,26 @@ function isObjectLike(doc: any) {
 function validateBulk(data: BulkData) {
     if (!data.body) throw new Error('bulk must have a body field');
     if (!Array.isArray(data.body)) throw new Error('bulk data must be an array');
+
     const areObjects = data.body.every(isSimpleObject);
+
     if (!areObjects) throw new Error('bulk data must be an array of objects');
     if (data.body.length === 0) throw new Error('bulk must contain an array of objects');
+
     const clone = cloneDeep(data.body);
 
     while (clone.length > 0) {
         const doc = clone.shift();
         const meta = getMeta(doc);
+
         if (meta === false) throw new Error('elasticsearch meta data object needs to be paired with data');
         // only delete meta is not paired
         if (meta !== 'delete') {
             const secondDoc = clone.shift();
+
             if (getMeta(secondDoc)) throw new Error('an elasticsearch meta object must be paired with data if it is not a delete operation');
             if (!isObjectLike(secondDoc)) throw new Error('data paired with elasitcsearhc bulk meta must be an object');
-            if (Object.keys(secondDoc).length === 0) throw new Error('data must not be an empty object');
+            if (Object.keys(secondDoc as AnyObject).length === 0) throw new Error('data must not be an empty object');
         }
     }
 }
@@ -116,7 +120,7 @@ export default class MockClient {
         };
     }
 
-    setSequenceData(data: any) {
+    setSequenceData(data: AnyObject[]) {
         this.sequence = data.map(
             (obj: any) => ({
                 _shards: { failed: 0 },

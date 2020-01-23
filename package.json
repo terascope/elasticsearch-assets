@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "1.7.1",
+    "version": "1.8.0",
     "scripts": {
         "asset:build": "yarn run build",
         "build": "rm -rf asset/dist; tsc --project tsconfig.json",
@@ -24,24 +24,26 @@
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
     "dependencies": {
-        "@terascope/eslint-config": "^0.1.8"
+        "@terascope/eslint-config": "^0.2.2"
     },
     "engines": {
         "node": ">=8.0.0"
     },
     "devDependencies": {
-        "@terascope/job-components": "^0.24.0",
+        "@terascope/elasticsearch-api": "^2.4.0",
+        "@terascope/job-components": "^0.27.0",
         "@types/bluebird": "^3.5.28",
         "@types/got": "^9.6.8",
-        "@types/jest": "^24.0.21",
-        "@types/node": "^12.12.5",
+        "@types/jest": "^24.9.1",
+        "@types/node": "^13.5.0",
         "eslint": "^6.8.0",
         "jest": "^24.9.0",
         "jest-extended": "^0.11.2",
-        "nock": "^11.7.0",
-        "teraslice-test-harness": "^0.9.0",
-        "ts-jest": "^24.1.0",
-        "ts-node": "^8.5.4",
+        "moment": "^2.24.0",
+        "nock": "^11.7.2",
+        "teraslice-test-harness": "^0.12.1",
+        "ts-jest": "^24.3.0",
+        "ts-node": "^8.6.2",
         "typescript": "^3.7.4"
     }
 }

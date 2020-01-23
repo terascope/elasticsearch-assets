@@ -1,4 +1,3 @@
-
 import {
     Fetcher, WorkerContext, ExecutionConfig, TSError
 } from '@terascope/job-components';

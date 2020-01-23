@@ -1,4 +1,3 @@
-
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import path from 'path';
@@ -51,7 +50,7 @@ describe('elasticsearch index selector', () => {
             date_field: 'created'
         };
 
-        const errMsg = 'elasticsearch_index_selector is mis-configured, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters';
+        const errMsg = 'Invalid elasticsearch_index_selector configuration';
         try {
             await makeTest(op1);
         } catch (err) {
@@ -75,7 +74,7 @@ describe('elasticsearch index selector', () => {
             _op: 'elasticsearch_index_selector',
             index: 'some-index'
         };
-        const errMsg = 'type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch';
+        const errMsg = 'Invalid elasticsearch_index_selector configuration';
         try {
             harness = WorkerTestHarness.testProcessor(opConfig, { assetDir, clients });
             await harness.initialize();
@@ -105,7 +104,7 @@ describe('elasticsearch index selector', () => {
         try {
             await test.runSlice(data);
         } catch (err) {
-            expect(err.message).toBe('opConfig date field: name either does not exists or is not a valid date on the records processed');
+            expect(err.message).toBe('Invalid opConfig date field: name. It either does not exists or is not a valid date on the records processed');
         }
     });
 

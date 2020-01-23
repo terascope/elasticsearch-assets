@@ -27,5 +27,5 @@ export function getKeyArray(config: ESIDReaderConfig) {
     if (config.key_type === 'HEXADECIMAL') {
         return HEXADECIMAL.slice();
     }
-    throw new Error('could not find correct key type');
+    throw new Error('Could not find correct key type');
 }

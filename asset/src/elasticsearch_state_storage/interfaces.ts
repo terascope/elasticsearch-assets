@@ -1,4 +1,3 @@
-
 import { APIConfig } from '@terascope/job-components';
 
 export interface ESStateStorageConfig extends APIConfig {

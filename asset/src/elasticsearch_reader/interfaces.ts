@@ -1,12 +1,8 @@
-
-import {
-    OpConfig,
-    WorkerContext,
-    ExecutionConfig,
-    Logger
-} from '@terascope/job-components';
+import { EventEmitter } from 'events';
+import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
+import WindowState from './window-state';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends OpConfig {
@@ -24,7 +20,7 @@ export interface ESReaderConfig extends OpConfig {
     subslice_by_key: boolean;
     subslice_key_threshold: number;
     key_type: IDType;
-    time_resolution: string;
+    time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
     geo_box_top_left?: string;
     geo_box_bottom_right?: string;
@@ -36,29 +32,58 @@ export interface ESReaderConfig extends OpConfig {
     connection: string;
 }
 
+export interface DateSegments {
+    start: moment.Moment;
+    limit: moment.Moment;
+}
+
+export interface SlicerDateConfig extends DateSegments {
+    end: moment.Moment;
+    holes?: DateConfig[];
+}
+
+export interface StartPointConfig {
+    dates: DateSegments;
+    id: number;
+    numOfSlicers: number;
+    interval: ParsedInterval;
+    recoveryData?: SlicerDateResults[];
+}
+
 export type ParsedInterval = [number, moment.unitOfTime.Base];
 
+// TODO: delete?
 export interface DateConfig {
-    start: string;
-    end: string;
-    interval?: ParsedInterval;
-    delayTime?: number;
+    start: string | moment.Moment;
+    end: string | moment.Moment;
 }
 
 export interface SlicerArgs {
-    context: WorkerContext;
     opConfig: any;
+    interval: ParsedInterval;
+    latencyInterval?: ParsedInterval;
     executionConfig: ExecutionConfig;
-    retryData?: any;
     logger: Logger;
-    dates: DateConfig;
+    dates: SlicerDateConfig;
+    primaryRange?: DateSegments;
     id: number;
     api: elasticApi.Client;
+    events: EventEmitter;
+    windowState: WindowState;
 }
-
 export interface SlicerDateResults {
     start: string;
     end: string;
+    limit: string;
     count: number;
+    holes?: DateConfig[];
     wildcard?: WildCardQuery;
 }
+
+export interface ApiConfig extends ESReaderConfig {
+    endpoint: string;
+    token: string;
+    timeout: number;
+}
+
+export type ESDateConfig = ESReaderConfig | ApiConfig;

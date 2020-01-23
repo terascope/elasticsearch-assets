@@ -1,10 +1,5 @@
-
-import {
-    OpConfig,
-    WorkerContext,
-    ExecutionConfig,
-    Logger
-} from '@terascope/job-components';
+import { EventEmitter } from 'events';
+import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
@@ -29,7 +24,6 @@ export interface ESIDReaderConfig extends OpConfig {
 }
 
 export interface ESIDSlicerArgs {
-    context: WorkerContext;
     opConfig: ESIDReaderConfig;
     executionConfig: ExecutionConfig;
     retryData?: any;
@@ -37,6 +31,7 @@ export interface ESIDSlicerArgs {
     range: SlicerDateResults;
     api: elasticApi.Client;
     keySet: string[];
+    events: EventEmitter;
 }
 
 export interface WildCardQuery {

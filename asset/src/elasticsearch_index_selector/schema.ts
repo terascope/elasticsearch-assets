@@ -8,16 +8,16 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
         const opConfig = getOpConfig(job, 'elasticsearch_index_selector');
         const preserveId = job.operations.find((op) => op.preserve_id === true);
 
-        if (opConfig == null) throw new Error('could not find elasticsearch_index_selector operation in jobConfig');
+        if (opConfig == null) throw new Error('Could not find elasticsearch_index_selector operation in jobConfig');
 
         if (opConfig.timeseries || opConfig.index_prefix || opConfig.date_field) {
             if (!(opConfig.timeseries && opConfig.index_prefix && opConfig.date_field)) {
-                throw new Error('elasticsearch_index_selector is mis-configured, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters');
+                throw new Error('Invalid elasticsearch_index_selector configuration, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters');
             }
         }
 
         if (!opConfig.type && !preserveId) {
-            throw new Error('type must be specified in elasticsearch index selector config if data is not a full response from elasticsearch');
+            throw new Error('Invalid elasticsearch_index_selector configuration, "type" must be specified if data is not a full response from elasticsearch');
         }
     }
 
@@ -29,15 +29,15 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 default: '',
                 format(val: any) {
                     if (typeof val !== 'string') {
-                        throw new Error('index must be of type string');
+                        throw new Error('Invalid index configuration, must be of type string');
                     }
 
                     if (val.match(/[A-Z]/)) {
-                        throw new Error('index must be lowercase');
+                        throw new Error('Invalid index configuration, must be lowercase');
                     }
 
                     if (val.length === 0) {
-                        throw new Error('index must not be an empty string');
+                        throw new Error('Invalid index configuration, must not be an empty string');
                     }
                 }
             },
@@ -66,7 +66,7 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 format(value: any) {
                     // This will generate logstash style timeseries names
                     if (value && (!['daily', 'weekly', 'monthly', 'yearly'].includes(value))) {
-                        throw new Error("timeseries must be one of 'daily', 'weekly', 'monthly', 'yearly'");
+                        throw new Error("Invalid timeseries configuration, must be one of 'daily', 'weekly', 'monthly', 'yearly'");
                     }
                 }
             },
@@ -77,10 +77,10 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 format(val: any) {
                     if (val) {
                         if (typeof val !== 'string') {
-                            throw new Error('index_prefix must be of type string');
+                            throw new Error('Invalid index_prefix configuration, must be of type string');
                         }
                         if (val.match(/[A-Z]/)) {
-                            throw new Error('index_prefix must be lowercase');
+                            throw new Error('Invalid index_prefix configuration, must be lowercase');
                         }
                     }
                 }
@@ -105,9 +105,9 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 default: 0,
                 format(val: any) {
                     if (isNaN(val)) {
-                        throw new Error('update_retry_on_conflict for elasticsearch_bulk must be a number');
+                        throw new Error('Invalid update_retry_on_conflict configuration, must be a number');
                     } else if (val < 0) {
-                        throw new Error('update_retry_on_conflict for elasticsearch_bulk must be greater than or equal to zero');
+                        throw new Error('Invalid update_retry_on_conflict configuration, must be greater than or equal to zero');
                     }
                 }
             },
