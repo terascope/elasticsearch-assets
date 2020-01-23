@@ -437,6 +437,7 @@ describe('elasticsearch_reader', () => {
             expect(results.start).toBeDefined();
             expect(results.end).toBeDefined();
             expect(results.count).toBeDefined();
+
             const now1 = makeDate(dateFormat);
             expect(moment(results.end).isBetween(delayedBoundary, now1)).toEqual(true);
 
@@ -498,6 +499,7 @@ describe('elasticsearch_reader', () => {
             expect(results5).not.toEqual(null);
             expect(results6).not.toEqual(null);
             expect(results5.limit).toEqual(results6.start);
+            expect(results5.start).toEqual(results2.limit);
             expect(moment(results6.limit).diff(results5.start)).toEqual(200);
 
             const [results7, results8] = await test.createSlices();
@@ -564,6 +566,61 @@ describe('elasticsearch_reader', () => {
 
             const [results9] = await test.createSlices();
             expect(results9).toEqual(null);
+        });
+
+        it('can run a persistent reader with recoveryData with no lastSlice', async () => {
+            const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
+            const start = makeDate(dateFormat);
+            const delayedBoundary = moment(start).subtract(delay[0], delay[1]);
+
+            const opConfig = {
+                _op: 'elasticsearch_reader',
+                date_field_name: '@timestamp',
+                time_resolution: 'ms',
+                size: 100,
+                index: 'someindex',
+                interval: '100ms',
+                delay: delay.join('')
+            };
+
+            const recoveryData = [
+                {
+                    lastSlice: undefined,
+                    slicer_id: 0
+                }
+            ];
+
+            const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent', recoveryData });
+
+            const [results] = await test.createSlices();
+
+            expect(results).toBeDefined();
+
+            expect(results.start).toBeDefined();
+            expect(results.end).toBeDefined();
+            expect(results.count).toBeDefined();
+
+            const now1 = makeDate(dateFormat);
+            expect(moment(results.end).isBetween(delayedBoundary, now1)).toEqual(true);
+
+            const [results2] = await test.createSlices();
+
+            expect(results2).toEqual(null);
+
+            await pDelay(110);
+
+            const [results3] = await test.createSlices();
+
+            expect(results3).toBeDefined();
+            expect(results3.start).toBeDefined();
+            expect(results3.end).toBeDefined();
+            expect(results3.count).toBeDefined();
+
+            const [results4] = await test.createSlices();
+            expect(results4).toEqual(null);
+
+            const [results5] = await test.createSlices();
+            expect(results5).toEqual(null);
         });
 
         it('slicer can reduce date slices down to size', async () => {

@@ -7,7 +7,7 @@ import {
     debugLogger,
     newTestJobConfig,
     times,
-    pDelay
+    pDelay,
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -28,7 +28,7 @@ interface TestConfig {
     lifecycle?: LifeCycle;
     id?: number;
     config?: AnyObject;
-    client?: any;
+    client?: MockClient;
     interval: ParsedInterval;
     latencyInterval?: ParsedInterval;
     dates: SlicerDateConfig;
@@ -49,7 +49,7 @@ describe('date slicer function', () => {
         slicers = 1,
         lifecycle = 'once',
         id = 0,
-        client = new MockClient(),
+        client: _client,
         interval,
         latencyInterval,
         dates,
@@ -58,6 +58,13 @@ describe('date slicer function', () => {
         timeResolution = 's',
         windowState
     }: TestConfig) {
+        let client = _client;
+
+        if (client == null) {
+            client = new MockClient();
+            client.setSequenceData(times(50, () => ({ count: 100, '@timestamp': new Date() })));
+        }
+
         if (lifecycle === 'persistent') {
             if (!primaryRange || !latencyInterval) throw new Error('Invalid test config');
         }
@@ -76,8 +83,6 @@ describe('date slicer function', () => {
                 }
             ],
         });
-
-        client.setSequenceData(times(50, () => ({ count: 100, '@timestamp': new Date() })));
 
         const executionConfig = newTestExecutionConfig(job);
         const opConfig = executionConfig.operations[0];
@@ -185,6 +190,55 @@ describe('date slicer function', () => {
         expect(moment(results6.start).isSame(thirdStart)).toBeTrue();
         expect(moment(results6.end).isSame(thirdEnd)).toBeTrue();
         expect(moment(results6.limit).isSame(thirdLimit)).toBeTrue();
+    });
+
+    it('can run a persistently with one slicer with zero records returned in client then with size to large', async () => {
+        const client = new MockClient();
+        const zeroCount = times(1, () => ({ count: 0 }));
+        const largeCount = times(50, () => ({ count: 5000 }));
+        const sequence: any[] = [];
+
+        while (zeroCount.length) {
+            sequence.push(zeroCount.pop(), largeCount.pop());
+        }
+
+        client.setSequenceData(sequence.filter(Boolean));
+
+        const interval: ParsedInterval = [500, 'ms'];
+        const latencyInterval: ParsedInterval = [500, 'ms'];
+
+        const currentTime = makeDate(dateFormat);
+
+        const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+        const start = moment(limit).subtract(interval[0], interval[1]);
+        const end = moment(start).add(interval[0], interval[1]);
+
+        const dates = { start, end, limit };
+
+        const testConfig: TestConfig = {
+            interval,
+            latencyInterval,
+            lifecycle: 'persistent',
+            primaryRange: { start, limit },
+            dates,
+            timeResolution: 'ms',
+            client
+        };
+
+        const slicer = makeSlicer(testConfig);
+
+        const results = await slicer({}) as SlicerDateResults;
+
+        expect(results).toBeDefined();
+        expect(moment(results.start)).toBeDefined();
+        expect(moment(results.end).isSame(moment(limit))).toBeDefined();
+        expect(moment(results.limit).isSame(moment(limit))).toBeDefined();
+
+        const results2 = await slicer({});
+
+        expect(results2).toEqual(null);
+        // we test this to show that it is null not becuase the mock client ran out
+        expect(client.sequence.length > 0).toBeTrue();
     });
 
     it('can run persistenly with multiple slicers', async () => {

@@ -72,13 +72,13 @@ export default function newSlicer(args: SlicerArgs) {
         primaryRange,
         windowState
     } = args;
-
+    const isPersistent = executionConfig.lifecycle === 'persistent';
     const timeResolution = dateOptions(opConfig.time_resolution);
     const retryError = retryModule(logger, executionConfig.max_retries);
     const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
     const currentWindow = primaryRange || {} as DateSegments;
 
-    if (executionConfig.lifecycle === 'persistent' && windowState == null) {
+    if (isPersistent && windowState == null) {
         throw new Error('WindowState must be provided if lifecyle is persistent');
     }
 
@@ -100,7 +100,7 @@ export default function newSlicer(args: SlicerArgs) {
         if (count > size) {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
-            // recurse down to the appropriate size
+                // recurse down to the appropriate size
                 const newStart = moment(end).subtract(step, unit);
                 // get diff from new start
                 const diff = splitTime(newStart, end, limit, timeResolution);
@@ -117,7 +117,8 @@ export default function newSlicer(args: SlicerArgs) {
                 const data: DetermineSliceResults = await determineSlice(
                     cloneDates,
                     slicerId,
-                    false
+                    false,
+                    isLimitQuery
                 );
                 // return the zero range start with the correct end
                 return {
@@ -142,13 +143,13 @@ export default function newSlicer(args: SlicerArgs) {
 
             if (logger.level() === 10) logger.trace(`slicer: ${slicerId} is recursing ${JSON.stringify(dateParams)}`);
 
-            return determineSlice(dateParams, slicerId, isExpandedSlice);
+            return determineSlice(dateParams, slicerId, isExpandedSlice, isLimitQuery);
         }
 
         // interval is only passed in with once mode, it will expand slices to prevent
         // counts of 0, if the limit is reached it will run once more for the correct count
         // then it should return and not recurse further if there is still no data
-        if (!isLimitQuery && count === 0 && dateParams.interval) {
+        if (!isPersistent && !isLimitQuery && count === 0 && dateParams.interval) {
             // increase the slice range to find documents
             let makeLimitQuery = false;
 
@@ -237,7 +238,7 @@ export default function newSlicer(args: SlicerArgs) {
     }
 
     async function nextRange() {
-        if (executionConfig.lifecycle === 'persistent') {
+        if (isPersistent) {
             const canProcessNextRange = windowState?.checkin(id);
 
             if (!canProcessNextRange) return null;
