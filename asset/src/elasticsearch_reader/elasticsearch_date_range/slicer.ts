@@ -116,7 +116,9 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     }
 
     async updateJob(data: AnyObject) {
-        return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
+        if (this.context.apis.executionContext.setMetadata) {
+            return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
+        }
     }
 
     async getCount(dates: any, key?: string) {
