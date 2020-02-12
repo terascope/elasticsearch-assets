@@ -5,6 +5,7 @@ import {
     ExecutionConfig,
     TSError,
     AnyObject,
+    isFunction,
 } from '@terascope/job-components';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -116,7 +117,11 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     }
 
     async updateJob(data: AnyObject) {
-        return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
+        const { setMetadata } = this.context.apis.executionContext;
+
+        if (setMetadata && isFunction(setMetadata)) {
+            return this.context.apis.executionContext.setMetadata(this.opConfig._op, data);
+        }
     }
 
     async getCount(dates: any, key?: string) {

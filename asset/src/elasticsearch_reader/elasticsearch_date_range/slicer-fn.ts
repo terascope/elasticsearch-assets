@@ -30,6 +30,7 @@ interface DetermineSliceResults {
 interface DateParams {
     start: moment.Moment;
     end: moment.Moment;
+    prevEnd?: moment.Moment;
     limit: moment.Moment;
     holes: DateConfig[];
     interval: ParsedInterval;
@@ -101,10 +102,11 @@ export default function newSlicer(args: SlicerArgs) {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
                 // recurse down to the appropriate size
-                const newStart = moment(end).subtract(step, unit);
+                const newStart = moment(dateParams.prevEnd);
                 // get diff from new start
                 const diff = splitTime(newStart, end, limit, timeResolution);
                 const newEnd = moment(newStart).add(diff, timeResolution);
+
                 const cloneDates: DateParams = {
                     interval: dateParams.interval,
                     limit,
@@ -131,7 +133,6 @@ export default function newSlicer(args: SlicerArgs) {
             // find difference in milliseconds and divide in half
             const diff = splitTime(start, end, limit, timeResolution);
             const newEnd = moment(start).add(diff, timeResolution);
-
             // prevent recursive call if difference is one millisecond
             if (diff <= 0) {
                 return { start, end, count };
@@ -146,18 +147,20 @@ export default function newSlicer(args: SlicerArgs) {
             return determineSlice(dateParams, slicerId, isExpandedSlice, isLimitQuery);
         }
 
-        // interval is only passed in with once mode, it will expand slices to prevent
+        // with once mode, it will expand slices to prevent
         // counts of 0, if the limit is reached it will run once more for the correct count
         // then it should return and not recurse further if there is still no data
-        if (!isPersistent && !isLimitQuery && count === 0 && dateParams.interval) {
+        if (!isPersistent && !isLimitQuery && count === 0) {
             // increase the slice range to find documents
             let makeLimitQuery = false;
+            // we make a mark of the last end spot before expansion
+            dateParams.prevEnd = moment(end);
 
             const newEnd = moment(dateParams.end).add(step, unit);
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;
-                dateParams.end = dateParams.limit;
+                dateParams.end = moment(dateParams.limit);
             } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
                 makeLimitQuery = true;
                 dateParams.end = moment(holes[0].start);
@@ -272,11 +275,37 @@ export default function newSlicer(args: SlicerArgs) {
         return null;
     }
 
+    function adjustDates(dateParams: DateParams, holes: DateConfig[]) {
+        const [step, unit] = interval;
+
+        if (holes.length > 0 && dateParams.start.isSameOrAfter(holes[0].start)) {
+            // we are in a hole, need to shift where it is looking at
+            // we mutate on pupose, eject hole that is already passed
+            const hole = holes.shift() as DateConfig;
+            let newStart = moment(hole.end);
+
+            if (newStart.isAfter(dateParams.limit)) {
+                newStart = moment(dateParams.limit);
+            }
+
+            dateParams.start = newStart;
+        }
+
+        const newEnd = moment(dateParams.start).add(step, unit);
+
+        if (newEnd.isSameOrAfter(dateParams.limit)) {
+            dateParams.end = moment(dateParams.limit);
+        } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
+            dateParams.end = moment(holes[0].start);
+        } else {
+            dateParams.end = newEnd;
+        }
+    }
+
     function dateSlicer(dates: SlicerDateConfig, slicerId: number) {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
-        const [step, unit] = interval as ParsedInterval;
 
         const dateParams: DateParams = {
             size: opConfig.size,
@@ -302,6 +331,7 @@ export default function newSlicer(args: SlicerArgs) {
                 dateParams.start = moment(start);
                 dateParams.end = moment(end);
                 dateParams.limit = moment(limit);
+                adjustDates(dateParams, holes);
             }
 
             let data: DetermineSliceResults;
@@ -315,28 +345,7 @@ export default function newSlicer(args: SlicerArgs) {
 
             dateParams.start = moment(data.end);
 
-            if (holes.length > 0 && dateParams.start.isSameOrAfter(holes[0].start)) {
-                // we are in a hole, need to shift where it is looking at
-                // we mutate on pupose, eject hole that is already passed
-                const hole = holes.shift() as DateConfig;
-                let newStart = moment(hole.end);
-
-                if (newStart.isAfter(dateParams.limit)) {
-                    newStart = moment(dateParams.limit);
-                }
-
-                dateParams.start = newStart;
-            }
-
-            const newEnd = moment(dateParams.start).add(step, unit);
-
-            if (newEnd.isAfter(dateParams.limit)) {
-                dateParams.end = moment(data.end).add(dateParams.limit.diff(data.end), 'ms');
-            } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
-                dateParams.end = moment(holes[0].start);
-            } else {
-                dateParams.end = newEnd;
-            }
+            adjustDates(dateParams, holes);
 
             if (shouldDivideByID && data.count >= threshold) {
                 logger.debug('date slicer is recursing by keylist');

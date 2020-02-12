@@ -129,228 +129,328 @@ describe('date slicer function', () => {
         expect(fn).toBeFunction();
     });
 
-    it('can run a persistently with one slicer', async () => {
-        const interval: ParsedInterval = [500, 'ms'];
-        const latencyInterval: ParsedInterval = [500, 'ms'];
+    describe('can gerenate dates in once mode', () => {
+        it('with zero count at end of slice it expands', async () => {
+            const interval: ParsedInterval = [5, 'm'];
+            const start = makeDate(dateFormatSeconds);
+            const end = moment(start).add(2, 'm');
+            const limit = moment(start).add(interval[0], interval[1]);
 
-        const currentTime = makeDate(dateFormat);
+            const client = new MockClient([{ count: 0 }], 0);
 
-        const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-        const start = moment(limit).subtract(interval[0], interval[1]);
-        const end = moment(start).add(interval[0], interval[1]);
+            const testConfig: TestConfig = {
+                interval,
+                dates: {
+                    start,
+                    end,
+                    limit
+                },
+                client
+            };
+            const expectedResults = {
+                start: moment(start).format(dateFormatSeconds),
+                end: moment(limit).format(dateFormatSeconds),
+                limit: moment(limit).format(dateFormatSeconds),
+                count: 0,
+                holes: []
+            };
 
-        const dates = { start, end, limit };
+            const slicer = makeSlicer(testConfig);
+            const results = await slicer({});
 
-        const secondStart = moment(limit);
-        const secondEnd = moment(secondStart).add(interval[0], interval[1]);
-        const secondLimit = moment(secondStart).add(interval[0], interval[1]);
+            expect(results).toEqual(expectedResults);
+        });
 
-        const thirdStart = moment(secondLimit);
-        const thirdEnd = moment(thirdStart).add(interval[0], interval[1]);
-        const thirdLimit = moment(thirdStart).add(interval[0], interval[1]);
+        it('with zero count, then to big a count at end of slice', async () => {
+            const interval: ParsedInterval = [5, 'm'];
+            const start = makeDate(dateFormatSeconds);
+            const end = moment(start).add(2, 'm');
+            const limit = moment(start).add(3, 'm');
+            const client = new MockClient([], 2000);
+            client.setSequenceData([{ count: 0 }]);
 
-        const testConfig: TestConfig = {
-            interval,
-            latencyInterval,
-            lifecycle: 'persistent',
-            primaryRange: { start, limit },
-            dates,
-            timeResolution: 'ms'
-        };
+            const testConfig: TestConfig = {
+                interval,
+                dates: {
+                    start,
+                    end,
+                    limit
+                },
+                client
+            };
+            const expectedResults = {
+                start: moment(start).format(dateFormatSeconds),
+                end: moment(end).add(1, 's').format(dateFormatSeconds),
+                limit: moment(limit).format(dateFormatSeconds),
+                count: 2000,
+                holes: []
+            };
 
-        const slicer = makeSlicer(testConfig);
+            const slicer = makeSlicer(testConfig);
+            const results = await slicer({});
 
-        const results = await slicer({}) as SlicerDateResults;
+            expect(results).toEqual(expectedResults);
+        });
 
-        expect(results).toBeDefined();
-        expect(moment(results.start).isSame(start)).toBeTrue();
-        expect(moment(results.end).isSame(moment(limit))).toBeTrue();
-        expect(moment(results.limit).isSame(moment(limit))).toBeTrue();
+        it('with expanded slice count, then to large a size', async () => {
+            const interval: ParsedInterval = [5, 'm'];
+            const start = makeDate(dateFormatSeconds);
+            const end = moment(start).add(2, 'm');
+            const limit = moment(start).add(interval[0], interval[1]);
 
-        const results2 = await slicer({});
-        expect(results2).toEqual(null);
+            const client = new MockClient([{ count: 2000 }], 2000);
 
-        await pDelay(500);
+            const testConfig: TestConfig = {
+                interval,
+                dates: {
+                    start,
+                    end,
+                    limit
+                },
+                client
+            };
+            const expectedResults = {
+                start: moment(start).format(dateFormatSeconds),
+                end: moment(start).add(1, 's').format(dateFormatSeconds),
+                limit: moment(limit).format(dateFormatSeconds),
+                count: 2000,
+                holes: []
+            };
 
-        const results4 = await slicer({}) as SlicerDateResults;
+            const slicer = makeSlicer(testConfig);
+            const results = await slicer({});
 
-        expect(results4).toBeDefined();
-        expect(moment(results4.start).isSame(secondStart)).toBeTrue();
-        expect(moment(results4.end).isSame(secondEnd)).toBeTrue();
-        expect(moment(results4.limit).isSame(secondLimit)).toBeTrue();
-
-        const results5 = await slicer({});
-        expect(results5).toEqual(null);
-
-        await pDelay(500);
-
-        const results6 = await slicer({}) as SlicerDateResults;
-
-        expect(results6).toBeDefined();
-        expect(moment(results6.start).isSame(thirdStart)).toBeTrue();
-        expect(moment(results6.end).isSame(thirdEnd)).toBeTrue();
-        expect(moment(results6.limit).isSame(thirdLimit)).toBeTrue();
+            expect(results).toEqual(expectedResults);
+        });
     });
 
-    it('can run a persistently with one slicer with zero records returned in client then with size to large', async () => {
-        const client = new MockClient();
-        const zeroCount = times(1, () => ({ count: 0 }));
-        const largeCount = times(50, () => ({ count: 5000 }));
-        const sequence: any[] = [];
+    describe('can run persistently', () => {
+        it('with one slicer', async () => {
+            const interval: ParsedInterval = [500, 'ms'];
+            const latencyInterval: ParsedInterval = [500, 'ms'];
 
-        while (zeroCount.length) {
-            sequence.push(zeroCount.pop(), largeCount.pop());
-        }
+            const currentTime = makeDate(dateFormat);
 
-        client.setSequenceData(sequence.filter(Boolean));
+            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment(limit).subtract(interval[0], interval[1]);
+            const end = moment(start).add(interval[0], interval[1]);
 
-        const interval: ParsedInterval = [500, 'ms'];
-        const latencyInterval: ParsedInterval = [500, 'ms'];
+            const dates = { start, end, limit };
 
-        const currentTime = makeDate(dateFormat);
+            const secondStart = moment(limit);
+            const secondEnd = moment(secondStart).add(interval[0], interval[1]);
+            const secondLimit = moment(secondStart).add(interval[0], interval[1]);
 
-        const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-        const start = moment(limit).subtract(interval[0], interval[1]);
-        const end = moment(start).add(interval[0], interval[1]);
+            const thirdStart = moment(secondLimit);
+            const thirdEnd = moment(thirdStart).add(interval[0], interval[1]);
+            const thirdLimit = moment(thirdStart).add(interval[0], interval[1]);
 
-        const dates = { start, end, limit };
+            const testConfig: TestConfig = {
+                interval,
+                latencyInterval,
+                lifecycle: 'persistent',
+                primaryRange: { start, limit },
+                dates,
+                timeResolution: 'ms'
+            };
 
-        const testConfig: TestConfig = {
-            interval,
-            latencyInterval,
-            lifecycle: 'persistent',
-            primaryRange: { start, limit },
-            dates,
-            timeResolution: 'ms',
-            client
-        };
+            const slicer = makeSlicer(testConfig);
 
-        const slicer = makeSlicer(testConfig);
+            const results = await slicer({}) as SlicerDateResults;
 
-        const results = await slicer({}) as SlicerDateResults;
+            expect(results).toBeDefined();
+            expect(moment(results.start).isSame(start)).toBeTrue();
+            expect(moment(results.end).isSame(moment(limit))).toBeTrue();
+            expect(moment(results.limit).isSame(moment(limit))).toBeTrue();
 
-        expect(results).toBeDefined();
-        expect(moment(results.start)).toBeDefined();
-        expect(moment(results.end).isSame(moment(limit))).toBeDefined();
-        expect(moment(results.limit).isSame(moment(limit))).toBeDefined();
+            const results2 = await slicer({});
+            expect(results2).toEqual(null);
 
-        const results2 = await slicer({});
+            await pDelay(500);
 
-        expect(results2).toEqual(null);
-        // we test this to show that it is null not becuase the mock client ran out
-        expect(client.sequence.length > 0).toBeTrue();
-    });
+            const results4 = await slicer({}) as SlicerDateResults;
 
-    it('can run persistenly with multiple slicers', async () => {
-        const numOfSlicer = 2;
-        const interval: ParsedInterval = [500, 'ms'];
-        const latencyInterval: ParsedInterval = [500, 'ms'];
-        const half: ParsedInterval = [250, 'ms'];
+            expect(results4).toBeDefined();
+            expect(moment(results4.start).isSame(secondStart)).toBeTrue();
+            expect(moment(results4.end).isSame(secondEnd)).toBeTrue();
+            expect(moment(results4.limit).isSame(secondLimit)).toBeTrue();
 
-        const currentTime = makeDate(dateFormat);
+            const results5 = await slicer({});
+            expect(results5).toEqual(null);
 
-        const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-        const start = moment(limit).subtract(interval[0], interval[1]);
+            await pDelay(500);
 
-        const primaryRange = { start, limit };
+            const results6 = await slicer({}) as SlicerDateResults;
 
-        const ranges = divideRange(start, limit, numOfSlicer);
+            expect(results6).toBeDefined();
+            expect(moment(results6.start).isSame(thirdStart)).toBeTrue();
+            expect(moment(results6.end).isSame(thirdEnd)).toBeTrue();
+            expect(moment(results6.limit).isSame(thirdLimit)).toBeTrue();
+        });
 
-        const secondRanges = divideRange(
-            moment(start).add(interval[0], interval[1]),
-            moment(limit).add(interval[0], interval[1]),
-            numOfSlicer
-        );
+        it('with one slicer with zero records returned in client then with size to large', async () => {
+            const client = new MockClient();
+            const zeroCount = times(1, () => ({ count: 0 }));
+            const largeCount = times(50, () => ({ count: 5000 }));
+            const sequence: any[] = [];
 
-        const date1 = Object.assign(
-            {}, ranges[0], { end: moment(ranges[0].start).add(half[0], half[1]) }
-        );
-        const date2 = Object.assign(
-            {}, ranges[1], { end: moment(ranges[1].start).add(half[0], half[1]) }
-        );
+            while (zeroCount.length) {
+                sequence.push(zeroCount.pop(), largeCount.pop());
+            }
 
-        const windowState = new WindowState(numOfSlicer);
+            client.setSequenceData(sequence.filter(Boolean));
 
-        const date3 = Object.assign(
-            {}, secondRanges[0], { end: moment(secondRanges[0].start).add(half[0], half[1]) }
-        );
-        const date4 = Object.assign(
-            {}, secondRanges[1], { end: moment(secondRanges[1].start).add(half[0], half[1]) }
-        );
+            const interval: ParsedInterval = [500, 'ms'];
+            const latencyInterval: ParsedInterval = [500, 'ms'];
 
-        const testConfig1: TestConfig = {
-            interval,
-            latencyInterval,
-            lifecycle: 'persistent',
-            primaryRange,
-            dates: date1,
-            timeResolution: 'ms',
-            slicers: numOfSlicer,
-            id: 0,
-            windowState
-        };
+            const currentTime = makeDate(dateFormat);
 
-        const testConfig2: TestConfig = {
-            interval,
-            latencyInterval,
-            lifecycle: 'persistent',
-            primaryRange: { start: moment(primaryRange.start), limit: moment(primaryRange.limit) },
-            dates: date2,
-            timeResolution: 'ms',
-            slicers: numOfSlicer,
-            id: 1,
-            windowState
-        };
+            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment(limit).subtract(interval[0], interval[1]);
+            const end = moment(start).add(interval[0], interval[1]);
 
-        const slicer1 = makeSlicer(testConfig1);
-        const slicer2 = makeSlicer(testConfig2);
+            const dates = { start, end, limit };
 
-        const results = await slicer1({}) as SlicerDateResults;
+            const testConfig: TestConfig = {
+                interval,
+                latencyInterval,
+                lifecycle: 'persistent',
+                primaryRange: { start, limit },
+                dates,
+                timeResolution: 'ms',
+                client
+            };
 
-        expect(results).toBeDefined();
-        expect(moment(results.start).isSame(date1.start)).toBeTrue();
-        expect(moment(results.end).isSame(moment(date1.limit))).toBeTrue();
-        expect(moment(results.limit).isSame(moment(date1.limit))).toBeTrue();
+            const slicer = makeSlicer(testConfig);
 
-        const results2 = await slicer2({}) as SlicerDateResults;
+            const results = await slicer({}) as SlicerDateResults;
 
-        expect(results2).toBeDefined();
-        expect(moment(results2.start).isSame(date2.start)).toBeTrue();
-        expect(moment(results2.end).isSame(moment(date2.limit))).toBeTrue();
-        expect(moment(results2.limit).isSame(moment(date2.limit))).toBeTrue();
+            expect(results).toBeDefined();
+            expect(moment(results.start)).toBeDefined();
+            expect(moment(results.end).isSame(moment(limit))).toBeDefined();
+            expect(moment(results.limit).isSame(moment(limit))).toBeDefined();
 
-        // slicer 1 is all done
-        const results3 = await slicer1({});
-        expect(results3).toEqual(null);
+            const results2 = await slicer({});
 
-        // slicer2 is all done now
-        const results5 = await slicer2({});
-        expect(results5).toEqual(null);
+            expect(results2).toEqual(null);
+            // we test this to show that it is null not becuase the mock client ran out
+            expect(client.sequence.length > 0).toBeTrue();
+        });
 
-        await pDelay(500);
+        it('with multiple slicers', async () => {
+            const numOfSlicer = 2;
+            const interval: ParsedInterval = [500, 'ms'];
+            const latencyInterval: ParsedInterval = [500, 'ms'];
+            const half: ParsedInterval = [250, 'ms'];
 
-        const results6 = await slicer1({}) as SlicerDateResults;
+            const currentTime = makeDate(dateFormat);
 
-        expect(results6).toBeDefined();
-        expect(moment(results6.start).isSame(date3.start)).toBeTrue();
-        expect(moment(results6.end).isSame(moment(date3.limit))).toBeTrue();
-        expect(moment(results6.limit).isSame(moment(date3.limit))).toBeTrue();
+            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment(limit).subtract(interval[0], interval[1]);
 
-        // slicer 1 is all done
-        const results7 = await slicer1({});
-        expect(results7).toEqual(null);
+            const primaryRange = { start, limit };
 
-        await pDelay(500);
+            const ranges = divideRange(start, limit, numOfSlicer);
 
-        // slicer 1 is still all done because slicer2 has not sliced yet
-        const results8 = await slicer1({});
-        expect(results8).toEqual(null);
+            const secondRanges = divideRange(
+                moment(start).add(interval[0], interval[1]),
+                moment(limit).add(interval[0], interval[1]),
+                numOfSlicer
+            );
 
-        const results9 = await slicer2({}) as SlicerDateResults;
+            const date1 = Object.assign(
+                {}, ranges[0], { end: moment(ranges[0].start).add(half[0], half[1]) }
+            );
+            const date2 = Object.assign(
+                {}, ranges[1], { end: moment(ranges[1].start).add(half[0], half[1]) }
+            );
 
-        expect(results9).toBeDefined();
-        expect(moment(results9.start).isSame(date4.start)).toBeTrue();
-        expect(moment(results9.end).isSame(moment(date4.limit))).toBeTrue();
-        expect(moment(results9.limit).isSame(moment(date4.limit))).toBeTrue();
+            const windowState = new WindowState(numOfSlicer);
+
+            const date3 = Object.assign(
+                {}, secondRanges[0], { end: moment(secondRanges[0].start).add(half[0], half[1]) }
+            );
+            const date4 = Object.assign(
+                {}, secondRanges[1], { end: moment(secondRanges[1].start).add(half[0], half[1]) }
+            );
+
+            const testConfig1: TestConfig = {
+                interval,
+                latencyInterval,
+                lifecycle: 'persistent',
+                primaryRange,
+                dates: date1,
+                timeResolution: 'ms',
+                slicers: numOfSlicer,
+                id: 0,
+                windowState
+            };
+
+            const testConfig2: TestConfig = {
+                interval,
+                latencyInterval,
+                lifecycle: 'persistent',
+                primaryRange: {
+                    start: moment(primaryRange.start),
+                    limit: moment(primaryRange.limit)
+                },
+                dates: date2,
+                timeResolution: 'ms',
+                slicers: numOfSlicer,
+                id: 1,
+                windowState
+            };
+
+            const slicer1 = makeSlicer(testConfig1);
+            const slicer2 = makeSlicer(testConfig2);
+
+            const results = await slicer1({}) as SlicerDateResults;
+
+            expect(results).toBeDefined();
+            expect(moment(results.start).isSame(date1.start)).toBeTrue();
+            expect(moment(results.end).isSame(moment(date1.limit))).toBeTrue();
+            expect(moment(results.limit).isSame(moment(date1.limit))).toBeTrue();
+
+            const results2 = await slicer2({}) as SlicerDateResults;
+
+            expect(results2).toBeDefined();
+            expect(moment(results2.start).isSame(date2.start)).toBeTrue();
+            expect(moment(results2.end).isSame(moment(date2.limit))).toBeTrue();
+            expect(moment(results2.limit).isSame(moment(date2.limit))).toBeTrue();
+
+            // slicer 1 is all done
+            const results3 = await slicer1({});
+            expect(results3).toEqual(null);
+
+            // slicer2 is all done now
+            const results5 = await slicer2({});
+            expect(results5).toEqual(null);
+
+            await pDelay(500);
+
+            const results6 = await slicer1({}) as SlicerDateResults;
+
+            expect(results6).toBeDefined();
+            expect(moment(results6.start).isSame(date3.start)).toBeTrue();
+            expect(moment(results6.end).isSame(moment(date3.limit))).toBeTrue();
+            expect(moment(results6.limit).isSame(moment(date3.limit))).toBeTrue();
+
+            // slicer 1 is all done
+            const results7 = await slicer1({});
+            expect(results7).toEqual(null);
+
+            await pDelay(500);
+
+            // slicer 1 is still all done because slicer2 has not sliced yet
+            const results8 = await slicer1({});
+            expect(results8).toEqual(null);
+
+            const results9 = await slicer2({}) as SlicerDateResults;
+
+            expect(results9).toBeDefined();
+            expect(moment(results9.start).isSame(date4.start)).toBeTrue();
+            expect(moment(results9.end).isSame(moment(date4.limit))).toBeTrue();
+            expect(moment(results9.limit).isSame(moment(date4.limit))).toBeTrue();
+        });
     });
 });

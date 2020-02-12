@@ -72,7 +72,7 @@ export default class MockClient {
     deepRecursiveResponseCount: boolean | number;
     searchQuery: AnyObject;
 
-    constructor(_sequence?: any[]) {
+    constructor(_sequence?: any[], deepRecursiveResponseCount: boolean | number = false) {
         const defaultSequence = [
             { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
             { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
@@ -85,7 +85,7 @@ export default class MockClient {
         this.indices = {};
         this.cluster = {};
         this.searchQuery = {};
-        this.deepRecursiveResponseCount = false;
+        this.deepRecursiveResponseCount = deepRecursiveResponseCount;
 
         this.indices.getSettings = async () => {
             const window = 10000;
@@ -110,6 +110,7 @@ export default class MockClient {
         validateQuery(query);
         this.searchQuery = query;
         const { sequence } = this;
+
         if (sequence.length > 0) {
             return sequence.shift();
         }
