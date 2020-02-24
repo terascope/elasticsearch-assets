@@ -14,14 +14,14 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.4.0.tgz#77845ab4bad57eff5783dbbc5c6038fb3db93386"
-  integrity sha512-apKCX3CyH+hGC/dEnUNDpBA0oCxFvPI4XxGOai5+qUlEVAN6+KJw+Onxge9asStYDGtCYeMAGKB02PBcjUIHaA==
+"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.5.1.tgz#94c09535bdd76195a2757724897d97299a18d61b"
+  integrity sha512-UZSKLBgIkn1YeFTaRKjihlx0iYLLURIJbAN7HTUgOMMLb0ureCr/q3Dyunnb7TkLJL+M8yg7kSPZEg3Vmr4g3w==
   dependencies:
-    "@terascope/utils" "^0.22.0"
+    "@terascope/utils" "^0.23.1"
     bluebird "^3.7.2"
-    lodash "^4.17.11"
+    lodash.isequal "^4.5.0"
 
 "@terascope/job-components@^0.28.1":
   version "0.28.1"
@@ -33,13 +33,13 @@
     datemath-parser "^1.0.6"
     uuid "^3.4.0"
 
-"@terascope/teraslice-state-storage@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.10.0.tgz#5b83396f0f17099a7fd1ccc6e23c8a0d3c8cda0b"
-  integrity sha512-ITvNnt1SCh8GMB9q1825KHxOCo2h+vKZNhBQn9Iq3TnjL2/Qb+KuReZTxdm7GfOURGfY8hLM6uteGASFbsxHnQ==
+"@terascope/teraslice-state-storage@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.11.1.tgz#09755f6763281bedee8f8caf96c177ef75f123d6"
+  integrity sha512-nA8Lyv/WXifIA8bFB7yKktRH63oYNnqLrhbPxf4chLp+ANdUCyBSmRUDv5p9OAZoEdA/EmsIgP0lXB6W4D/wRQ==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.4.0"
-    "@terascope/utils" "^0.22.0"
+    "@terascope/elasticsearch-api" "^2.5.1"
+    "@terascope/utils" "^0.23.1"
     bluebird "^3.7.2"
     mnemonist "^0.32.0"
 
@@ -47,20 +47,6 @@
   version "0.1.1"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.1.1.tgz#c0e93fbd792eb0df1a788405b3bc8cac3398f137"
   integrity sha512-eXgcr77Lkc8TMnBR4+NyVFrB7jg6ki/5g18AYPErKciAYut7phVDtE6QbCl0/sQsL3RXQMe3D+fPH4TEmK5S2g==
-
-"@terascope/utils@^0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.22.0.tgz#ce65b2659dbe23bf8ce6a5a1b114211ad9cd420f"
-  integrity sha512-jjB5Lr/ISKzC9TmgEnMpFU42YDHViRjqWu7WzXidVKk6oIq4hxv1kCW/G+xnzSx21yMev40yE2X2NFyQi1z1Hw==
-  dependencies:
-    debug "^4.1.1"
-    is-plain-object "^3.0.0"
-    js-string-escape "^1.0.1"
-    kind-of "^6.0.2"
-    lodash.clonedeep "^4.5.0"
-    lodash.get "^4.4.2"
-    lodash.set "^4.3.2"
-    lodash.unset "^4.5.2"
 
 "@terascope/utils@^0.23.1":
   version "0.23.1"
@@ -263,7 +249,7 @@ keyv@^3.0.0:
   dependencies:
     json-buffer "3.0.0"
 
-kind-of@^6.0.2, kind-of@^6.0.3:
+kind-of@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
@@ -283,6 +269,11 @@ lodash.get@^4.4.2:
   resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
   integrity sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=
 
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
+
 lodash.set@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
@@ -292,11 +283,6 @@ lodash.unset@^4.5.2:
   version "4.5.2"
   resolved "https://registry.yarnpkg.com/lodash.unset/-/lodash.unset-4.5.2.tgz#370d1d3e85b72a7e1b0cdf2d272121306f23e4ed"
   integrity sha1-Nw0dPoW3Kn4bDN8tJyEhMG8j5O0=
-
-lodash@^4.17.11:
-  version "4.17.15"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.15.tgz#b447f6670a0455bbfeedd11392eff330ea097548"
-  integrity sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A==
 
 lowercase-keys@^1.0.0, lowercase-keys@^1.0.1:
   version "1.0.1"
