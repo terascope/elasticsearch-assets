@@ -30,7 +30,7 @@
         "node": ">=8.0.0"
     },
     "devDependencies": {
-        "@terascope/elasticsearch-api": "^2.4.0",
+        "@terascope/elasticsearch-api": "^2.5.3",
         "@terascope/job-components": "^0.27.0",
         "@types/bluebird": "^3.5.28",
         "@types/got": "^9.6.8",
