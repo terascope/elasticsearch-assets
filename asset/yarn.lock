@@ -14,7 +14,7 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.4.0":
+"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.5.3":
   version "2.5.3"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.5.3.tgz#47d6911813eab1cccf4ca420db8ac63ee1a0f754"
   integrity sha512-dU2R9Tm0ATSU6bio6iNYTwaVaPNYUe9S39jwWl2XEtJXI3IxwUzsqW3hqbEewrQo3LJ4Mead6Lb1Zr5tPeyD2w==
@@ -33,13 +33,13 @@
     datemath-parser "^1.0.6"
     uuid "^3.4.0"
 
-"@terascope/teraslice-state-storage@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.10.0.tgz#5b83396f0f17099a7fd1ccc6e23c8a0d3c8cda0b"
-  integrity sha512-ITvNnt1SCh8GMB9q1825KHxOCo2h+vKZNhBQn9Iq3TnjL2/Qb+KuReZTxdm7GfOURGfY8hLM6uteGASFbsxHnQ==
+"@terascope/teraslice-state-storage@^0.11.3":
+  version "0.11.3"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.11.3.tgz#e7ed42b7c6debe9a5112733299d7e92680288224"
+  integrity sha512-STrO52Ac3ccdmq0BR0Z0Z+2n0JoD4SwImWnXm5c+e/44c6tl1r/MzzmtBFQfITILp0T4q/5V8x3usmAEc1mv8Q==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.4.0"
-    "@terascope/utils" "^0.22.0"
+    "@terascope/elasticsearch-api" "^2.5.3"
+    "@terascope/utils" "^0.23.2"
     bluebird "^3.7.2"
     mnemonist "^0.32.0"
 
@@ -47,20 +47,6 @@
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.1.2.tgz#ff95bf7ff48eb96ae0bff7dece0f85abf217558d"
   integrity sha512-lYd3t6B8FTmvfZ2pXnQEfgAYNVro4FEw2VgRAB8CBmactCOA12xiStrP7Vqehva5ELgvnovFFqK5my10Ms8hwA==
-
-"@terascope/utils@^0.22.0":
-  version "0.22.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.22.0.tgz#ce65b2659dbe23bf8ce6a5a1b114211ad9cd420f"
-  integrity sha512-jjB5Lr/ISKzC9TmgEnMpFU42YDHViRjqWu7WzXidVKk6oIq4hxv1kCW/G+xnzSx21yMev40yE2X2NFyQi1z1Hw==
-  dependencies:
-    debug "^4.1.1"
-    is-plain-object "^3.0.0"
-    js-string-escape "^1.0.1"
-    kind-of "^6.0.2"
-    lodash.clonedeep "^4.5.0"
-    lodash.get "^4.4.2"
-    lodash.set "^4.3.2"
-    lodash.unset "^4.5.2"
 
 "@terascope/utils@^0.23.1", "@terascope/utils@^0.23.2":
   version "0.23.2"
@@ -263,7 +249,7 @@ keyv@^3.0.0:
   dependencies:
     json-buffer "3.0.0"
 
-kind-of@^6.0.2, kind-of@^6.0.3:
+kind-of@^6.0.3:
   version "6.0.3"
   resolved "https://registry.yarnpkg.com/kind-of/-/kind-of-6.0.3.tgz#07c05034a6c349fa06e24fa35aa76db4580ce4dd"
   integrity sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==
