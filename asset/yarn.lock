@@ -14,7 +14,7 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.6.3":
+"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.6.4":
   version "2.6.4"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.6.4.tgz#1a4942f11e001b93e13eb141cd8f64c3b650de9c"
   integrity sha512-ynEgPZxOywim6hWKh/PKFum/nLi/bWg3VyWxfi4f+gWzYPzHkY1JqRWZqkDE8hIJpsL5A+1wzBk1fdzfgBEWKA==
@@ -34,12 +34,12 @@
     uuid "^7.0.1"
 
 "@terascope/teraslice-state-storage@^0.12.3":
-  version "0.12.3"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.12.3.tgz#6836bda758182f739e158d264d63831563f4ffc9"
-  integrity sha512-BNjIWO6BN08rrN8xPAz18oOuDpFec1DFPsAFjQb9MgYSENl9Ueiz5EzPfb60MIC/ExsYDY44Q/beaMGPrFLPxA==
+  version "0.12.4"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.12.4.tgz#0cdb38233a75330ea083520b3694c7acd0b0570e"
+  integrity sha512-MqRjx/UJzjvApwZqL8bPwWjHSn6FuYVC2nNZNeiq0bA+x3UEit+HfnUxyeB7u778mjoiqnDtx+PQIh5MXq8x8g==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.6.3"
-    "@terascope/utils" "^0.24.3"
+    "@terascope/elasticsearch-api" "^2.6.4"
+    "@terascope/utils" "^0.24.4"
     mnemonist "^0.32.0"
 
 "@terascope/types@^0.1.3":
