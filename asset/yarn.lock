@@ -14,12 +14,12 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.6.4":
-  version "2.6.4"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.6.4.tgz#1a4942f11e001b93e13eb141cd8f64c3b650de9c"
-  integrity sha512-ynEgPZxOywim6hWKh/PKFum/nLi/bWg3VyWxfi4f+gWzYPzHkY1JqRWZqkDE8hIJpsL5A+1wzBk1fdzfgBEWKA==
+"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.8.1.tgz#06f171a4e37223efa6b5ef987248202f077b26d8"
+  integrity sha512-ugFloQL4puAKga90EVo53iZTtjSWlZbiw8pDkq/NV31VgZfx4H6ObU36vbarLu2dczKs5nZr5al7Y/jnUJb/2Q==
   dependencies:
-    "@terascope/utils" "^0.24.4"
+    "@terascope/utils" "^0.26.1"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -33,19 +33,24 @@
     datemath-parser "^1.0.6"
     uuid "^7.0.2"
 
-"@terascope/teraslice-state-storage@^0.12.3":
-  version "0.12.4"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.12.4.tgz#0cdb38233a75330ea083520b3694c7acd0b0570e"
-  integrity sha512-MqRjx/UJzjvApwZqL8bPwWjHSn6FuYVC2nNZNeiq0bA+x3UEit+HfnUxyeB7u778mjoiqnDtx+PQIh5MXq8x8g==
+"@terascope/teraslice-state-storage@^0.14.1":
+  version "0.14.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.14.1.tgz#529f44e26940dae3725410717d7b07b8e8064888"
+  integrity sha512-N6u05DlwfFnWfOC/nrkuKMwNXp6/bM3hhLwRwAHoEL49NmMyKNPdaJzOB/V56h7AQYu7TFKgA3Ze1LQodI5GHg==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.6.4"
-    "@terascope/utils" "^0.24.4"
-    mnemonist "^0.32.0"
+    "@terascope/elasticsearch-api" "^2.8.1"
+    "@terascope/utils" "^0.26.1"
+    mnemonist "^0.35.0"
 
 "@terascope/types@^0.1.3":
   version "0.1.3"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.1.3.tgz#9be5f483d2e87004f00896069d5112618ae4a3cb"
   integrity sha512-GzCeaZpLWnZXxpTxnR/dwIbXDO3pVAUOKZbpILPKpvldHdO5gectWke6ysGPFwcWK/e/6c0i+VBzFL57DquYJw==
+
+"@terascope/types@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
+  integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
 
 "@terascope/utils@^0.24.4":
   version "0.24.4"
@@ -53,6 +58,23 @@
   integrity sha512-DC2cfaStCkzxZAemBh4w52Y9mO/2mArYDa/fA0FIDKuhMwayUcvJM3zYpJdwC5ECP3ikWyQOFM4xufwU8Pp8UQ==
   dependencies:
     "@terascope/types" "^0.1.3"
+    debug "^4.1.1"
+    is-plain-object "^3.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash.get "^4.4.2"
+    lodash.has "^4.5.2"
+    lodash.set "^4.3.2"
+    lodash.unset "^4.5.2"
+    shallow-clone "^3.0.1"
+
+"@terascope/utils@^0.26.1":
+  version "0.26.1"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.26.1.tgz#d7f3143cfa7c4672a3d77a6e2db47f8137f92929"
+  integrity sha512-GegXPIRsH3KbCF9PWRAj6htiY1r7BbFttn6a5DS87lFxauJLGkAd2NcuWc+hR1g8JjrFkeJ9Qm5xvLoaRLi2UQ==
+  dependencies:
+    "@terascope/types" "^0.3.0"
     debug "^4.1.1"
     is-plain-object "^3.0.0"
     js-string-escape "^1.0.1"
@@ -314,12 +336,12 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-mnemonist@^0.32.0:
-  version "0.32.0"
-  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.32.0.tgz#2c6d1dd12cb69ca2ed79a636ba9ffe5a6e9f2573"
-  integrity sha512-WMVGPpT8guWwnsnw+WibOvInBnPfXFG+9SD+mg2+YgPEuW9Gdz9D2MEi05ko6RG1ui0RHljc+yYAvOHQn3GbbQ==
+mnemonist@^0.35.0:
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.35.0.tgz#318fb69b79b98309a97ebf7f1d9f5873c3d86605"
+  integrity sha512-dewrFCpMv4jfEIxZLZufkxieuib2Q7bkZviiDyQnsDzNkkk7e1YV93tdY8sgwe+XuFQ5e+CJ+kR8qQ3jbzF9KQ==
   dependencies:
-    obliterator "^1.5.0"
+    obliterator "^1.6.1"
 
 mocker-data-generator@^2.6.6:
   version "2.6.6"
@@ -352,10 +374,10 @@ normalize-url@^4.1.0:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.5.0.tgz#453354087e6ca96957bd8f5baf753f5982142129"
   integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
 
-obliterator@^1.5.0:
-  version "1.5.0"
-  resolved "https://registry.yarnpkg.com/obliterator/-/obliterator-1.5.0.tgz#f3535e5be192473ef59efb2d30396738f7c645c6"
-  integrity sha512-dENe0UviDf8/auXn0bIBKwCcUr49khvSBWDLlszv/ZB2qz1VxWDmkNKFqO2nfmve7hQb/QIDY7+rc7K3LdJimQ==
+obliterator@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/obliterator/-/obliterator-1.6.1.tgz#dea03e8ab821f6c4d96a299e17aef6a3af994ef3"
+  integrity sha512-9WXswnqINnnhOG/5SLimUlzuU1hFJUc8zkwyD59Sd+dPOMf05PmnYG/d6Q7HZ+KmgkZJa1PxRso6QdM3sTNHig==
 
 once@^1.3.1, once@^1.4.0:
   version "1.4.0"

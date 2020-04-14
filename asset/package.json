@@ -12,7 +12,7 @@
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.4.0",
         "@terascope/job-components": "^0.30.1",
-        "@terascope/teraslice-state-storage": "^0.12.3",
+        "@terascope/teraslice-state-storage": "^0.14.1",
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
         "mocker-data-generator": "^2.6.6",
