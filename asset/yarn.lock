@@ -95,7 +95,7 @@ casual-browserify@^1.5.19:
     mersenne-twister "^1.0.1"
     moment "^2.15.2"
 
-chance@^1.0.16:
+chance@^1.1.4:
   version "1.1.4"
   resolved "https://registry.yarnpkg.com/chance/-/chance-1.1.4.tgz#d8743bf8e40bb05e024c305ca1ff441195eb23db"
   integrity sha512-pXPDSu3knKlb6H7ahQfpq//J9mSOxYK8SMtp8MV/nRJh8aLRDIl0ipLH8At8+nVogVwtvPZzyIzY/EbcY/cLuQ==
@@ -322,15 +322,15 @@ mnemonist@^0.35.0:
     obliterator "^1.6.1"
 
 mocker-data-generator@^2.6.6:
-  version "2.6.6"
-  resolved "https://registry.yarnpkg.com/mocker-data-generator/-/mocker-data-generator-2.6.6.tgz#74bef411d8acff2fbe92ac55b347bbfeb26c098a"
-  integrity sha512-BwiZXbWNAmBuIMWo6RNR9cxp9yml9nYgVuJXGQV/yCpQefnpoGVt3ZOkaKGwewfmKYwSWZmz4zQpsyTzDylOng==
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/mocker-data-generator/-/mocker-data-generator-2.7.0.tgz#c1866bef78cce47f475b6643b4bb6585ae2838da"
+  integrity sha512-RFr5ZkP0YW2Zmzua9A3ihWwk3+Y5WIwna3vYsr6/RDSqv2Qp0de9N3RZmi3nsofjdqr9jqzW3uDG8zwYQpHXxQ==
   dependencies:
     casual-browserify "^1.5.19"
-    chance "^1.0.16"
+    chance "^1.1.4"
     faker "^4.1.0"
     randexp "^0.5.3"
-    tslib "^1.9.0"
+    tslib "^1.11.1"
 
 moment@2.22.2:
   version "2.22.2"
@@ -414,10 +414,10 @@ to-readable-stream@^1.0.0:
   resolved "https://registry.yarnpkg.com/to-readable-stream/-/to-readable-stream-1.0.0.tgz#ce0aa0c2f3df6adf852efb404a783e77c0475771"
   integrity sha512-Iq25XBt6zD5npPhlLVXGFN3/gyR2/qODcKNNyTMd4vbm39HUaOiAM4PMq0eMVC/Tkxz+Zjdsc55g9yyz+Yq00Q==
 
-tslib@^1.9.0:
-  version "1.10.0"
-  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.10.0.tgz#c3c19f95973fb0a62973fb09d90d961ee43e5c8a"
-  integrity sha512-qOebF53frne81cf0S9B41ByenJ3/IuH8yJKngAX35CmiZySA0khhkovshKK+jGCaMnVomla7gVlIcc3EvKPbTQ==
+tslib@^1.11.1:
+  version "1.11.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.11.1.tgz#eb15d128827fbee2841549e171f45ed338ac7e35"
+  integrity sha512-aZW88SY8kQbU7gpV19lN24LtXh/yD4ZZg6qieAJDDg+YBsJcSmLGK9QpnUjAKVG/xefmvJGd1WUmfpT/g6AJGA==
 
 url-parse-lax@^3.0.0:
   version "3.0.0"
