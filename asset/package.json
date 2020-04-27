@@ -1,8 +1,6 @@
 {
     "name": "asset",
     "version": "1.8.2",
-    "main": "utils.js",
-    "devDependencies": {},
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -17,5 +15,6 @@
         "got": "^9.6.0",
         "mocker-data-generator": "^2.6.6",
         "moment": "^2.24.0"
-    }
+    },
+    "devDependencies": {}
 }
