@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "1.8.1",
+    "version": "1.8.2",
     "scripts": {
         "asset:build": "yarn run build",
         "build": "rm -rf asset/dist; tsc --project tsconfig.json",
@@ -23,13 +23,12 @@
         "url": "https://github.com/terascope/elasticsearch-assets/issues"
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
-    "dependencies": {
-        "@terascope/eslint-config": "^0.3.0"
-    },
     "engines": {
         "node": ">=8.0.0"
     },
+    "dependencies": {},
     "devDependencies": {
+        "@terascope/eslint-config": "^0.3.0",
         "@terascope/elasticsearch-api": "^2.6.4",
         "@terascope/job-components": "^0.30.2",
         "@types/bluebird": "^3.5.30",

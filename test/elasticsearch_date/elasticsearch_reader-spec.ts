@@ -1477,6 +1477,7 @@ describe('elasticsearch_reader', () => {
             const middleDate = moment(currentDate).subtract(5, 'm');
             // end is delayed by setting
             const endingData = moment(currentDate).subtract(delay[0], delay[1]);
+            const startTime = Date.now();
 
             const opConfig = {
                 _op: 'elasticsearch_reader',
@@ -1502,10 +1503,12 @@ describe('elasticsearch_reader', () => {
 
             const test = await makeSlicerTest({ opConfig, recoveryData, lifecycle: 'persistent' });
 
+            // add the time (in seconds) took to run the tests
+            const elasped = Math.round((Date.now() - startTime) / 1000);
             const expectedResult = {
-                start: middleDate.format(dateFormatSeconds),
-                end: endingData.format(dateFormatSeconds),
-                limit: endingData.format(dateFormatSeconds),
+                start: middleDate.add(elasped, 's').format(dateFormatSeconds),
+                end: endingData.add(elasped, 's').format(dateFormatSeconds),
+                limit: endingData.add(elasped, 's').format(dateFormatSeconds),
                 holes: [],
                 count: 100
             };

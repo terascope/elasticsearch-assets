@@ -14,43 +14,43 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.8.1":
-  version "2.8.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.8.1.tgz#06f171a4e37223efa6b5ef987248202f077b26d8"
-  integrity sha512-ugFloQL4puAKga90EVo53iZTtjSWlZbiw8pDkq/NV31VgZfx4H6ObU36vbarLu2dczKs5nZr5al7Y/jnUJb/2Q==
+"@terascope/elasticsearch-api@^2.4.0", "@terascope/elasticsearch-api@^2.8.2":
+  version "2.8.2"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.8.2.tgz#4619735962387c028a2ff581beabebeeb7ca5264"
+  integrity sha512-kKfvPDImiFnLEOd56s7yWXoP4Tdqfa7QYKKDIiLyf4cudSYC7w2jQhwJneD1K/uUyXSz5VNJHmnoD2ku7Ja+mQ==
   dependencies:
-    "@terascope/utils" "^0.26.1"
+    "@terascope/utils" "^0.26.2"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
 "@terascope/job-components@^0.32.2":
-  version "0.32.2"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.32.2.tgz#74707b1967beba00086d325788be0cd35af60793"
-  integrity sha512-cx3H84nG4pvQ9gVuMRDHXuBBOEbQMoumy0rA1E3pMnw58lCYavA0W7wtoStghDTsUypD210+30oxwa8XE04wPg==
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.32.3.tgz#27d35f4021d9c6e4f8f84d358c6cb61b83682412"
+  integrity sha512-lPCSeYdGlvUN+ERpf6jreQCNvr9ixjcCl0SHSM9znfWeeEkJUOHDhLZGlo7QaxbZBKXRkH26/DVhJ+cIwHQ2hg==
   dependencies:
-    "@terascope/utils" "^0.26.1"
+    "@terascope/utils" "^0.26.2"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
     uuid "^7.0.2"
 
 "@terascope/teraslice-state-storage@^0.14.1":
-  version "0.14.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.14.1.tgz#529f44e26940dae3725410717d7b07b8e8064888"
-  integrity sha512-N6u05DlwfFnWfOC/nrkuKMwNXp6/bM3hhLwRwAHoEL49NmMyKNPdaJzOB/V56h7AQYu7TFKgA3Ze1LQodI5GHg==
+  version "0.14.2"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.14.2.tgz#4536e5879a757f91717e8d10bf27107938440551"
+  integrity sha512-GV1bvNfDLOJi6ygppjr1W22E8lUnIIHwPAKFdBQl9g2erdrTt+3x832EhykpYXqp1HMABIW2GufePT/NNrzGeg==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.8.1"
-    "@terascope/utils" "^0.26.1"
-    mnemonist "^0.35.0"
+    "@terascope/elasticsearch-api" "^2.8.2"
+    "@terascope/utils" "^0.26.2"
+    mnemonist "^0.36.0"
 
 "@terascope/types@^0.3.0":
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
   integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
 
-"@terascope/utils@^0.26.1":
-  version "0.26.1"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.26.1.tgz#d7f3143cfa7c4672a3d77a6e2db47f8137f92929"
-  integrity sha512-GegXPIRsH3KbCF9PWRAj6htiY1r7BbFttn6a5DS87lFxauJLGkAd2NcuWc+hR1g8JjrFkeJ9Qm5xvLoaRLi2UQ==
+"@terascope/utils@^0.26.2":
+  version "0.26.2"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.26.2.tgz#a96fd7023a6135d0402670fc8839587be8f0a68a"
+  integrity sha512-8aQi/dlyn2hLN2d2SVa1l3HkGad06Cw2qPj2tb2O4qO5SQQ0oqJ/DR1dIGDtsFsxJ6oJLE/kWx0jTmjfYyJWBA==
   dependencies:
     "@terascope/types" "^0.3.0"
     debug "^4.1.1"
@@ -146,9 +146,9 @@ decompress-response@^3.3.0:
     mimic-response "^1.0.0"
 
 defer-to-connect@^1.0.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/defer-to-connect/-/defer-to-connect-1.1.1.tgz#88ae694b93f67b81815a2c8c769aef6574ac8f2f"
-  integrity sha512-J7thop4u3mRTkYRQ+Vpfwy2G5Ehoy82I14+14W4YMDLKdWloI9gSzRbV30s/NckQGVJtPkWNcW4oMAUigTdqiQ==
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/defer-to-connect/-/defer-to-connect-1.1.3.tgz#331ae050c08dcf789f8c83a7b81f0ed94f4ac591"
+  integrity sha512-0ISdNousHvZT2EiFlZeZAHBUvSxmKswVCEf8hW7KWgG4a8MVEu/3Vb6uWYozkjylyCxe0JBIiRB1jV45S70WVQ==
 
 depd@1.1.2:
   version "1.1.2"
@@ -209,9 +209,9 @@ got@^9.6.0:
     url-parse-lax "^3.0.0"
 
 http-cache-semantics@^4.0.0:
-  version "4.0.3"
-  resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.0.3.tgz#495704773277eeef6e43f9ab2c2c7d259dda25c5"
-  integrity sha512-TcIMG3qeVLgDr1TEd2XvHaTnMPwYQUQMIBLy+5pLSDKYFc7UIqj39w8EGzZkaxoLv/l2K8HaI0t5AVA+YYgUew==
+  version "4.1.0"
+  resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
+  integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
 
 is-plain-object@^3.0.0:
   version "3.0.0"
@@ -314,10 +314,10 @@ minimist@^1.2.0:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-mnemonist@^0.35.0:
-  version "0.35.0"
-  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.35.0.tgz#318fb69b79b98309a97ebf7f1d9f5873c3d86605"
-  integrity sha512-dewrFCpMv4jfEIxZLZufkxieuib2Q7bkZviiDyQnsDzNkkk7e1YV93tdY8sgwe+XuFQ5e+CJ+kR8qQ3jbzF9KQ==
+mnemonist@^0.36.0:
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.36.1.tgz#9d8aa39e7db23ccb3735861d1081fc3faea4f180"
+  integrity sha512-PXrJJ5MRu++lfoZN1z/DjQhlMrrNgmHKb+DVFqGy/lCn9hMTZwXKC6aaKKwtqd6lwwak3HOonqo3D1fhQzfwaQ==
   dependencies:
     obliterator "^1.6.1"
 
@@ -427,9 +427,9 @@ url-parse-lax@^3.0.0:
     prepend-http "^2.0.0"
 
 uuid@^7.0.2:
-  version "7.0.2"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.2.tgz#7ff5c203467e91f5e0d85cfcbaaf7d2ebbca9be6"
-  integrity sha512-vy9V/+pKG+5ZTYKf+VcphF5Oc6EFiu3W8Nv3P3zIh0EqVI80ZxOzuPfe9EHjkFNvf8+xuTHVeei4Drydlx4zjw==
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
+  integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
 validator@10.8.0:
   version "10.8.0"
