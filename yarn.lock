@@ -539,7 +539,7 @@
     datemath-parser "^1.0.6"
     uuid "^7.0.2"
 
-"@terascope/teraslice-op-test-harness@^1.14.2":
+"@terascope/teraslice-op-test-harness@^1.16.3":
   version "1.16.3"
   resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.16.3.tgz#02ad17eeb5626f0b272ff3ede84664545f6ef831"
   integrity sha512-7WoW96uRdOhojB6p593vjlsGnRzkCBKyv+ssjHeko2tqyOXy1NF/98Quwapipe3xZEY+/buoQBarM8zp2TQMdQ==
@@ -4506,13 +4506,13 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-teraslice-test-harness@^0.15.2:
-  version "0.15.2"
-  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.15.2.tgz#62c41a720256faaa8479b88ce7feb0bf16a79e42"
-  integrity sha512-Zz+4UveVsQiS+y4VLWJf5raIQCPOJVuy7VwEGs7ZPnq8y0MKqVKc1iDceCy3yBrdXZkNtp9S0LB06cyKt6hG5w==
+teraslice-test-harness@^0.17.3:
+  version "0.17.3"
+  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.17.3.tgz#fc1f4a62f1ae4cfd11062f9f42a1c389c9ccbc12"
+  integrity sha512-6WAgqqcQ6997ZvbKR/LEpTtdv/p0AP/S6yoOAjLXWvbjqVDDCmmcL24r0XyDTDhT7pzv5Isu34kCF7dfoI5L8g==
   dependencies:
-    "@terascope/job-components" "^0.30.2"
-    "@terascope/teraslice-op-test-harness" "^1.14.2"
+    "@terascope/job-components" "^0.32.3"
+    "@terascope/teraslice-op-test-harness" "^1.16.3"
 
 terminal-link@^2.0.0:
   version "2.1.1"
