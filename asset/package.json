@@ -12,7 +12,7 @@
         "@terascope/job-components": "^0.33.0",
         "@terascope/teraslice-state-storage": "^0.15.0",
         "datemath-parser": "^1.0.6",
-        "got": "^9.6.0",
+        "got": "^11.0.3",
         "mocker-data-generator": "^2.6.6",
         "moment": "^2.24.0"
     },
