@@ -7,7 +7,7 @@ export interface ESStateStorageConfig extends APIConfig {
     source_fields: string[];
     chunk_size: number;
     persist: boolean;
-    persist_field?: string;
+    meta_key_field: string;
     connection: string;
     cache_size: number;
 }
