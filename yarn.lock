@@ -495,12 +495,12 @@
   dependencies:
     type-detect "4.0.8"
 
-"@terascope/elasticsearch-api@^2.6.4":
-  version "2.8.2"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.8.2.tgz#4619735962387c028a2ff581beabebeeb7ca5264"
-  integrity sha512-kKfvPDImiFnLEOd56s7yWXoP4Tdqfa7QYKKDIiLyf4cudSYC7w2jQhwJneD1K/uUyXSz5VNJHmnoD2ku7Ja+mQ==
+"@terascope/elasticsearch-api@^2.9.0":
+  version "2.9.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.0.tgz#0246bf2c9323a035d6413388bc3db513c4afa91f"
+  integrity sha512-SkBtS4IQKI4MHE9Nm4wA9tYoAM/M3b2x78TxZmv234mmdjCj1y6waZqRzhX7MV2edM39DGnu2p0+fYTt27yy+g==
   dependencies:
-    "@terascope/utils" "^0.26.2"
+    "@terascope/utils" "^0.27.0"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -519,16 +519,6 @@
     eslint-plugin-react "^7.19.0"
     eslint-plugin-react-hooks "^3.0.0"
 
-"@terascope/job-components@^0.32.3":
-  version "0.32.3"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.32.3.tgz#27d35f4021d9c6e4f8f84d358c6cb61b83682412"
-  integrity sha512-lPCSeYdGlvUN+ERpf6jreQCNvr9ixjcCl0SHSM9znfWeeEkJUOHDhLZGlo7QaxbZBKXRkH26/DVhJ+cIwHQ2hg==
-  dependencies:
-    "@terascope/utils" "^0.26.2"
-    convict "^4.4.1"
-    datemath-parser "^1.0.6"
-    uuid "^7.0.2"
-
 "@terascope/job-components@^0.33.0":
   version "0.33.0"
   resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.33.0.tgz#82a83e2c97ac2f7b6b0c61d6ec2d56b9fe6f2e28"
@@ -539,7 +529,7 @@
     datemath-parser "^1.0.6"
     uuid "^7.0.2"
 
-"@terascope/teraslice-op-test-harness@^1.16.3":
+"@terascope/teraslice-op-test-harness@^1.17.0":
   version "1.17.0"
   resolved "https://registry.yarnpkg.com/@terascope/teraslice-op-test-harness/-/teraslice-op-test-harness-1.17.0.tgz#d5956f2524c4cb4cecda73cf91f02beb599e98dd"
   integrity sha512-cO0NGeZnNiOo6k5ImviijPw9hfcS/NXSRLyQ8+iNP2i6U6R/zpNkEVpnbBJZrFeahXAQCBf5Qt1SomNdzVsiEA==
@@ -551,23 +541,6 @@
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
   integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
-
-"@terascope/utils@^0.26.2":
-  version "0.26.2"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.26.2.tgz#a96fd7023a6135d0402670fc8839587be8f0a68a"
-  integrity sha512-8aQi/dlyn2hLN2d2SVa1l3HkGad06Cw2qPj2tb2O4qO5SQQ0oqJ/DR1dIGDtsFsxJ6oJLE/kWx0jTmjfYyJWBA==
-  dependencies:
-    "@terascope/types" "^0.3.0"
-    debug "^4.1.1"
-    is-plain-object "^3.0.0"
-    js-string-escape "^1.0.1"
-    kind-of "^6.0.3"
-    latlon-geohash "^1.1.0"
-    lodash.get "^4.4.2"
-    lodash.has "^4.5.2"
-    lodash.set "^4.3.2"
-    lodash.unset "^4.5.2"
-    shallow-clone "^3.0.1"
 
 "@terascope/utils@^0.27.0":
   version "0.27.0"
@@ -1298,7 +1271,7 @@ convert-source-map@^1.4.0, convert-source-map@^1.6.0, convert-source-map@^1.7.0:
 
 convict@^4.4.1:
   version "4.4.1"
-  resolved "https://registry.yarnpkg.com/convict/-/convict-4.4.1.tgz#87f93c2a4f51bfc961e2873864442d0349a1b0d0"
+  resolved "https://npm.terascope.io/convict/-/convict-4.4.1.tgz#87f93c2a4f51bfc961e2873864442d0349a1b0d0"
   integrity sha512-celpR4hOWWwb/S8azhzgQwDon6muAJlNe2LTLeOGyoSgH390TsaqoieAe9BLbAv7+9wNfG7DTA2q3IfFp2viKw==
   dependencies:
     depd "1.1.2"
@@ -1383,7 +1356,7 @@ data-urls@^1.1.0:
 
 datemath-parser@^1.0.6:
   version "1.0.6"
-  resolved "https://registry.yarnpkg.com/datemath-parser/-/datemath-parser-1.0.6.tgz#d527dabf8541b3da1b661d81c16c328f3b9a8dc5"
+  resolved "https://npm.terascope.io/datemath-parser/-/datemath-parser-1.0.6.tgz#d527dabf8541b3da1b661d81c16c328f3b9a8dc5"
   integrity sha512-TEB1YBiGnLAn8lG8ZRf88NCHEERo04xdi1zVGSb//X4nQZs9yqLX7ZM2Ra1PIx+ivnT6j596c8p9QmUX4Y+ddg==
   dependencies:
     moment "^2.22.2"
@@ -1397,14 +1370,14 @@ debug@^2.2.0, debug@^2.3.3, debug@^2.6.9:
 
 debug@^4.0.1, debug@^4.1.0, debug@^4.1.1:
   version "4.1.1"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
+  resolved "https://npm.terascope.io/debug/-/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
   integrity sha512-pYAIzeRo8J6KPEaJ0VWOh5Pzkbw/RetuzehGM7QRRX5he4fPHx2rdKMB256ehJCkX+XRQm16eZLqLNS8RSZXZw==
   dependencies:
     ms "^2.1.1"
 
 decamelize@^1.2.0:
   version "1.2.0"
-  resolved "https://registry.yarnpkg.com/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
+  resolved "https://npm.terascope.io/decamelize/-/decamelize-1.2.0.tgz#f6534d15148269b20352e7bee26f501f9a191290"
   integrity sha1-9lNNFRSCabIDUue+4m9QH5oZEpA=
 
 decode-uri-component@^0.2.0:
@@ -1458,7 +1431,7 @@ delayed-stream@~1.0.0:
 
 depd@1.1.2:
   version "1.1.2"
-  resolved "https://registry.yarnpkg.com/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
+  resolved "https://npm.terascope.io/depd/-/depd-1.1.2.tgz#9bcd52e14c097763e749b274c4346ed2e560b5a9"
   integrity sha1-m81S4UwJd2PnSbJ0xDRu0uVgtak=
 
 detect-newline@^3.0.0:
@@ -2447,7 +2420,7 @@ is-plain-object@^2.0.3, is-plain-object@^2.0.4:
 
 is-plain-object@^3.0.0:
   version "3.0.0"
-  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-3.0.0.tgz#47bfc5da1b5d50d64110806c199359482e75a928"
+  resolved "https://npm.terascope.io/is-plain-object/-/is-plain-object-3.0.0.tgz#47bfc5da1b5d50d64110806c199359482e75a928"
   integrity sha512-tZIpofR+P05k8Aocp7UI/2UTa9lTJSebCXpFFoR9aibpokDj/uXBsJ8luUu0tTVYKkMU6URDUuOfJZ7koewXvg==
   dependencies:
     isobject "^4.0.0"
@@ -2520,7 +2493,7 @@ isobject@^3.0.0, isobject@^3.0.1:
 
 isobject@^4.0.0:
   version "4.0.0"
-  resolved "https://registry.yarnpkg.com/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
+  resolved "https://npm.terascope.io/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
   integrity sha512-S/2fF5wH8SJA/kmwr6HYhK/RI/OkhD84k8ntalo0iJjZikgq1XFvR5M8NPT1x5F7fBwCG3qHfnzeP/Vh/ZxCUA==
 
 isstream@~0.1.2:
@@ -2995,7 +2968,7 @@ jest@^25.4.0:
 
 js-string-escape@^1.0.1:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
+  resolved "https://npm.terascope.io/js-string-escape/-/js-string-escape-1.0.1.tgz#e2625badbc0d67c7533e9edc1068c587ae4137ef"
   integrity sha1-4mJbrbwNZ8dTPp7cEGjFh65BN+8=
 
 "js-tokens@^3.0.0 || ^4.0.0", js-tokens@^4.0.0:
@@ -3080,7 +3053,7 @@ json-stringify-safe@^5.0.1, json-stringify-safe@~5.0.1:
 
 json5@1.0.1:
   version "1.0.1"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-1.0.1.tgz#779fb0018604fa854eacbf6252180d83543e3dbe"
+  resolved "https://npm.terascope.io/json5/-/json5-1.0.1.tgz#779fb0018604fa854eacbf6252180d83543e3dbe"
   integrity sha512-aKS4WQjPenRxiQsC93MNfjx+nbF4PAdYzmd/1JIj8HYzqfbu86beTuNgXDzPknWk0n0uARlyewZo4s++ES36Ow==
   dependencies:
     minimist "^1.2.0"
@@ -3141,7 +3114,7 @@ kleur@^3.0.3:
 
 latlon-geohash@^1.1.0:
   version "1.1.0"
-  resolved "https://registry.yarnpkg.com/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
+  resolved "https://npm.terascope.io/latlon-geohash/-/latlon-geohash-1.1.0.tgz#7abe15224c4800e3eaecac71c753a20bfb6cbf65"
   integrity sha1-er4VIkxIAOPq7Kxxx1OiC/tsv2U=
 
 leven@^3.1.0:
@@ -3189,17 +3162,17 @@ locate-path@^5.0.0:
 
 lodash.clonedeep@4.5.0:
   version "4.5.0"
-  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+  resolved "https://npm.terascope.io/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
   integrity sha1-4j8/nE+Pvd6HJSnBBxhXoIblzO8=
 
 lodash.get@^4.4.2:
   version "4.4.2"
-  resolved "https://registry.yarnpkg.com/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
+  resolved "https://npm.terascope.io/lodash.get/-/lodash.get-4.4.2.tgz#2d177f652fa31e939b4438d5341499dfa3825e99"
   integrity sha1-LRd/ZS+jHpObRDjVNBSZ36OCXpk=
 
 lodash.has@^4.5.2:
   version "4.5.2"
-  resolved "https://registry.yarnpkg.com/lodash.has/-/lodash.has-4.5.2.tgz#d19f4dc1095058cccbe2b0cdf4ee0fe4aa37c862"
+  resolved "https://npm.terascope.io/lodash.has/-/lodash.has-4.5.2.tgz#d19f4dc1095058cccbe2b0cdf4ee0fe4aa37c862"
   integrity sha1-0Z9NwQlQWMzL4rDN9O4P5Ko3yGI=
 
 lodash.isequal@^4.5.0:
@@ -3214,7 +3187,7 @@ lodash.memoize@4.x:
 
 lodash.set@^4.3.2:
   version "4.3.2"
-  resolved "https://registry.yarnpkg.com/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
+  resolved "https://npm.terascope.io/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
   integrity sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
 
 lodash.sortby@^4.7.0:
@@ -3224,7 +3197,7 @@ lodash.sortby@^4.7.0:
 
 lodash.unset@^4.5.2:
   version "4.5.2"
-  resolved "https://registry.yarnpkg.com/lodash.unset/-/lodash.unset-4.5.2.tgz#370d1d3e85b72a7e1b0cdf2d272121306f23e4ed"
+  resolved "https://npm.terascope.io/lodash.unset/-/lodash.unset-4.5.2.tgz#370d1d3e85b72a7e1b0cdf2d272121306f23e4ed"
   integrity sha1-Nw0dPoW3Kn4bDN8tJyEhMG8j5O0=
 
 lodash@^4.17.13, lodash@^4.17.14, lodash@^4.17.15:
@@ -3360,10 +3333,15 @@ mkdirp@^0.5.1:
 
 moment@2.22.2:
   version "2.22.2"
-  resolved "https://registry.yarnpkg.com/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
+  resolved "https://npm.terascope.io/moment/-/moment-2.22.2.tgz#3c257f9839fc0e93ff53149632239eb90783ff66"
   integrity sha1-PCV/mDn8DpP/UxSWMiOeuQeD/2Y=
 
-moment@^2.22.2, moment@^2.24.0:
+moment@^2.22.2:
+  version "2.25.1"
+  resolved "https://npm.terascope.io/moment/-/moment-2.25.1.tgz#1cb546dca1eccdd607c9324747842200b683465d"
+  integrity sha512-nRKMf9wDS4Fkyd0C9LXh2FFXinD+iwbJ5p/lh3CHitW9kZbRbJ8hCruiadiIXZVbeAqKZzqcTvHnK3mRhFjb6w==
+
+moment@^2.24.0:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
@@ -3375,7 +3353,7 @@ ms@2.0.0:
 
 ms@^2.1.1:
   version "2.1.2"
-  resolved "https://registry.yarnpkg.com/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
+  resolved "https://npm.terascope.io/ms/-/ms-2.1.2.tgz#d09d1f357b443f493382a8eb3ccd183872ae6009"
   integrity sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==
 
 mute-stream@0.0.8:
@@ -4142,7 +4120,7 @@ set-value@^2.0.0, set-value@^2.0.1:
 
 shallow-clone@^3.0.1:
   version "3.0.1"
-  resolved "https://registry.yarnpkg.com/shallow-clone/-/shallow-clone-3.0.1.tgz#8f2981ad92531f55035b01fb230769a40e02efa3"
+  resolved "https://npm.terascope.io/shallow-clone/-/shallow-clone-3.0.1.tgz#8f2981ad92531f55035b01fb230769a40e02efa3"
   integrity sha512-/6KqX+GVUdqPuPPd2LxDDxzX6CAbjJehAAOKlNpqqUpAqPM6HeL8f+o3a+JsyGjn2lv0WY8UsTgUJjU9Ok55NA==
   dependencies:
     kind-of "^6.0.2"
@@ -4501,13 +4479,13 @@ table@^5.2.3:
     slice-ansi "^2.1.0"
     string-width "^3.0.0"
 
-teraslice-test-harness@^0.17.3:
-  version "0.17.3"
-  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.17.3.tgz#fc1f4a62f1ae4cfd11062f9f42a1c389c9ccbc12"
-  integrity sha512-6WAgqqcQ6997ZvbKR/LEpTtdv/p0AP/S6yoOAjLXWvbjqVDDCmmcL24r0XyDTDhT7pzv5Isu34kCF7dfoI5L8g==
+teraslice-test-harness@^0.18.0:
+  version "0.18.0"
+  resolved "https://npm.terascope.io/teraslice-test-harness/-/teraslice-test-harness-0.18.0.tgz#0fe0b5a485d4536cdbf4e3660d4e78b870197938"
+  integrity sha512-oMQuK+C/6Ag759Lq3zEs3NhOCZnaU5SLwDXudatyFA/3IEIHOlh0wAQGhrWng5Mmj2OcGf1g9jLIYIAVOHFUUQ==
   dependencies:
-    "@terascope/job-components" "^0.32.3"
-    "@terascope/teraslice-op-test-harness" "^1.16.3"
+    "@terascope/job-components" "^0.33.0"
+    "@terascope/teraslice-op-test-harness" "^1.17.0"
 
 terminal-link@^2.0.0:
   version "2.1.1"
@@ -4747,7 +4725,7 @@ uuid@^3.3.2:
 
 uuid@^7.0.2:
   version "7.0.3"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
+  resolved "https://npm.terascope.io/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
   integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
 v8-compile-cache@^2.0.3:
@@ -4774,7 +4752,7 @@ validate-npm-package-license@^3.0.1:
 
 validator@10.8.0:
   version "10.8.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-10.8.0.tgz#8acb15a5c39411cbc8ef2be0c98c2514da4410a7"
+  resolved "https://npm.terascope.io/validator/-/validator-10.8.0.tgz#8acb15a5c39411cbc8ef2be0c98c2514da4410a7"
   integrity sha512-mXqMxfCh5NLsVgYVKl9WvnHNDPCcbNppHSPPowu0VjtSsGWVY+z8hJF44edLR1nbLNzi3jYoYsIl8KZpioIk6g==
 
 verror@1.10.0:
@@ -4919,7 +4897,7 @@ y18n@^4.0.0:
 
 yargs-parser@11.0.0:
   version "11.0.0"
-  resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-11.0.0.tgz#d9fd0f0cd551a2a2ef9bbf42606ffb6211634232"
+  resolved "https://npm.terascope.io/yargs-parser/-/yargs-parser-11.0.0.tgz#d9fd0f0cd551a2a2ef9bbf42606ffb6211634232"
   integrity sha512-dvsafRjM45h79WOTvS/dP35Sb31SlGAKz6tFjI97kGC4MJFBuzTZY6TTYHrz0QSMQdkyd8Y+RsOMLr+JY0nPFQ==
   dependencies:
     camelcase "^5.0.0"
