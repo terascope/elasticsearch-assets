@@ -30,10 +30,9 @@ export default class Schema extends ConvictSchema<ESStateStorageConfig> {
                 doc: 'If set to true will save state in storage for mset, doest not apply to set, defaults to false',
                 default: false
             },
-            persist_field: {
-                doc: ' If persist is true this option is the name of the metadata key field that will be used to make the id of the doc in the es bulk update, defaults to _id',
-                default: '',
-                format: 'optional_String'
+            meta_key_field: {
+                doc: 'Data entity meta field used for cache key and elasticsearch _id for mget/ mset functions',
+                default: '_key'
             },
             connection: {
                 doc: 'elasticsearch connection',
