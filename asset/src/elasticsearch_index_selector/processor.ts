@@ -81,7 +81,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         const index = this.indexName(record);
         const meta: Partial<BulkMeta> = {
             _index: index,
-            _type: this.opConfig.type
+            // _type: this.opConfig.type
         };
 
         if (this.opConfig.preserve_id) meta._id = record.getKey();
