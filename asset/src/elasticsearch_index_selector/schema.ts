@@ -6,7 +6,6 @@ import { IndexSelectorConfig } from './interfaces';
 export default class Schema extends ConvictSchema<IndexSelectorConfig> {
     validateJob(job: ValidatedJobConfig) {
         const opConfig = getOpConfig(job, 'elasticsearch_index_selector');
-        const preserveId = job.operations.find((op) => op.preserve_id === true);
 
         if (opConfig == null) throw new Error('Could not find elasticsearch_index_selector operation in jobConfig');
 
@@ -14,10 +13,6 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
             if (!(opConfig.timeseries && opConfig.index_prefix && opConfig.date_field)) {
                 throw new Error('Invalid elasticsearch_index_selector configuration, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters');
             }
-        }
-
-        if (!opConfig.type && !preserveId) {
-            throw new Error('Invalid elasticsearch_index_selector configuration, "type" must be specified if data is not a full response from elasticsearch');
         }
     }
 
@@ -42,10 +37,8 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 }
             },
             type: {
-                doc: 'Set the type of the data for elasticsearch. If incoming data is from elasticsearch'
-                + ' it will default to the type on the metadata if this field is not set. This field must be set'
-                + 'for all other incoming data',
-                default: '',
+                doc: 'Set the elasticsearch mapping type, required for elasticsearch v5 or lower, accepted in v6, and depreciated in v7 or above',
+                default: undefined,
                 format: 'optional_String'
             },
             preserve_id: {
