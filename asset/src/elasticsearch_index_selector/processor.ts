@@ -80,11 +80,13 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         const indexSpec: IndexSpec = DataEntity.make({});
         const index = this.indexName(record);
         const meta: Partial<BulkMeta> = {
-            _index: index,
-            // _type: this.opConfig.type
+            _index: index
         };
 
+        if (this.opConfig.type) meta._type = this.opConfig.type;
+
         if (this.opConfig.preserve_id) meta._id = record.getKey();
+
         if (this.opConfig.id_field) meta._id = record[this.opConfig.id_field];
 
         if (this.opConfig.update || this.opConfig.upsert) {

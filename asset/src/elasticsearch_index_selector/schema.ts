@@ -42,10 +42,8 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 }
             },
             type: {
-                doc: 'Set the type of the data for elasticsearch. If incoming data is from elasticsearch'
-                + ' it will default to the type on the metadata if this field is not set. This field must be set'
-                + 'for all other incoming data',
-                default: '',
+                doc: 'Set the elasticsearch mapping type',
+                default: null,
                 format: 'optional_String'
             },
             preserve_id: {
