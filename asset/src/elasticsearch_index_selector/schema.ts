@@ -37,7 +37,7 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
                 }
             },
             type: {
-                doc: 'Set the elasticsearch mapping type, required for elasticsearch v5 or lower, accepted in v6, and deprecated in v7 or above',
+                doc: 'Set the elasticsearch mapping type, required for elasticsearch v5 or lower, accepted in v6, and depreciated in v7 or above',
                 default: undefined,
                 format: 'optional_String'
             },
