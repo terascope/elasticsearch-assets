@@ -14,6 +14,8 @@ describe('elasticsearch index selector', () => {
 
     async function makeTest(_config: any) {
         const config = Object.assign({}, { _op: 'elasticsearch_index_selector', index: 'some-index', type: 'some-type' }, _config);
+        if (!_config.type) delete config.type;
+
         harness = WorkerTestHarness.testProcessor(config, { assetDir, clients });
         await harness.initialize();
         return harness;
@@ -65,22 +67,6 @@ describe('elasticsearch index selector', () => {
 
         const test = await makeTest(op3);
         expect(test).toBeDefined();
-    });
-
-    it('will throw if type is not set', async () => {
-        expect.hasAssertions();
-
-        const opConfig = {
-            _op: 'elasticsearch_index_selector',
-            index: 'some-index'
-        };
-        const errMsg = 'Invalid elasticsearch_index_selector configuration';
-        try {
-            harness = WorkerTestHarness.testProcessor(opConfig, { assetDir, clients });
-            await harness.initialize();
-        } catch (err) {
-            expect(err.message).toStartWith(errMsg);
-        }
     });
 
     it('will throw error on a bad date field in timeseries', async () => {
@@ -191,6 +177,37 @@ describe('elasticsearch index selector', () => {
         const results = await test.runSlice(data);
 
         expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'someName' } });
+        expect(results[1]).toEqual(data[0]);
+    });
+
+    it('should set _type if type is present in opConfig', async () => {
+        const opConfig = {
+            _op: 'elasticsearch_index_selector',
+            index: 'some_index',
+            type: 'events',
+            id_field: 'name'
+        };
+        const data = [{ some: 'data', name: 'someName' }];
+
+        const test = await makeTest(opConfig);
+        const results = await test.runSlice(data);
+
+        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'someName' } });
+        expect(results[1]).toEqual(data[0]);
+    });
+
+    it('should not set type if type is not present in opConfig', async () => {
+        const opConfig = {
+            _op: 'elasticsearch_index_selector',
+            index: 'some_index',
+            id_field: 'name'
+        };
+        const data = [{ some: 'data', name: 'someName' }];
+
+        const test = await makeTest(opConfig);
+        const results = await test.runSlice(data);
+
+        expect(results[0]).toEqual({ index: { _index: 'some_index', _id: 'someName' } });
         expect(results[1]).toEqual(data[0]);
     });
 

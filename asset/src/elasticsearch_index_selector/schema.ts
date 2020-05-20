@@ -6,7 +6,6 @@ import { IndexSelectorConfig } from './interfaces';
 export default class Schema extends ConvictSchema<IndexSelectorConfig> {
     validateJob(job: ValidatedJobConfig) {
         const opConfig = getOpConfig(job, 'elasticsearch_index_selector');
-        const preserveId = job.operations.find((op) => op.preserve_id === true);
 
         if (opConfig == null) throw new Error('Could not find elasticsearch_index_selector operation in jobConfig');
 
@@ -14,10 +13,6 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
             if (!(opConfig.timeseries && opConfig.index_prefix && opConfig.date_field)) {
                 throw new Error('Invalid elasticsearch_index_selector configuration, if any of the following configurations are set: timeseries, index_prefix or date_field, they must all be used together, please set the missing parameters');
             }
-        }
-
-        if (!opConfig.type && !preserveId) {
-            throw new Error('Invalid elasticsearch_index_selector configuration, "type" must be specified if data is not a full response from elasticsearch');
         }
     }
 
