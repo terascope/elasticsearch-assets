@@ -1,11 +1,12 @@
+import { BatchProcessor } from '@terascope/job-components';
 import {
     DataEntity,
-    BatchProcessor,
     AnyObject,
     set,
     getValidDate,
-    TSError
-} from '@terascope/job-components';
+    TSError,
+    fastAssign
+} from '@terascope/utils';
 import { IndexSelectorConfig } from './interfaces';
 
 function _getWeeklyIndex(date: string) {
@@ -76,7 +77,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         return this.opConfig.index;
     }
 
-    private generateRequest(record: DataEntity, formatted: DataEntity[]) {
+    private generateRequestMetadata(record: DataEntity) {
         const indexSpec: IndexSpec = DataEntity.make({});
         const index = this.indexName(record);
         const meta: Partial<BulkMeta> = {
@@ -103,14 +104,14 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
             indexSpec.index = meta;
         }
 
-        formatted.push(indexSpec);
+        record.setMetadata('elasticsearch:index:metadata', indexSpec);
 
         if (this.opConfig.update || this.opConfig.upsert) {
             const update: UpdateConfig = DataEntity.make({});
 
             if (this.opConfig.upsert) {
                 // The upsert field is what is inserted if the key doesn't already exist
-                update.upsert = record;
+                update.upsert = fastAssign({}, record);
             }
 
             // This will merge this record with the existing record.
@@ -141,22 +142,17 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
                     }
                 }
             } else {
-                update.doc = record;
+                update.doc = fastAssign({}, record);
             }
-
-            formatted.push(update);
-        } else if (this.opConfig.delete === false) {
-            formatted.push(record);
+            record.setMetadata('elasticsearch:mutate:metadata', update);
         }
     }
 
     async onBatch(data: DataEntity[]) {
-        const formatted: DataEntity[] = [];
-
         for (const record of data) {
-            this.generateRequest(record, formatted);
+            this.generateRequestMetadata(record);
         }
 
-        return formatted;
+        return data;
     }
 }

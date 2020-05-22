@@ -1,7 +1,10 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
+import { DataEntity } from '@terascope/utils';
 import path from 'path';
 import { WorkerTestHarness } from 'teraslice-test-harness';
+
+const INDEX_META = 'elasticsearch:index:metadata';
+const MUTATE_META = 'elasticsearch:mutate:metadata';
 
 describe('elasticsearch index selector', () => {
     const assetDir = path.join(__dirname, '..');
@@ -111,14 +114,24 @@ describe('elasticsearch index selector', () => {
             { _id: '3', date: '2019-07-04T00:14:01.032Z' },
             { _id: '4', date: '2019-07-11T00:06:35.672Z' }
         ];
+        const indexNames = [
+            'weekly-test-2582',
+            'weekly-test-2582',
+            'weekly-test-2583',
+            'weekly-test-2584'
+        ];
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0].index._index).toBe('weekly-test-2582');
-        expect(results[2].index._index).toBe('weekly-test-2582');
-        expect(results[4].index._index).toBe('weekly-test-2583');
-        expect(results[6].index._index).toBe('weekly-test-2584');
+        expect(results).toBeArrayOfSize(4);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta.index._index).toEqual(indexNames[index]);
+        });
     });
 
     it('can take an array of objects and returns properly formatted data for bulk requests', async () => {
@@ -129,12 +142,19 @@ describe('elasticsearch index selector', () => {
             delete: false
         };
         const data = [{ some: 'data' }];
+        const expectedMetadata = { index: { _index: 'some_index', _type: 'events' } };
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events' } });
-        expect(results[1]).toEqual(data[0]);
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('preserve_id will work the DataEntity', async () => {
@@ -146,6 +166,7 @@ describe('elasticsearch index selector', () => {
             delete: false
         };
         const data = [{ some: 'data' }];
+        const expectedMetadata = { index: { _index: 'some_index', _type: 'events', _id: 'specialID' } };
 
         function addTestMeta(obj: any) {
             return DataEntity.make(obj, { _key: 'specialID' });
@@ -160,8 +181,14 @@ describe('elasticsearch index selector', () => {
         reader.fetch = async (incDocs: DataEntity[]) => fn(incDocs.map(addTestMeta));
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'specialID' } });
-        expect(results[1]).toEqual({ some: 'data' });
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('can set id to any field in data', async () => {
@@ -172,12 +199,19 @@ describe('elasticsearch index selector', () => {
             id_field: 'name'
         };
         const data = [{ some: 'data', name: 'someName' }];
+        const expectedMetadata = { index: { _index: 'some_index', _type: 'events', _id: 'someName' } };
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'someName' } });
-        expect(results[1]).toEqual(data[0]);
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('should set _type if type is present in opConfig', async () => {
@@ -188,12 +222,19 @@ describe('elasticsearch index selector', () => {
             id_field: 'name'
         };
         const data = [{ some: 'data', name: 'someName' }];
+        const expectedMetadata = { index: { _index: 'some_index', _type: 'events', _id: 'someName' } };
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _type: 'events', _id: 'someName' } });
-        expect(results[1]).toEqual(data[0]);
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('should not set type if type is not present in opConfig', async () => {
@@ -206,9 +247,16 @@ describe('elasticsearch index selector', () => {
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
+        const expectedMetadata = { index: { _index: 'some_index', _id: 'someName' } };
 
-        expect(results[0]).toEqual({ index: { _index: 'some_index', _id: 'someName' } });
-        expect(results[1]).toEqual(data[0]);
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('can send an update request instead of index', async () => {
@@ -223,19 +271,32 @@ describe('elasticsearch index selector', () => {
             update: true
         };
         const data = [{ some: 'data', name: 'someName' }];
-
-        const test = await makeTest(opConfig);
-        const results = await test.runSlice(data);
-
-        expect(results[0]).toEqual({
+        const expectedMetadata = {
             update: {
                 _index: 'some_index',
                 _type: 'events',
                 _id: 'someName',
                 retry_on_conflict: 11
             }
+        };
+
+        const expectedMutateMetadata = { doc: { name: 'someName' } };
+
+        const test = await makeTest(opConfig);
+        const results = await test.runSlice(data);
+
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+
+            const mutateMeta = record.getMetadata(MUTATE_META);
+            expect(mutateMeta).toBeDefined();
+            expect(mutateMeta).toMatchObject(expectedMutateMetadata);
         });
-        expect(results[1]).toEqual({ doc: { name: 'someName' } });
     });
 
     it('can send a delete request instead of index', async () => {
@@ -247,11 +308,19 @@ describe('elasticsearch index selector', () => {
             delete: true
         };
         const data = [{ some: 'data', name: 'someName' }];
+        const expectedMetadata = { delete: { _index: 'some_index', _type: 'events', _id: 'someName' } };
 
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ delete: { _index: 'some_index', _type: 'events', _id: 'someName' } });
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+        });
     });
 
     it('can upsert specified fields by passing in an array of keys matching the document', async () => {
@@ -267,10 +336,24 @@ describe('elasticsearch index selector', () => {
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ update: { _index: 'some_index', _type: 'events' } });
-        expect(results[1]).toEqual({
+        const expectedMetadata = { update: { _index: 'some_index', _type: 'events' } };
+
+        const expectedMutateMetadata = {
             upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
             doc: { name: 'someName', job: 'to be awesome!' }
+        };
+
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+
+            const mutateMeta = record.getMetadata(MUTATE_META);
+            expect(mutateMeta).toBeDefined();
+            expect(mutateMeta).toMatchObject(expectedMutateMetadata);
         });
     });
 
@@ -286,13 +369,27 @@ describe('elasticsearch index selector', () => {
         };
         const data = [{ some: 'data', name: 'someName', job: 'to be awesome!' }];
 
+        const expectedMetadata = { update: { _index: 'some_index', _type: 'events' } };
+
+        const expectedMutateMetadata = {
+            upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
+            script: { file: 'someFile', params: { aKey: 'to be awesome!' } }
+        };
+
         const test = await makeTest(opConfig);
         const results = await test.runSlice(data);
 
-        expect(results[0]).toEqual({ update: { _index: 'some_index', _type: 'events' } });
-        expect(results[1]).toEqual({
-            upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
-            script: { file: 'someFile', params: { aKey: 'to be awesome!' } }
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+
+            const mutateMeta = record.getMetadata(MUTATE_META);
+            expect(mutateMeta).toBeDefined();
+            expect(mutateMeta).toMatchObject(expectedMutateMetadata);
         });
     });
 
@@ -310,11 +407,9 @@ describe('elasticsearch index selector', () => {
             { count: 1, add: 2 }
         ];
 
-        const test = await makeTest(opConfig);
-        const results = await test.runSlice(data);
+        const expectedMetadata = { update: { _index: 'hello', _type: 'events' } };
 
-        expect(results[0]).toEqual({ update: { _index: 'hello', _type: 'events' } });
-        expect(results[1]).toEqual({
+        const expectedMutateMetadata = {
             upsert: { count: 1, add: 2 },
             script: {
                 source: 'ctx._source.count += add',
@@ -322,6 +417,22 @@ describe('elasticsearch index selector', () => {
                     add: 2
                 }
             }
+        };
+
+        const test = await makeTest(opConfig);
+        const results = await test.runSlice(data);
+
+        expect(results).toBeArrayOfSize(1);
+
+        results.forEach((record, index) => {
+            expect(record).toMatchObject(data[index]);
+            const indexMeta = record.getMetadata(INDEX_META);
+            expect(indexMeta).toBeDefined();
+            expect(indexMeta).toMatchObject(expectedMetadata);
+
+            const mutateMeta = record.getMetadata(MUTATE_META);
+            expect(mutateMeta).toBeDefined();
+            expect(mutateMeta).toMatchObject(expectedMutateMetadata);
         });
     });
 });
