@@ -29,7 +29,7 @@
     "dependencies": {},
     "devDependencies": {
         "@terascope/elasticsearch-api": "^2.9.0",
-        "@terascope/eslint-config": "^0.3.0",
+        "@terascope/eslint-config": "^0.3.1",
         "@terascope/job-components": "^0.33.0",
         "@types/bluebird": "^3.5.31",
         "@types/got": "^9.6.11",
