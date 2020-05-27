@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "1.8.6-dev",
+    "version": "1.8.6",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
