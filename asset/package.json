@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "1.8.5",
+    "version": "1.8.6",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -8,9 +8,9 @@
     "license": "MIT",
     "description": "",
     "dependencies": {
-        "@terascope/elasticsearch-api": "^2.9.0",
-        "@terascope/job-components": "^0.33.0",
-        "@terascope/teraslice-state-storage": "^0.16.0",
+        "@terascope/elasticsearch-api": "^2.9.1",
+        "@terascope/job-components": "^0.34.0",
+        "@terascope/teraslice-state-storage": "^0.16.1",
         "@terascope/utils": "^0.27.0",
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
