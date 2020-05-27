@@ -603,10 +603,10 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/bluebird@^3.5.31":
-  version "3.5.31"
-  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.31.tgz#d17fa0ec242b51c3db302481c557ce3813bf45cb"
-  integrity sha512-0PKlnDIxOh3xJHwJpVONR2PP11LhdM+QYiLJGLIbzMqRwLAPxN6lQar2RpdRhfIEh/HjVMgMdhHWJA0CgC5X6w==
+"@types/bluebird@^3.5.32":
+  version "3.5.32"
+  resolved "https://registry.yarnpkg.com/@types/bluebird/-/bluebird-3.5.32.tgz#381e7b59e39f010d20bbf7e044e48f5caf1ab620"
+  integrity sha512-dIOxFfI0C+jz89g6lQ+TqhGgPQ0MxSnh/E4xuC0blhFtyW269+mPG5QeLgbdwst/LvdP8o1y0o/Gz5EHXLec/g==
 
 "@types/color-name@^1.1.1":
   version "1.1.1"
@@ -4530,7 +4530,7 @@ table@^5.2.3:
 
 teraslice-test-harness@^0.19.0:
   version "0.19.0"
-  resolved "https://npm.terascope.io/teraslice-test-harness/-/teraslice-test-harness-0.19.0.tgz#b7f61cdf97750b4ffd8299ed311bde737901ca3d"
+  resolved "https://registry.yarnpkg.com/teraslice-test-harness/-/teraslice-test-harness-0.19.0.tgz#b7f61cdf97750b4ffd8299ed311bde737901ca3d"
   integrity sha512-GpWXykI1TUc36OZ912Acz1LUF72w9iUa4JpZJfA9OflMvrHc9320bDhwubUrdNDA2/9vMUGo0Cc7gLCJACXVsg==
   dependencies:
     "@terascope/job-components" "^0.34.0"
@@ -4773,7 +4773,7 @@ uuid@^3.3.2:
 
 uuid@^8.0.0:
   version "8.1.0"
-  resolved "https://npm.terascope.io/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
   integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
 
 v8-compile-cache@^2.0.3:
