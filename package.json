@@ -28,9 +28,9 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@terascope/elasticsearch-api": "^2.9.0",
+        "@terascope/elasticsearch-api": "^2.9.1",
         "@terascope/eslint-config": "^0.3.1",
-        "@terascope/job-components": "^0.33.0",
+        "@terascope/job-components": "^0.34.0",
         "@types/bluebird": "^3.5.31",
         "@types/got": "^9.6.11",
         "@types/jest": "^25.2.2",
@@ -40,7 +40,7 @@
         "jest-extended": "^0.11.5",
         "moment": "^2.25.3",
         "nock": "^12.0.3",
-        "teraslice-test-harness": "^0.18.0",
+        "teraslice-test-harness": "^0.19.0",
         "ts-jest": "^25.5.1",
         "ts-node": "^8.10.1",
         "typescript": "^3.8.3"
