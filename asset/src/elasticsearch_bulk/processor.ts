@@ -2,14 +2,24 @@ import elasticApi from '@terascope/elasticsearch-api';
 import {
     getClient,
     BatchProcessor,
-    DataEntity,
     WorkerContext,
-    ExecutionConfig,
+    ExecutionConfig
+} from '@terascope/job-components';
+import {
+    DataEntity,
     AnyObject,
     has,
     flatten,
-    TSError
-} from '@terascope/job-components';
+    TSError,
+    isNotNil,
+    isNil
+} from '@terascope/utils';
+import {
+    MUTATE_META,
+    INDEX_META,
+    IndexSpec,
+    UpdateConfig
+} from '../elasticsearch_index_selector/interfaces';
 import { BulkSender } from './interfaces';
 
 interface Endpoint {
@@ -69,6 +79,28 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         const slicedData = splitArray(dataArray, this.limit)
             .map((data: any) => client.bulkSend(data));
         return Promise.all(slicedData);
+    }
+
+    private _formatData(input: DataEntity[]) {
+        const results: any[] = [];
+
+        input.forEach((record) => {
+            const indexingMeta = record.getMetadata(INDEX_META) as IndexSpec;
+            if (isNotNil(indexingMeta)) {
+                results.push(indexingMeta);
+                if (isNil(indexingMeta.delete)) {
+                    const mutateMeta = record.getMetadata(MUTATE_META) as UpdateConfig;
+
+                    if (isNotNil(mutateMeta)) {
+                        results.push(mutateMeta);
+                    } else {
+                        results.push(record);
+                    }
+                }
+            }
+        });
+
+        return results;
     }
 
     private async multiSend(data: any[]) {
@@ -133,11 +165,15 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
             return data;
         }
 
+        const formattedData = this._formatData(data);
+
         if (this.isMultisend) {
-            return this.multiSend(data);
+            await this.multiSend(formattedData);
+        } else {
+            await this._recursiveSend(this.client, formattedData);
         }
 
-        return this._recursiveSend(this.client, data);
+        return data;
     }
 }
 

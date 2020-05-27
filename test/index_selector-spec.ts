@@ -2,9 +2,7 @@ import 'jest-extended';
 import { DataEntity } from '@terascope/utils';
 import path from 'path';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-
-const INDEX_META = 'elasticsearch:index:metadata';
-const MUTATE_META = 'elasticsearch:mutate:metadata';
+import { MUTATE_META, INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces';
 
 describe('elasticsearch index selector', () => {
     const assetDir = path.join(__dirname, '..');

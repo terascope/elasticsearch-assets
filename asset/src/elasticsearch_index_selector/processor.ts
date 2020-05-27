@@ -1,13 +1,12 @@
 import { BatchProcessor } from '@terascope/job-components';
 import {
     DataEntity,
-    AnyObject,
     set,
     getValidDate,
     TSError,
     fastAssign
 } from '@terascope/utils';
-import { IndexSelectorConfig } from './interfaces';
+import * as i from './interfaces';
 
 function _getWeeklyIndex(date: string) {
     // weeks since Jan 1, 1970
@@ -19,33 +18,7 @@ const offsets = {
     yearly: 4
 };
 
-interface BulkMeta {
-    _index: string;
-    _type: string;
-    _id: string | number;
-    retry_on_conflict: number;
-}
-
-interface IndexSpec extends DataEntity {
-    index?: AnyObject;
-    create?: AnyObject;
-    update?: AnyObject;
-    delete?: AnyObject;
-}
-
-interface ScriptConfig {
-    file?: string;
-    source?: string;
-    params?: AnyObject;
-}
-
-interface UpdateConfig extends DataEntity {
-    upsert?: AnyObject;
-    doc?: AnyObject;
-    script?: ScriptConfig;
-}
-
-export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
+export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig> {
     private formattedDate(record: DataEntity) {
         const { date_field: dateField, timeseries } = this.opConfig;
         let end = 10;
@@ -78,9 +51,9 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
     }
 
     private generateRequestMetadata(record: DataEntity) {
-        const indexSpec: IndexSpec = DataEntity.make({});
+        const indexSpec: i.IndexSpec = DataEntity.make({});
         const index = this.indexName(record);
-        const meta: Partial<BulkMeta> = {
+        const meta: Partial<i.BulkMeta> = {
             _index: index
         };
 
@@ -104,10 +77,10 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
             indexSpec.index = meta;
         }
 
-        record.setMetadata('elasticsearch:index:metadata', indexSpec);
+        record.setMetadata(i.INDEX_META, indexSpec);
 
         if (this.opConfig.update || this.opConfig.upsert) {
-            const update: UpdateConfig = DataEntity.make({});
+            const update: i.UpdateConfig = DataEntity.make({});
 
             if (this.opConfig.upsert) {
                 // The upsert field is what is inserted if the key doesn't already exist
@@ -144,7 +117,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
             } else {
                 update.doc = fastAssign({}, record);
             }
-            record.setMetadata('elasticsearch:mutate:metadata', update);
+            record.setMetadata(i.MUTATE_META, update);
         }
     }
 

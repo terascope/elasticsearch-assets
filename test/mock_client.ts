@@ -1,10 +1,9 @@
 import {
     AnyObject,
     isPlainObject,
-    isSimpleObject,
     cloneDeep,
-    DataEntity
-} from '@terascope/job-components';
+    isObjectEntity
+} from '@terascope/utils';
 
 function createData() {
     return {
@@ -34,15 +33,11 @@ function getMeta(meta: AnyObject|undefined) {
     return false;
 }
 
-function isObjectLike(doc: any) {
-    return DataEntity.isDataEntity(doc) || isSimpleObject(doc);
-}
-
 function validateBulk(data: BulkData) {
     if (!data.body) throw new Error('bulk must have a body field');
     if (!Array.isArray(data.body)) throw new Error('bulk data must be an array');
 
-    const areObjects = data.body.every(isSimpleObject);
+    const areObjects = data.body.every(isObjectEntity);
 
     if (!areObjects) throw new Error('bulk data must be an array of objects');
     if (data.body.length === 0) throw new Error('bulk must contain an array of objects');
@@ -59,7 +54,7 @@ function validateBulk(data: BulkData) {
             const secondDoc = clone.shift();
 
             if (getMeta(secondDoc)) throw new Error('an elasticsearch meta object must be paired with data if it is not a delete operation');
-            if (!isObjectLike(secondDoc)) throw new Error('data paired with elasitcsearhc bulk meta must be an object');
+            if (!isObjectEntity(secondDoc)) throw new Error('data paired with elasitcsearhc bulk meta must be an object');
             if (Object.keys(secondDoc as AnyObject).length === 0) throw new Error('data must not be an empty object');
         }
     }

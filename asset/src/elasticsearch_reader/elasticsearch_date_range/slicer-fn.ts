@@ -236,8 +236,8 @@ export default function newSlicer(args: SlicerArgs) {
             end: end.format(dateFormat)
         };
         const query = api.buildQuery(opConfig, range);
-
-        return api.count(query);
+        // TODO: review types here
+        return api.count(query as any);
     }
 
     async function nextRange() {

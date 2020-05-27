@@ -136,7 +136,8 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
 
         const query = this.api.buildQuery(this.opConfig, range);
-        return this.api.count(query);
+        // TODO: review types here
+        return this.api.count(query as any);
     }
 
     async getInterval(interval: string, esDates?: DateSegments) {
