@@ -1,20 +1,17 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { WorkerTestHarness, newTestJobConfig, JobHarnessOptions } from 'teraslice-test-harness';
+import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams } from 'elasticsearch';
-import {
-    cloneDeep, isPlainObject, DataEntity, pDelay, __ENTITY_METADATA_KEY
-} from '@terascope/job-components';
+import { DataEntity, pDelay } from '@terascope/job-components';
 import path from 'path';
 import {
     makeClient, cleanupIndex, fetch, upload
 } from './helpers/elasticsearch';
 import { TEST_INDEX_PREFIX } from './helpers/config';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { MUTATE_META, INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces';
+import { INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces';
 
 // TODO: current bug in convict prevents testing connection_map without a *
 // TODO: test flush scenarios/retries
+// TODO: any mutate tests ??
 describe('elasticsearch_bulk', () => {
     const assetDir = path.join(__dirname, '..');
     let harness: WorkerTestHarness;
@@ -294,10 +291,10 @@ describe('elasticsearch_bulk', () => {
         expect(clientCalls.otherConnection).toBeDefined();
         const {
             default: [
-                { body: [_meta1, doc1, _meta2, doc2] }
+                { body: [, doc1,, doc2] }
             ],
             otherConnection: [
-                { body: [_meta3, doc3] }
+                { body: [, doc3] }
             ]
         } = clientCalls;
 

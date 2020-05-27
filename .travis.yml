@@ -15,6 +15,14 @@ if: NOT (branch = master AND type = push AND tag IS blank AND os = osx)
 cache:
   npm: false
   yarn: false
+env:
+  - ELASTICSEARCH_VERSION=6.8.6
+  - ELASTICSEARCH_VERSION=7.2.1
+before_script:
+  - curl -O https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/deb/elasticsearch/$ELASTICSEARCH_VERSION/elasticsearch-$ELASTICSEARCH_VERSION.deb
+  - sudo dpkg -i --force-confnew elasticsearch-$ELASTICSEARCH_VERSION.deb
+  - sudo service elasticsearch restart
+  - sleep 10
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - yarn lint
