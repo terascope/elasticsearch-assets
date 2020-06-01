@@ -34,7 +34,7 @@
         "@types/bluebird": "^3.5.32",
         "@types/got": "^9.6.11",
         "@types/jest": "^25.2.2",
-        "@types/node": "^14.0.3",
+        "@types/node": "^14.0.6",
         "eslint": "^6.8.0",
         "jest": "^25.5.4",
         "jest-extended": "^0.11.5",
