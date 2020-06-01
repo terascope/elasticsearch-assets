@@ -506,12 +506,12 @@
   dependencies:
     type-detect "4.0.8"
 
-"@terascope/elasticsearch-api@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.1.tgz#fb494224b2e4046bc23e9e0de2d8b2234bfa70ce"
-  integrity sha512-Z3vNB+xKRMoMWBUIPh/wyuswkL1uqB659NNjft9Gkdi6PpAP6qOyu3xczbo2oieY/Hfx6aWLTkye+M4D/Wibpg==
+"@terascope/elasticsearch-api@^2.9.2":
+  version "2.9.2"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.2.tgz#024a6eabc0e6a03aabefc3f87ed1561712ec95a2"
+  integrity sha512-WwHn0HkDYp0RlpJMtQXGckRAHcthWWVAldby7gIRNNyMMf6JvImKHH8DxmSV1hgh+GGZkLvp5xOax/V3DIAIlQ==
   dependencies:
-    "@terascope/utils" "^0.27.0"
+    "@terascope/utils" "^0.27.1"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -553,10 +553,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
   integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
 
-"@terascope/utils@^0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.0.tgz#91bf9cc4b6e30046ddfc457c96276f1bd7adf755"
-  integrity sha512-i9Xq4iOwJm1fuNDFl7IjAp833N4vf3wPer8kRc2ZQlSgyc36uxKoDzmBoXe1E8stSyTMUgWYUpluZrl9qrPenA==
+"@terascope/utils@^0.27.0", "@terascope/utils@^0.27.1":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.1.tgz#e288a3790480a5f4400ffd6531f30c1becb58a53"
+  integrity sha512-gFkiEdhR8Pt9vSDaoaG13fOu+yhGZI2sC1QP0uym/Da6GBCwxnbJC9D8appzFNOtpnaiteP8/Cdfvdq5ANOxyg==
   dependencies:
     "@terascope/types" "^0.3.0"
     debug "^4.1.1"
