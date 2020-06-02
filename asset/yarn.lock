@@ -24,14 +24,14 @@
     lodash.isequal "^4.5.0"
 
 "@terascope/job-components@^0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.34.0.tgz#264dc50a72dd99e0a0ec3fa93839bd91edee4e71"
-  integrity sha512-DlrJG6C4qVA4sxNbs8RiAHx4GgljE7Ll2YPLxrmAVddPAjJQVAApWst9oU63E7ez4ZeL5RWOXSR4NNtvqAQCEQ==
+  version "0.34.2"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.34.2.tgz#696604b62339f9e1fbadaa145b4fed9f382ef99e"
+  integrity sha512-qsNNPrLcsyRzLX7em8M8s1sdcjqdGaGV6RuTT+d8XNdvHP6KOHBsMmKY3b8DxQSFLDKHnDoqhtjM4zlUYotPBg==
   dependencies:
-    "@terascope/utils" "^0.27.0"
+    "@terascope/utils" "^0.27.2"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
-    uuid "^8.0.0"
+    uuid "^8.1.0"
 
 "@terascope/teraslice-state-storage@^0.16.1":
   version "0.16.1"
@@ -452,7 +452,7 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-uuid@^8.0.0:
+uuid@^8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
   integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
