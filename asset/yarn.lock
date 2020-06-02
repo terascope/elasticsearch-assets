@@ -15,11 +15,11 @@
     defer-to-connect "^1.0.1"
 
 "@terascope/elasticsearch-api@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.1.tgz#fb494224b2e4046bc23e9e0de2d8b2234bfa70ce"
-  integrity sha512-Z3vNB+xKRMoMWBUIPh/wyuswkL1uqB659NNjft9Gkdi6PpAP6qOyu3xczbo2oieY/Hfx6aWLTkye+M4D/Wibpg==
+  version "2.9.3"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.3.tgz#deee0626bd9c2fd56b5dda0a090fff28897957a4"
+  integrity sha512-tBoYthkT5kquh+RwMvguuoA587UnSwaSucT9KW6VGqUvMI7jesN/Z7fv2kYGK22W9dY6LbijGTDp8neGkgdhxw==
   dependencies:
-    "@terascope/utils" "^0.27.0"
+    "@terascope/utils" "^0.27.2"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -47,10 +47,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
   integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
 
-"@terascope/utils@^0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.0.tgz#91bf9cc4b6e30046ddfc457c96276f1bd7adf755"
-  integrity sha512-i9Xq4iOwJm1fuNDFl7IjAp833N4vf3wPer8kRc2ZQlSgyc36uxKoDzmBoXe1E8stSyTMUgWYUpluZrl9qrPenA==
+"@terascope/utils@^0.27.0", "@terascope/utils@^0.27.2":
+  version "0.27.2"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.2.tgz#25cddf84cc71072b731d04ccd2f623e62ca73831"
+  integrity sha512-C0OAMD+SKHPqKZx/nI6WE8JdQ+gw9GaVxJCBuMhFNclZof41v7cuu16yMbaZ0nNw3s6qtjjT5odcq+ZxvaiHAg==
   dependencies:
     "@terascope/types" "^0.3.0"
     debug "^4.1.1"
@@ -62,7 +62,16 @@
     lodash.has "^4.5.2"
     lodash.set "^4.3.2"
     lodash.unset "^4.5.2"
+    p-map "^4.0.0"
     shallow-clone "^3.0.1"
+
+aggregate-error@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-3.0.1.tgz#db2fe7246e536f40d9b5442a39e117d7dd6a24e0"
+  integrity sha512-quoaXsZ9/BLNae5yiNoUz+Nhkwz83GhWwtYFglcjEQB2NDHCIpApbqXxIFnm4Pq/Nvhrsq5sYJFyohrrxnTGAA==
+  dependencies:
+    clean-stack "^2.0.0"
+    indent-string "^4.0.0"
 
 bluebird@^3.7.2:
   version "3.7.2"
@@ -99,6 +108,11 @@ chance@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/chance/-/chance-1.1.5.tgz#94d9415b40e8d31a13144b998e76519193456dce"
   integrity sha512-uBVETzUktMGLALWQ8fCJCOjNF4Gm1lRjjjuC2+z7rCjx78ioONIK7bYhGzBovhQyqOegJEl3nAJxjE7mvY6aIw==
+
+clean-stack@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
+  integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
 
 clone-response@^1.0.2:
   version "1.0.2"
@@ -212,6 +226,11 @@ http-cache-semantics@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
   integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
+
+indent-string@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/indent-string/-/indent-string-4.0.0.tgz#624f8f4497d619b2d9768531d58f4122854d7251"
+  integrity sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==
 
 is-plain-object@^3.0.0:
   version "3.0.0"
@@ -368,6 +387,13 @@ p-cancelable@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-1.1.0.tgz#d078d15a3af409220c886f1d9a0ca2e441ab26cc"
   integrity sha512-s73XxOZ4zpt1edZYZzvhqFa6uvQc1vwUa0K0BdtIZgQMAJj9IbebH+JkgKZc9h+B05PKHLOTl4ajG1BmNrVZlw==
+
+p-map@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-4.0.0.tgz#bb2f95a5eda2ec168ec9274e06a747c3e2904d2b"
+  integrity sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==
+  dependencies:
+    aggregate-error "^3.0.0"
 
 prepend-http@^2.0.0:
   version "2.0.0"
