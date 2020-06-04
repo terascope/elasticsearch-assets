@@ -5,6 +5,7 @@ import {
     WorkerContext,
     ExecutionConfig
 } from '@terascope/job-components';
+import { Client } from 'elasticsearch';
 import elasticApi from '@terascope/elasticsearch-api';
 import { ESDateConfig } from '../interfaces';
 
@@ -16,14 +17,14 @@ export default class DateReader extends Fetcher<ESDateConfig> {
         context: WorkerContext,
         opConfig: ESDateConfig,
         executionConfig: ExecutionConfig,
-        client: any
+        client: Client
     ) {
         super(context, opConfig, executionConfig);
         this.apiConfig = Object.assign({}, this.opConfig, { full_response: true });
         this.api = elasticApi(client, this.logger, this.apiConfig);
     }
 
-    async fetch(slice: SliceRequest) {
+    async fetch(slice: SliceRequest): Promise<DataEntity[]> {
         const query = this.api.buildQuery(this.apiConfig, slice);
         const results = await this.api.search(query);
         // TODO: better typeing of doc

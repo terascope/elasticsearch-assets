@@ -15,7 +15,7 @@
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
         "mocker-data-generator": "^2.6.6",
-        "moment": "^2.24.0"
+        "moment": "^2.26.0"
     },
     "devDependencies": {}
 }

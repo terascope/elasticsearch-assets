@@ -1,4 +1,5 @@
 import { makeExContextLogger, WorkerContext, ExecutionConfig } from '@terascope/job-components';
+import { Client } from 'elasticsearch';
 import MockedClient from './client';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import DateSlicer from '../elasticsearch_reader/elasticsearch_date_range/slicer';
@@ -12,7 +13,7 @@ export default class ESDateSlicer extends DateSlicer {
         const logger = makeExContextLogger(context, executionConfig, 'operation', {
             opName: opConfig._op,
         });
-        const client = new MockedClient(opConfig, logger);
+        const client = new MockedClient(opConfig, logger) as unknown as Client;
         super(context, opConfig, executionConfig, client);
     }
 }

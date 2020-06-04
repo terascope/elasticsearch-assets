@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { AnyObject, isEmpty } from '@terascope/utils';
 import { DataGenerator, DateOptions, IDType } from './interfaces';
 import { dateFormat } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 
@@ -87,10 +88,10 @@ function getFormatFunction(format: DateOptions, options: FormatOptions = {}) {
     return formatOptions[format];
 }
 
-export default function getSchema(opConfig: DataGenerator, otherSchema: any) {
+export default function getSchema(opConfig: DataGenerator, otherSchema: AnyObject): AnyObject {
     const startDate = opConfig.start ? moment(opConfig.start) : moment(0); // 01 January, 1970 UTC
     const endDate = opConfig.end ? moment(opConfig.end) : moment();
-    const schema = otherSchema || nativeSchema;
+    const schema = isEmpty(otherSchema) ? nativeSchema : otherSchema;
     const start = startDate.valueOf();
     const end = endDate.valueOf();
     const diff = end - start;

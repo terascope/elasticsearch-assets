@@ -43,7 +43,7 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
 }
 
 function parsedSchema(opConfig: DataGenerator) {
-    let dataSchema = false;
+    let dataSchema = {};
 
     if (opConfig.json_schema) {
         const firstPath = opConfig.json_schema;

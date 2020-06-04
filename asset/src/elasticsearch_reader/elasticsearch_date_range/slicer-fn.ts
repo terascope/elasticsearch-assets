@@ -1,4 +1,4 @@
-import { cloneDeep, TSError } from '@terascope/job-components';
+import { cloneDeep, TSError, SlicerFn } from '@terascope/job-components';
 import moment from 'moment';
 import idSlicer from '../../id_reader/id-slicer';
 import {
@@ -59,7 +59,7 @@ function splitTime(
     return secondDiff;
 }
 
-export default function newSlicer(args: SlicerArgs) {
+export default function newSlicer(args: SlicerArgs): SlicerFn {
     const {
         events,
         opConfig,
@@ -302,7 +302,7 @@ export default function newSlicer(args: SlicerArgs) {
         }
     }
 
-    function dateSlicer(dates: SlicerDateConfig, slicerId: number) {
+    function dateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
@@ -318,7 +318,7 @@ export default function newSlicer(args: SlicerArgs) {
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        return async function sliceDate(msg: any): Promise<SliceResults> {
+        return async function sliceDate(): Promise<SliceResults> {
             if (dateParams.start.isSameOrAfter(dateParams.limit)) {
                 // we are done
                 // if steaming and there is more work, then continue
@@ -340,7 +340,7 @@ export default function newSlicer(args: SlicerArgs) {
                 data = await determineSlice(dateParams, slicerId, false);
             } catch (err) {
                 const retryInput = dateParams.start.format(dateFormat);
-                return retryError(retryInput, err, sliceDate, msg);
+                return retryError(retryInput, err, sliceDate, '');
             }
 
             dateParams.start = moment(data.end);

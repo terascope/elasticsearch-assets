@@ -1,10 +1,10 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig
+    ConvictSchema, ValidatedJobConfig, getOpConfig, AnyObject
 } from '@terascope/job-components';
 import { IndexSelectorConfig } from './interfaces';
 
 export default class Schema extends ConvictSchema<IndexSelectorConfig> {
-    validateJob(job: ValidatedJobConfig) {
+    validateJob(job: ValidatedJobConfig): void {
         const opConfig = getOpConfig(job, 'elasticsearch_index_selector');
 
         if (opConfig == null) throw new Error('Could not find elasticsearch_index_selector operation in jobConfig');
@@ -16,7 +16,7 @@ export default class Schema extends ConvictSchema<IndexSelectorConfig> {
         }
     }
 
-    build() {
+    build(): AnyObject {
         return {
             index: {
                 doc: 'Index to where the data will be sent to, if you wish the index to be based on a timeseries, '

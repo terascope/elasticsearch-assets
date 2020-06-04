@@ -1,8 +1,8 @@
-import { ConvictSchema } from '@terascope/job-components';
+import { ConvictSchema, AnyObject } from '@terascope/job-components';
 import { ESStateStorageConfig } from './interfaces';
 
 export default class Schema extends ConvictSchema<ESStateStorageConfig> {
-    build() {
+    build(): AnyObject {
         return {
             index: {
                 doc: 'name of elasticsearch index',

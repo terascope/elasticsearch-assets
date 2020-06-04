@@ -121,7 +121,7 @@ export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig>
         }
     }
 
-    async onBatch(data: DataEntity[]) {
+    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         for (const record of data) {
             this.generateRequestMetadata(record);
         }

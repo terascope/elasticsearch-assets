@@ -159,7 +159,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         return flatten(results);
     }
 
-    async onBatch(data: DataEntity[]) {
+    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         // bulk throws an error if you send an empty array
         if (data == null || data.length === 0) {
             return data;

@@ -7,6 +7,7 @@ import {
     AnyObject,
     isFunction,
 } from '@terascope/job-components';
+import { Client } from 'elasticsearch';
 import moment from 'moment';
 import elasticApi from '@terascope/elasticsearch-api';
 import dateSlicerFn from './slicer-fn';
@@ -40,7 +41,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         context: WorkerContext,
         opConfig: ESDateConfig,
         executionConfig: ExecutionConfig,
-        client: any
+        client: Client
     ) {
         super(context, opConfig, executionConfig);
         this.api = elasticApi(client, this.logger, this.opConfig);
@@ -49,7 +50,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         this.windowState = new WindowState(executionConfig.slicers);
     }
 
-    async getDates() {
+    async getDates(): Promise<{ start: FetchDate; limit: FetchDate; }> {
         const [startDate, endDate] = await Promise.all([this.getIndexDate(this.opConfig.start, 'start'), this.getIndexDate(this.opConfig.end, 'end')]);
         const finalDates = { start: startDate, limit: endDate };
         if (startDate && endDate) {
@@ -111,12 +112,11 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
         // end date is non-inclusive, adding 1s so range will cover it
         const newDate = data[this.opConfig.date_field_name];
-        // @ts-ignore
         const time = moment(newDate).add(1, this.opConfig.time_resolution);
         return parseDate(time.format(this.dateFormat));
     }
 
-    async updateJob(data: AnyObject) {
+    async updateJob(data: AnyObject): Promise<void> {
         const { setMetadata } = this.context.apis.executionContext;
 
         if (setMetadata && isFunction(setMetadata)) {
@@ -124,8 +124,8 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
     }
 
-    async getCount(dates: any, key?: string) {
-        const end = dates.end ? dates.end : dates.limit;
+    async getCount(dates: DateSegments, key?: string): Promise<number> {
+        const end = dates.limit;
         const range: any = {
             start: dates.start.format(this.dateFormat),
             end: end.format(this.dateFormat)
@@ -140,7 +140,9 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         return this.api.count(query as any);
     }
 
-    async getInterval(interval: string, esDates?: DateSegments) {
+    async getInterval(
+        interval: string, esDates?: DateSegments
+    ): Promise<[number, moment.unitOfTime.Base]> {
         if (this.opConfig.interval !== 'auto') {
             return processInterval(interval, this.opConfig.time_resolution, esDates);
         }
@@ -162,7 +164,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         return [millisecondInterval, 'ms'];
     }
 
-    isRecoverable() {
+    isRecoverable(): boolean {
         return true;
     }
 
