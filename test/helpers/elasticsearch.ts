@@ -1,6 +1,8 @@
+import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
+import { DataEntity } from '@terascope/utils';
+import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION } from './config';
-import { DataEntity } from '../../../teraslice/packages/utils/dist/src';
 
 // automatically set the timeout to 10s when using elasticsearch
 jest.setTimeout(10000);
@@ -33,6 +35,44 @@ export async function upload(client: Client, _query: BulkIndexDocumentsParams, d
     const body = formatUploadData(_query.index as string, data, _query.type);
     const query = Object.assign({ refresh: 'wait_for', body }, _query);
     return client.bulk(query);
+}
+
+export async function populateIndex(
+    client: Client,
+    index: string,
+    fields: TypeConfigFields,
+    records: any[]
+) {
+    const overrides = {
+        settings: {
+            'index.number_of_shards': 1,
+            'index.number_of_replicas': 0,
+        },
+    };
+
+    const dataType = new DataType({ version: LATEST_VERSION, fields });
+    const version = getESVersion(client);
+    const mapping = dataType.toESMapping({ typeName: 'events', overrides, version });
+
+    await client.indices.create(
+        fixMappingRequest(
+            client,
+            {
+                index,
+                waitForActiveShards: 'all',
+                body: mapping,
+            },
+            false
+        )
+    );
+    const body = formatUploadData(index, records, 'events');
+
+    return client.bulk({
+        index,
+        type: 'events',
+        body,
+        refresh: true
+    });
 }
 
 export async function fetch(client: Client, query: SearchParams, fullRequest = false) {

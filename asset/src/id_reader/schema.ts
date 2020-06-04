@@ -1,10 +1,10 @@
 import {
-    ConvictSchema, isString, ValidatedJobConfig, getOpConfig
+    ConvictSchema, isString, ValidatedJobConfig, getOpConfig, AnyObject
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
-    validateJob(job: ValidatedJobConfig) {
+    validateJob(job: ValidatedJobConfig): void {
         const opConfig = getOpConfig(job, 'id_reader');
         if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
@@ -25,7 +25,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
         }
     }
 
-    build() {
+    build(): AnyObject {
         return {
             index: {
                 doc: 'Which index to read from',

@@ -14,32 +14,32 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@terascope/elasticsearch-api@^2.9.1":
-  version "2.9.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.1.tgz#fb494224b2e4046bc23e9e0de2d8b2234bfa70ce"
-  integrity sha512-Z3vNB+xKRMoMWBUIPh/wyuswkL1uqB659NNjft9Gkdi6PpAP6qOyu3xczbo2oieY/Hfx6aWLTkye+M4D/Wibpg==
+"@terascope/elasticsearch-api@^2.9.4":
+  version "2.9.4"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.9.4.tgz#de731b94e4141a3cbedc0fb1b8d58bea1dea014a"
+  integrity sha512-DHf9Mtj4mgPSdivGIT30eHvD0k133u9TVjsdI2TI8C3JBKpAokzrSd9VS92ZqWKBDEiaM2McSe69jOs45NXvSw==
   dependencies:
-    "@terascope/utils" "^0.27.0"
+    "@terascope/utils" "^0.27.3"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
-"@terascope/job-components@^0.34.0":
-  version "0.34.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.34.0.tgz#264dc50a72dd99e0a0ec3fa93839bd91edee4e71"
-  integrity sha512-DlrJG6C4qVA4sxNbs8RiAHx4GgljE7Ll2YPLxrmAVddPAjJQVAApWst9oU63E7ez4ZeL5RWOXSR4NNtvqAQCEQ==
+"@terascope/job-components@^0.34.3":
+  version "0.34.3"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.34.3.tgz#69fdd1a0b6dafa2dde503efee87bf18702d4b681"
+  integrity sha512-8ZqB1kRShnRir1XHAxGGHjTOllPhFmzvzc7945MtNlqknlMzGU5WRt8VJ6FiKjSpFXK6K28rbcDEg5sMNrzL1Q==
   dependencies:
-    "@terascope/utils" "^0.27.0"
+    "@terascope/utils" "^0.27.3"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
-    uuid "^8.0.0"
+    uuid "^8.1.0"
 
-"@terascope/teraslice-state-storage@^0.16.1":
-  version "0.16.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.16.1.tgz#fc82f4b62b723cebffbdd853f9aa9dbc9e4c4cdc"
-  integrity sha512-cCNX04rdE+KS6CfMMnPDNhgceP2LOWyRd3pqfnQQRiPM0mjCk7ZQdthFqmoygI6UouYKGsfl/DxAqv2mU+PCug==
+"@terascope/teraslice-state-storage@^0.16.4":
+  version "0.16.4"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.16.4.tgz#b944509e85b19594c3a60d7fb06d2c65161a8124"
+  integrity sha512-Et5NObxRK1YUPi0Zz6baU+qq8okjfjZJHrJ7ckeH0EJc1qaiY0UxzSW+/VYkWq8iATLzxX8xPFBy3ahP4vsNLw==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.9.1"
-    "@terascope/utils" "^0.27.0"
+    "@terascope/elasticsearch-api" "^2.9.4"
+    "@terascope/utils" "^0.27.3"
     mnemonist "^0.36.1"
 
 "@terascope/types@^0.3.0":
@@ -47,10 +47,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.3.0.tgz#41a0ac5a440841d89d6902064f360cc03fd0f4d0"
   integrity sha512-qvCI0gfsI8HYHJhnfRa5rRTkITM0ZnPpAYX1M0GdYsR8h2ytIUF5jnsf2Bn6OqDdReQCFisr4h+FQafpqxmE6g==
 
-"@terascope/utils@^0.27.0":
-  version "0.27.0"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.0.tgz#91bf9cc4b6e30046ddfc457c96276f1bd7adf755"
-  integrity sha512-i9Xq4iOwJm1fuNDFl7IjAp833N4vf3wPer8kRc2ZQlSgyc36uxKoDzmBoXe1E8stSyTMUgWYUpluZrl9qrPenA==
+"@terascope/utils@^0.27.3":
+  version "0.27.3"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.27.3.tgz#ce5374cb933d3cff243fe8f220b730b3f4d02a7e"
+  integrity sha512-qJy0UQ9L8/TOoI4UDsJnYSXRnWf1bMJZ+8vRx0IcXpStHsjAqzVkVCBUHw1zAfPzYZNv0EhAGnTGJW3YySB9/Q==
   dependencies:
     "@terascope/types" "^0.3.0"
     debug "^4.1.1"
@@ -62,7 +62,16 @@
     lodash.has "^4.5.2"
     lodash.set "^4.3.2"
     lodash.unset "^4.5.2"
+    p-map "^4.0.0"
     shallow-clone "^3.0.1"
+
+aggregate-error@^3.0.0:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/aggregate-error/-/aggregate-error-3.0.1.tgz#db2fe7246e536f40d9b5442a39e117d7dd6a24e0"
+  integrity sha512-quoaXsZ9/BLNae5yiNoUz+Nhkwz83GhWwtYFglcjEQB2NDHCIpApbqXxIFnm4Pq/Nvhrsq5sYJFyohrrxnTGAA==
+  dependencies:
+    clean-stack "^2.0.0"
+    indent-string "^4.0.0"
 
 bluebird@^3.7.2:
   version "3.7.2"
@@ -99,6 +108,11 @@ chance@^1.1.5:
   version "1.1.5"
   resolved "https://registry.yarnpkg.com/chance/-/chance-1.1.5.tgz#94d9415b40e8d31a13144b998e76519193456dce"
   integrity sha512-uBVETzUktMGLALWQ8fCJCOjNF4Gm1lRjjjuC2+z7rCjx78ioONIK7bYhGzBovhQyqOegJEl3nAJxjE7mvY6aIw==
+
+clean-stack@^2.0.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-2.2.0.tgz#ee8472dbb129e727b31e8a10a427dee9dfe4008b"
+  integrity sha512-4diC9HaTE+KRAMWhDhrGOECgWZxoevMc5TlkObMqNSsVU62PYzXZ/SMTjzyGAFF1YusgxGcSWTEXBhp0CPwQ1A==
 
 clone-response@^1.0.2:
   version "1.0.2"
@@ -212,6 +226,11 @@ http-cache-semantics@^4.0.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/http-cache-semantics/-/http-cache-semantics-4.1.0.tgz#49e91c5cbf36c9b94bcfcd71c23d5249ec74e390"
   integrity sha512-carPklcUh7ROWRK7Cv27RPtdhYhUsela/ue5/jKzjegVvXDqM2ILE9Q2BGn9JZJh1g87cp56su/FgQSzcWS8cQ==
+
+indent-string@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/indent-string/-/indent-string-4.0.0.tgz#624f8f4497d619b2d9768531d58f4122854d7251"
+  integrity sha512-EdDDZu4A2OyIK7Lr/2zG+w5jmbuk1DVBnEwREQvBzspBJkCEbRa8GxU1lghYcaGJCnRWibjDXlq779X1/y5xwg==
 
 is-plain-object@^3.0.0:
   version "3.0.0"
@@ -369,6 +388,13 @@ p-cancelable@^1.0.0:
   resolved "https://registry.yarnpkg.com/p-cancelable/-/p-cancelable-1.1.0.tgz#d078d15a3af409220c886f1d9a0ca2e441ab26cc"
   integrity sha512-s73XxOZ4zpt1edZYZzvhqFa6uvQc1vwUa0K0BdtIZgQMAJj9IbebH+JkgKZc9h+B05PKHLOTl4ajG1BmNrVZlw==
 
+p-map@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-4.0.0.tgz#bb2f95a5eda2ec168ec9274e06a747c3e2904d2b"
+  integrity sha512-/bjOqmgETBYB5BoEeGVea8dmvHb2m9GLy1E9W43yeyfP6QQCZGFNa+XRceJEuDB6zqr+gKpIAmlLebMpykw/MQ==
+  dependencies:
+    aggregate-error "^3.0.0"
+
 prepend-http@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/prepend-http/-/prepend-http-2.0.0.tgz#e92434bfa5ea8c19f41cdfd401d741a3c819d897"
@@ -426,7 +452,7 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-uuid@^8.0.0:
+uuid@^8.1.0:
   version "8.1.0"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.1.0.tgz#6f1536eb43249f473abc6bd58ff983da1ca30d8d"
   integrity sha512-CI18flHDznR0lq54xBycOVmphdCYnQLKn8abKn7PXUiKUGdEd+/l9LWNJmugXel4hXq7S+RMNl34ecyC9TntWg==
