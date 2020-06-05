@@ -20,7 +20,7 @@ env:
   - ELASTICSEARCH_VERSION=7.2.1
 before_script:
   - curl -O https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-${ELASTICSEARCH_VERSION}-amd64.deb
-  - sudo dpkg -i --force-confnew elasticsearch-$ELASTICSEARCH_VERSION.deb
+  - sudo dpkg -i --force-confnew elasticsearch-${ELASTICSEARCH_VERSION}-amd64.deb
   - sudo service elasticsearch restart
   - sleep 10
 after_success:
