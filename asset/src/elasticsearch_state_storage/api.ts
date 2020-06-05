@@ -16,7 +16,7 @@ class ElasticsearchStateStorage extends OperationAPI {
             type: 'elasticsearch',
             cached: true
         });
-        // @ts-ignore TODO: fix discrepancies
+        // @ts-expect-error
         this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig);
     }
 

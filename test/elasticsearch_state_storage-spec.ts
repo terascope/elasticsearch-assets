@@ -104,10 +104,10 @@ describe('elasticsearch state storage api', () => {
         noopFoo = harness.getOperation(1);
         noopBar = harness.getOperation(2);
         const reader = harness.getOperation('test-reader');
-        // @ts-ignore
+        // @ts-expect-error
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-ignore
+        // @ts-expect-error
         reader.fetch = async (incDocs: DataEntity[]) => fn(incDocs.map(addTestMeta));
 
         noopFoo.onBatch = async (docs: DataEntity[]) => {

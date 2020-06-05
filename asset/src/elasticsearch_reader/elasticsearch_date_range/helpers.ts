@@ -3,7 +3,7 @@ import {
 } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
-// @ts-ignore
+// @ts-expect-error
 import dateMath from 'datemath-parser';
 
 import {
@@ -104,6 +104,7 @@ export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
 
 type RetryCb = (msg: string) => any
 
+// TODO: this migth be broken, there is no msg
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
     return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: string) => {

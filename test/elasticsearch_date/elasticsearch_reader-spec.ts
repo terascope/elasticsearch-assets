@@ -53,7 +53,7 @@ describe('elasticsearch_reader', () => {
     }
 
     async function getMeta(test: SlicerTestHarness) {
-        // @ts-ignore
+        // @ts-expect-error
         return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
     }
 
@@ -140,13 +140,13 @@ describe('elasticsearch_reader', () => {
             expect(() => geoPointValidation(null)).not.toThrowError();
             expect(() => validGeoDistance(null)).not.toThrowError();
             expect(() => geoSortOrder(null)).not.toThrowError();
-            // @ts-ignore
+
             expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
             expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
             expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
             expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitutde parameter, was given 185.2134, should be >= -180 and <= 180');
             expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
-            // @ts-ignore
+
             expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
             expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
             expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');

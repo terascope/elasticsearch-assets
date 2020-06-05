@@ -1,6 +1,6 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SearchParams } from 'elasticsearch';
-import { DataEntity, pDelay } from '@terascope/job-components';
+import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
+import { DataEntity, pDelay, AnyObject } from '@terascope/job-components';
 import path from 'path';
 import {
     makeClient, cleanupIndex, fetch, upload
@@ -11,12 +11,16 @@ import { INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces
 
 // TODO: current bug in convict prevents testing connection_map without a *
 // TODO: test flush scenarios/retries
-// TODO: any mutate tests ??
+
+interface ClientCalls {
+    [key: string]: BulkIndexDocumentsParams
+}
+
 describe('elasticsearch_bulk', () => {
     const assetDir = path.join(__dirname, '..');
     let harness: WorkerTestHarness;
     let clients: any;
-    let clientCalls: any = {};
+    let clientCalls: ClientCalls = {};
     const esClient = makeClient();
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
 
@@ -31,10 +35,9 @@ describe('elasticsearch_bulk', () => {
     function proxyClient(endpoint: string) {
         const client = makeClient();
         const bulkFn = esClient.bulk.bind(client);
-        client.bulk = (...args: any[]) => {
-            clientCalls[endpoint] = args;
-            // @ts-ignore
-            return bulkFn(...args);
+        client.bulk = (params: BulkIndexDocumentsParams) => {
+            clientCalls[endpoint] = params;
+            return bulkFn(params);
         };
 
         return client;
@@ -212,10 +215,10 @@ describe('elasticsearch_bulk', () => {
         const test = await makeTest({ opConfig, indexConfig, index });
 
         const reader = harness.getOperation('test-reader');
-        // @ts-ignore
+        // @ts-expect-error
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-ignore
+        // @ts-expect-error
         reader.fetch = async (_incDocs: DataEntity[]) => fn(data);
         const results = await test.runSlice(data);
 
@@ -279,26 +282,25 @@ describe('elasticsearch_bulk', () => {
         const test = await makeTest({ opConfig, indexConfig, index });
 
         const reader = harness.getOperation('test-reader');
-        // @ts-ignore
+        // @ts-expect-error
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-ignore
+        // @ts-expect-error
         reader.fetch = async (_incDocs: DataEntity[]) => fn(data);
 
         await test.runSlice(data);
 
         expect(clientCalls.default).toBeDefined();
         expect(clientCalls.otherConnection).toBeDefined();
-        const {
-            default: [
-                { body: [, doc1,, doc2] }
-            ],
-            otherConnection: [
-                { body: [, doc3] }
-            ]
-        } = clientCalls;
 
-        expect([doc1, doc2, doc3]).toEqual(data);
+        const docs: AnyObject[] = [];
+
+        for (const apiResult of Object.values(clientCalls)) {
+            const apiData = apiResult.body.filter((obj: AnyObject) => obj.index == null);
+            docs.push(...apiData);
+        }
+
+        expect(docs).toEqual(data);
 
         await pDelay(1000);
 
@@ -344,16 +346,14 @@ describe('elasticsearch_bulk', () => {
         const test = await makeTest({ opConfig, indexConfig, index });
 
         const reader = harness.getOperation('test-reader');
-        // @ts-ignore
+        // @ts-expect-error
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-ignore
+        // @ts-expect-error
         reader.fetch = async (_incDocs: DataEntity[]) => fn(data);
 
         await test.runSlice(data);
-        // const results = await test.runSlice(data);
-
-        const { default: [{ body }] } = clientCalls;
+        const { default: { body } } = clientCalls;
 
         const isAppended = body
             .filter((obj: any) => obj.index !== undefined)

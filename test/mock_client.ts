@@ -101,7 +101,7 @@ export default class MockClient {
         };
     }
 
-    async search(query: AnyObject) {
+    async search(query: AnyObject): Promise<AnyObject> {
         validateQuery(query);
         this.searchQuery = query;
         const { sequence } = this;
@@ -116,7 +116,7 @@ export default class MockClient {
         };
     }
 
-    setSequenceData(data: AnyObject[]) {
+    setSequenceData(data: AnyObject[]): void {
         this.sequence = data.map(
             (obj: any) => ({
                 _shards: { failed: 0 },
@@ -129,7 +129,7 @@ export default class MockClient {
     }
 
     // eslint-disable-next-line class-methods-use-this
-    async bulk(data: BulkData) {
+    async bulk(data: BulkData): Promise<BulkData> {
         validateBulk(data);
         return data;
     }

@@ -172,10 +172,10 @@ describe('elasticsearch index selector', () => {
 
         const test = await makeTest(opConfig);
         const reader = test.getOperation('test-reader');
-        // @ts-ignore
+        // @ts-expect-error
         const fn = reader.fetch.bind(reader);
         // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-ignore
+        // @ts-expect-error
         reader.fetch = async (incDocs: DataEntity[]) => fn(incDocs.map(addTestMeta));
         const results = await test.runSlice(data);
 

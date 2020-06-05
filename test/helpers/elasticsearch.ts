@@ -1,6 +1,6 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { DataEntity } from '@terascope/utils';
+import { DataEntity, AnyObject } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION } from './config';
 
@@ -15,7 +15,9 @@ export function makeClient(): Client {
     });
 }
 
-export function formatUploadData(index: string, data: any[], type?: string,) {
+export function formatUploadData(
+    index: string, data: any[], type?: string
+): AnyObject[] {
     const results: any[] = [];
 
     data.forEach((record) => {
@@ -31,7 +33,9 @@ export function formatUploadData(index: string, data: any[], type?: string,) {
     return results;
 }
 
-export async function upload(client: Client, _query: BulkIndexDocumentsParams, data: any[]) {
+export async function upload(
+    client: Client, _query: BulkIndexDocumentsParams, data: any[]
+): Promise<AnyObject> {
     const body = formatUploadData(_query.index as string, data, _query.type);
     const query = Object.assign({ refresh: 'wait_for', body }, _query);
     return client.bulk(query);
@@ -42,7 +46,7 @@ export async function populateIndex(
     index: string,
     fields: TypeConfigFields,
     records: any[]
-) {
+): Promise<void> {
     const overrides = {
         settings: {
             'index.number_of_shards': 1,
@@ -75,13 +79,17 @@ export async function populateIndex(
     });
 }
 
-export async function fetch(client: Client, query: SearchParams, fullRequest = false) {
+export async function fetch(
+    client: Client, query: SearchParams, fullRequest = false
+): Promise<(AnyObject[] | AnyObject)> {
     const results = await client.search(query);
     if (!fullRequest) return results.hits.hits.map((obj) => obj._source);
     return results;
 }
 
-export async function cleanupIndex(client: Client, index: string, template?: string) {
+export async function cleanupIndex(
+    client: Client, index: string, template?: string
+): Promise<void> {
     await client.indices
         .delete({
             index,

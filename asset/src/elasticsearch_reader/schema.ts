@@ -3,7 +3,7 @@ import {
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
-// @ts-ignore
+// @ts-expect-error
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
 import { dateOptions } from './elasticsearch_date_range/helpers';

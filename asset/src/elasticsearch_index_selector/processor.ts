@@ -91,7 +91,7 @@ export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig>
             if (this.opConfig.update_fields.length > 0) {
                 update.doc = {};
                 this.opConfig.update_fields.forEach((field) => {
-                    // @ts-ignore
+                    // @ts-expect-error
                     update.doc[field] = record[field];
                 });
             } else if (this.opConfig.script_file || this.opConfig.script) {
@@ -110,7 +110,7 @@ export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig>
                 set(update, 'script.params', {});
                 for (const [key, field] of Object.entries(this.opConfig.script_params)) {
                     if (record[field]) {
-                        // @ts-ignore
+                    // @ts-expect-error
                         update.script.params[key] = record[field];
                     }
                 }

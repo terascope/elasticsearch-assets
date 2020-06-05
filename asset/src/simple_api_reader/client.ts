@@ -1,4 +1,6 @@
-import { Logger, TSError, get } from '@terascope/job-components';
+import {
+    Logger, TSError, get, AnyObject
+} from '@terascope/job-components';
 import got from 'got';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 
@@ -16,7 +18,7 @@ export default class ApiClient {
         this.logger = logger;
     }
 
-    async makeRequest(uri: string, query: string) {
+    async makeRequest(uri: string, query: string): Promise<AnyObject> {
         try {
             const { body } = await got(uri, {
                 query,
