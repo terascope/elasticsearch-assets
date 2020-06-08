@@ -28,7 +28,7 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@terascope/elasticsearch-api": "^2.9.1",
+        "@terascope/elasticsearch-api": "^2.9.4",
         "@terascope/eslint-config": "^0.4.0",
         "@terascope/job-components": "^0.34.2",
         "@types/bluebird": "^3.5.32",
