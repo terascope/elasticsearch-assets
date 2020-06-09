@@ -1,6 +1,6 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { DataEntity, AnyObject } from '@terascope/utils';
+import { DataEntity, AnyObject, isNil } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION } from './config';
 
@@ -16,12 +16,16 @@ export function makeClient(): Client {
 }
 
 export function formatUploadData(
-    index: string, data: any[], type?: string
+    index: string, version:number, data: any[], type?: string
 ): AnyObject[] {
     const results: any[] = [];
 
     data.forEach((record) => {
-        const meta: any = { _index: index, _type: type };
+        const meta: any = { _index: index };
+        if (version === 6) {
+            if (isNil(type)) throw new Error('type must be provided is elasticsearch is version 6');
+            meta._type = type;
+        }
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -36,7 +40,7 @@ export function formatUploadData(
 export async function upload(
     client: Client, _query: BulkIndexDocumentsParams, data: any[]
 ): Promise<AnyObject> {
-    const body = formatUploadData(_query.index as string, data, _query.type);
+    const body = formatUploadData(_query.index as string, getESVersion(client), data, _query.type);
     const query = Object.assign({ refresh: 'wait_for', body }, _query);
     return client.bulk(query);
 }
@@ -69,9 +73,9 @@ export async function populateIndex(
             false
         )
     );
-    const body = formatUploadData(index, records, 'events');
+    const body = formatUploadData(index, version, records, 'events');
 
-    return client.bulk({
+    await client.bulk({
         index,
         type: 'events',
         body,

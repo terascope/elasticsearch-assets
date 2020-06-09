@@ -59,7 +59,7 @@ export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig>
 
         if (this.opConfig.type) meta._type = this.opConfig.type;
 
-        if (this.opConfig.preserve_id) meta._id = record.getKey();
+        if (this.opConfig.preserve_id || this.opConfig.delete) meta._id = record.getKey();
 
         if (this.opConfig.id_field) meta._id = record[this.opConfig.id_field];
 

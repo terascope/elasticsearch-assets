@@ -9,22 +9,14 @@ import {
     DataEntity,
     AnyObject,
     has,
-    flatten,
-    TSError,
-    isNotNil,
-    isNil
+    TSError
 } from '@terascope/utils';
-import {
-    MUTATE_META,
-    INDEX_META,
-    IndexSpec,
-    UpdateConfig
-} from '../elasticsearch_index_selector/interfaces';
+import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
 import { BulkSender } from './interfaces';
 
 interface Endpoint {
-    client: elasticApi.Client;
-    data: any[];
+    client: ElasticsearchSender;
+    data: DataEntity[];
 }
 
 interface BulkContexts {
@@ -35,7 +27,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     limit: number;
     bulkContexts: BulkContexts = {};
     isMultisend: boolean;
-    client: elasticApi.Client;
+    client: ElasticsearchSender;
     multisendIndexAppend: boolean;
 
     constructor(context: WorkerContext, opConfig: BulkSender, exConfig: ExecutionConfig) {
@@ -72,35 +64,8 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     private _createClient(config: AnyObject = this.opConfig) {
         const client = getClient(this.context, config, 'elasticsearch');
         if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${this.opConfig.connection}`);
-        return elasticApi(client, this.logger, this.opConfig);
-    }
-
-    private _recursiveSend(client: elasticApi.Client, dataArray: any[]) {
-        const slicedData = splitArray(dataArray, this.limit)
-            .map((data: any) => client.bulkSend(data));
-        return Promise.all(slicedData);
-    }
-
-    private _formatData(input: DataEntity[]) {
-        const results: any[] = [];
-
-        input.forEach((record) => {
-            const indexingMeta = record.getMetadata(INDEX_META) as IndexSpec;
-            if (isNotNil(indexingMeta)) {
-                results.push(indexingMeta);
-                if (isNil(indexingMeta.delete)) {
-                    const mutateMeta = record.getMetadata(MUTATE_META) as UpdateConfig;
-
-                    if (isNotNil(mutateMeta)) {
-                        results.push(mutateMeta);
-                    } else {
-                        results.push(record);
-                    }
-                }
-            }
-        });
-
-        return results;
+        const esClient = elasticApi(client, this.logger, this.opConfig);
+        return new ElasticsearchSender(esClient, config as any);
     }
 
     private async multiSend(data: any[]) {
@@ -152,11 +117,11 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
         for (const [, { data: dataList, client }] of Object.entries(this.bulkContexts)) {
             if (dataList.length > 0) {
-                senders.push(this._recursiveSend(client, dataList));
+                senders.push(client.send(dataList));
             }
         }
-        const results = await Promise.all(senders);
-        return flatten(results);
+
+        await Promise.all(senders);
     }
 
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
@@ -165,26 +130,16 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
             return data;
         }
 
-        const formattedData = this._formatData(data);
-
         if (this.isMultisend) {
+            const formattedData = this.client.formatBulkData(data);
             await this.multiSend(formattedData);
         } else {
-            await this._recursiveSend(this.client, formattedData);
+            console.log('what is client', this.client)
+            await this.client.send(data);
         }
 
         return data;
     }
-}
-
-// TODO: better types
-function isMeta(meta: AnyObject) {
-    if (meta.index) return { type: 'index', realMeta: meta.index };
-    if (meta.create) return { type: 'create', realMeta: meta.create };
-    if (meta.update) return { type: 'update', realMeta: meta.update };
-    if (meta.delete) return { type: 'delete', realMeta: meta.delete };
-
-    return false;
 }
 
 function extractMeta(meta: AnyObject) {
@@ -194,27 +149,4 @@ function extractMeta(meta: AnyObject) {
     if (meta.delete) return meta.delete;
 
     throw new TSError('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
-}
-
-// TODO: splicing has bad performance, need to refactor this
-function splitArray(dataArray: AnyObject[], splitLimit: number) {
-    const docLimit = splitLimit * 2;
-
-    if (dataArray.length > docLimit) {
-        const splitResults = [];
-
-        while (dataArray.length) {
-            const end = dataArray.length - 1 > docLimit ? docLimit : dataArray.length - 1;
-            const isMetaData = isMeta(dataArray[end]);
-            if (isMetaData && isMetaData.type !== 'delete') {
-                splitResults.push(dataArray.splice(0, end));
-            } else {
-                splitResults.push(dataArray.splice(0, end + 1));
-            }
-        }
-
-        return splitResults;
-    }
-
-    return [dataArray];
 }

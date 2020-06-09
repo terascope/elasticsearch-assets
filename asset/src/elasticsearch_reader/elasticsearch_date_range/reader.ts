@@ -26,7 +26,9 @@ export default class DateReader extends Fetcher<ESDateConfig> {
 
     async fetch(slice: SliceRequest): Promise<DataEntity[]> {
         const query = this.api.buildQuery(this.apiConfig, slice);
+        this.logger.info('what is query', JSON.stringify(query, null, 4))
         const results = await this.api.search(query);
+        this.logger.info('results', results)
         // TODO: better typeing of doc
         return results.hits.hits.map((doc: any) => {
             const now = Date.now();

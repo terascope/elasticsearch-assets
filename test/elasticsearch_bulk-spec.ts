@@ -95,7 +95,7 @@ describe('elasticsearch_bulk', () => {
         return harness;
     }
 
-    it('schema has defaults', async () => {
+    fit('schema has defaults', async () => {
         const opName = 'elasticsearch_bulk';
         const test = await makeTest();
         const { opConfig: { multisend, size } } = test.getOperation(opName);

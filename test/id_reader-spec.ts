@@ -29,7 +29,7 @@ describe('id_reader', () => {
     });
 
     afterAll(async () => {
-        await cleanupIndex(esClient, makeIndex('*'));
+        // await cleanupIndex(esClient, makeIndex('*'));
     });
 
     beforeEach(() => {
@@ -77,7 +77,7 @@ describe('id_reader', () => {
         return harness;
     }
 
-    it('can fetch all even-data', async () => {
+    fit('can fetch all even-data', async () => {
         const field = 'uuid';
 
         const opConfig = {
@@ -89,7 +89,7 @@ describe('id_reader', () => {
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
         const sliceResults = await test.runToCompletion();
-
+        console.log('sliceResults', sliceResults)
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
