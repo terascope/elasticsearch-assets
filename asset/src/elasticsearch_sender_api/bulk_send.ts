@@ -18,7 +18,7 @@ export default class ElasticsearchSender implements SenderApi {
 
     constructor(client: elasticApi.Client, config: SenderConfig) {
         const { size } = config;
-        if (!isNumber(size)) throw new Error(`Invalid size concurrency, expected number, got ${getTypeOf(size)}`);
+        if (!isNumber(size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(size)}`);
         this.client = client;
         // @ts-expect-error TODO: this will go away when lib is updated
         this.clientVersion = client.getESVersion();

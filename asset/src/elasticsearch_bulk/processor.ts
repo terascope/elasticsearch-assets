@@ -13,6 +13,7 @@ import {
 } from '@terascope/utils';
 import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
 import { BulkSender } from './interfaces';
+import { SenderConfig } from '../elasticsearch_sender_api/interfaces';
 
 interface Endpoint {
     client: ElasticsearchSender;
@@ -61,11 +62,14 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         }
     }
 
-    private _createClient(config: AnyObject = this.opConfig) {
-        const client = getClient(this.context, config, 'elasticsearch');
-        if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${this.opConfig.connection}`);
-        const esClient = elasticApi(client, this.logger, this.opConfig);
-        return new ElasticsearchSender(esClient, config as any);
+    private _createClient(config: AnyObject = {}) {
+        const clientConfig = Object.assign({}, this.opConfig, config);
+        const client = getClient(this.context, clientConfig, 'elasticsearch');
+
+        if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${clientConfig.connection}`);
+
+        const esClient = elasticApi(client, this.logger, clientConfig);
+        return new ElasticsearchSender(esClient, clientConfig as any);
     }
 
     private async multiSend(data: any[]) {
@@ -134,7 +138,6 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
             const formattedData = this.client.formatBulkData(data);
             await this.multiSend(formattedData);
         } else {
-            console.log('what is client', this.client)
             await this.client.send(data);
         }
 

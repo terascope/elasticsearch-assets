@@ -116,7 +116,6 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
             try {
                 const results = await determineKeySlice(gen, closePath, dateRange);
                 closePath = true;
-                console.log('what key stuff', results)
                 return results;
             } catch (err) {
                 const error = new TSError(err, {

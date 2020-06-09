@@ -1,4 +1,6 @@
-import { debugLogger, AnyObject, DataEntity, pDelay } from '@terascope/utils';
+import {
+    debugLogger, AnyObject, DataEntity, pDelay
+} from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import elasticApi from '@terascope/elasticsearch-api';
 import { makeClient, cleanupIndex, fetch } from '../helpers/elasticsearch';
