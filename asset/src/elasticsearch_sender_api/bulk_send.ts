@@ -1,8 +1,8 @@
+import { RouteSenderAPI } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import {
     isNumber, getTypeOf, DataEntity, isNotNil, isNil, AnyObject
 } from '@terascope/utils';
-import { SenderApi } from '@terascope/types';
 import { SenderConfig } from './interfaces';
 import {
     MUTATE_META,
@@ -11,7 +11,7 @@ import {
     UpdateConfig
 } from '../elasticsearch_index_selector/interfaces';
 
-export default class ElasticsearchSender implements SenderApi {
+export default class ElasticsearchSender implements RouteSenderAPI {
     client: elasticApi.Client;
     size: number;
     clientVersion: number;
@@ -20,7 +20,6 @@ export default class ElasticsearchSender implements SenderApi {
         const { size } = config;
         if (!isNumber(size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(size)}`);
         this.client = client;
-        // @ts-expect-error TODO: this will go away when lib is updated
         this.clientVersion = client.getESVersion();
         this.size = size;
     }

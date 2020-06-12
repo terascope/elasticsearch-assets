@@ -1,10 +1,10 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { DataEntity, pDelay, AnyObject } from '@terascope/job-components';
+import { DataEntity, AnyObject, pDelay } from '@terascope/job-components';
 import path from 'path';
 import {
-    makeClient, cleanupIndex, fetch, upload
-} from './helpers/elasticsearch';
+    makeClient, cleanupIndex, fetch, upload, waitForData
+} from './helpers';
 import { TEST_INDEX_PREFIX } from './helpers/config';
 
 import { INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces';
@@ -23,6 +23,7 @@ describe('elasticsearch_bulk', () => {
     let clientCalls: ClientCalls = {};
     const esClient = makeClient();
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
+    let testIndex = '';
 
     beforeAll(async () => {
         await cleanupIndex(esClient, `${bulkIndex}*`);
@@ -44,6 +45,7 @@ describe('elasticsearch_bulk', () => {
     }
 
     beforeEach(() => {
+        testIndex = '';
         clientCalls = {};
         clients = [
             {
@@ -68,7 +70,7 @@ describe('elasticsearch_bulk', () => {
     });
 
     async function makeTest({ opConfig = {}, indexConfig = {}, index = '' } = {}) {
-        const testIndex = index ? `${bulkIndex}${index}` : bulkIndex;
+        testIndex = index ? `${bulkIndex}${index}` : bulkIndex;
         const indexSelctorConfig = Object.assign({
             _op: 'elasticsearch_index_selector',
             index: testIndex,
@@ -151,7 +153,7 @@ describe('elasticsearch_bulk', () => {
         expect(Array.isArray(results)).toEqual(true);
         expect(results).toEqual(data);
 
-        await pDelay(1000);
+        await waitForData(esClient, testIndex, data.length);
 
         const fetchedData = await fetch(esClient, query);
 
@@ -180,7 +182,7 @@ describe('elasticsearch_bulk', () => {
         expect(Array.isArray(results)).toEqual(true);
         expect(results).toEqual(data);
 
-        await pDelay(1000);
+        await waitForData(esClient, testIndex, data.length);
 
         const fetchedData = await fetch(esClient, query);
 
@@ -217,7 +219,6 @@ describe('elasticsearch_bulk', () => {
         const reader = harness.getOperation('test-reader');
         // @ts-expect-error
         const fn = reader.fetch.bind(reader);
-        // NOTE: we do not have a good story around added meta data to testing data
         // @ts-expect-error
         reader.fetch = async (_incDocs: DataEntity[]) => fn(data);
         const results = await test.runSlice(data);

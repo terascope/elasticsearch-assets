@@ -22,7 +22,12 @@ export default class Schema extends ConvictSchema<SenderConfig> {
                 doc: 'Name of the elasticsearch connection to use when sending data.',
                 default: 'default',
                 format: 'optional_String'
-            }
+            },
+            full_response: {
+                doc: 'Set to true if want the full elasticsearch response back',
+                default: false,
+                format: Boolean
+            },
         };
     }
 }

@@ -13,7 +13,6 @@ import {
 } from '@terascope/utils';
 import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
 import { BulkSender } from './interfaces';
-import { SenderConfig } from '../elasticsearch_sender_api/interfaces';
 
 interface Endpoint {
     client: ElasticsearchSender;

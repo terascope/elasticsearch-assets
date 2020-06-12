@@ -1,10 +1,8 @@
-import {
-    debugLogger, AnyObject, DataEntity, pDelay
-} from '@terascope/utils';
+import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import elasticApi from '@terascope/elasticsearch-api';
 import { makeClient, cleanupIndex, fetch } from '../helpers/elasticsearch';
-import { TEST_INDEX_PREFIX } from '../helpers/config';
+import { TEST_INDEX_PREFIX, waitForData } from '../helpers';
 import Sender from '../../asset/src/elasticsearch_sender_api/bulk_send';
 
 describe('elasticsearch bulk sender module', () => {
@@ -268,7 +266,7 @@ describe('elasticsearch bulk sender module', () => {
 
             await sender.send(annotatedData);
 
-            await pDelay(1000);
+            await waitForData(client, senderIndex, 2);
 
             const query = {
                 index: senderIndex,

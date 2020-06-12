@@ -1,8 +1,13 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { DataEntity, AnyObject, isNil } from '@terascope/utils';
+import {
+    DataEntity, AnyObject, isNil, debugLogger, pDelay
+} from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
+import elasticApi from '@terascope/elasticsearch-api';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION } from './config';
+
+const logger = debugLogger('elasticsearch_helpers');
 
 // automatically set the timeout to 10s when using elasticsearch
 jest.setTimeout(10000);
@@ -38,10 +43,12 @@ export function formatUploadData(
 }
 
 export async function upload(
-    client: Client, _query: BulkIndexDocumentsParams, data: any[]
+    client: Client, queryBody: BulkIndexDocumentsParams, data: any[]
 ): Promise<AnyObject> {
-    const body = formatUploadData(_query.index as string, getESVersion(client), data, _query.type);
-    const query = Object.assign({ refresh: 'wait_for', body }, _query);
+    const body = formatUploadData(
+        queryBody.index as string, getESVersion(client), data, queryBody.type
+    );
+    const query = Object.assign({ refresh: 'wait_for', body }, queryBody);
     return client.bulk(query);
 }
 
@@ -86,9 +93,33 @@ export async function populateIndex(
 export async function fetch(
     client: Client, query: SearchParams, fullRequest = false
 ): Promise<(AnyObject[] | AnyObject)> {
-    const results = await client.search(query);
-    if (!fullRequest) return results.hits.hits.map((obj) => obj._source);
+    const esClient = elasticApi(client, logger, { full_response: fullRequest });
+    const results = await esClient.search(query);
     return results;
+}
+
+export async function waitForData(
+    client: Client, index: string, count: number, timeout = 5000
+): Promise<void> {
+    const esClient = elasticApi(client, logger);
+    const failTestTime = Date.now() + timeout;
+
+    return new Promise((resolve, reject) => {
+        async function checkIndex() {
+            if (failTestTime <= Date.now()) reject(new Error('Could not find count in alloated time'));
+            await pDelay(100);
+            try {
+                const indexCount = await esClient.count({ index, q: '*' });
+                if (count === indexCount) resolve();
+            } catch (err) {
+                reject(err);
+            }
+
+            checkIndex();
+        }
+
+        checkIndex();
+    });
 }
 
 export async function cleanupIndex(
