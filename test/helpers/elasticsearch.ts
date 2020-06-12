@@ -5,7 +5,7 @@ import {
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import elasticApi from '@terascope/elasticsearch-api';
-import { ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION } from './config';
+import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
 
 const logger = debugLogger('elasticsearch_helpers');
 
@@ -13,10 +13,12 @@ const logger = debugLogger('elasticsearch_helpers');
 jest.setTimeout(10000);
 
 export function makeClient(): Client {
+    let apiVersion = ELASTICSEARCH_VERSION;
+    if (apiVersion.charAt(0) === '7') apiVersion = '7.x';
     return new Client({
         host: ELASTICSEARCH_HOST,
         log: 'error',
-        apiVersion: ELASTICSEARCH_API_VERSION,
+        apiVersion,
     });
 }
 
