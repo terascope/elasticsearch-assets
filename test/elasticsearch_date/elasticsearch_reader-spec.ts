@@ -14,7 +14,6 @@ import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslic
 import MockClient from '../mock_client';
 import Schema from '../../asset/src/elasticsearch_reader/schema';
 import { IDType } from '../../asset/src/id_reader/interfaces';
-// @ts-ignore TODO: fixme:
 import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 
 describe('elasticsearch_reader', () => {
@@ -54,7 +53,7 @@ describe('elasticsearch_reader', () => {
     }
 
     async function getMeta(test: SlicerTestHarness) {
-        // @ts-ignore
+        // @ts-expect-error
         return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
     }
 
@@ -141,13 +140,13 @@ describe('elasticsearch_reader', () => {
             expect(() => geoPointValidation(null)).not.toThrowError();
             expect(() => validGeoDistance(null)).not.toThrowError();
             expect(() => geoSortOrder(null)).not.toThrowError();
-            // @ts-ignore
+
             expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
             expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
             expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
             expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitutde parameter, was given 185.2134, should be >= -180 and <= 180');
             expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
-            // @ts-ignore
+
             expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
             expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
             expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');
@@ -405,9 +404,9 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig });
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(results.end).toEqual(closingDate.format());
-            expect(results.count).toEqual(100);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(results?.end).toEqual(closingDate.format());
+            expect(results?.count).toEqual(100);
 
             const [results2] = await test.createSlices();
             expect(results2).toEqual(null);
@@ -434,12 +433,12 @@ describe('elasticsearch_reader', () => {
 
             expect(results).toBeDefined();
 
-            expect(results.start).toBeDefined();
-            expect(results.end).toBeDefined();
-            expect(results.count).toBeDefined();
+            expect(results?.start).toBeDefined();
+            expect(results?.end).toBeDefined();
+            expect(results?.count).toBeDefined();
 
             const now1 = makeDate(dateFormat);
-            expect(moment(results.end).isBetween(delayedBoundary, now1)).toEqual(true);
+            expect(moment(results?.end).isBetween(delayedBoundary, now1)).toEqual(true);
 
             const [results2] = await test.createSlices();
 
@@ -450,9 +449,9 @@ describe('elasticsearch_reader', () => {
             const [results3] = await test.createSlices();
 
             expect(results3).toBeDefined();
-            expect(results3.start).toBeDefined();
-            expect(results3.end).toBeDefined();
-            expect(results3.count).toBeDefined();
+            expect(results3?.start).toBeDefined();
+            expect(results3?.end).toBeDefined();
+            expect(results3?.count).toBeDefined();
 
             const [results4] = await test.createSlices();
             expect(results4).toEqual(null);
@@ -484,8 +483,8 @@ describe('elasticsearch_reader', () => {
 
             expect(results).not.toEqual(null);
             expect(results2).not.toEqual(null);
-            expect(results.limit).toEqual(results2.start);
-            expect(moment(results2.limit).diff(results.start)).toEqual(200);
+            expect(results?.limit).toEqual(results2?.start);
+            expect(moment(results2?.limit).diff(results?.start)).toEqual(200);
 
             const [results3, results4] = await test.createSlices();
 
@@ -498,9 +497,9 @@ describe('elasticsearch_reader', () => {
 
             expect(results5).not.toEqual(null);
             expect(results6).not.toEqual(null);
-            expect(results5.limit).toEqual(results6.start);
-            expect(results5.start).toEqual(results2.limit);
-            expect(moment(results6.limit).diff(results5.start)).toEqual(200);
+            expect(results5?.limit).toEqual(results6?.start);
+            expect(results5?.start).toEqual(results2?.limit);
+            expect(moment(results6?.limit).diff(results5?.start)).toEqual(200);
 
             const [results7, results8] = await test.createSlices();
 
@@ -529,9 +528,9 @@ describe('elasticsearch_reader', () => {
 
             const [results] = await test.createSlices();
             expect(results).toBeDefined();
-            expect(results.start).toBeDefined();
-            expect(results.end).toBeDefined();
-            expect(results.count).toBeDefined();
+            expect(results?.start).toBeDefined();
+            expect(results?.end).toBeDefined();
+            expect(results?.count).toBeDefined();
 
             const [results2] = await test.createSlices();
             expect(results2).toEqual(null);
@@ -543,9 +542,9 @@ describe('elasticsearch_reader', () => {
 
             const [results4] = await test.createSlices();
             expect(results4).toBeDefined();
-            expect(results4.start).toBeDefined();
-            expect(results4.end).toBeDefined();
-            expect(results4.count).toBeDefined();
+            expect(results4?.start).toBeDefined();
+            expect(results4?.end).toBeDefined();
+            expect(results4?.count).toBeDefined();
 
             const [results5] = await test.createSlices();
             expect(results5).toEqual(null);
@@ -557,9 +556,9 @@ describe('elasticsearch_reader', () => {
 
             const [results7] = await test.createSlices();
             expect(results7).toBeDefined();
-            expect(results7.start).toBeDefined();
-            expect(results7.end).toBeDefined();
-            expect(results7.count).toBeDefined();
+            expect(results7?.start).toBeDefined();
+            expect(results7?.end).toBeDefined();
+            expect(results7?.count).toBeDefined();
 
             const [results8] = await test.createSlices();
             expect(results8).toEqual(null);
@@ -596,12 +595,12 @@ describe('elasticsearch_reader', () => {
 
             expect(results).toBeDefined();
 
-            expect(results.start).toBeDefined();
-            expect(results.end).toBeDefined();
-            expect(results.count).toBeDefined();
+            expect(results?.start).toBeDefined();
+            expect(results?.end).toBeDefined();
+            expect(results?.count).toBeDefined();
 
             const now1 = makeDate(dateFormat);
-            expect(moment(results.end).isBetween(delayedBoundary, now1)).toEqual(true);
+            expect(moment(results?.end).isBetween(delayedBoundary, now1)).toEqual(true);
 
             const [results2] = await test.createSlices();
 
@@ -612,9 +611,9 @@ describe('elasticsearch_reader', () => {
             const [results3] = await test.createSlices();
 
             expect(results3).toBeDefined();
-            expect(results3.start).toBeDefined();
-            expect(results3.end).toBeDefined();
-            expect(results3.count).toBeDefined();
+            expect(results3?.start).toBeDefined();
+            expect(results3?.end).toBeDefined();
+            expect(results3?.count).toBeDefined();
 
             const [results4] = await test.createSlices();
             expect(results4).toEqual(null);
@@ -663,16 +662,16 @@ describe('elasticsearch_reader', () => {
 
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(results.end).toEqual(middleDate.format());
-            expect(results.count).toEqual(50);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(results?.end).toEqual(middleDate.format());
+            expect(results?.count).toEqual(50);
 
             const [results2] = await test.createSlices();
 
             expect(hasRecursed).toEqual(true);
-            expect(results2.start).toEqual(middleDate.format());
-            expect(results2.end).toEqual(closingDate.format());
-            expect(results2.count).toEqual(50);
+            expect(results2?.start).toEqual(middleDate.format());
+            expect(results2?.end).toEqual(closingDate.format());
+            expect(results2?.count).toEqual(50);
 
             const results3 = await test.createSlices();
             expect(results3).toEqual([null]);
@@ -716,16 +715,16 @@ describe('elasticsearch_reader', () => {
             });
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(results.end).toEqual(endDate.format());
-            expect(results.count).toEqual(100);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(results?.end).toEqual(endDate.format());
+            expect(results?.count).toEqual(100);
 
             const [results2] = await test.createSlices();
 
             expect(hasExpanded).toEqual(true);
-            expect(results2.start).toEqual(endDate.format());
-            expect(results2.end).toEqual(closingDate.format());
-            expect(results2.count).toEqual(100);
+            expect(results2?.start).toEqual(endDate.format());
+            expect(results2?.end).toEqual(closingDate.format());
+            expect(results2?.count).toEqual(100);
 
             const results3 = await test.createSlices();
             expect(results3).toEqual([null]);
@@ -768,9 +767,9 @@ describe('elasticsearch_reader', () => {
             });
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(results.end).toEqual(closingDate.format());
-            expect(results.count).toEqual(0);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(results?.end).toEqual(closingDate.format());
+            expect(results?.count).toEqual(0);
 
             expect(hasExpanded).toEqual(true);
 
@@ -813,15 +812,15 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig, eventHook });
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(moment(results.end).isBetween(middleDate, endDate)).toEqual(true);
-            expect(results.count).toEqual(100);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(moment(results?.end).isBetween(middleDate, endDate)).toEqual(true);
+            expect(results?.count).toEqual(100);
 
             const [results2] = await test.createSlices();
             expect(hasExpanded).toEqual(true);
-            expect(moment(results2.start).isBetween(middleDate, endDate)).toEqual(true);
-            expect(results2.end).toEqual(closingDate.format());
-            expect(results2.count).toEqual(100);
+            expect(moment(results2?.start).isBetween(middleDate, endDate)).toEqual(true);
+            expect(results2?.end).toEqual(closingDate.format());
+            expect(results2?.count).toEqual(100);
 
             const results3 = await test.createSlices();
             expect(results3).toEqual([null]);
@@ -866,22 +865,22 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig, eventHook });
             const [results] = await test.createSlices();
 
-            expect(results.start).toEqual(firstDate.format());
-            expect(moment(results.end).isBetween(firstDate, midDate)).toEqual(true);
-            expect(results.count).toEqual(100);
+            expect(results?.start).toEqual(firstDate.format());
+            expect(moment(results?.end).isBetween(firstDate, midDate)).toEqual(true);
+            expect(results?.count).toEqual(100);
 
             const [results2] = await test.createSlices();
 
-            expect(moment(results2.end).isBetween(midDate, endDate)).toEqual(true);
+            expect(moment(results2?.end).isBetween(midDate, endDate)).toEqual(true);
             expect(hasExpanded).toEqual(true);
-            expect(results2.count).toEqual(100);
+            expect(results2?.count).toEqual(100);
 
             const [results3] = await test.createSlices();
 
-            expect(moment(results3.end).isBetween(midDate, endDate)).toEqual(true);
+            expect(moment(results3?.end).isBetween(midDate, endDate)).toEqual(true);
 
             const [results4] = await test.createSlices();
-            expect(results4.end).toEqual(closingDate.format());
+            expect(results4?.end).toEqual(closingDate.format());
 
             const results5 = await test.createSlices();
             expect(results5).toEqual([null]);
@@ -913,9 +912,9 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig });
             const [resultsS] = await test.createSlices();
 
-            expect(resultsS.start).toEqual(firstDateS.format());
-            expect(resultsS.end).toEqual(closingDateS.format());
-            expect(resultsS.count).toEqual(100);
+            expect(resultsS?.start).toEqual(firstDateS.format());
+            expect(resultsS?.end).toEqual(closingDateS.format());
+            expect(resultsS?.count).toEqual(100);
         });
 
         it('slicer can will recurse down to smallest factor using "ms" format', async () => {
@@ -945,12 +944,12 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig });
             const [resultsMS] = await test.createSlices();
 
-            const startMsIsSame = moment(resultsMS.start).isSame(moment(firstDateMS));
-            const endMsIsSame = moment(resultsMS.end).isSame(moment(closingDateMS));
+            const startMsIsSame = moment(resultsMS?.start).isSame(moment(firstDateMS));
+            const endMsIsSame = moment(resultsMS?.end).isSame(moment(closingDateMS));
 
             expect(startMsIsSame).toEqual(true);
             expect(endMsIsSame).toEqual(true);
-            expect(resultsMS.count).toEqual(100);
+            expect(resultsMS?.count).toEqual(100);
         });
 
         it('slicer can will recurse down to smallest factor and subslice by key', async () => {
@@ -991,7 +990,7 @@ describe('elasticsearch_reader', () => {
             const results = await test.createSlices();
 
             hexadecimal.forEach((char) => {
-                const subslice = results.find((s) => s.wildcard.value === `${char}*`);
+                const subslice = results.find((s) => s?.wildcard?.value === `${char}*`);
                 expect(subslice).not.toBeUndefined();
                 expect(subslice!.start === firstDate.format()).toEqual(true);
                 expect(subslice!.end === closingDate.format()).toEqual(true);
@@ -1296,25 +1295,25 @@ describe('elasticsearch_reader', () => {
             const [results, results2, results3, results4, results5] = await test.createSlices();
 
             expect(results).toEqual(expectedSlice1);
-            expect(moment(results.start).isSame(expectedSlice1.start)).toBeTrue();
-            expect(moment(results.end).isSame(moment(expectedSlice1.end))).toBeTrue();
-            expect(moment(results.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
+            expect(moment(results?.start).isSame(expectedSlice1.start)).toBeTrue();
+            expect(moment(results?.end).isSame(moment(expectedSlice1.end))).toBeTrue();
+            expect(moment(results?.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
 
-            expect(moment(results2.start).isSame(expectedSlice2.start)).toBeTrue();
-            expect(moment(results2.end).isSame(moment(expectedSlice2.end))).toBeTrue();
-            expect(moment(results2.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
+            expect(moment(results2?.start).isSame(expectedSlice2.start)).toBeTrue();
+            expect(moment(results2?.end).isSame(moment(expectedSlice2.end))).toBeTrue();
+            expect(moment(results2?.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
 
-            expect(moment(results3.start).isSame(expectedSlice3.start)).toBeTrue();
-            expect(moment(results3.end).isSame(moment(expectedSlice3.end))).toBeTrue();
-            expect(moment(results3.limit).isSame(moment(expectedSlice3.limit))).toBeTrue();
+            expect(moment(results3?.start).isSame(expectedSlice3.start)).toBeTrue();
+            expect(moment(results3?.end).isSame(moment(expectedSlice3.end))).toBeTrue();
+            expect(moment(results3?.limit).isSame(moment(expectedSlice3.limit))).toBeTrue();
 
-            expect(moment(results4.start).isSame(expectedSlice4.start)).toBeTrue();
-            expect(moment(results4.end).isSame(moment(expectedSlice4.end))).toBeTrue();
-            expect(moment(results4.limit).isSame(moment(expectedSlice4.limit))).toBeTrue();
+            expect(moment(results4?.start).isSame(expectedSlice4.start)).toBeTrue();
+            expect(moment(results4?.end).isSame(moment(expectedSlice4.end))).toBeTrue();
+            expect(moment(results4?.limit).isSame(moment(expectedSlice4.limit))).toBeTrue();
 
-            expect(moment(results5.start).isSame(expectedSlice5.start)).toBeTrue();
-            expect(moment(results5.end).isSame(moment(expectedSlice5.end))).toBeTrue();
-            expect(moment(results5.limit).isSame(moment(expectedSlice5.limit))).toBeTrue();
+            expect(moment(results5?.start).isSame(expectedSlice5.start)).toBeTrue();
+            expect(moment(results5?.end).isSame(moment(expectedSlice5.end))).toBeTrue();
+            expect(moment(results5?.limit).isSame(moment(expectedSlice5.limit))).toBeTrue();
 
             const [results6] = await test.createSlices();
             expect(results6).toEqual(null);
@@ -1432,26 +1431,26 @@ describe('elasticsearch_reader', () => {
 
             const [results] = await test.createSlices();
 
-            expect(moment(results.start).isSame(expectedSlice1.start)).toBeTrue();
-            expect(moment(results.end).isSame(moment(expectedSlice1.end))).toBeTrue();
-            expect(moment(results.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
+            expect(moment(results?.start).isSame(expectedSlice1.start)).toBeTrue();
+            expect(moment(results?.end).isSame(moment(expectedSlice1.end))).toBeTrue();
+            expect(moment(results?.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
             expect(
-                moment(results.holes[0].start).isSame(moment(expectedSlice1.holes[0].start))
+                moment(results?.holes[0].start).isSame(moment(expectedSlice1.holes[0].start))
             ).toBeTrue();
             expect(
-                moment(results.holes[0].end).isSame(moment(expectedSlice1.holes[0].end))
+                moment(results?.holes[0].end).isSame(moment(expectedSlice1.holes[0].end))
             ).toBeTrue();
 
             const [results2] = await test.createSlices();
 
-            expect(moment(results2.start).isSame(expectedSlice2.start)).toBeTrue();
-            expect(moment(results2.end).isSame(moment(expectedSlice2.end))).toBeTrue();
-            expect(moment(results2.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
+            expect(moment(results2?.start).isSame(expectedSlice2.start)).toBeTrue();
+            expect(moment(results2?.end).isSame(moment(expectedSlice2.end))).toBeTrue();
+            expect(moment(results2?.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
             expect(
-                moment(results2.holes[0].start).isSame(moment(expectedSlice2.holes[0].start))
+                moment(results2?.holes[0].start).isSame(moment(expectedSlice2.holes[0].start))
             ).toBeTrue();
             expect(
-                moment(results2.holes[0].end).isSame(moment(expectedSlice2.holes[0].end))
+                moment(results2?.holes[0].end).isSame(moment(expectedSlice2.holes[0].end))
             ).toBeTrue();
 
             const [results3] = await test.createSlices();

@@ -1,5 +1,5 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, get,
+    ConvictSchema, ValidatedJobConfig, getOpConfig, get, AnyObject,
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
 
@@ -10,7 +10,7 @@ function fetchConfig(job: ValidatedJobConfig) {
 }
 
 export default class Schema extends ConvictSchema<BulkSender> {
-    validateJob(job: ValidatedJobConfig) {
+    validateJob(job: ValidatedJobConfig): void {
         const opConfig = fetchConfig(job);
         const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
@@ -26,7 +26,7 @@ export default class Schema extends ConvictSchema<BulkSender> {
         }
     }
 
-    build() {
+    build(): AnyObject {
         return {
             size: {
                 doc: 'the maximum number of docs it will take at a time, anything past it will be split up and sent'

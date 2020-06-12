@@ -1,16 +1,16 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber,
+    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber, AnyObject,
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
-// @ts-ignore
+// @ts-expect-error
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
 import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
-    validateJob(job: ValidatedJobConfig) {
+    validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
         if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
@@ -34,7 +34,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         }
     }
 
-    build() {
+    build(): AnyObject {
         return {
             index: {
                 doc: 'Which index to read from',

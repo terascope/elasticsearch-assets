@@ -5,7 +5,7 @@ import Counter from './counter';
 export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
     countHandle!: () => Promise<CounterResults>
 
-    async initialize(recoveryData: SlicerRecoveryData[]) {
+    async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         await super.initialize(recoveryData);
 
         const { size } = this.opConfig;
@@ -23,15 +23,15 @@ export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
         this.countHandle = counter.handle;
     }
 
-    maxQueueLength() {
+    maxQueueLength(): number {
         return this.workersConnected * 3;
     }
 
-    isRecoverable() {
+    isRecoverable(): boolean {
         return true;
     }
 
-    async slice() {
+    async slice(): Promise<CounterResults> {
         return this.countHandle();
     }
 }

@@ -1,9 +1,9 @@
-import { ConvictSchema } from '@terascope/job-components';
+import { ConvictSchema, AnyObject } from '@terascope/job-components';
 import ReaderSchema from '../elasticsearch_reader/schema';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 
 export default class Schema extends ConvictSchema<ApiConfig> {
-    build() {
+    build(): AnyObject {
         const schema = new ReaderSchema(this.context, this.opType);
         const esSchema = schema.build();
         const apiSchema = {

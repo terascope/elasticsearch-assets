@@ -52,7 +52,6 @@ export interface StartPointConfig {
 
 export type ParsedInterval = [number, moment.unitOfTime.Base];
 
-// TODO: delete?
 export interface DateConfig {
     start: string | moment.Moment;
     end: string | moment.Moment;

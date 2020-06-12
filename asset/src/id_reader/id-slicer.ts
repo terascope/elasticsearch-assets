@@ -1,10 +1,10 @@
-import { TSError } from '@terascope/job-components';
+import { TSError, SlicerFn } from '@terascope/job-components';
 import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
 import { getKeyArray } from './helpers';
 import { retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
-export default function newSlicer(args: ESIDSlicerArgs) {
+export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
     const {
         events,
         opConfig,
@@ -138,8 +138,8 @@ function compareKeys(key: string, retryKey: string) {
     }
     return false;
 }
-// @ts-ignore
-function* recurse(baseArray: string[], str: string) {
+
+function* recurse(baseArray: string[], str: string): Generator<string> {
     for (const key of baseArray) {
         const newStr = str + key;
         const resp = yield newStr;

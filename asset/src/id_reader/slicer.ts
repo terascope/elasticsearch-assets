@@ -24,7 +24,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         this.api = elasticApi(client, this.logger, this.opConfig);
     }
 
-    isRecoverable() {
+    isRecoverable(): boolean {
         if (this.executionConfig.lifecycle === 'once') return true;
         return false;
     }
@@ -41,6 +41,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             return Promise.reject(error);
         }
         const keySet = divideKeyArray(keyArray, this.executionConfig.slicers);
+
         const args: Partial<ESIDSlicerArgs> = {
             events: this.context.foundation.getEventEmitter(),
             opConfig: this.opConfig,

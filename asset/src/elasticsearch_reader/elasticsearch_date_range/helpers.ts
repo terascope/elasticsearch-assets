@@ -1,7 +1,9 @@
-import { Logger, times } from '@terascope/job-components';
+import {
+    Logger, times, AnyObject, toNumber
+} from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
-// @ts-ignore
+// @ts-expect-error
 import dateMath from 'datemath-parser';
 
 import {
@@ -59,8 +61,8 @@ export function dateOptions(value: string): moment.unitOfTime.Base {
 export function processInterval(
     interval: string,
     timeResolution: moment.unitOfTime.Base,
-    esDates?: any
-) {
+    esDates?: DateSegments
+): ParsedInterval {
     // one or more digits, followed by one or more letters, case-insensitive
     const regex = /(\d+)(\w+)/i;
     const intervalMatch = regex.exec(interval);
@@ -72,14 +74,16 @@ export function processInterval(
     // dont need first parameter, its the full string
     intervalMatch.shift();
 
-    intervalMatch[1] = dateOptions(intervalMatch[1]);
-    return compareInterval(intervalMatch, esDates, timeResolution);
+    const newInterval: ParsedInterval = [toNumber(intervalMatch[0]), dateOptions(intervalMatch[1])];
+    return compareInterval(newInterval, timeResolution, esDates);
 }
 
-function compareInterval(interval: any, esDates: any, timeResolution: string) {
+function compareInterval(
+    interval: ParsedInterval, timeResolution: string, esDates?: DateSegments,
+): ParsedInterval {
     if (esDates) {
         const datesDiff = esDates.limit.diff(esDates.start);
-        const intervalDiff = moment.duration(Number(interval[0]), interval[1]).as('milliseconds');
+        const intervalDiff = moment.duration(Number(interval[0]), interval[1] as moment.unitOfTime.Base).as('milliseconds');
 
         if (intervalDiff > datesDiff) {
             if (timeResolution === 's') {
@@ -98,11 +102,12 @@ export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 // 2016-06-29T12:44:57-07:00
 export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
 
-type RetryFn = (msg: string) => any
+type RetryCb = (msg: string) => any
 
+// TODO: this migth be broken, there is no msg
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
-    return (_key: string | object, err: Error, fn: RetryFn, msg: string) => {
+    return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: string) => {
         logger.error(err, 'error while getting next slice');
         const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
 
@@ -122,7 +127,7 @@ export function retryModule(logger: Logger, numOfRetries: number) {
     };
 }
 
-export function existsSync(filename: string) {
+export function existsSync(filename: string): boolean {
     try {
         fs.accessSync(filename);
         return true;
@@ -131,7 +136,7 @@ export function existsSync(filename: string) {
     }
 }
 
-export function getMilliseconds(interval: any[]) {
+export function getMilliseconds(interval: any[]): number {
     const conversions = {
         d: 86400000,
         h: 3600000,
@@ -143,7 +148,7 @@ export function getMilliseconds(interval: any[]) {
     return interval[0] * conversions[interval[1]];
 }
 
-export function parseDate(date: string) {
+export function parseDate(date: string): moment.Moment {
     let result;
 
     if (moment(new Date(date)).isValid()) {
@@ -246,7 +251,7 @@ export function divideRange(
     startTime: moment.Moment,
     endTime: moment.Moment,
     numOfSlicers: number,
-) {
+): DateSegments[] {
     const results: DateSegments[] = [];
     // 'x' is Unix Millisecond Timestamp format
     const startNum = Number(moment(startTime).format('x'));
@@ -272,7 +277,7 @@ export function delayedStreamSegment(
     startTime: moment.Moment,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
-) {
+): { start: moment.Moment, limit: moment.Moment } {
     const now = moment(startTime);
 
     const delayedLimit = moment(now).subtract(

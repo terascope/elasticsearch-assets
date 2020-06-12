@@ -14,7 +14,7 @@ export const hexadecimal = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a
 
 export const HEXADECIMAL = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'];
 
-export function getKeyArray(config: ESIDReaderConfig) {
+export function getKeyArray(config: ESIDReaderConfig): string[] {
     if (config.key_type === 'base64url') {
         return base64url.slice();
     }

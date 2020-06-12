@@ -1,10 +1,10 @@
 import {
-    Fetcher, WorkerContext, ExecutionConfig, TSError
+    Fetcher, WorkerContext, ExecutionConfig, TSError, AnyObject
 } from '@terascope/job-components';
 import mocker from 'mocker-data-generator';
 import path from 'path';
 import { existsSync } from 'fs';
-import { DataGenerator } from './interfaces';
+import { DataGenerator, CounterResults } from './interfaces';
 import defaultSchema from './data-schema';
 
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
@@ -14,10 +14,10 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
         super(context, opConfig, exConfig);
         this.dataSchema = parsedSchema(opConfig);
     }
-    // TODO: is this right type here?
-    async fetch(slice?: any) {
-        const count = typeof slice === 'number' ? slice : slice.count;
+
+    async fetch(slice?: CounterResults): Promise<AnyObject[]> {
         if (slice == null) return [];
+        const { count } = slice;
 
         if (this.opConfig.stress_test) {
             return mocker()
@@ -43,7 +43,7 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
 }
 
 function parsedSchema(opConfig: DataGenerator) {
-    let dataSchema = false;
+    let dataSchema = {};
 
     if (opConfig.json_schema) {
         const firstPath = opConfig.json_schema;

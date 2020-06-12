@@ -2,7 +2,7 @@ import { OperationAPI, WorkerContext, ExecutionConfig } from '@terascope/job-com
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
 import { ESStateStorageConfig } from './interfaces';
 
-class ElasticsearchStateStorage extends OperationAPI {
+export default class ElasticsearchStateStorage extends OperationAPI {
     stateStorage: ESCachedStateStorage;
 
     constructor(
@@ -16,23 +16,21 @@ class ElasticsearchStateStorage extends OperationAPI {
             type: 'elasticsearch',
             cached: true
         });
-        // @ts-ignore TODO: fix discrepancies
+        // @ts-expect-error
         this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig);
     }
 
-    async initialize() {
+    async initialize(): Promise<void> {
         await super.initialize();
         await this.stateStorage.initialize();
     }
 
-    async shutdown() {
+    async shutdown(): Promise<void> {
         await super.shutdown();
         await this.stateStorage.shutdown();
     }
 
-    async createAPI() {
+    async createAPI(): Promise<ESCachedStateStorage> {
         return this.stateStorage;
     }
 }
-
-module.exports = ElasticsearchStateStorage;

@@ -1,5 +1,7 @@
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, DataEntity, SlicerRecoveryData } from '@terascope/job-components';
+import {
+    AnyObject, DataEntity, SlicerRecoveryData, TestContext
+} from '@terascope/job-components';
 import path from 'path';
 import MockClient from './mock_client';
 import Schema from '../asset/src/id_reader/schema';
@@ -74,9 +76,9 @@ describe('id_reader', () => {
             const job6 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
 
             function testValidation(job: AnyObject) {
-                // @ts-ignore
-                const schema = new Schema();
-                schema.validateJob(job);
+                const context = new TestContext('test');
+                const schema = new Schema(context);
+                schema.validateJob(job as any);
             }
 
             expect(() => {

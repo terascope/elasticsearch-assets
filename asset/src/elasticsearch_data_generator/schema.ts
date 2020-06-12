@@ -1,10 +1,10 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig
+    ConvictSchema, ValidatedJobConfig, getOpConfig, AnyObject
 } from '@terascope/job-components';
 import { DataGenerator } from './interfaces';
 
 export default class Schema extends ConvictSchema<DataGenerator> {
-    validateJob(job: ValidatedJobConfig) {
+    validateJob(job: ValidatedJobConfig): void {
         const opConfig = getOpConfig(job, 'elasticsearch_data_generator');
         if (!opConfig) throw new Error('No opConfig was found for operation elasticsearch_data_generator on the job');
 
@@ -26,7 +26,7 @@ export default class Schema extends ConvictSchema<DataGenerator> {
         }
     }
 
-    build() {
+    build(): AnyObject {
         return {
             json_schema: {
                 doc: 'file path to custom data schema',

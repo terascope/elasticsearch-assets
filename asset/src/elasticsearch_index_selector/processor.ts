@@ -1,12 +1,12 @@
+import { BatchProcessor } from '@terascope/job-components';
 import {
     DataEntity,
-    BatchProcessor,
-    AnyObject,
     set,
     getValidDate,
-    TSError
-} from '@terascope/job-components';
-import { IndexSelectorConfig } from './interfaces';
+    TSError,
+    fastAssign
+} from '@terascope/utils';
+import * as i from './interfaces';
 
 function _getWeeklyIndex(date: string) {
     // weeks since Jan 1, 1970
@@ -18,33 +18,7 @@ const offsets = {
     yearly: 4
 };
 
-interface BulkMeta {
-    _index: string;
-    _type: string;
-    _id: string | number;
-    retry_on_conflict: number;
-}
-
-interface IndexSpec extends DataEntity {
-    index?: AnyObject;
-    create?: AnyObject;
-    update?: AnyObject;
-    delete?: AnyObject;
-}
-
-interface ScriptConfig {
-    file?: string;
-    source?: string;
-    params?: AnyObject;
-}
-
-interface UpdateConfig extends DataEntity {
-    upsert?: AnyObject;
-    doc?: AnyObject;
-    script?: ScriptConfig;
-}
-
-export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
+export default class IndexSelector extends BatchProcessor<i.IndexSelectorConfig> {
     private formattedDate(record: DataEntity) {
         const { date_field: dateField, timeseries } = this.opConfig;
         let end = 10;
@@ -76,10 +50,10 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
         return this.opConfig.index;
     }
 
-    private generateRequest(record: DataEntity, formatted: DataEntity[]) {
-        const indexSpec: IndexSpec = DataEntity.make({});
+    private generateRequestMetadata(record: DataEntity) {
+        const indexSpec: i.IndexSpec = DataEntity.make({});
         const index = this.indexName(record);
-        const meta: Partial<BulkMeta> = {
+        const meta: Partial<i.BulkMeta> = {
             _index: index
         };
 
@@ -96,6 +70,7 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
                 meta.retry_on_conflict = this.opConfig.update_retry_on_conflict;
             }
         } else if (this.opConfig.delete) {
+            if (meta._id == null) meta._id = record.getKey();
             indexSpec.delete = meta;
         } else if (this.opConfig.create) {
             indexSpec.create = meta;
@@ -103,21 +78,21 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
             indexSpec.index = meta;
         }
 
-        formatted.push(indexSpec);
+        record.setMetadata(i.INDEX_META, indexSpec);
 
         if (this.opConfig.update || this.opConfig.upsert) {
-            const update: UpdateConfig = DataEntity.make({});
+            const update: i.UpdateConfig = DataEntity.make({});
 
             if (this.opConfig.upsert) {
                 // The upsert field is what is inserted if the key doesn't already exist
-                update.upsert = record;
+                update.upsert = fastAssign({}, record);
             }
 
             // This will merge this record with the existing record.
             if (this.opConfig.update_fields.length > 0) {
                 update.doc = {};
                 this.opConfig.update_fields.forEach((field) => {
-                    // @ts-ignore
+                    // @ts-expect-error
                     update.doc[field] = record[field];
                 });
             } else if (this.opConfig.script_file || this.opConfig.script) {
@@ -136,27 +111,22 @@ export default class IndexSelector extends BatchProcessor<IndexSelectorConfig> {
                 set(update, 'script.params', {});
                 for (const [key, field] of Object.entries(this.opConfig.script_params)) {
                     if (record[field]) {
-                        // @ts-ignore
+                    // @ts-expect-error
                         update.script.params[key] = record[field];
                     }
                 }
             } else {
-                update.doc = record;
+                update.doc = fastAssign({}, record);
             }
-
-            formatted.push(update);
-        } else if (this.opConfig.delete === false) {
-            formatted.push(record);
+            record.setMetadata(i.MUTATE_META, update);
         }
     }
 
-    async onBatch(data: DataEntity[]) {
-        const formatted: DataEntity[] = [];
-
+    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         for (const record of data) {
-            this.generateRequest(record, formatted);
+            this.generateRequestMetadata(record);
         }
 
-        return formatted;
+        return data;
     }
 }

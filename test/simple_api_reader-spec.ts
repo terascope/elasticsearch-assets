@@ -206,7 +206,7 @@ describe('simple_api_reader', () => {
                 },
                 msg: {}
             }],
-            // @ts-ignore
+
         ])('when performing a %s', (m, { query, opConfig: _opConfig, msg }) => {
             const opConfig = Object.assign({
                 _op: 'simple_api_reader',
@@ -345,7 +345,7 @@ describe('simple_api_reader', () => {
                 token: 'test-token',
             };
             async function getMeta(test: SlicerTestHarness) {
-                // @ts-ignore
+                // @ts-expect-error
                 return test.context.apis.executionContext.getMetadata('simple_api_reader');
             }
 
