@@ -1,7 +1,7 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import {
-    DataEntity, AnyObject, isNil, debugLogger, pDelay
+    DataEntity, AnyObject, isNil, debugLogger, pDelay, uniq
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import elasticApi from '@terascope/elasticsearch-api';
@@ -31,6 +31,8 @@ export function formatUploadData(
             if (isNil(type)) throw new Error('type must be provided is elasticsearch is version 6');
             meta._type = type;
         }
+
+        if (version === 7) meta._type = '_doc';
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -80,14 +82,24 @@ export async function populateIndex(
             false
         )
     );
+
     const body = formatUploadData(index, version, records, 'events');
 
-    await client.bulk({
+    const results = await client.bulk({
         index,
         type: 'events',
         body,
         refresh: true
     });
+
+    if (results.errors) {
+        const errors: string[] = [];
+        for (const response of results.items) {
+            if (response.index.error) errors.push(response.index.error.reason);
+        }
+
+        throw new Error(`There were errors populating index, errors: ${uniq(errors).join(' ; ')}`);
+    }
 }
 
 export async function fetch(

@@ -10,6 +10,7 @@ describe('elasticsearch bulk sender module', () => {
     const client = makeClient();
     const esClient = elasticApi(client, logger);
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
+    const type = esClient.getESVersion() === 7 ? '_doc' : 'events';
     let harness: WorkerTestHarness;
 
     beforeAll(async () => {
@@ -63,7 +64,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events'
+                    _type: type
                 }
             });
             expect(doc).toEqual(data[0]);
@@ -114,7 +115,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                     _id: key
                 }
             });
@@ -140,7 +141,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                     _id: key
                 }
             });
@@ -165,7 +166,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 create: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                 }
             });
             expect(doc).toEqual(data[0]);
@@ -189,7 +190,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 update: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                 }
             });
             expect(doc).toEqual({
@@ -215,7 +216,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(meta).toEqual({
                 update: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                 }
             });
             expect(doc).toEqual({
@@ -245,7 +246,7 @@ describe('elasticsearch bulk sender module', () => {
             expect(results[0]).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
-                    _type: 'events',
+                    _type: type,
                     _id: key
                 }
             });

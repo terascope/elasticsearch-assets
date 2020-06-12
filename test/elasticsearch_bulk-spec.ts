@@ -3,9 +3,8 @@ import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import { DataEntity, AnyObject, pDelay } from '@terascope/job-components';
 import path from 'path';
 import {
-    makeClient, cleanupIndex, fetch, upload, waitForData
+    makeClient, cleanupIndex, fetch, upload, waitForData, TEST_INDEX_PREFIX, ELASTICSEARCH_VERSION
 } from './helpers';
-import { TEST_INDEX_PREFIX } from './helpers/config';
 
 import { INDEX_META } from '../asset/src/elasticsearch_index_selector/interfaces';
 
@@ -24,6 +23,8 @@ describe('elasticsearch_bulk', () => {
     const esClient = makeClient();
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
     let testIndex = '';
+
+    const type = ELASTICSEARCH_VERSION.charAt(0) === '6' ? 'events' : '_doc';
 
     beforeAll(async () => {
         await cleanupIndex(esClient, `${bulkIndex}*`);
@@ -129,7 +130,7 @@ describe('elasticsearch_bulk', () => {
 
         const indexMetaData = results[0].getMetadata(INDEX_META);
         expect(indexMetaData).toBeDefined();
-        expect(indexMetaData).toMatchObject({ index: { _index: 'es_assets__bulk_docs_returned', _type: 'events' } });
+        expect(indexMetaData).toMatchObject({ index: { _index: 'es_assets__bulk_docs_returned', _type: type } });
     });
 
     it('does not split if the size is <= than 2 * size in opConfig', async () => {
