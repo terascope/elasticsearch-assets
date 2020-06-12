@@ -13,12 +13,10 @@ const logger = debugLogger('elasticsearch_helpers');
 jest.setTimeout(10000);
 
 export function makeClient(): Client {
-    let apiVersion = ELASTICSEARCH_VERSION;
-    if (apiVersion.charAt(0) === '7') apiVersion = '7.x';
     return new Client({
         host: ELASTICSEARCH_HOST,
         log: 'error',
-        apiVersion,
+        apiVersion: ELASTICSEARCH_VERSION,
     });
 }
 

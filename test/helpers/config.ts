@@ -1,3 +1,6 @@
-const { TEST_INDEX_PREFIX = 'es_assets_', ELASTICSEARCH_HOST = 'http://localhost:9200', ELASTICSEARCH_VERSION = '6.5' } = process.env;
-
+const { TEST_INDEX_PREFIX = 'es_assets_', ELASTICSEARCH_HOST = 'http://localhost:9200' } = process.env;
+let version = process.env.ELASTICSEARCH_VERSION;
+if (!version || version.charAt(0) === '6') version = '6.5';
+if (version.charAt(0) === '7') version = '7.x';
+const ELASTICSEARCH_VERSION = version;
 export { TEST_INDEX_PREFIX, ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION };
