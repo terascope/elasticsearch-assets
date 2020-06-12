@@ -6,6 +6,7 @@ node_js:
   - '12.17'
 os:
   - linux
+  - osx
 branches:
   only:
   - master
@@ -20,14 +21,20 @@ env:
   - ELASTICSEARCH_VERSION=6.8.6
   - ELASTICSEARCH_VERSION=7.2.1
 before_script:
-  - 'docker run -d
-        --publish 9200:9200
-        --env "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-        --env "network.host=0.0.0.0"
-        --env "discovery.type=single-node"
-        blacktop/elasticsearch:$ELASTICSEARCH_VERSION'
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+        docker run -d
+            --publish 9200:9200
+            --env "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+            --env "network.host=0.0.0.0"
+            --env "discovery.type=single-node"
+            blacktop/elasticsearch:$ELASTICSEARCH_VERSION
+    fi
 script:
-  - 'yarn test'
+  - if [ $TRAVIS_OS_NAME == "linux" ]; then
+        yarn test
+    else
+        echo "* skipping tests for macos"
+    fi
 after_success:
   - bash <(curl -s https://codecov.io/bash)
   - yarn lint
