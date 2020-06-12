@@ -81,18 +81,16 @@ describe('elasticsearch sender api', () => {
         return harness;
     }
 
-    describe('elasticsearch_sender_api', () => {
-        it('can send data to an index', async () => {
-            const data = [{ some: 'data' }, { other: 'data' }];
-            const test = await setupTest();
-            const results = await test.runSlice(data);
+    it('can send data to an index', async () => {
+        const data = [{ some: 'data' }, { other: 'data' }];
+        const test = await setupTest();
+        const results = await test.runSlice(data);
 
-            expect(results).toEqual(data);
+        expect(results).toEqual(data);
 
-            await waitForData(esClient, apiSendIndex, 2);
+        await waitForData(esClient, apiSendIndex, 2);
 
-            const fetchResults = await fetch(esClient, { index: apiSendIndex, q: '*' });
-            expect(fetchResults.length).toEqual(2);
-        });
+        const fetchResults = await fetch(esClient, { index: apiSendIndex, q: '*' });
+        expect(fetchResults.length).toEqual(2);
     });
 });
