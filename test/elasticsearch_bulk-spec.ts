@@ -1,6 +1,6 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { DataEntity, AnyObject, pDelay } from '@terascope/job-components';
+import { DataEntity, AnyObject } from '@terascope/job-components';
 import path from 'path';
 import {
     makeClient, cleanupIndex, fetch, upload, waitForData, TEST_INDEX_PREFIX, ELASTICSEARCH_VERSION
@@ -227,7 +227,7 @@ describe('elasticsearch_bulk', () => {
         expect(Array.isArray(results)).toEqual(true);
         expect(results).toEqual(data);
 
-        await pDelay(1000);
+        await waitForData(esClient, index, 0);
 
         const fetchedData = await fetch(esClient, query);
 
@@ -304,7 +304,7 @@ describe('elasticsearch_bulk', () => {
 
         expect(docs).toEqual(data);
 
-        await pDelay(1000);
+        await waitForData(esClient, index, 3);
 
         const fetchedData = await fetch(esClient, query) as any[];
 
@@ -364,7 +364,7 @@ describe('elasticsearch_bulk', () => {
 
         expect(isAppended).toEqual(true);
 
-        await pDelay(1000);
+        await waitForData(esClient, expectedIndex, 3);
 
         const fetchedData = await fetch(esClient, query) as any[];
         expect(fetchedData.length).toEqual(3);
