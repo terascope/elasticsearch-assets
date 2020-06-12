@@ -112,9 +112,9 @@ export async function waitForData(
             await pDelay(100);
             try {
                 const indexCount = await esClient.count({ index, q: '*' });
-                if (count === indexCount) resolve();
+                if (count === indexCount) return resolve();
             } catch (err) {
-                reject(err);
+                return reject(err);
             }
 
             checkIndex();

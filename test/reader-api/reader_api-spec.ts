@@ -5,7 +5,7 @@ import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
 } from '../helpers';
 
-describe('elasticsearch sender api', () => {
+describe('elasticsearch reader api', () => {
     const dir = __dirname;
     const assetDir = path.join(dir, '../../asset');
 
@@ -74,19 +74,17 @@ describe('elasticsearch sender api', () => {
         return harness;
     }
 
-    describe('elasticsearch_reader_api', () => {
-        it('can read data from an index', async () => {
-            const data = [{ some: 'data' }, { other: 'data' }];
+    it('can read data from an index', async () => {
+        const data = [{ some: 'data' }, { other: 'data' }];
 
-            await upload(esClient, { index: apiReaderIndex, type: 'events' }, data);
+        await upload(esClient, { index: apiReaderIndex, type: 'events' }, data);
 
-            await waitForData(esClient, apiReaderIndex, 2);
+        await waitForData(esClient, apiReaderIndex, 2);
 
-            const slice = [{ index: apiReaderIndex, q: '*' }];
-            const test = await setupTest();
-            const results = await test.runSlice(slice);
+        const slice = [{ index: apiReaderIndex, q: '*' }];
+        const test = await setupTest();
+        const results = await test.runSlice(slice);
 
-            expect(results.length).toEqual(2);
-        });
+        expect(results.length).toEqual(2);
     });
 });
