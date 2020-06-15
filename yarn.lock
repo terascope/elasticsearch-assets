@@ -531,14 +531,14 @@
     validator "^13.0.0"
     xlucene-parser "^0.23.0"
 
-"@terascope/data-types@^0.19.0":
-  version "0.19.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.19.0.tgz#7602408a627c943a136f4cab0aa0b15640c70abe"
-  integrity sha512-VfeLJgnUGKznb/sVWy+vlGi5bjCt13+mVOHyMbVAhntcjHDmTUn0Qnbnhqqli6elOaueEjWeo3e++70gAMlyAw==
+"@terascope/data-types@^0.19.0", "@terascope/data-types@^0.19.1":
+  version "0.19.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.19.1.tgz#23c627558bc9fb345367a75c85aefc99ee6c22e9"
+  integrity sha512-alpNa3hGmnybTSkn3FB+jepTxPdMmWmPdgE+UT6YFGlmeI2t0MUg2m3OGtwW8FNBfO52dGshPP3hA/0M40y6QQ==
   dependencies:
     "@terascope/types" "^0.4.0"
     "@terascope/utils" "^0.28.0"
-    graphql "^14.5.8"
+    graphql "^15.1.0"
     lodash.defaultsdeep "^4.6.1"
     yargs "^15.3.1"
 
@@ -2535,12 +2535,10 @@ graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.2.4:
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
 
-graphql@^14.5.8:
-  version "14.6.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.6.0.tgz#57822297111e874ea12f5cd4419616930cd83e49"
-  integrity sha512-VKzfvHEKybTKjQVpTFrA5yUq2S9ihcZvfJAtsDBBCuV6wauPu1xl/f9ehgVf0FcEJJs4vz6ysb/ZMkGigQZseg==
-  dependencies:
-    iterall "^1.2.2"
+graphql@^15.1.0:
+  version "15.1.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.1.0.tgz#b93e28de805294ec08e1630d901db550cb8960a1"
+  integrity sha512-0TVyfOlCGhv/DBczQkJmwXOK6fjWkjzY3Pt7wY8i0gcYXq8aogG3weCsg48m72lywKSeOqedEHvVPOvZvSD51Q==
 
 growly@^1.3.0:
   version "1.3.0"
@@ -3033,11 +3031,6 @@ istanbul-reports@^3.0.2:
   dependencies:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
-
-iterall@^1.2.2:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.3.0.tgz#afcb08492e2915cbd8a0884eb93a8c94d0d72fea"
-  integrity sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==
 
 jest-changed-files@^25.5.0:
   version "25.5.0"
