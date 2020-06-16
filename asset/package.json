@@ -10,7 +10,7 @@
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.10.0",
         "@terascope/job-components": "^0.35.0",
-        "@terascope/teraslice-state-storage": "file:/Users/ciorg/Scope/TeraStuff/teraslice/packages/teraslice-state-storage",
+        "@terascope/teraslice-state-storage": "^0.17.1",
         "@terascope/utils": "^0.28.0",
         "datemath-parser": "^1.0.6",
         "got": "^9.6.0",
