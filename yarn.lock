@@ -507,12 +507,12 @@
   dependencies:
     type-detect "4.0.8"
 
-"@terascope/data-mate@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.11.0.tgz#98203a22ce7231964db4eea5497652ca08caedf4"
-  integrity sha512-NNY7bk97JxiN7kO5Gm6pTwA531vK6lOVAVjOX8vmmwhdkBGaTAky7x0zE4rk9mSUFQsiU7pKjmOQckys5UurQw==
+"@terascope/data-mate@^0.11.1":
+  version "0.11.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.11.1.tgz#de5bbc3d6b292ecb34f5d32477369747673f598a"
+  integrity sha512-nabUCEBQXMBOXTyvXTFqBMu05ChI3hQALd4dxGEpfSe5LTRAlr6uBJn7Aag6b4Qg3pW/Mxu/4/EHY0qixlj0lA==
   dependencies:
-    "@terascope/data-types" "^0.19.0"
+    "@terascope/data-types" "^0.19.1"
     "@terascope/types" "^0.4.0"
     "@terascope/utils" "^0.28.0"
     "@turf/bbox" "^6.0.1"
@@ -531,7 +531,7 @@
     validator "^13.0.0"
     xlucene-parser "^0.23.0"
 
-"@terascope/data-types@^0.19.0", "@terascope/data-types@^0.19.1":
+"@terascope/data-types@^0.19.1":
   version "0.19.1"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.19.1.tgz#23c627558bc9fb345367a75c85aefc99ee6c22e9"
   integrity sha512-alpNa3hGmnybTSkn3FB+jepTxPdMmWmPdgE+UT6YFGlmeI2t0MUg2m3OGtwW8FNBfO52dGshPP3hA/0M40y6QQ==
@@ -1885,13 +1885,13 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-elasticsearch-store@^0.31.0:
-  version "0.31.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.31.0.tgz#8bde52ee305510873780a7dcc5ec6b30d54eb201"
-  integrity sha512-gCYEHyaQ7OLRokeCuoOJHEAy7Ivy6o4crMOFt20HyAkUb1DI/t21F0chBTFV2oqf2xt3GlZRzkxyEynONKG9hg==
+elasticsearch-store@^0.31.1:
+  version "0.31.1"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.31.1.tgz#3d1f77873e8eec4dd0c1a685e10778f153f105b5"
+  integrity sha512-ZMeS/5yAwq5MCNt18GIwUsaaXnOi5VeWZeIOnvMXzo6oxeU1qmkcz+wCKr8glN5faeWDDZmBQyV2VBR7MD7E4Q==
   dependencies:
-    "@terascope/data-mate" "^0.11.0"
-    "@terascope/data-types" "^0.19.0"
+    "@terascope/data-mate" "^0.11.1"
+    "@terascope/data-types" "^0.19.1"
     "@terascope/types" "^0.4.0"
     "@terascope/utils" "^0.28.0"
     ajv "^6.12.2"
