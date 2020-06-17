@@ -1,3 +1,4 @@
+import type { Client, SearchResponse } from 'elasticsearch';
 import {
     Logger, TSError, get, AnyObject
 } from '@terascope/job-components';
@@ -18,11 +19,11 @@ export default class ApiClient {
         this.logger = logger;
     }
 
-    async makeRequest(uri: string, query: string): Promise<AnyObject> {
+    async makeRequest(uri: string, query: string): Promise<SearchResult> {
         try {
-            const { body } = await got(uri, {
-                query,
-                json: true,
+            const { body } = await got<SearchResult>(uri, {
+                searchParams: query,
+                responseType: 'json',
                 timeout: this.opConfig.timeout,
                 retry: 0
             });
@@ -47,7 +48,7 @@ export default class ApiClient {
         }
     }
 
-    async apiSearch(queryConfig: any) {
+    async apiSearch(queryConfig: AnyObject): Promise<SearchResponse<any>> {
         const { opConfig } = this;
         const fields = get(queryConfig, '_source', null);
         const dateFieldName = this.opConfig.date_field_name;
@@ -156,12 +157,14 @@ export default class ApiClient {
         try {
             const response = await this.makeRequest(uri, query);
 
-            let esResults = [];
+            let esResults: any[] = [];
             if (response.results) {
-                esResults = response.results.map((result: any) => ({ _source: result }));
+                esResults = response.results.map((result: any) => ({
+                    _source: result
+                }));
             }
 
-            return ({
+            return {
                 hits: {
                     hits: esResults,
                     total: response.total
@@ -172,22 +175,22 @@ export default class ApiClient {
                     successful: 1,
                     failed: 0
                 }
-            });
+            } as SearchResponse<any>;
         } catch (err) {
             return Promise.reject(new TSError(err, { reason: `error while calling endpoint ${uri}` }));
         }
     }
 
-    search(queryConfig: any) {
+    search(queryConfig: AnyObject): Promise<AnyObject> {
         return this.apiSearch(queryConfig);
     }
 
-    count(queryConfig: any) {
+    count(queryConfig: AnyObject): Promise<AnyObject> {
         queryConfig.size = 0;
         return this.apiSearch(queryConfig);
     }
 
-    get cluster() {
+    get cluster(): Partial<Client['cluster']> {
         const { index } = this.opConfig;
         return {
             async stats() {
@@ -217,3 +220,10 @@ export default class ApiClient {
         };
     }
 }
+
+type SearchResult = {
+    info: string;
+    total: number;
+    returning: number;
+    results: any[];
+};
