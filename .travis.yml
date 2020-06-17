@@ -3,7 +3,7 @@ dist: bionic
 language: node_js
 node_js:
   - '10.19'
-  - '12.17'
+  - '12.18'
 os:
   - linux
   - osx
@@ -34,17 +34,18 @@ before_script:
     else
         echo "* skipping docker run for macos...";
     fi
+  - yarn build
+  - yarn global add teraslice-cli
 script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         yarn test;
     else
         echo "* skipping tests for macos...";
     fi
+  - yarn lint
+  - teraslice-cli assets build
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-  - yarn lint
-  - yarn global add teraslice-cli
-  - teraslice-cli assets build
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN

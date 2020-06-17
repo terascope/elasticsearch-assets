@@ -1,6 +1,12 @@
 {
     "name": "asset",
     "version": "1.9.1",
+    "private": true,
+    "workspaces": {
+        "nohoist": [
+            "**"
+        ]
+    },
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
@@ -13,7 +19,7 @@
         "@terascope/teraslice-state-storage": "^0.17.1",
         "@terascope/utils": "^0.28.0",
         "datemath-parser": "^1.0.6",
-        "got": "^9.6.0",
+        "got": "^11.3.0",
         "mocker-data-generator": "^2.6.6",
         "moment": "^2.26.0"
     },

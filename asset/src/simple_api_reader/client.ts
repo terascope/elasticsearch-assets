@@ -20,9 +20,9 @@ export default class ApiClient {
 
     async makeRequest(uri: string, query: string): Promise<AnyObject> {
         try {
-            const { body } = await got(uri, {
-                query,
-                json: true,
+            const { body } = await got<AnyObject>(uri, {
+                searchParams: query,
+                responseType: 'json',
                 timeout: this.opConfig.timeout,
                 retry: 0
             });
