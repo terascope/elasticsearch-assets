@@ -1,4 +1,4 @@
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import {
     getClient,
     BatchProcessor,
@@ -67,7 +67,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
         if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${clientConfig.connection}`);
 
-        const esClient = elasticApi(client, this.logger, clientConfig);
+        const esClient = elasticAPI(client, this.logger, clientConfig);
         return new ElasticsearchSender(esClient, clientConfig as any);
     }
 

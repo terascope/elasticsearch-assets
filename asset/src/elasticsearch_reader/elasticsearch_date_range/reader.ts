@@ -1,17 +1,10 @@
-import {
-    Fetcher,
-    SliceRequest,
-    DataEntity,
-    AnyObject,
-    APIFactoryRegistry
-} from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import { Fetcher, SliceRequest, DataEntity } from '@terascope/job-components';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { ESDateConfig } from '../interfaces';
-
-type ESReaderFactoryAPI = APIFactoryRegistry<elasticApi.Client, AnyObject>
+import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfaces';
 
 export default class DateReader extends Fetcher<ESDateConfig> {
-    api!: elasticApi.Client;
+    api!: elasticAPI.Client;
 
     async initialize(): Promise<void> {
         await super.initialize();
@@ -20,7 +13,7 @@ export default class DateReader extends Fetcher<ESDateConfig> {
         const apiConfig = this.executionConfig.apis.find((config) => config._name === apiName);
         if (apiConfig == null) throw new Error(`could not find api configuration for api ${apiName}`);
         // TODO: verify this type works
-        const apiManager = this.getAPI<ESReaderFactoryAPI>(apiName);
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, apiConfig);
     }
 

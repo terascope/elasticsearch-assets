@@ -1,6 +1,6 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
@@ -13,7 +13,7 @@ describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const esClient = makeClient();
 
-    type API = APIFactoryRegistry<elasticApi.Client, AnyObject>
+    type API = APIFactoryRegistry<elasticAPI.Client, AnyObject>
 
     const clients = [
         {

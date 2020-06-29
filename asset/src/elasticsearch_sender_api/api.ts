@@ -2,11 +2,11 @@ import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject, AnyObject, isNumber, getTypeOf
 } from '@terascope/utils';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import ElasticsearchSender from './bulk_send';
 import { SenderConfig, ValidSenderConfig } from './interfaces';
 
-export default class ElasticsearchSenderApi extends APIFactory<ElasticsearchSender, AnyObject> {
+export default class ElasticsearchSenderAPI extends APIFactory<ElasticsearchSender, AnyObject> {
     // TODO: there might need more checks here
     validateConfig(config: unknown): ValidSenderConfig {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
@@ -27,7 +27,7 @@ export default class ElasticsearchSenderApi extends APIFactory<ElasticsearchSend
             cached: true
         });
 
-        const esClient = elasticApi(client, this.context.logger, config);
+        const esClient = elasticAPI(client, this.context.logger, config);
         const esSender = new ElasticsearchSender(esClient, config);
 
         return { client: esSender, config };

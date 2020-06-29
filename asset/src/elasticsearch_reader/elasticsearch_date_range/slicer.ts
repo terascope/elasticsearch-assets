@@ -6,10 +6,10 @@ import {
     TSError,
     AnyObject,
     isFunction,
+    SlicerRecoveryData,
 } from '@terascope/job-components';
-import { Client } from 'elasticsearch';
 import moment from 'moment';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import dateSlicerFn from './slicer-fn';
 import {
     processInterval,
@@ -29,10 +29,12 @@ import {
 } from '../interfaces';
 import WindowState from '../window-state';
 
+import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfaces';
+
 type FetchDate = moment.Moment | null;
 
 export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
-    api: elasticApi.Client;
+    api!: elasticAPI.Client;
     dateFormat: string;
     windowState: WindowState
     startTime = moment();
@@ -41,13 +43,22 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         context: WorkerContext,
         opConfig: ESDateConfig,
         executionConfig: ExecutionConfig,
-        client: Client
     ) {
         super(context, opConfig, executionConfig);
-        this.api = elasticApi(client, this.logger, this.opConfig);
         const timeResolution = dateOptions(opConfig.time_resolution);
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
         this.windowState = new WindowState(executionConfig.slicers);
+    }
+
+    async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
+        await super.initialize(recoveryData);
+        const apiName = this.opConfig.api_name;
+
+        const apiConfig = this.executionConfig.apis.find((config) => config._name === apiName);
+        if (apiConfig == null) throw new Error(`could not find api configuration for api ${apiName}`);
+        // TODO: verify this type works
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, apiConfig);
     }
 
     async getDates(): Promise<{ start: FetchDate; limit: FetchDate; }> {

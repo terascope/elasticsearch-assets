@@ -4,7 +4,7 @@ import {
     DataEntity, AnyObject, isNil, debugLogger, pDelay, uniq
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
 
 const logger = debugLogger('elasticsearch_helpers');
@@ -105,7 +105,7 @@ export async function populateIndex(
 export async function fetch(
     client: Client, query: SearchParams, fullRequest = false
 ): Promise<(AnyObject[] | AnyObject)> {
-    const esClient = elasticApi(client, logger, { full_response: fullRequest });
+    const esClient = elasticAPI(client, logger, { full_response: fullRequest });
     const results = await esClient.search(query);
     return results;
 }
@@ -113,7 +113,7 @@ export async function fetch(
 export async function waitForData(
     client: Client, index: string, count: number, timeout = 5000
 ): Promise<void> {
-    const esClient = elasticApi(client, logger);
+    const esClient = elasticAPI(client, logger);
     const failTestTime = Date.now() + timeout;
 
     return new Promise((resolve, reject) => {

@@ -7,7 +7,7 @@ import {
     getTypeOf,
     isString
 } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
@@ -28,7 +28,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             }
         }
 
-        elasticApi({}, logger).validateGeoParameters(opConfig);
+        elasticAPI({}, logger).validateGeoParameters(opConfig);
 
         if (job.lifecycle === 'persistent') {
             if (opConfig.interval === 'auto') {

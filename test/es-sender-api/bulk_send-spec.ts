@@ -1,6 +1,6 @@
 import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { makeClient, cleanupIndex, fetch } from '../helpers/elasticsearch';
 import { TEST_INDEX_PREFIX, waitForData } from '../helpers';
 import Sender from '../../asset/src/elasticsearch_sender_api/bulk_send';
@@ -8,7 +8,7 @@ import Sender from '../../asset/src/elasticsearch_sender_api/bulk_send';
 describe('elasticsearch bulk sender module', () => {
     const logger = debugLogger('sender_api_test');
     const client = makeClient();
-    const esClient = elasticApi(client, logger);
+    const esClient = elasticAPI(client, logger);
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
     const type = esClient.getESVersion() === 7 ? '_doc' : 'events';
     let harness: WorkerTestHarness;
@@ -43,7 +43,7 @@ describe('elasticsearch bulk sender module', () => {
         expect(sender).toBeDefined();
         expect(sender).toHaveProperty('formatBulkData');
         expect(sender).toHaveProperty('send');
-        expect(sender).toHaveProperty('verifyRoute');
+        expect(sender).toHaveProperty('verify');
     });
 
     describe('can format bulk data', () => {

@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 import WindowState from './window-state';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
@@ -67,7 +67,7 @@ export interface SlicerArgs {
     dates: SlicerDateConfig;
     primaryRange?: DateSegments;
     id: number;
-    api: elasticApi.Client;
+    api: elasticAPI.Client;
     events: EventEmitter;
     windowState: WindowState;
 }

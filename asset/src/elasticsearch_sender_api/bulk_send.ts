@@ -1,5 +1,5 @@
 import { RouteSenderAPI } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import {
     isNumber, getTypeOf, DataEntity, isNotNil, isNil, AnyObject
 } from '@terascope/utils';
@@ -12,11 +12,11 @@ import {
 } from '../elasticsearch_index_selector/interfaces';
 
 export default class ElasticsearchSender implements RouteSenderAPI {
-    client: elasticApi.Client;
+    client: elasticAPI.Client;
     size: number;
     clientVersion: number;
 
-    constructor(client: elasticApi.Client, config: SenderConfig) {
+    constructor(client: elasticAPI.Client, config: SenderConfig) {
         const { size } = config;
         if (!isNumber(size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(size)}`);
         this.client = client;

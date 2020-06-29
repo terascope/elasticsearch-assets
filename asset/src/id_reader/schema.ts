@@ -1,7 +1,13 @@
 import {
-    ConvictSchema, isString, ValidatedJobConfig, getOpConfig, AnyObject
+    ConvictSchema,
+    isString,
+    ValidatedJobConfig,
+    getOpConfig,
+    AnyObject,
+    getTypeOf
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
+import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -105,6 +111,14 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             },
             connection: {
                 default: 'default'
+            },
+            api_name: {
+                doc: 'name of api to be used by elasticearch reader',
+                default: DEFAULT_API_NAME,
+                format: (val: unknown) => {
+                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                }
             }
         };
     }
