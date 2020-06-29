@@ -66,8 +66,8 @@ export default class ElasticsearchSender implements RouteSenderAPI {
 
         await Promise.all(slicedData);
     }
-    // unkown if needs to be implemented for elasticsearch
-    async verifyRoute(): Promise<void> {}
+    // unknown if needs to be implemented for elasticsearch
+    async verify(): Promise<void> {}
 }
 
 function splitArray(dataArray: AnyObject[], splitLimit: number) {

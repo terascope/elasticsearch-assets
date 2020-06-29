@@ -30,6 +30,7 @@ export interface ESReaderConfig extends OpConfig {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
+    api_name: string;
 }
 
 export interface DateSegments {

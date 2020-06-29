@@ -1,19 +1,14 @@
 import { WorkerContext, makeExContextLogger, ExecutionConfig } from '@terascope/job-components';
-import { Client } from 'elasticsearch';
 import ESDateFetcher from '../elasticsearch_reader/elasticsearch_date_range/reader';
-import MockedClient from './client';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 
-export default class ESReader extends ESDateFetcher {
+export default class SpacesReader extends ESDateFetcher {
     constructor(
         context: WorkerContext,
         opConfig: ApiConfig,
         executionConfig: ExecutionConfig
     ) {
-        const logger = makeExContextLogger(context, executionConfig, 'operation', {
-            opName: opConfig._op,
-        });
-        const client = new MockedClient(opConfig, logger) as unknown as Client;
-        super(context, opConfig, executionConfig, client);
+        if (opConfig.api_name)
+        super(context, opConfig, executionConfig);
     }
 }

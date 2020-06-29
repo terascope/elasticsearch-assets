@@ -1,5 +1,11 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber, AnyObject,
+    ConvictSchema,
+    ValidatedJobConfig,
+    getOpConfig,
+    toNumber,
+    AnyObject,
+    getTypeOf,
+    isString
 } from '@terascope/job-components';
 import elasticApi from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -8,6 +14,7 @@ import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
 import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
+import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -137,9 +144,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 doc: 'used to only return fields that you are interested in',
                 default: null,
                 format(val: any) {
-                    function isString(elem: any) {
-                        return typeof elem === 'string';
-                    }
                     if (val === null) {
                         return true;
                     }
@@ -246,6 +250,14 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             connection: {
                 default: 'default'
             },
+            api_name: {
+                doc: 'name of api to be used by elasticearch reader',
+                default: DEFAULT_API_NAME,
+                format: (val: unknown) => {
+                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                }
+            }
         };
     }
 }

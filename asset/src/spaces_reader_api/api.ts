@@ -3,9 +3,10 @@ import {
     isNil, isString, isPlainObject, getTypeOf, AnyObject
 } from '@terascope/utils';
 import elasticApi from '@terascope/elasticsearch-api';
-import { ValidReaderConfig } from './interfaces';
+import MockedClient from './client';
+import { ValidReaderConfig } from '../elasticsearch_reader_api/interfaces';
 
-export default class ElasticsearchReaderApi extends APIFactory<elasticApi.Client, AnyObject > {
+export default class SpacesReaderApi extends APIFactory<elasticApi.Client, AnyObject > {
     // TODO: this needs more validation
     validateConfig(config: unknown): ValidReaderConfig {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
@@ -18,15 +19,11 @@ export default class ElasticsearchReaderApi extends APIFactory<elasticApi.Client
         _name: string, overrideConfigs: AnyObject
     ): Promise<{ client: elasticApi.Client, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
+        // TODO: fixme: remove the any
+        const mockedClient = new MockedClient(config as any, this.logger);
+        const client = elasticApi(mockedClient, this.logger, config);
 
-        const { client } = this.context.foundation.getConnection({
-            endpoint: config.connection,
-            type: 'elasticsearch',
-            cached: true
-        });
-        const esClient = elasticApi(client, this.logger, config);
-
-        return { client: esClient, config };
+        return { client, config };
     }
 
     async remove(_index: string): Promise<void> {}

@@ -1,6 +1,6 @@
 import { makeExContextLogger, WorkerContext, ExecutionConfig } from '@terascope/job-components';
 import { Client } from 'elasticsearch';
-import MockedClient from './client';
+import MockedClient from '../spaces_reader_api/client';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import DateSlicer from '../elasticsearch_reader/elasticsearch_date_range/slicer';
 

@@ -1,6 +1,7 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
 import elasticApi from '@terascope/elasticsearch-api';
+import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
 } from '../helpers';
@@ -11,6 +12,8 @@ describe('elasticsearch reader api', () => {
 
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const esClient = makeClient();
+
+    type API = APIFactoryRegistry<elasticApi.Client, AnyObject>
 
     const clients = [
         {
@@ -65,7 +68,8 @@ describe('elasticsearch reader api', () => {
         const processor = harness.getOperation('noop');
         // @ts-expect-error\
         processor.onBatch = async function test(data: DataEntity[]) {
-            const api = processor.getAPI<elasticApi.Client>(processor.opConfig.apiName);
+            const apiManager = processor.getAPI<API>(processor.opConfig.apiName);
+            const api = await apiManager.create('test', {});
             return api.search(data[0]);
         };
 
@@ -84,7 +88,6 @@ describe('elasticsearch reader api', () => {
         const slice = [{ index: apiReaderIndex, q: '*' }];
         const test = await setupTest();
         const results = await test.runSlice(slice);
-
         expect(results.length).toEqual(2);
     });
 });
