@@ -56,7 +56,7 @@ export default class Schema extends ConvictSchema<ApiConfig> {
                 default: 300000
             },
         };
-        console.log('what is esSchema', esSchema)
+
         return Object.assign({}, esSchema, apiSchema);
     }
 }

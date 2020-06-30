@@ -20,7 +20,6 @@ export default class SpacesReaderApi extends APIFactory<elasticAPI.Client, AnyOb
     ): Promise<{ client: elasticAPI.Client, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         // TODO: fixme: remove the any
-        console.log('in the api create', this.apiConfig, overrideConfigs)
         const mockedClient = new SpacesClient(config as any, this.logger);
         const client = elasticAPI(mockedClient, this.logger, config);
 

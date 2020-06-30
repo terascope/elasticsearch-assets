@@ -195,7 +195,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                         millisecond: 'ms',
                         ms: 'ms'
                     };
-                    if (!isNumber(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!isString(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
                     if (!obj[val]) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
 
                     return obj[val];

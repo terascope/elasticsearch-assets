@@ -156,7 +156,7 @@ export default class SpacesClient {
 
         try {
             const response = await this.makeRequest(uri, query);
-            console.log('what is response', response)
+
             let esResults: any[] = [];
             if (response.results) {
                 esResults = response.results.map((result: any) => ({
