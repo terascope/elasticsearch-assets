@@ -100,3 +100,12 @@ function isMeta(meta: AnyObject) {
 
     return false;
 }
+
+// function extractMeta(meta: AnyObject) {
+//     if (meta.index) return meta.index;
+//     if (meta.create) return meta.create;
+//     if (meta.update) return meta.update;
+//     if (meta.delete) return meta.delete;
+
+//     throw new TSError('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
+// }

@@ -4,7 +4,9 @@ import {
     getOpConfig,
     get,
     AnyObject,
-    isNil
+    isNil,
+    isString,
+    getTypeOf
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
@@ -21,18 +23,8 @@ export default class Schema extends ConvictSchema<BulkSender> {
         const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
-        // check to verify if connection map provided is
-        // consistent with sysconfig.terafoundation.connectors
-        if (opConfig.multisend) {
-            for (const [, value] of Object.entries(opConfig.connection_map)) {
-                if (!elasticConnectors[value]) {
-                    throw new Error(`A connection for [${value}] was set on the elasticsearch_bulk connection_map but is not found in the system configuration [terafoundation.connectors.elasticsearch]`);
-                }
-            }
-        }
-
         const {
-            index, connection, full_response, size, api_name
+            index, connection, size, api_name
         } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
@@ -44,7 +36,6 @@ export default class Schema extends ConvictSchema<BulkSender> {
                 _name: DEFAULT_API_NAME,
                 index,
                 connection,
-                full_response,
                 size
             });
         }
@@ -64,32 +55,18 @@ export default class Schema extends ConvictSchema<BulkSender> {
                     }
                 }
             },
-            connection_map: {
-                doc: 'Mapping from ID prefix to connection names. Routes data to multiple clusters '
-                + 'based on the incoming key. Used when multisend is set to true. The key name can be a '
-                + 'comma separated list of prefixes that will map to the same connection. Prefixes matching takes '
-                + 'the first character of the key.',
-                default: {
-                    '*': 'default'
-                },
-                format: Object
-            },
-            multisend: {
-                doc: 'When set to true the connection_map will be used allocate the data stream across multiple '
-                + 'connections based on the keys of the incoming documents.',
-                default: false,
-                format: Boolean
-            },
-            multisend_index_append: {
-                doc: 'When set to true will append the connection_map prefixes to the name of the index '
-                + 'before data is submitted.',
-                default: false,
-                format: Boolean
-            },
             connection: {
                 doc: 'Name of the elasticsearch connection to use when sending data.',
                 default: 'default',
                 format: 'optional_String'
+            },
+            api_name: {
+                doc: 'name of api to be used by elasticearch reader',
+                default: DEFAULT_API_NAME,
+                format: (val: unknown) => {
+                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                }
             }
         };
     }
