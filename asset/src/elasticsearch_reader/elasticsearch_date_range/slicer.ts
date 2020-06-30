@@ -51,7 +51,6 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     }
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
-        await super.initialize(recoveryData);
         const apiName = this.opConfig.api_name;
 
         const apiConfig = this.executionConfig.apis.find((config) => config._name === apiName);
@@ -59,6 +58,12 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         // TODO: verify this type works
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, apiConfig);
+
+        // NOTE ORDER MATTERS
+        // a parallel slicer initialize calls newSlicer multiple times
+        // need to make api before newSlicer is called
+
+        await super.initialize(recoveryData);
     }
 
     async getDates(): Promise<{ start: FetchDate; limit: FetchDate; }> {

@@ -68,12 +68,12 @@ describe('id_reader', () => {
             const errorStr2 = 'The number of slicers specified on the job cannot be more than 16';
             const errorStr3 = 'The number of slicers specified on the job cannot be more than 64';
 
-            const job1 = { slicers: 1, operations: [{ _op: 'id_reader', key_range: ['a', 'b'] }] };
-            const job2 = { slicers: 2, operations: [{ _op: 'id_reader', key_range: ['a'] }] };
-            const job3 = { slicers: 4, operations: [{ _op: 'id_reader', key_type: 'hexadecimal' }] };
-            const job4 = { slicers: 20, operations: [{ _op: 'id_reader', key_type: 'hexadecimal' }] };
-            const job5 = { slicers: 20, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
-            const job6 = { slicers: 70, operations: [{ _op: 'id_reader', key_type: 'base64url' }] };
+            const job1 = { slicers: 1, operations: [{ _op: 'id_reader', index: 'someIndex', key_range: ['a', 'b'] }] };
+            const job2 = { slicers: 2, operations: [{ _op: 'id_reader', index: 'someIndex', key_range: ['a'] }] };
+            const job3 = { slicers: 4, operations: [{ _op: 'id_reader', index: 'someIndex', key_type: 'hexadecimal' }] };
+            const job4 = { slicers: 20, operations: [{ _op: 'id_reader', index: 'someIndex', key_type: 'hexadecimal' }] };
+            const job5 = { slicers: 20, operations: [{ _op: 'id_reader', index: 'someIndex', key_type: 'base64url' }] };
+            const job6 = { slicers: 70, operations: [{ _op: 'id_reader', index: 'someIndex', key_type: 'base64url' }] };
 
             function testValidation(job: AnyObject) {
                 const context = new TestContext('test');

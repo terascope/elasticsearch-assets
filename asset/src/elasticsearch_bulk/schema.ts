@@ -1,7 +1,13 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, get, AnyObject,
+    ConvictSchema,
+    ValidatedJobConfig,
+    getOpConfig,
+    get,
+    AnyObject,
+    isNil
 } from '@terascope/job-components';
 import { BulkSender } from './interfaces';
+import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
 
 function fetchConfig(job: ValidatedJobConfig) {
     const opConfig = getOpConfig(job, 'elasticsearch_bulk');
@@ -23,6 +29,24 @@ export default class Schema extends ConvictSchema<BulkSender> {
                     throw new Error(`A connection for [${value}] was set on the elasticsearch_bulk connection_map but is not found in the system configuration [terafoundation.connectors.elasticsearch]`);
                 }
             }
+        }
+
+        const {
+            index, connection, full_response, size, api_name
+        } = opConfig;
+        if (!Array.isArray(job.apis)) job.apis = [];
+        const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
+
+        if (isNil(ElasticSenderAPI)) {
+            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+
+            job.apis.push({
+                _name: DEFAULT_API_NAME,
+                index,
+                connection,
+                full_response,
+                size
+            });
         }
     }
 

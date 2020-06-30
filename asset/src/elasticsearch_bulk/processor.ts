@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
     getClient,
@@ -11,7 +12,9 @@ import {
     has,
     TSError
 } from '@terascope/utils';
+import { ElasticSenderAPI } from '../elasticsearch_sender_api/interfaces';
 import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
+
 import { BulkSender } from './interfaces';
 
 interface Endpoint {
@@ -29,6 +32,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
     isMultisend: boolean;
     client: ElasticsearchSender;
     multisendIndexAppend: boolean;
+    apiManager!: ElasticSenderAPI;
 
     constructor(context: WorkerContext, opConfig: BulkSender, exConfig: ExecutionConfig) {
         super(context, opConfig, exConfig);
@@ -42,6 +46,7 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         this.limit = limit;
         this.isMultisend = multisend;
         this.multisendIndexAppend = multisendIndexAppend;
+        // @ts-expect-error
         this.client = this._createClient();
         this.bulkContexts = {};
 
@@ -53,6 +58,8 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
 
                 for (const key of keys) {
                     this.bulkContexts[key.toLowerCase()] = {
+                        // @ts-expect-error
+
                         client,
                         data: []
                     };
@@ -61,14 +68,13 @@ export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
         }
     }
 
+    async initialize(): Promise<void> {
+        await super.initialize();
+        this.apiManager = this.getAPI(this.opConfig.api_name);
+    }
+
     private _createClient(config: AnyObject = {}) {
-        const clientConfig = Object.assign({}, this.opConfig, config);
-        const client = getClient(this.context, clientConfig, 'elasticsearch');
-
-        if (client == null) throw new TSError(`Could not find elasticsearch client for connection: ${clientConfig.connection}`);
-
-        const esClient = elasticAPI(client, this.logger, clientConfig);
-        return new ElasticsearchSender(esClient, clientConfig as any);
+        return this.apiManager.create('hello', config);
     }
 
     private async multiSend(data: any[]) {

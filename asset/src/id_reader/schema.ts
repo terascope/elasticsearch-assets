@@ -4,7 +4,9 @@ import {
     ValidatedJobConfig,
     getOpConfig,
     AnyObject,
-    getTypeOf
+    getTypeOf,
+    isNotNil,
+    isNil
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
@@ -29,13 +31,28 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 throw new Error('The number of slicers specified on the job cannot be more than 16');
             }
         }
+
+        const { index, connection, api_name } = opConfig;
+        if (!Array.isArray(job.apis)) job.apis = [];
+        const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
+
+        if (isNil(ElasticReaderAPI)) {
+            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+
+            job.apis.push({
+                _name: DEFAULT_API_NAME,
+                index,
+                connection,
+                full_response: false
+            });
+        }
     }
 
     build(): AnyObject {
         return {
             index: {
                 doc: 'Which index to read from',
-                default: '',
+                default: null,
                 format: 'required_String'
 
             },
@@ -52,15 +69,8 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             },
             field: {
                 doc: 'The field in which searches will be queryed from',
-                default: '',
+                default: null,
                 format: 'required_String'
-            },
-            full_response: {
-                doc: 'used internally for api, must be set to true',
-                default: true,
-                format: (val: any) => {
-                    if (val !== true) throw new Error('Parameter full_response must be set to true');
-                }
             },
             key_type: {
                 doc: 'The type of id used in index',
@@ -99,18 +109,17 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             fields: {
                 doc: 'used to only return fields that you are interested in',
                 default: null,
-                format(val: any) {
-                    if (val === null) return;
-                    if (!Array.isArray(val)) {
-                        throw new Error('Fields parameter must be an array');
-                    }
-                    if (!val.every(isString)) {
-                        throw new Error('Invalid fields parameter, the values listed in the fields array must be of type string');
+                format(val: unknown): void {
+                    if (isNotNil(val)) {
+                        if (!Array.isArray(val)) throw new Error('Fields parameter must be an array');
+                        if (!val.every(isString)) throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
                     }
                 }
             },
             connection: {
-                default: 'default'
+                doc: 'Name of the elasticsearch connection to use when sending data.',
+                default: 'default',
+                format: 'optional_String'
             },
             api_name: {
                 doc: 'name of api to be used by elasticearch reader',
