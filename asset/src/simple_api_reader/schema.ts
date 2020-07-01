@@ -33,7 +33,7 @@ export default class Schema extends ConvictSchema<ApiConfig> {
             });
         } else {
             ['endpoint', 'index', 'token', 'index', 'date_field_name'].forEach((field) => {
-                if (isNotNil(opConfig[field])) throw new Error(`Invalid config, if api is specified, parameter ${field} must live in the api config and not in spaces_reader`)
+                if (isNotNil(opConfig[field])) throw new Error(`Invalid config, if api is specified, parameter ${field} must live in the api config and not in spaces_reader`);
             });
         }
     }

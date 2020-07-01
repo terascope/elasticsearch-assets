@@ -15,12 +15,8 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         const apiName = this.opConfig.api_name;
-
-        const apiConfig = this.executionConfig.apis.find((config) => config._name === apiName);
-        if (apiConfig == null) throw new Error(`could not find api configuration for api ${apiName}`);
-        // TODO: verify this type works
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
-        this.api = await apiManager.create(apiName, apiConfig);
+        this.api = await apiManager.create(apiName, {});
         // NOTE ORDER MATTERS
         // a parallel slicer initialize calls newSlicer multiple times
         // need to make api before newSlicer is called

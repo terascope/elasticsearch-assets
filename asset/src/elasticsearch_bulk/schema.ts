@@ -114,7 +114,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
         const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
         if (isNil(ElasticSenderAPI)) {
-            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_sender configuration, must provide parameter index');
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
@@ -132,7 +132,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
             default: DEFAULT_API_NAME,
             format: (val: unknown): void => {
                 if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-                if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_sender_api');
             }
         };
         return clone;
