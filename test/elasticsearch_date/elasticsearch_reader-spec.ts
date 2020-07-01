@@ -115,7 +115,6 @@ describe('elasticsearch_reader', () => {
                     connection,
                     size,
                     interval,
-                    preserve_id: preserveId,
                     delay,
                     subslice_by_key: subslice,
                     time_resolution: resolution
@@ -125,7 +124,6 @@ describe('elasticsearch_reader', () => {
             expect(connection).toEqual('default');
             expect(size).toEqual(5000);
             expect(interval).toEqual('auto');
-            expect(preserveId).toEqual(false);
             expect(delay).toEqual('30s');
             expect(subslice).toEqual(false);
             expect(resolution).toEqual('s');

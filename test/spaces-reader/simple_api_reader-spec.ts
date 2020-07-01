@@ -12,7 +12,7 @@ describe('simple_api_reader', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
     const logger = debugLogger('simple_api_reader');
-    const assetDir = path.join(__dirname, '..');
+    const assetDir = path.join(__dirname, '../..');
     let clients: any;
     let defaultClient: MockClient;
 
