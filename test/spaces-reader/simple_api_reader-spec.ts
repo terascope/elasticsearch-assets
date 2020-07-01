@@ -4,9 +4,9 @@ import path from 'path';
 import moment from 'moment';
 import { newTestJobConfig, debugLogger, SlicerRecoveryData } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
-import SpacesClient from '../asset/src/spaces_reader_api/client';
-import { IDType } from '../asset/src/id_reader/interfaces';
-import MockClient from './mock_client';
+import SpacesClient from '../../asset/src/spaces_reader_api/client';
+import { IDType } from '../../asset/src/id_reader/interfaces';
+import MockClient from '../mock_client';
 
 describe('simple_api_reader', () => {
     const baseUri = 'http://test.dev';

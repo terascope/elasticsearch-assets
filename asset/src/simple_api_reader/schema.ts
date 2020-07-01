@@ -5,7 +5,9 @@ import {
     getTypeOf,
     getOpConfig,
     ValidatedJobConfig,
-    isNil
+    isNil,
+    isNumber,
+    isNotNil
 } from '@terascope/job-components';
 import ReaderSchema from '../elasticsearch_reader/schema';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
@@ -19,11 +21,19 @@ export default class Schema extends ConvictSchema<ApiConfig> {
         const SpacesReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
         if (isNil(SpacesReaderAPI)) {
-            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+            if (isNil(opConfig.index) || !isString(opConfig.index)) throw new Error(`Invalid parameter index, must be of type string, was given ${getTypeOf(opConfig.index)}`);
+            if (isNil(opConfig.date_field_name) || !isString(opConfig.date_field_name)) throw new Error(`Invalid parameter date_field_name, must be of type string, was given ${getTypeOf(opConfig.date_field_name)}`);
+            if (isNil(opConfig.endpoint) || !isString(opConfig.endpoint)) throw new Error(`Invalid parameter endpoint, must be of type string, was given ${getTypeOf(opConfig.endpoint)}`);
+            if (isNil(opConfig.token) || !isString(opConfig.token)) throw new Error(`Invalid parameter token, must be of type string, was given ${getTypeOf(opConfig.token)}`);
+            if (isNil(opConfig.timeout) || !isNumber(opConfig.timeout)) throw new Error(`Invalid parameter timeout, must be of type number, was given ${getTypeOf(opConfig.timeout)}`);
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
                 ...apiConfig
+            });
+        } else {
+            ['endpoint', 'index', 'token', 'index', 'date_field_name'].forEach((field) => {
+                if (isNotNil(opConfig[field])) throw new Error(`Invalid config, if api is specified, parameter ${field} must live in the api config and not in spaces_reader`)
             });
         }
     }
@@ -43,13 +53,13 @@ export default class Schema extends ConvictSchema<ApiConfig> {
         const apiSchema = {
             endpoint: {
                 doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
-                default: '',
-                format: 'required_String'
+                default: null,
+                format: 'optional_String'
             },
             token: {
                 doc: 'API access token for making requests',
-                default: '',
-                format: 'required_String'
+                default: null,
+                format: 'optional_String'
             },
             timeout: {
                 doc: 'Time in milliseconds to wait for a connection to timeout.',

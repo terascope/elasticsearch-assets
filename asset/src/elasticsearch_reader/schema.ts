@@ -134,11 +134,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                     dateOptions(interval[2]);
                 }
             },
-            preserve_id: {
-                doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',
-                default: false,
-                format: Boolean
-            },
             date_field_name: {
                 doc: 'field name where the date of the doc is located',
                 default: null,
