@@ -1,67 +1,134 @@
 import { RouteSenderAPI } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
-    isNumber, getTypeOf, DataEntity, isNotNil, isNil, AnyObject
+    DataEntity,
+    AnyObject,
+    isString,
+    fastAssign,
+    set
 } from '@terascope/utils';
-import { SenderConfig } from './interfaces';
 import {
-    MUTATE_META,
-    INDEX_META,
-    IndexSpec,
-    UpdateConfig
-} from '../elasticsearch_index_selector/interfaces';
+    ElasticsearchSenderConfig, IndexSpec, BulkMeta, UpdateConfig
+} from './interfaces';
 
 export default class ElasticsearchSender implements RouteSenderAPI {
     client: elasticAPI.Client;
-    size: number;
+    config: ElasticsearchSenderConfig;
     clientVersion: number;
+    isRouter = false;
 
-    constructor(client: elasticAPI.Client, config: SenderConfig) {
-        const { size } = config;
-        if (!isNumber(size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(size)}`);
+    constructor(client: elasticAPI.Client, config: ElasticsearchSenderConfig) {
         this.client = client;
         this.clientVersion = client.getESVersion();
-        this.size = size;
+        this.config = config;
+        // _key is the char from router
+        if (config._key && isString(config._key)) this.isRouter = true;
     }
 
-    formatBulkData(input: DataEntity[], isFormated = false): AnyObject[] {
-        if (isFormated) return input;
-        const results: any[] = [];
+    private createRoute(record: DataEntity): string {
+        let { index } = this.config;
+        // we only allow dynamic routes with the router
+        // bulk_sender only sends to a given index
+        if (this.isRouter) {
+            const routeMetadata = record.getMetadata('standard:route');
+            if (routeMetadata) index = `${index}-${routeMetadata}`;
+        }
 
-        input.forEach((record) => {
-            const indexingMeta = record.getMetadata(INDEX_META) as IndexSpec;
-            if (isNotNil(indexingMeta)) {
-                if (this.clientVersion === 7) {
-                    results.push(this.sanitizeMeta(indexingMeta));
-                } else {
-                    results.push(indexingMeta);
+        return index;
+    }
+
+    private createBulkMeta(record: DataEntity) {
+        const indexMeta: IndexSpec = {};
+        const index = this.createRoute(record);
+        let data: DataEntity | null | UpdateConfig = record;
+        const meta: Partial<BulkMeta> = {
+            _index: index
+        };
+        let update: UpdateConfig | null = null;
+
+        if (this.clientVersion < 7 && this.config.type) {
+            meta._type = this.config.type;
+        } else {
+            meta._type = '_doc';
+        }
+
+        const id = record.getMetadata('_key');
+
+        if (id) meta._id = id;
+
+        if (this.config.update || this.config.upsert) {
+            indexMeta.update = meta;
+
+            if (this.config.update_retry_on_conflict > 0) {
+                meta.retry_on_conflict = this.config.update_retry_on_conflict;
+            }
+
+            update = {};
+
+            if (this.config.upsert) {
+                // The upsert field is what is inserted if the key doesn't already exist
+                update.upsert = fastAssign({}, record);
+            }
+
+            // This will merge this record with the existing record.
+            if (this.config.update_fields.length > 0) {
+                update.doc = {};
+                this.config.update_fields.forEach((field) => {
+                    // @ts-expect-error
+                    update.doc[field] = record[field];
+                });
+            } else if (this.config.script_file || this.config.script) {
+                if (this.config.script_file) {
+                    update.script = {
+                        file: this.config.script_file
+                    };
                 }
 
-                if (isNil(indexingMeta.delete)) {
-                    const mutateMeta = record.getMetadata(MUTATE_META) as UpdateConfig;
+                if (this.config.script) {
+                    update.script = {
+                        source: this.config.script
+                    };
+                }
 
-                    if (isNotNil(mutateMeta)) {
-                        results.push(mutateMeta);
-                    } else {
-                        results.push(record);
+                set(update, 'script.params', {});
+                for (const [key, field] of Object.entries(this.config.script_params)) {
+                    if (record[field]) {
+                    // @ts-expect-error
+                        update.script.params[key] = record[field];
                     }
                 }
+            } else {
+                update.doc = fastAssign({}, record);
             }
-        });
+
+            data = update;
+        } else if (this.config.delete) {
+            indexMeta.delete = meta;
+            data = null;
+        } else if (this.config.create) {
+            indexMeta.create = meta;
+        } else {
+            indexMeta.index = meta;
+        }
+
+        return { indexMeta, data };
+    }
+
+    formatBulkData(input: DataEntity[]): AnyObject[] {
+        const results: any[] = [];
+
+        for (const record of input) {
+            const { indexMeta, data } = this.createBulkMeta(record);
+            results.push(indexMeta);
+            if (data) results.push(data);
+        }
 
         return results;
     }
 
-    private sanitizeMeta(meta: AnyObject): AnyObject {
-        for (const config of Object.values(meta)) {
-            config._type = '_doc';
-        }
-        return meta;
-    }
-
-    async send(dataArray: DataEntity[], isFormated = false): Promise<void> {
-        const formattedData = this.formatBulkData(dataArray, isFormated);
-        const slicedData = splitArray(formattedData, this.size)
+    async send(dataArray: DataEntity[]): Promise<void> {
+        const formattedData = this.formatBulkData(dataArray);
+        const slicedData = splitArray(formattedData, this.config.size)
             .map((data: any) => this.client.bulkSend(data));
 
         await Promise.all(slicedData);
@@ -100,12 +167,3 @@ function isMeta(meta: AnyObject) {
 
     return false;
 }
-
-// function extractMeta(meta: AnyObject) {
-//     if (meta.index) return meta.index;
-//     if (meta.create) return meta.create;
-//     if (meta.update) return meta.update;
-//     if (meta.delete) return meta.delete;
-
-//     throw new TSError('elasticsearch_bulk: Unknown elasticsearch operation in bulk request.');
-// }

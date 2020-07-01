@@ -1,7 +1,7 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import {
-    DataEntity, AnyObject, isNil, debugLogger, pDelay, uniq
+    DataEntity, AnyObject, debugLogger, pDelay, uniq
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import elasticAPI from '@terascope/elasticsearch-api';
@@ -21,18 +21,14 @@ export function makeClient(): Client {
 }
 
 export function formatUploadData(
-    index: string, version:number, data: any[], type?: string
+    index: string, version:number, data: any[]
 ): AnyObject[] {
     const results: any[] = [];
 
     data.forEach((record) => {
         const meta: any = { _index: index };
-        if (version === 6) {
-            if (isNil(type)) throw new Error('type must be provided is elasticsearch is version 6');
-            meta._type = type;
-        }
 
-        if (version === 7) meta._type = '_doc';
+        meta._type = '_doc';
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -48,7 +44,7 @@ export async function upload(
     client: Client, queryBody: BulkIndexDocumentsParams, data: any[]
 ): Promise<AnyObject> {
     const body = formatUploadData(
-        queryBody.index as string, getESVersion(client), data, queryBody.type
+        queryBody.index as string, getESVersion(client), data
     );
     const query = Object.assign({ refresh: 'wait_for', body }, queryBody);
     return client.bulk(query);
@@ -83,7 +79,7 @@ export async function populateIndex(
         )
     );
 
-    const body = formatUploadData(index, version, records, 'events');
+    const body = formatUploadData(index, version, records);
 
     const results = await client.bulk({
         index,
@@ -104,7 +100,7 @@ export async function populateIndex(
 
 export async function fetch(
     client: Client, query: SearchParams, fullRequest = false
-): Promise<(AnyObject[] | AnyObject)> {
+): Promise<(DataEntity[] | DataEntity)> {
     const esClient = elasticAPI(client, logger, { full_response: fullRequest });
     const results = await esClient.search(query);
     return results;

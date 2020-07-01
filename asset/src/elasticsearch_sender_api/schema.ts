@@ -1,9 +1,9 @@
 import {
     ConvictSchema, AnyObject, cloneDeep,
 } from '@terascope/job-components';
-import { SenderConfig } from './interfaces';
+import { ElasticsearchSenderConfig } from './interfaces';
 
-import { schema } from '../elasticsearch_reader_api/schema';
+import { schema } from '../elasticsearch_bulk/schema';
 
 const newSchema: AnyObject = cloneDeep(schema);
 
@@ -20,7 +20,7 @@ newSchema.size = {
     }
 };
 
-export default class Schema extends ConvictSchema<SenderConfig> {
+export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
     build(): AnyObject {
         return newSchema;
     }

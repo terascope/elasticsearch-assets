@@ -1,19 +1,12 @@
-import { BatchProcessor, WorkerContext, ExecutionConfig } from '@terascope/job-components';
+import { BatchProcessor } from '@terascope/job-components';
 import { DataEntity } from '@terascope/utils';
 import { ElasticSenderAPI } from '../elasticsearch_sender_api/interfaces';
 import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
-import { BulkSender } from './interfaces';
+import { ElasticsearchBulkConfig } from './interfaces';
 
-export default class ElasticsearchBulk extends BatchProcessor<BulkSender> {
-    limit: number;
+export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkConfig> {
     client!: ElasticsearchSender;
     apiManager!: ElasticSenderAPI;
-
-    constructor(context: WorkerContext, opConfig: BulkSender, exConfig: ExecutionConfig) {
-        super(context, opConfig, exConfig);
-        const { size: limit } = opConfig;
-        this.limit = limit;
-    }
 
     async initialize(): Promise<void> {
         await super.initialize();

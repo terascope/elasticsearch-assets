@@ -4,21 +4,22 @@ import {
 } from '@terascope/utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import ElasticsearchSender from './bulk_send';
-import { SenderConfig, ValidSenderConfig } from './interfaces';
+import { ElasticsearchSenderConfig } from './interfaces';
 
-export default class ElasticsearchSenderAPI extends APIFactory<ElasticsearchSender, AnyObject> {
+export default class ElasticsearchSenderAPI extends APIFactory
+    <ElasticsearchSender, ElasticsearchSenderConfig> {
     // TODO: there might need more checks here
-    validateConfig(config: unknown): ValidSenderConfig {
+    validateConfig(config: unknown): ElasticsearchSenderConfig {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
         if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         if (!isNumber(config.size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(config.size)}`);
         if (isNil(config.connection) || !isString(config.connection)) throw new Error('Invalid parameter "connection", must provide a valid connection');
-        return config as ValidSenderConfig;
+        return config as ElasticsearchSenderConfig;
     }
 
     async create(
-        _name: string, overrideConfig: SenderConfig
-    ): Promise<{ client: ElasticsearchSender, config: AnyObject }> {
+        _name: string, overrideConfig: Partial<ElasticsearchSenderConfig>
+    ): Promise<{ client: ElasticsearchSender, config: ElasticsearchSenderConfig }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
 
         const { client } = this.context.foundation.getConnection({

@@ -43,19 +43,13 @@ describe('elasticsearch sender api', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    index: 'someIndex',
+                    index: apiSendIndex,
                 },
             ],
             operations: [
                 {
                     _op: 'test-reader',
                     passthrough_slice: true
-                },
-                {
-                    _op: 'elasticsearch_index_selector',
-                    index: apiSendIndex,
-                    type: 'events'
-
                 },
                 {
                     _op: 'noop',
