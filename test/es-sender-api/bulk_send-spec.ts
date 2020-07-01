@@ -225,7 +225,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = sender.formatBulkData(data);
 
-            const expectedMetadata = { update: { _index: 'some_index', _type: 'events' } };
+            const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
             const expectedMutateMetadata = {
                 upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
@@ -252,7 +252,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = sender.formatBulkData(data);
 
-            const expectedMetadata = { update: { _index: 'some_index', _type: 'events' } };
+            const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
             const expectedMutateMetadata = {
                 upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
@@ -280,7 +280,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = sender.formatBulkData(data);
 
-            const expectedMetadata = { update: { _index: 'hello', _type: 'events' } };
+            const expectedMetadata = { update: { _index: 'hello', _type: type } };
 
             const expectedMutateMetadata = {
                 upsert: { count: 1, add: 2 },
