@@ -2,6 +2,7 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
 } from '../helpers';
@@ -12,6 +13,10 @@ describe('elasticsearch reader api', () => {
 
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const esClient = makeClient();
+
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
 
     type API = APIFactoryRegistry<elasticAPI.Client, AnyObject>
 
@@ -46,6 +51,7 @@ describe('elasticsearch reader api', () => {
                 {
                     _name: 'elasticsearch_reader_api',
                     index: apiReaderIndex,
+                    type: docType
                 },
             ],
             operations: [
@@ -81,7 +87,7 @@ describe('elasticsearch reader api', () => {
     it('can read data from an index', async () => {
         const data = [{ some: 'data' }, { other: 'data' }];
 
-        await upload(esClient, { index: apiReaderIndex, type: 'events' }, data);
+        await upload(esClient, { index: apiReaderIndex, type: docType }, data);
 
         await waitForData(esClient, apiReaderIndex, 2);
 

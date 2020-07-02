@@ -1,6 +1,7 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
+import { getESVersion } from 'elasticsearch-store';
 import { DataEntity, OpConfig } from '@terascope/job-components';
 import path from 'path';
 import {
@@ -23,6 +24,9 @@ describe('elasticsearch_bulk', () => {
     let clientCalls: ClientCalls = {};
     const esClient = makeClient();
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
 
     beforeAll(async () => {
         await cleanupIndex(esClient, `${bulkIndex}*`);
@@ -75,7 +79,8 @@ describe('elasticsearch_bulk', () => {
     async function makeTest(opConfig = {}) {
         const bulkConfig: OpConfig = Object.assign(
             { _op: 'elasticsearch_bulk', index: bulkIndex },
-            opConfig
+            opConfig,
+            { type: docType }
         );
 
         const job = newTestJobConfig({
@@ -108,7 +113,7 @@ describe('elasticsearch_bulk', () => {
         } = test.getOperation(opName);
 
         expect(size).toEqual(500);
-        expect(type).toEqual('_doc');
+        expect(type).toEqual(docType);
         expect(create).toEqual(false);
         expect(upsert).toEqual(false);
         expect(update_fields).toBeArrayOfSize(0);

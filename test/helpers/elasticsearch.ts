@@ -21,14 +21,14 @@ export function makeClient(): Client {
 }
 
 export function formatUploadData(
-    index: string, version:number, data: any[]
+    index: string, type: string, data: any[]
 ): AnyObject[] {
     const results: any[] = [];
 
     data.forEach((record) => {
         const meta: any = { _index: index };
 
-        meta._type = '_doc';
+        meta._type = type || '_doc';
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -44,7 +44,7 @@ export async function upload(
     client: Client, queryBody: BulkIndexDocumentsParams, data: any[]
 ): Promise<AnyObject> {
     const body = formatUploadData(
-        queryBody.index as string, getESVersion(client), data
+        queryBody.index as string, queryBody.type as string, data
     );
     const query = Object.assign({ refresh: 'wait_for', body }, queryBody);
     return client.bulk(query);
@@ -54,7 +54,8 @@ export async function populateIndex(
     client: Client,
     index: string,
     fields: TypeConfigFields,
-    records: any[]
+    records: any[],
+    type = '_doc'
 ): Promise<void> {
     const overrides = {
         settings: {
@@ -79,11 +80,11 @@ export async function populateIndex(
         )
     );
 
-    const body = formatUploadData(index, version, records);
+    const body = formatUploadData(index, type, records);
 
     const results = await client.bulk({
         index,
-        type: 'events',
+        type,
         body,
         refresh: true
     });
