@@ -106,7 +106,6 @@ describe('elasticsearch_reader', () => {
             const testOpConfig = {
                 _op: opName,
                 index: 'some-index',
-                type: 'some-type',
                 date_field_name: 'created'
             };
             const test = await makeFetcherTest(testOpConfig);
@@ -166,7 +165,6 @@ describe('elasticsearch_reader', () => {
             const testOpConfig = {
                 _op: 'elasticsearch_reader',
                 index: 'some-index',
-                type: 'some-type',
                 date_field_name: 'created'
             };
 

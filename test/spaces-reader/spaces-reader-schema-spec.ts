@@ -9,7 +9,7 @@ describe('spaces-reader schema', () => {
 
     async function makeTest(opConfig: AnyObject = {}, apiConfig?: AnyObject) {
         const readerConfig = Object.assign({
-            _op: 'simple_api_reader',
+            _op: 'spaces_reader',
         }, opConfig);
 
         const partialJob: AnyObject = {
@@ -47,7 +47,7 @@ describe('spaces-reader schema', () => {
             token: 'someToken'
         });
 
-        const op = test.getOperation('simple_api_reader');
+        const op = test.getOperation('spaces_reader');
         const { api_name, connection } = op.opConfig;
 
         expect(connection).toEqual('default');
