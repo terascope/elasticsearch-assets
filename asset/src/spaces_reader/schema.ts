@@ -15,7 +15,7 @@ import { DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
 
 export default class Schema extends ConvictSchema<ApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
-        const opConfig = getOpConfig(job, 'simple_api_reader') as ApiConfig;
+        const opConfig = getOpConfig(job, 'spaces_reader') as ApiConfig;
         const { api_name, ...apiConfig } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const SpacesReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
@@ -41,6 +41,7 @@ export default class Schema extends ConvictSchema<ApiConfig> {
     build(): AnyObject {
         const schema = new ReaderSchema(this.context, this.opType);
         const esSchema = schema.build();
+
         esSchema.api_name = {
             doc: 'name of api to be used by elasticearch reader',
             default: DEFAULT_API_NAME,

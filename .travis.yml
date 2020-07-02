@@ -18,6 +18,7 @@ cache:
 services:
   - docker
 env:
+  - ELASTICSEARCH_VERSION=5.6.0
   - ELASTICSEARCH_VERSION=6.8.6
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:

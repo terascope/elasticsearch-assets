@@ -24,7 +24,7 @@ describe('spaces-reader schema', () => {
         };
 
         if (apiConfig) {
-            const newApiConfig = Object.assign({ _name: 'spaces_api_reader' }, apiConfig);
+            const newApiConfig = Object.assign({ _name: 'spaces_reader_api' }, apiConfig);
             partialJob.apis.push(newApiConfig);
         }
 
@@ -62,7 +62,7 @@ describe('spaces-reader schema', () => {
             token: 'someToken'
         };
 
-        expect(async () => makeTest({}, apiConfig)).toResolve();
+        await expect(makeTest({}, apiConfig)).toResolve();
     });
 
     it('will throw if parameters are in both api and opConfig', async () => {
@@ -80,6 +80,6 @@ describe('spaces-reader schema', () => {
             token: 'someToken'
         };
 
-        expect(async () => makeTest(opConfig, apiConfig)).toReject();
+        await expect(makeTest(opConfig, apiConfig)).toReject();
     });
 });

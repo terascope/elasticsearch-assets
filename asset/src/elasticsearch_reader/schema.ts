@@ -19,6 +19,12 @@ import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
+export function checkIndex(index: string|undefined): void {
+    if (!isString(index)) throw new Error('Invalid index parameter, must be of type string');
+    if (index.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
+    if (index.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+}
+
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
@@ -48,7 +54,8 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
         if (isNil(ElasticReaderAPI)) {
-            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+            checkIndex(opConfig.index);
+            if (isNil(opConfig.date_field_name)) throw new Error(`Invalid parameter date_field_name, must be of type string, got ${getTypeOf(opConfig.date_field_name)}`);
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
@@ -65,9 +72,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 doc: 'Which index to read from',
                 default: null,
                 format(val: unknown): void {
-                    if (!isString(val)) throw new Error('Invalid index parameter, must be of type string');
-                    if (val.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
-                    if (val.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+                    if (isNotNil(val)) checkIndex(val as any);
                 }
             },
             field: {
@@ -137,7 +142,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             date_field_name: {
                 doc: 'field name where the date of the doc is located',
                 default: null,
-                format: 'required_String'
+                format: 'optional_String'
             },
             query: {
                 doc: 'You may place a lucene query here, and the slicer will use it when making slices',

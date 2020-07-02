@@ -10,6 +10,7 @@ import {
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
+import { checkIndex } from '../elasticsearch_reader/schema';
 
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -37,7 +38,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
         const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
         if (isNil(ElasticReaderAPI)) {
-            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_reader configuration, must provide parameter index');
+            checkIndex(opConfig.index);
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
@@ -53,8 +54,9 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             index: {
                 doc: 'Which index to read from',
                 default: null,
-                format: 'required_String'
-
+                format(val: unknown): void {
+                    if (isNotNil(val)) checkIndex(val as any);
+                }
             },
             size: {
                 doc: 'The keys will attempt to recurse until the chunk will be <= size',

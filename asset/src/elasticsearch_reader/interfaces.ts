@@ -87,3 +87,14 @@ export interface ApiConfig extends ESReaderConfig {
 }
 
 export type ESDateConfig = ESReaderConfig | ApiConfig;
+
+export interface DetermineSliceResults {
+    start: moment.Moment;
+    end: moment.Moment;
+    count: number;
+    key?: string;
+}
+
+export interface ReaderSlice extends DetermineSliceResults {
+    wildcard?: WildCardQuery;
+}

@@ -8,7 +8,8 @@ import {
     ParsedInterval,
     DateConfig,
     StartPointConfig,
-    DateSegments
+    DateSegments,
+    DetermineSliceResults
 } from '../interfaces';
 import {
     dateFormat as dFormat,
@@ -19,13 +20,6 @@ import {
 } from './helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
-
-interface DetermineSliceResults {
-    start: moment.Moment;
-    end: moment.Moment;
-    count: number;
-    key?: string;
-}
 
 interface DateParams {
     start: moment.Moment;

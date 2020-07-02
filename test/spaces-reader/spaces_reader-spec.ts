@@ -5,6 +5,7 @@ import moment from 'moment';
 import { newTestJobConfig, debugLogger, SlicerRecoveryData } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
 import SpacesClient from '../../asset/src/spaces_reader_api/client';
+import { ApiConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import { IDType } from '../../asset/src/id_reader/interfaces';
 import MockClient from '../mock_client';
 
@@ -44,7 +45,7 @@ describe('spaces_reader', () => {
     });
 
     it('should look like an elasticsearch client', () => {
-        const opConfig = {
+        const opConfig: ApiConfig = {
             _op: 'spaces_reader',
             index: testIndex,
             endpoint: baseUri,
@@ -63,8 +64,9 @@ describe('spaces_reader', () => {
             key_type: IDType.base64,
             connection: 'default',
             time_resolution: 's',
+            api_name: 'someName'
         };
-        const client = new SpacesClient(opConfig as any, logger);
+        const client = new SpacesClient(opConfig, logger);
 
         expect(client.search).toBeDefined();
         expect(client.count).toBeDefined();
