@@ -12,11 +12,17 @@ import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces'
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     api!: elasticAPI.Client;
+    version!: number;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         const apiName = this.opConfig.api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
+        const version = this.api.getESVersion();
+        this.version = version;
+        if (version !== 5 && this.opConfig.field == null) {
+            throw new Error('Paramter field must be set if querying against elasticsearch version >= 6.x');
+        }
         // NOTE ORDER MATTERS
         // a parallel slicer initialize calls newSlicer multiple times
         // need to make api before newSlicer is called

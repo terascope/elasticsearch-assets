@@ -1,8 +1,9 @@
 import { TSError, SlicerFn } from '@terascope/job-components';
-import { ESIDSlicerArgs, ESIDSlicerResult } from './interfaces';
+import { CountParams } from 'elasticsearch';
+import { ESIDSlicerArgs } from './interfaces';
 import { getKeyArray } from './helpers';
-import { retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
-import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
+import { buildQuery, retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
+import { SlicerDateResults, IDReaderSlice } from '../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
     const {
@@ -17,13 +18,14 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
     } = args;
     const baseKeyArray = getKeyArray(opConfig);
     const startingKeyDepth = opConfig.starting_key_depth;
+    const version = api.getESVersion();
     const retryError = retryModule(logger, executionConfig.max_retries);
 
     async function determineKeySlice(
         generator: any,
         closePath: boolean,
         rangeObj?: SlicerDateResults
-    ): Promise<ESIDSlicerResult| null> {
+    ): Promise<IDReaderSlice| null> {
         let data;
         if (closePath) {
             data = generator.next(closePath);
@@ -32,28 +34,29 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         }
 
         if (data.done) return null;
-        const wildcard = { field: opConfig.field, value: `${data.value}*` };
-        let msg: Partial<SlicerDateResults> = { wildcard };
 
-        // this is used by elasticsearch slicer if slice is to large and its
-        // set to break it up further by key
+        const query: Partial<IDReaderSlice> = {};
+
         if (rangeObj) {
-            msg = {
-                start: rangeObj.start,
-                end: rangeObj.end,
-                wildcard
-            };
+            query.start = rangeObj.start;
+            query.end = rangeObj.end;
         }
 
-        const esQuery = api.buildQuery(opConfig, msg);
+        if (version >= 6) {
+            query.wildcard = { field: opConfig.field, value: `${data.value}*` };
+        } else {
+            query.key = `${opConfig.type}#${data.value}*`;
+        }
 
-        async function getKeySlice(query: any) {
+        const countQuery = buildQuery(opConfig, query as IDReaderSlice) as CountParams;
+
+        async function getKeySlice(esQuery: CountParams): Promise<IDReaderSlice | null> {
             let count: number;
 
             try {
-                count = await api.count(query);
+                count = await api.count(esQuery);
             } catch (err) {
-                return retryError(wildcard, err, getKeySlice, query);
+                return retryError(esQuery, err, getKeySlice, esQuery);
             }
 
             if (count > opConfig.size) {
@@ -63,19 +66,14 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
 
             if (count !== 0) {
                 // the closing of this path happens at keyGenerator
-                if (range) {
-                    range.count = count;
-                    range.wildcard = wildcard;
-                    return range;
-                }
-                return { count, wildcard };
+                return { ...query, count };
             }
 
             // if count is zero then close path to prevent further iteration
             return determineKeySlice(generator, true, rangeObj);
         }
 
-        return getKeySlice(esQuery);
+        return getKeySlice(countQuery);
     }
 
     function keyGenerator(

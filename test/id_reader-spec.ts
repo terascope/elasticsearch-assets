@@ -1,3 +1,4 @@
+import { DataEntity } from '@terascope/job-components';
 import {
     JobTestHarness, newTestJobConfig, SlicerTestHarness
 } from 'teraslice-test-harness';
@@ -21,6 +22,9 @@ describe('id_reader', () => {
     const version = getESVersion(esClient);
 
     const docType = version === 5 ? 'events' : '_doc';
+    // in es5 this should be ignored
+    const field = 'uuid';
+    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
@@ -30,7 +34,7 @@ describe('id_reader', () => {
 
     beforeAll(async () => {
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, evenSpread.data, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
     });
 
     afterAll(async () => {
@@ -65,7 +69,7 @@ describe('id_reader', () => {
         const idReader = Object.assign(
             { _op: 'id_reader' },
             opConfig,
-            { type: docType }
+            { type: docType, field }
         );
         const job = newTestJobConfig({
             slicers: numOfSlicers,
@@ -85,12 +89,7 @@ describe('id_reader', () => {
     }
 
     it('can fetch all even-data', async () => {
-        const field = 'uuid';
-
-        const opConfig = {
-            index: evenIndex,
-            field
-        };
+        const opConfig = { index: evenIndex };
         const keyList = getKeyArray({ key_type: 'base64url' } as any);
         const test = await makeTest(opConfig);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
@@ -109,12 +108,7 @@ describe('id_reader', () => {
     });
 
     it('can fetch all even-data with multiple slicers', async () => {
-        const field = 'uuid';
-
-        const opConfig = {
-            index: evenIndex,
-            field
-        };
+        const opConfig = { index: evenIndex };
         const keyList = getKeyArray({ key_type: 'base64url' } as any);
         const test = await makeTest(opConfig, 2);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
@@ -133,11 +127,8 @@ describe('id_reader', () => {
     });
 
     it('can fetch all even-data for a given key', async () => {
-        const field = 'uuid';
-
         const opConfig = {
             index: evenIndex,
-            field,
             key_range: ['a']
         };
         const keyList = getKeyArray({ key_type: 'base64url' } as any);
