@@ -15,8 +15,12 @@ import {
     ParsedInterval,
     DateConfig,
     ESReaderConfig,
-    ReaderSlice
+    IDReaderSlice,
 } from '../interfaces';
+import { ESIDReaderConfig } from '../../id_reader/interfaces';
+
+type ReaderConfig = ESReaderConfig | ESIDReaderConfig;
+type BuildQueryInput = SlicerDateResults | IDReaderSlice;
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -105,12 +109,12 @@ export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 // 2016-06-29T12:44:57-07:00
 export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
 
-type RetryCb = (msg: string) => any
+type RetryCb = (msg: any) => Promise<any>
 
 // TODO: this migth be broken, there is no msg
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
-    return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: string) => {
+    return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: any) => {
         logger.error(err, 'error while getting next slice');
         const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
 
@@ -459,7 +463,7 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
     return { dates: newDates as SlicerDateConfig, range: dates };
 }
 
-export function buildQuery(opConfig: ESReaderConfig, slice: ReaderSlice): SearchParams {
+export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): SearchParams {
     const query: SearchParams = {
         index: opConfig.index,
         size: slice.count,
@@ -471,7 +475,7 @@ export function buildQuery(opConfig: ESReaderConfig, slice: ReaderSlice): Search
     return query;
 }
 
-function _buildRangeQuery(opConfig: ESReaderConfig, slice: ReaderSlice) {
+function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
     const body: AnyObject = {
         query: {
             bool: {
@@ -520,7 +524,7 @@ function _buildRangeQuery(opConfig: ESReaderConfig, slice: ReaderSlice) {
     return body;
 }
 
-export function validateGeoParameters(opConfig: ESReaderConfig): void {
+export function validateGeoParameters(opConfig: ReaderConfig): void {
     const {
         geo_field: geoField,
         geo_box_top_left: geoBoxTopLeft,
@@ -575,7 +579,7 @@ export function validateGeoParameters(opConfig: ESReaderConfig): void {
     }
 }
 
-export function geoSearch(opConfig: ESReaderConfig): AnyObject {
+export function geoSearch(opConfig: ReaderConfig): AnyObject {
     let isGeoSort = false;
     const queryResults: AnyObject = {};
     // check for key existence to see if they are user defined

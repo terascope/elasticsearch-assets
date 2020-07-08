@@ -72,7 +72,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             field: {
                 doc: 'The field in which searches will be queryed from',
                 default: null,
-                format: 'required_String'
+                format: 'optional_String'
             },
             key_type: {
                 doc: 'The type of id used in index',

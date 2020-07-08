@@ -78,6 +78,7 @@ export interface SlicerDateResults {
     count: number;
     holes?: DateConfig[];
     wildcard?: WildCardQuery;
+    key?: string;
 }
 
 export interface ApiConfig extends ESReaderConfig {
@@ -95,6 +96,11 @@ export interface DetermineSliceResults {
     key?: string;
 }
 
-export interface ReaderSlice extends DetermineSliceResults {
+export interface IDReaderSlice {
+    start?: string;
+    end?: string;
+    count: number;
+    holes?: DateConfig[];
     wildcard?: WildCardQuery;
+    key?: string;
 }
