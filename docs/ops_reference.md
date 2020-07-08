@@ -112,8 +112,8 @@ No start or end keys
 
 - this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
 
-### simple_api_reader ###
-This is a wrapper around the elasticsearch_reader so it has all of the functionality, schemas and validations of that reader. This is used to allow client access to data through communication with teraserver.
+### spaces_reader ###
+This is a wrapper around the elasticsearch_reader so it has all of the functionality, schemas and validations of that reader. This is used to allow client access to data through communication with a spaces server.
 
 | Configuration | Description | Type |  Notes   |
 | --------- | -------- | ------ | ------ |
@@ -121,6 +121,7 @@ This is a wrapper around the elasticsearch_reader so it has all of the functiona
 | endpoint | The base API endpoint to read from: i.e.http://yourdomain.com/api/v1 | String | required |
 | token | teraserver API access token for making requests | String | required |
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
+| api_name | name of api to be used by id reader | String | optional, defaults to 'spaces_reader_api' |
 
 NOTE: this op uses all the configurations listed in the elasticsearch_reader in addtion to what is listed above!!! Please reference that reader. HOWEVER, a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort paramter is specified on the query. Sorting on geo distance while specifiying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
@@ -213,41 +214,9 @@ Currently the id_reader and makes keys for base64url (elasticsearch native id ge
 | starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting | Number | optional |
 | fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
+| api_name | name of api to be used by id reader | String | optional, defaults to 'elasticsearch_reader_api' |
 
 ## Processors ##
-
-### elasticsearch_index_selector ###
-This processor formats the incoming data to prepare it for the elasticsearch bulk request. It accepts either an array of data or a full elasticsearch response with all associated meta-data. It should be noted that the resulting formatted array required for the bulk request will always double the length of the incoming array.
-
-Example configuration
-```
-{
-    "_op": "elasticsearch_index_selector",
-    "type": "events",
-    "index_prefix": "events",
-    "timeseries": "daily",
-    "date_field": "created"
-}
-```
-
-| Configuration | Description | Type |  Notes
-| --------- | -------- | ------ | ------ |
-| \_op | Name of operation, it must reflect the exact name of the file | String | required |
-| index | Index to where the data will be sent to, if you wish the index to be based on a timeseries use the timeseries option instead | String | optional |
-| type | Set the type of the data for elasticsearch. If incoming data is from elasticsearch it will default to the type on the metadata if this field is not set. This field must be set for all other incoming data | String | optional |
-| preserve_id | If incoming data if from elasticsearch, set this to true if you wish to keep the previous id else elasticsearch will generate one for you (upload performance is faster if you let it auto-generate) | Boolean | optional, defaults to false |
-| id_field | If you wish to set the id based off another field in the doc, set the name of the field here | String | optional |
-| timeseries | Set to either "daily", "monthly" or "yearly" if you want the index to be based off it, must be used in tandem with index_prefix and date_field | String | optional |
-| index_prefix | Used with timeseries, adds a prefix to the date ie (index_prefix: "events-" ,timeseries: "daily => events-2015.08.20 | String | optional, required if timeseries is used |
-| date_field | Used with timeseries, specify what field of the data should be used to calculate the timeseries | String | optional, but required if using timeseries defaults to @timestamp |
-| delete| Use the id_field from the incoming records to bulk delete documents | Boolean | optional, defaults to false |
-| upsert| Specify if the incoming records should be used to perform an upsert. If update_fields is also specified then existing records will be updated with those fields otherwise the full incoming  record will be inserted | Boolean | optional, defaults to false |
-| create| Specify if the incoming records should be used to perform an create event ("put-if-absent" behavior)| Boolean | optional, defaults to false |
-| update | Specify if the data should update existing records, if false it will index them | Boolean | optional, defaults to false |
-| update_fields | if you are updating the documents, you can specify fields to update here (it should be an array containing all the field names you want), it defaults to sending the entire document | Array | optional, defaults to [] |
-| script_file | Name of the script file to run as part of an update request | String | optional |
-| script_params | key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key | Object | optional |
-
 
 ### elasticsearch_bulk ###
 This sends a bulk request to elasticsearch
@@ -256,19 +225,9 @@ Example configuration
 ```
 {
     "_op": "elasticsearch_bulk",
-    "size": 10000,
-    "multisend": true,
-    "multisend_index_append": true,
-    "connection_map": {
-        "a,2": "es_d1",
-        "b,3": "es_d2",
-        "c,4": "es_d3",
-        "d,5": "es_d4",
-        "e,6": "es_d5",
-        "f,7": "es_d6",
-        "0,8": "es_d7",
-        "1,9": "es_d8"
-    }
+    "date_field": "created"
+
+    "size": 10000
 }
 ```
 The keys used were hexidecimal based
@@ -277,7 +236,103 @@ The keys used were hexidecimal based
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
 | size | the maximum number of docs it will send in a given request, anything past it will be split up and sent | Number | required, typically the index selector returns up to double the length of the original documents due to the metadata involved with bulk requests. This number is essentially doubled to to maintain the notion that we split by actual documents and not the metadata |
-| connection_map | | Object | optional |
-| multisend | When set to true the connection_map will be used allocate the data stream across multiple connections based on the keys of the incoming documents | Boolean | optional, defaults to false |
-| multisend_index_append | When set to true will append the connection_map prefixes to the name of the index before data is submitted | Boolean | optional, defaults to false |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
+| index | Index to where the data will be sent to, it must be lowercase | String | required |
+| type | Set the type of the data for elasticsearch | String | optional defaults to '_doc'|
+| delete| Use the id_field from the incoming records to bulk delete documents | Boolean | optional, defaults to false |
+| upsert| Specify if the incoming records should be used to perform an upsert. If update_fields is also specified then existing records will be updated with those fields otherwise the full incoming  record will be inserted | Boolean | optional, defaults to false |
+| create| Specify if the incoming records should be used to perform an create event ("put-if-absent" behavior)| Boolean | optional, defaults to false |
+| update | Specify if the data should update existing records, if false it will index them | Boolean | optional, defaults to false |
+| update_fields | if you are updating the documents, you can specify fields to update here (it should be an array containing all the field names you want), it defaults to sending the entire document | Array | optional, defaults to [] |
+| script_file | Name of the script file to run as part of an update request | String | optional |
+| script | Inline script to include in each indexing request. Only very simple painless scripts are currently supported | String | optional |
+| script_params | key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key | Object | optional |
+| update_retry_on_conflict | If there is a version conflict from an update how often should it be retried | Number | optional, defaults to 0 |
+| api_name | name of api to be used by elasticearch bulk sender | String | optional, defaults to 'elasticsearch_sender_api' |
+
+## APIS ##
+
+The apis in this asset are the means to allow other custom made processors the ability to read and write to their respective destinations. When you use a reader or a sender from the asset, it will instantiate one for you automatically if you don't specify api_name.
+
+Short hand method:
+
+```json
+{
+    "name" : "testing",
+    "workers" : 1,
+    "slicers" : 1,
+    "lifecycle" : "once",
+    "assets" : [
+        "elasticsearch"
+    ],
+    "operations" : [
+    {
+        "_op" : "elasticsearch_reader",
+        "index" : "test_index",
+        "size" : 5000,
+        "date_field_name" : "created"
+    },
+    {
+        "_op" : "elasticsearch_bulk",
+        "size" : 10000,
+        "index" : "api-test",
+        "type" : "events"
+    }
+    ],
+}
+
+```
+
+Will convert to =>
+
+```json
+{
+    "name" : "testing",
+    "workers" : 1,
+    "slicers" : 1,
+    "lifecycle" : "once",
+    "assets" : [
+            "elasticsearch"
+        ],
+    "apis" : [
+        {
+            "_name" : "elasticsearch_reader_api",
+            "index" : "test_index",
+            "connection" : "default",
+            "full_response" : false
+        },
+        {
+            "_name" : "elasticsearch_sender_api",
+            "index" : "api-test",
+            "connection" : "default",
+            "size" : 10000
+        }
+    ],
+    "operations" : [
+        {
+            "_op" : "elasticsearch_reader",
+            "index" : "test_index",
+            "size" : 5000,
+            "date_field_name" : "created",
+            "api_name": "elasticsearch_reader_api"
+        },
+        {
+            "_op" : "elasticsearch_bulk",
+            "size" : 10000,
+            "index" : "api-test",
+            "type" : "events",
+            "api_name": "elasticsearch_sender_api"
+        }
+    ],
+}
+```
+
+NOTE If start with the long form (which means to set up the apis manually and specify the api_name on the operation) then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimalized. The api configs take precendence.
+
+If submitting the job in long form, here is a list of parameters that will throw an error, since these values will be placed on the api manually or by defaults
+
+| operation | restricted fields |
+| elasticsearch_reader | index |
+| id_reader | index |
+| elasticsearch_bulk | index |
+| spaces_reader | index, endpoint, token, timeout, date_field_name |

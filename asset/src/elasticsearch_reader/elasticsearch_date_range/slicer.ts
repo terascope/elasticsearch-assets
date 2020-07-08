@@ -6,10 +6,10 @@ import {
     TSError,
     AnyObject,
     isFunction,
+    SlicerRecoveryData,
 } from '@terascope/job-components';
-import { Client } from 'elasticsearch';
 import moment from 'moment';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import dateSlicerFn from './slicer-fn';
 import {
     processInterval,
@@ -29,10 +29,12 @@ import {
 } from '../interfaces';
 import WindowState from '../window-state';
 
+import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfaces';
+
 type FetchDate = moment.Moment | null;
 
 export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
-    api: elasticApi.Client;
+    api!: elasticAPI.Client;
     dateFormat: string;
     windowState: WindowState
     startTime = moment();
@@ -41,13 +43,23 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         context: WorkerContext,
         opConfig: ESDateConfig,
         executionConfig: ExecutionConfig,
-        client: Client
     ) {
         super(context, opConfig, executionConfig);
-        this.api = elasticApi(client, this.logger, this.opConfig);
         const timeResolution = dateOptions(opConfig.time_resolution);
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
         this.windowState = new WindowState(executionConfig.slicers);
+    }
+
+    async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
+        const apiName = this.opConfig.api_name;
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, {});
+
+        // NOTE ORDER MATTERS
+        // a parallel slicer initialize calls newSlicer multiple times
+        // need to make api before newSlicer is called
+
+        await super.initialize(recoveryData);
     }
 
     async getDates(): Promise<{ start: FetchDate; limit: FetchDate; }> {

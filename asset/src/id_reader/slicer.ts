@@ -1,27 +1,26 @@
 import {
     ParallelSlicer,
     SlicerFn,
-    getClient,
-    WorkerContext,
-    ExecutionConfig,
-    TSError
+    TSError,
+    SlicerRecoveryData
 } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import idSlicer from './id-slicer';
 import { getKeyArray } from './helpers';
 import { ESIDReaderConfig, ESIDSlicerArgs } from './interfaces';
+import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
-    api: elasticApi.Client;
+    api!: elasticAPI.Client;
 
-    constructor(
-        context: WorkerContext,
-        opConfig: ESIDReaderConfig,
-        executionConfig: ExecutionConfig
-    ) {
-        super(context, opConfig, executionConfig);
-        const client = getClient(this.context, this.opConfig, 'elasticsearch');
-        this.api = elasticApi(client, this.logger, this.opConfig);
+    async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
+        const apiName = this.opConfig.api_name;
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, {});
+        // NOTE ORDER MATTERS
+        // a parallel slicer initialize calls newSlicer multiple times
+        // need to make api before newSlicer is called
+        await super.initialize(recoveryData);
     }
 
     isRecoverable(): boolean {

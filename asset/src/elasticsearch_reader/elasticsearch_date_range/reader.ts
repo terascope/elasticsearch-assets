@@ -1,48 +1,21 @@
-import {
-    Fetcher,
-    SliceRequest,
-    DataEntity,
-    WorkerContext,
-    ExecutionConfig
-} from '@terascope/job-components';
-import { Client } from 'elasticsearch';
-import elasticApi from '@terascope/elasticsearch-api';
-import { ESDateConfig } from '../interfaces';
+import { Fetcher, DataEntity } from '@terascope/job-components';
+import elasticAPI from '@terascope/elasticsearch-api';
+import { ESDateConfig, ReaderSlice } from '../interfaces';
+import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfaces';
+import { buildQuery } from './helpers';
 
 export default class DateReader extends Fetcher<ESDateConfig> {
-    apiConfig: elasticApi.Config;
-    api: elasticApi.Client;
+    api!: elasticAPI.Client;
 
-    constructor(
-        context: WorkerContext,
-        opConfig: ESDateConfig,
-        executionConfig: ExecutionConfig,
-        client: Client
-    ) {
-        super(context, opConfig, executionConfig);
-        this.apiConfig = Object.assign({}, this.opConfig, { full_response: true });
-        this.api = elasticApi(client, this.logger, this.apiConfig);
+    async initialize(): Promise<void> {
+        await super.initialize();
+        const apiName = this.opConfig.api_name;
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, {});
     }
 
-    async fetch(slice: SliceRequest): Promise<DataEntity[]> {
-        const query = this.api.buildQuery(this.apiConfig, slice);
-        const results = await this.api.search(query);
-        // TODO: better typeing of doc
-        return results.hits.hits.map((doc: any) => {
-            const now = Date.now();
-            const metadata = {
-                _key: doc._id,
-                _processTime: now,
-                /** @todo this should come from the data */
-                _ingestTime: now,
-                /** @todo this should come from the data */
-                _eventTime: now,
-                // pass only the record metadata
-                _index: doc._index,
-                _type: doc._type,
-                _version: doc._version,
-            };
-            return DataEntity.make(doc._source, metadata);
-        });
+    async fetch(slice: ReaderSlice): Promise<DataEntity[]> {
+        const query = buildQuery(this.opConfig, slice);
+        return this.api.search(query);
     }
 }

@@ -8,7 +8,7 @@ import { ApiConfig } from '../elasticsearch_reader/interfaces';
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-export default class ApiClient {
+export default class SpacesClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     opConfig: ApiConfig;

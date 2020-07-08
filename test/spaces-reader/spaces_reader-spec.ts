@@ -4,16 +4,16 @@ import path from 'path';
 import moment from 'moment';
 import { newTestJobConfig, debugLogger, SlicerRecoveryData } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness } from 'teraslice-test-harness';
-import ApiMockedClient from '../asset/src/simple_api_reader/client';
-import { ApiConfig } from '../asset/src/elasticsearch_reader/interfaces';
-import { IDType } from '../asset/src/id_reader/interfaces';
-import MockClient from './mock_client';
+import SpacesClient from '../../asset/src/spaces_reader_api/client';
+import { ApiConfig } from '../../asset/src/elasticsearch_reader/interfaces';
+import { IDType } from '../../asset/src/id_reader/interfaces';
+import MockClient from '../mock_client';
 
-describe('simple_api_reader', () => {
+describe('spaces_reader', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
-    const logger = debugLogger('simple_api_reader');
-    const assetDir = path.join(__dirname, '..');
+    const logger = debugLogger('spaces_reader');
+    const assetDir = path.join(__dirname, '../..');
     let clients: any;
     let defaultClient: MockClient;
 
@@ -46,7 +46,7 @@ describe('simple_api_reader', () => {
 
     it('should look like an elasticsearch client', () => {
         const opConfig: ApiConfig = {
-            _op: 'simple_api_reader',
+            _op: 'spaces_reader',
             index: testIndex,
             endpoint: baseUri,
             token: 'test-token',
@@ -64,9 +64,9 @@ describe('simple_api_reader', () => {
             key_type: IDType.base64,
             connection: 'default',
             time_resolution: 's',
-            full_response: true
+            api_name: 'someName'
         };
-        const client = new ApiMockedClient(opConfig, logger);
+        const client = new SpacesClient(opConfig, logger);
 
         expect(client.search).toBeDefined();
         expect(client.count).toBeDefined();
@@ -209,7 +209,7 @@ describe('simple_api_reader', () => {
 
         ])('when performing a %s', (m, { query, opConfig: _opConfig, msg }) => {
             const opConfig = Object.assign({
-                _op: 'simple_api_reader',
+                _op: 'spaces_reader',
                 index: testIndex,
                 endpoint: baseUri,
                 interval: '30s',
@@ -255,7 +255,7 @@ describe('simple_api_reader', () => {
                 max_retries: 0,
                 operations: [
                     {
-                        _op: 'simple_api_reader',
+                        _op: 'spaces_reader',
                         query: 'test:query',
                         index: testIndex,
                         endpoint: baseUri,
@@ -333,7 +333,7 @@ describe('simple_api_reader', () => {
             }
 
             const opConfig = {
-                _op: 'simple_api_reader',
+                _op: 'spaces_reader',
                 date_field_name: 'created',
                 time_resolution: 's',
                 size: 100,
@@ -346,7 +346,7 @@ describe('simple_api_reader', () => {
             };
             async function getMeta(test: SlicerTestHarness) {
                 // @ts-expect-error
-                return test.context.apis.executionContext.getMetadata('simple_api_reader');
+                return test.context.apis.executionContext.getMetadata('spaces_reader');
             }
 
             async function waitForUpdate(config: any) {
@@ -395,7 +395,7 @@ describe('simple_api_reader', () => {
                 max_retries: 0,
                 operations: [
                     {
-                        _op: 'simple_api_reader',
+                        _op: 'spaces_reader',
                         query: 'slicer:query',
                         index: testIndex,
                         endpoint: baseUri,

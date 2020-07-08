@@ -1,11 +1,12 @@
-import { OperationAPI } from '@terascope/job-components';
+import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject, getTypeOf, AnyObject
 } from '@terascope/utils';
-import elasticApi from '@terascope/elasticsearch-api';
-import { ReaderConfig, ValidReaderConfig } from './interfaces';
+import elasticAPI from '@terascope/elasticsearch-api';
+import { ValidReaderConfig } from './interfaces';
 
-export default class ElasticsearchReaderApi extends OperationAPI {
+export default class ElasticsearchReaderAPI extends APIFactory<elasticAPI.Client, AnyObject > {
+    // TODO: this needs more validation
     validateConfig(config: unknown): ValidReaderConfig {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
         if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
@@ -13,17 +14,22 @@ export default class ElasticsearchReaderApi extends OperationAPI {
         return config as ValidReaderConfig;
     }
 
-    async createAPI(config: ReaderConfig): Promise<elasticApi.Client> {
-        const clientConfig = this.validateConfig(Object.assign({}, this.apiConfig, config));
+    async create(
+        _name: string, overrideConfigs: Partial<ValidReaderConfig>
+    ): Promise<{ client: elasticAPI.Client, config: AnyObject }> {
+        const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
 
         const { client } = this.context.foundation.getConnection({
-            endpoint: clientConfig.connection,
+            endpoint: config.connection,
             type: 'elasticsearch',
             cached: true
         });
+        const esClient = elasticAPI(client, this.logger, config);
 
-        return elasticApi(client, this.context.logger, clientConfig);
+        return { client: esClient, config };
     }
+
+    async remove(_index: string): Promise<void> {}
 }
 
 function isObject(input: unknown): input is AnyObject {

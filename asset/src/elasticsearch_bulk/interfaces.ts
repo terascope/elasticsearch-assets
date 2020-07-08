@@ -1,13 +1,6 @@
 import { OpConfig } from '@terascope/job-components';
+import { ElasticsearchSenderConfig } from '../elasticsearch_sender_api/interfaces';
 
-export interface ConnectionMapping {
-    [key: string]: string;
-}
-
-export interface BulkSender extends OpConfig {
-    size: number;
-    connection_map: ConnectionMapping;
-    multisend: boolean;
-    multisend_index_append: boolean;
-    connection: string;
+export interface ElasticsearchBulkConfig extends ElasticsearchSenderConfig, OpConfig {
+    api_name: string;
 }

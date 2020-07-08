@@ -2,6 +2,7 @@ import {
     JobTestHarness, newTestJobConfig, SlicerTestHarness
 } from 'teraslice-test-harness';
 import path from 'path';
+import { getESVersion } from 'elasticsearch-store';
 import { getKeyArray } from '../asset/src/id_reader/helpers';
 import {
     makeClient, cleanupIndex, populateIndex
@@ -17,6 +18,10 @@ describe('id_reader', () => {
     const esClient = makeClient();
     const idIndex = `${TEST_INDEX_PREFIX}_id_`;
 
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
+
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
     }
@@ -25,7 +30,7 @@ describe('id_reader', () => {
 
     beforeAll(async () => {
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, evenSpread.data);
+        await populateIndex(esClient, evenIndex, evenSpread.types, evenSpread.data, docType);
     });
 
     afterAll(async () => {
@@ -57,9 +62,11 @@ describe('id_reader', () => {
     });
 
     async function makeTest(opConfig?: any, numOfSlicers = 1) {
-        const idReader = Object.assign({
-            _op: 'id_reader',
-        }, opConfig);
+        const idReader = Object.assign(
+            { _op: 'id_reader' },
+            opConfig,
+            { type: docType }
+        );
         const job = newTestJobConfig({
             slicers: numOfSlicers,
             max_retries: 0,

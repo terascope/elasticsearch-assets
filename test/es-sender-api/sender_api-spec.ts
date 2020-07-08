@@ -1,9 +1,11 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
+import { isNil } from '@terascope/job-components';
 import path from 'path';
-import { RouteSenderAPI } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, fetch, waitForData
 } from '../helpers';
+import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces';
 
 describe('elasticsearch sender api', () => {
     const dir = __dirname;
@@ -11,6 +13,10 @@ describe('elasticsearch sender api', () => {
 
     const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;
     const esClient = makeClient();
+
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
 
     const clients = [
         {
@@ -42,19 +48,14 @@ describe('elasticsearch sender api', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    index: 'someIndex',
+                    index: apiSendIndex,
+                    type: docType
                 },
             ],
             operations: [
                 {
                     _op: 'test-reader',
                     passthrough_slice: true
-                },
-                {
-                    _op: 'elasticsearch_index_selector',
-                    index: apiSendIndex,
-                    type: 'events'
-
                 },
                 {
                     _op: 'noop',
@@ -71,7 +72,11 @@ describe('elasticsearch sender api', () => {
         const processor = harness.getOperation('noop');
         // @ts-expect-error\
         processor.onBatch = async function test(data: DataEntity[]) {
-            const api = processor.getAPI<RouteSenderAPI>(processor.opConfig.apiName);
+            const { apiName } = processor.opConfig;
+            const apiManager = processor.getAPI<ElasticSenderAPI>(apiName);
+            let api = apiManager.get(apiName);
+
+            if (isNil(api)) api = await apiManager.create(apiName, this.opConfig);
             await api.send(data);
             return data;
         };

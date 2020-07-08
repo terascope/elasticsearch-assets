@@ -1,7 +1,16 @@
 import {
-    ConvictSchema, isString, ValidatedJobConfig, getOpConfig, AnyObject
+    ConvictSchema,
+    isString,
+    ValidatedJobConfig,
+    getOpConfig,
+    AnyObject,
+    getTypeOf,
+    isNotNil,
+    isNil
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
+import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
+import { checkIndex } from '../elasticsearch_reader/schema';
 
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -23,15 +32,31 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 throw new Error('The number of slicers specified on the job cannot be more than 16');
             }
         }
+
+        const { index, connection, api_name } = opConfig;
+        if (!Array.isArray(job.apis)) job.apis = [];
+        const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
+
+        if (isNil(ElasticReaderAPI)) {
+            checkIndex(opConfig.index);
+
+            job.apis.push({
+                _name: DEFAULT_API_NAME,
+                index,
+                connection,
+                full_response: false
+            });
+        }
     }
 
     build(): AnyObject {
         return {
             index: {
                 doc: 'Which index to read from',
-                default: '',
-                format: 'required_String'
-
+                default: null,
+                format(val: unknown): void {
+                    if (isNotNil(val)) checkIndex(val as any);
+                }
             },
             size: {
                 doc: 'The keys will attempt to recurse until the chunk will be <= size',
@@ -46,15 +71,8 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             },
             field: {
                 doc: 'The field in which searches will be queryed from',
-                default: '',
+                default: null,
                 format: 'required_String'
-            },
-            full_response: {
-                doc: 'used internally for api, must be set to true',
-                default: true,
-                format: (val: any) => {
-                    if (val !== true) throw new Error('Parameter full_response must be set to true');
-                }
             },
             key_type: {
                 doc: 'The type of id used in index',
@@ -93,18 +111,25 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             fields: {
                 doc: 'used to only return fields that you are interested in',
                 default: null,
-                format(val: any) {
-                    if (val === null) return;
-                    if (!Array.isArray(val)) {
-                        throw new Error('Fields parameter must be an array');
-                    }
-                    if (!val.every(isString)) {
-                        throw new Error('Invalid fields parameter, the values listed in the fields array must be of type string');
+                format(val: unknown): void {
+                    if (isNotNil(val)) {
+                        if (!Array.isArray(val)) throw new Error('Fields parameter must be an array');
+                        if (!val.every(isString)) throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
                     }
                 }
             },
             connection: {
-                default: 'default'
+                doc: 'Name of the elasticsearch connection to use when sending data.',
+                default: 'default',
+                format: 'optional_String'
+            },
+            api_name: {
+                doc: 'name of api to be used by elasticearch reader',
+                default: DEFAULT_API_NAME,
+                format: (val: unknown) => {
+                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                }
             }
         };
     }

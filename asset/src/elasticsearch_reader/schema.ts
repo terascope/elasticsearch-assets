@@ -1,13 +1,29 @@
 import {
-    ConvictSchema, ValidatedJobConfig, getOpConfig, toNumber, AnyObject,
+    ConvictSchema,
+    ValidatedJobConfig,
+    getOpConfig,
+    toNumber,
+    AnyObject,
+    getTypeOf,
+    isString,
+    isNil,
+    isNumber,
+    isNotNil
 } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
 import { dateOptions } from './elasticsearch_date_range/helpers';
 import { IDType } from '../id_reader/interfaces';
+import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
+
+export function checkIndex(index: string|undefined): void {
+    if (!isString(index)) throw new Error('Invalid index parameter, must be of type string');
+    if (index.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
+    if (index.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+}
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -21,7 +37,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             }
         }
 
-        elasticApi({}, logger).validateGeoParameters(opConfig);
+        elasticAPI({}, logger).validateGeoParameters(opConfig);
 
         if (job.lifecycle === 'persistent') {
             if (opConfig.interval === 'auto') {
@@ -32,25 +48,31 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 throw new Error('Invalid delay parameter, must be manually set while job is in persistent mode');
             }
         }
+
+        const { index, connection, api_name } = opConfig;
+        if (!Array.isArray(job.apis)) job.apis = [];
+        const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
+
+        if (isNil(ElasticReaderAPI)) {
+            checkIndex(opConfig.index);
+            if (isNil(opConfig.date_field_name)) throw new Error(`Invalid parameter date_field_name, must be of type string, got ${getTypeOf(opConfig.date_field_name)}`);
+
+            job.apis.push({
+                _name: DEFAULT_API_NAME,
+                index,
+                connection,
+                full_response: false
+            });
+        }
     }
 
     build(): AnyObject {
         return {
             index: {
                 doc: 'Which index to read from',
-                default: '',
-                format(val: any) {
-                    if (typeof val !== 'string') {
-                        throw new Error('Invalid index parameter, must be of type string');
-                    }
-
-                    if (val.length === 0) {
-                        throw new Error('Invalid index parameter, must not be an empty string');
-                    }
-
-                    if (val.match(/[A-Z]/)) {
-                        throw new Error('Invalid index parameter, must be lowercase');
-                    }
+                default: null,
+                format(val: unknown): void {
+                    if (isNotNil(val)) checkIndex(val as any);
                 }
             },
             field: {
@@ -61,18 +83,16 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             size: {
                 doc: 'The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the interval exceeds this number, it will cause the function to recurse to provide a smaller batch',
                 default: 5000,
-                format(val: any) {
-                    if (isNaN(val)) {
-                        throw new Error('Invalid size parameter, must be a number');
-                    } else if (val <= 0) {
-                        throw new Error('Invalid size parameter, must be greater than zero');
-                    }
+                format(val: unknown): void {
+                    if (!isNumber(val)) throw new Error(`Invalid parameter size, it must be of type number, was given ${getTypeOf(val)}`);
+                    if (isNaN(val)) throw new Error('Invalid size parameter, must be a number');
+                    if (val <= 0) throw new Error('Invalid size parameter, must be greater than zero');
                 }
             },
             start: {
                 doc: 'The start date (ISOstring or in ms) to which it will read from ',
                 default: null,
-                format(val: any) {
+                format(val: unknown): void {
                     if (val) {
                         if (typeof val === 'string' || typeof val === 'number') {
                             if (!moment(new Date(val)).isValid()) {
@@ -91,7 +111,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             end: {
                 doc: 'The end date (ISOstring or in ms) to which it will read to',
                 default: null,
-                format(val: any) {
+                format(val: unknown): void {
                     if (val) {
                         if (typeof val === 'string' || typeof val === 'number') {
                             if (!moment(new Date(val)).isValid()) {
@@ -110,7 +130,8 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             interval: {
                 doc: 'The time interval in which it will read from, the number must be separated from the unit of time by an underscore. The unit of time may be months, weeks, days, hours, minutes, seconds, millesconds or their appropriate abbreviations',
                 default: 'auto',
-                format(val: any) {
+                format(val: unknown): void {
+                    if (!isString(val)) throw new Error(`Invalid parameter interval, it must be of type string, was given ${getTypeOf(val)}`);
                     if (val === 'auto') return;
                     const regex = /(\d+)(\D+)/i;
                     const interval = regex.exec(val);
@@ -118,15 +139,10 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                     dateOptions(interval[2]);
                 }
             },
-            preserve_id: {
-                doc: 'Set to true to add the _id field of the doc set to the hidden metadata on the documents returned',
-                default: false,
-                format: Boolean
-            },
             date_field_name: {
                 doc: 'field name where the date of the doc is located',
-                default: '',
-                format: 'required_String'
+                default: null,
+                format: 'optional_String'
             },
             query: {
                 doc: 'You may place a lucene query here, and the slicer will use it when making slices',
@@ -136,20 +152,11 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             fields: {
                 doc: 'used to only return fields that you are interested in',
                 default: null,
-                format(val: any) {
-                    function isString(elem: any) {
-                        return typeof elem === 'string';
+                format(val: unknown): void {
+                    if (isNotNil(val)) {
+                        if (!Array.isArray(val)) throw new Error('Fields parameter must be an array');
+                        if (!val.every(isString)) throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
                     }
-                    if (val === null) {
-                        return true;
-                    }
-                    if (!Array.isArray(val)) {
-                        throw new Error('Fields parameter must be an array');
-                    }
-                    if (!val.every(isString)) {
-                        throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
-                    }
-                    return true;
                 }
             },
             delay: {
@@ -165,12 +172,10 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             subslice_key_threshold: {
                 doc: 'After subslicing as far as possible, the docs threshold to initiate division by keys',
                 default: 50000,
-                format(val: any) {
-                    if (isNaN(val)) {
-                        throw new Error('Invalid subslice_key_threshold parameter, must be a number');
-                    } else if (val <= 0) {
-                        throw new Error('Invalid subslice_key_threshold parameter, must be greater than zero');
-                    }
+                format(val: unknown): void {
+                    if (!isNumber(val)) throw new Error(`Invalid parameter subslice_key_threshold, it must be of type number, was given ${getTypeOf(val)}`);
+                    if (isNaN(val)) throw new Error('Invalid subslice_key_threshold parameter, must be a number');
+                    if (val <= 0) throw new Error('Invalid subslice_key_threshold parameter, must be greater than zero');
                 }
             },
             key_type: {
@@ -181,7 +186,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             time_resolution: {
                 doc: 'indicate if data reading has second or millisecond resolutions',
                 default: 's',
-                format(val: any) {
+                format(val: unknown): string {
                     const obj = {
                         seconds: 's',
                         second: 's',
@@ -190,11 +195,10 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                         millisecond: 'ms',
                         ms: 'ms'
                     };
-                    if (!obj[val]) {
-                        throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
-                    } else {
-                        return obj[val];
-                    }
+                    if (!isString(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!obj[val]) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
+
+                    return obj[val];
                 }
             },
             geo_field: {
@@ -230,7 +234,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             geo_sort_order: {
                 doc: 'used for sorting geo queries',
                 default: '',
-                format: (val: any) => {
+                format: (val: unknown): void => {
                     if (val) {
                         const options = { asc: true, desc: true };
                         if (typeof val !== 'string') throw new Error('Invalid geo_sort_order parameter, must be a string IF specified');
@@ -244,13 +248,23 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
                 format: checkUnits
             },
             connection: {
-                default: 'default'
+                doc: 'Name of the elasticsearch connection to use when sending data.',
+                default: 'default',
+                format: 'optional_String'
             },
+            api_name: {
+                doc: 'name of api to be used by elasticearch reader',
+                default: DEFAULT_API_NAME,
+                format: (val: unknown): void => {
+                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+                }
+            }
         };
     }
 }
 
-function geoPointValidation(point: string | null) {
+function geoPointValidation(point: string | null):void {
     if (point) {
         if (typeof point !== 'string') throw new Error('Invalid geo_point, must be a string IF specified');
 
@@ -264,7 +278,7 @@ function geoPointValidation(point: string | null) {
     }
 }
 
-function checkUnits(unit: string | null) {
+function checkUnits(unit: string | null):void {
     if (unit) {
         const unitOptions = {
             mi: true,
@@ -278,7 +292,7 @@ function checkUnits(unit: string | null) {
     }
 }
 
-function validGeoDistance(distance: string | null) {
+function validGeoDistance(distance: string | null):void {
     if (distance) {
         if (typeof distance !== 'string') throw new Error('Invalid geo_distance parameter, must be a string IF specified');
         const matches = distance.match(/(\d+)(.*)$/);

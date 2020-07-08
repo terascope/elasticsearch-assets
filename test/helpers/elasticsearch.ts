@@ -1,10 +1,10 @@
 import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import {
-    DataEntity, AnyObject, isNil, debugLogger, pDelay, uniq
+    DataEntity, AnyObject, debugLogger, pDelay, uniq
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
 
 const logger = debugLogger('elasticsearch_helpers');
@@ -21,18 +21,14 @@ export function makeClient(): Client {
 }
 
 export function formatUploadData(
-    index: string, version:number, data: any[], type?: string
+    index: string, type: string, data: any[]
 ): AnyObject[] {
     const results: any[] = [];
 
     data.forEach((record) => {
         const meta: any = { _index: index };
-        if (version === 6) {
-            if (isNil(type)) throw new Error('type must be provided is elasticsearch is version 6');
-            meta._type = type;
-        }
 
-        if (version === 7) meta._type = '_doc';
+        meta._type = type || '_doc';
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -48,7 +44,7 @@ export async function upload(
     client: Client, queryBody: BulkIndexDocumentsParams, data: any[]
 ): Promise<AnyObject> {
     const body = formatUploadData(
-        queryBody.index as string, getESVersion(client), data, queryBody.type
+        queryBody.index as string, queryBody.type as string, data
     );
     const query = Object.assign({ refresh: 'wait_for', body }, queryBody);
     return client.bulk(query);
@@ -58,7 +54,8 @@ export async function populateIndex(
     client: Client,
     index: string,
     fields: TypeConfigFields,
-    records: any[]
+    records: any[],
+    type = '_doc'
 ): Promise<void> {
     const overrides = {
         settings: {
@@ -83,11 +80,11 @@ export async function populateIndex(
         )
     );
 
-    const body = formatUploadData(index, version, records, 'events');
+    const body = formatUploadData(index, type, records);
 
     const results = await client.bulk({
         index,
-        type: 'events',
+        type,
         body,
         refresh: true
     });
@@ -104,8 +101,8 @@ export async function populateIndex(
 
 export async function fetch(
     client: Client, query: SearchParams, fullRequest = false
-): Promise<(AnyObject[] | AnyObject)> {
-    const esClient = elasticApi(client, logger, { full_response: fullRequest });
+): Promise<(DataEntity[] | DataEntity)> {
+    const esClient = elasticAPI(client, logger, { full_response: fullRequest });
     const results = await esClient.search(query);
     return results;
 }
@@ -113,7 +110,7 @@ export async function fetch(
 export async function waitForData(
     client: Client, index: string, count: number, timeout = 5000
 ): Promise<void> {
-    const esClient = elasticApi(client, logger);
+    const esClient = elasticAPI(client, logger);
     const failTestTime = Date.now() + timeout;
 
     return new Promise((resolve, reject) => {

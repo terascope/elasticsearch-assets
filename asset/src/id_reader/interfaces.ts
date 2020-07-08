@@ -1,6 +1,6 @@
 import { EventEmitter } from 'events';
 import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
 
 export enum IDType {
@@ -29,7 +29,7 @@ export interface ESIDSlicerArgs {
     retryData?: any;
     logger: Logger;
     range: SlicerDateResults;
-    api: elasticApi.Client;
+    api: elasticAPI.Client;
     keySet: string[];
     events: EventEmitter;
 }

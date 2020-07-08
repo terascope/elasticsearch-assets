@@ -1,6 +1,8 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
+import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
 } from '../helpers';
@@ -11,6 +13,12 @@ describe('elasticsearch reader api', () => {
 
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const esClient = makeClient();
+
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
+
+    type API = APIFactoryRegistry<elasticAPI.Client, AnyObject>
 
     const clients = [
         {
@@ -43,6 +51,7 @@ describe('elasticsearch reader api', () => {
                 {
                     _name: 'elasticsearch_reader_api',
                     index: apiReaderIndex,
+                    type: docType
                 },
             ],
             operations: [
@@ -65,7 +74,8 @@ describe('elasticsearch reader api', () => {
         const processor = harness.getOperation('noop');
         // @ts-expect-error\
         processor.onBatch = async function test(data: DataEntity[]) {
-            const api = processor.getAPI<elasticApi.Client>(processor.opConfig.apiName);
+            const apiManager = processor.getAPI<API>(processor.opConfig.apiName);
+            const api = await apiManager.create('test', {});
             return api.search(data[0]);
         };
 
@@ -77,14 +87,13 @@ describe('elasticsearch reader api', () => {
     it('can read data from an index', async () => {
         const data = [{ some: 'data' }, { other: 'data' }];
 
-        await upload(esClient, { index: apiReaderIndex, type: 'events' }, data);
+        await upload(esClient, { index: apiReaderIndex, type: docType }, data);
 
         await waitForData(esClient, apiReaderIndex, 2);
 
         const slice = [{ index: apiReaderIndex, q: '*' }];
         const test = await setupTest();
         const results = await test.runSlice(slice);
-
         expect(results.length).toEqual(2);
     });
 });

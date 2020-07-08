@@ -9,7 +9,7 @@ import {
     times,
     pDelay,
 } from '@terascope/job-components';
-import elasticApi from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 import WindowState from '../../asset/src/elasticsearch_reader/window-state';
 import slicerFn from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/slicer-fn';
@@ -86,7 +86,7 @@ describe('date slicer function', () => {
 
         const executionConfig = newTestExecutionConfig(job);
         const opConfig = executionConfig.operations[0];
-        const api = elasticApi(client, logger, opConfig as any);
+        const api = elasticAPI(client, logger, opConfig as any);
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
         const slicerArgs: SlicerArgs = {
