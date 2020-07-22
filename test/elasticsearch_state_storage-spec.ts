@@ -1,38 +1,33 @@
+import 'jest-extended';
 import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { DataEntity, AnyObject } from '@terascope/job-components';
+import { DataEntity } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
+import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
+import {
+    TEST_INDEX_PREFIX,
+    cleanupIndex,
+    makeClient,
+    waitForData,
+    fetch
+} from './helpers';
 
 describe('elasticsearch state storage api', () => {
     const idField = '_key';
-
-    class TestClient {
-        getData!: AnyObject;
-        mgetData!: AnyObject[]
-        bulkRequest!: AnyObject;
-
-        setGetData(data: AnyObject) {
-            this.getData = data;
+    const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
+    const esClient = makeClient();
+    const version = getESVersion(esClient);
+    const docType = version === 5 ? 'type' : '_doc';
+    let api: ESCachedStateStorage;
+    const clients = [
+        {
+            type: 'elasticsearch',
+            endpoint: 'default',
+            create: () => ({
+                client: esClient
+            }),
         }
-
-        setMGetData(data: AnyObject[]) {
-            this.mgetData = data;
-        }
-
-        async get() {
-            return this.getData;
-        }
-
-        async mget() {
-            return this.mgetData;
-        }
-
-        async bulk(request: AnyObject) {
-            this.bulkRequest = request.body;
-            return request;
-        }
-    }
-
-    const client = new TestClient();
+    ];
 
     function addTestMeta(obj: any, index: number) {
         return DataEntity.make(obj, { [idField]: index + 1 });
@@ -48,29 +43,19 @@ describe('elasticsearch state storage api', () => {
         {
             data: 'thisIsThirdData'
         }
-    ];
+    ].map(addTestMeta);
 
-    const clientConfig = {
-        type: 'elasticsearch',
-        create() {
-            return { client };
-        }
-    };
+    const apiName = 'elasticsearch_state_storage';
 
     const job = newTestJobConfig({
         max_retries: 3,
         apis: [
             {
-                _name: 'elasticsearch_state_storage:foo',
-                index: 'someIndex',
+                _name: apiName,
+                index: apiReaderIndex,
                 cache_size: (2 ** 16) - 1,
-                type: 'type'
-            },
-            {
-                _name: 'elasticsearch_state_storage:bar',
-                index: 'someIndex',
-                cache_size: (2 ** 16) - 1,
-                type: 'type'
+                type: docType,
+                persist: true
             }
         ],
         operations: [
@@ -80,59 +65,30 @@ describe('elasticsearch state storage api', () => {
             },
             {
                 _op: 'noop',
-                state_storage_api: 'elasticsearch_state_storage:foo'
             },
-            {
-                _op: 'noop',
-                state_storage_api: 'elasticsearch_state_storage:bar'
-            }
+
         ],
     });
 
     let harness: WorkerTestHarness;
-    let noopFoo: any;
-    let noopBar: any;
-    let countFoo: number;
-    let countBar: number;
+
+    beforeAll(async () => {
+        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+    });
+
+    afterAll(async () => {
+        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+    });
 
     beforeEach(async () => {
         harness = new WorkerTestHarness(job, {
             assetDir: path.join(__dirname, '../asset'),
-            clients: [clientConfig],
+            clients,
         });
 
-        noopFoo = harness.getOperation(1);
-        noopBar = harness.getOperation(2);
-        const reader = harness.getOperation('test-reader');
-        // @ts-expect-error
-        const fn = reader.fetch.bind(reader);
-        // NOTE: we do not have a good story around added meta data to testing data
-        // @ts-expect-error
-        reader.fetch = async (incDocs: DataEntity[]) => fn(incDocs.map(addTestMeta));
-
-        noopFoo.onBatch = async (docs: DataEntity[]) => {
-            const results = [];
-            const { state_storage_api: name } = noopFoo.opConfig;
-            const stateStorage = noopFoo.getAPI(name);
-            await stateStorage.mset(docs);
-            countFoo = stateStorage.count();
-            const cached = await stateStorage.mget(docs);
-
-            // eslint-disable-next-line guard-for-in
-            for (const key in cached) {
-                results.push(cached[key]);
-            }
-            return results;
-        };
-
-        noopBar.onBatch = async (docs: DataEntity[]) => {
-            const { state_storage_api: name } = noopBar.opConfig;
-            const stateStorage = noopFoo.getAPI(name);
-            countBar = stateStorage.count();
-            return docs;
-        };
-
         await harness.initialize();
+
+        api = harness.getAPI(apiName);
     });
 
     afterEach(async () => {
@@ -140,15 +96,22 @@ describe('elasticsearch state storage api', () => {
     });
 
     it('can run and use the api', async () => {
-        const results = await harness.runSlice(docArray);
+        expect.hasAssertions();
 
-        expect(countFoo).toEqual(3);
-        expect(countBar).toEqual(0);
-        expect(results.length).toEqual(3);
+        docArray.forEach((record) => {
+            expect(api.isCached(record)).toBeFalse();
+        });
 
-        results.forEach((obj: DataEntity, ind: number) => {
-            expect(obj).toEqual(docArray[ind]);
-            expect(DataEntity.isDataEntity(obj)).toEqual(true);
+        await api.mset(docArray);
+
+        await waitForData(esClient, apiReaderIndex, 3);
+
+        const results = await fetch(esClient, { index: apiReaderIndex, size: 1000, q: '*' });
+
+        expect(results).toBeArrayOfSize(3);
+
+        docArray.forEach((record) => {
+            expect(api.isCached(record)).toBeTrue();
         });
     });
 });
