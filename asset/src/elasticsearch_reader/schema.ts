@@ -25,6 +25,201 @@ export function checkIndex(index: string|undefined): void {
     if (index.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
 }
 
+export const schema = {
+    index: {
+        doc: 'Which index to read from',
+        default: null,
+        format(val: unknown): void {
+            if (isNotNil(val)) checkIndex(val as any);
+        }
+    },
+    field: {
+        doc: 'field to use for id_slicer if subslice_by_key is set to true',
+        default: '',
+        format: 'optional_String'
+    },
+    size: {
+        doc: 'The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the interval exceeds this number, it will cause the function to recurse to provide a smaller batch',
+        default: 5000,
+        format(val: unknown): void {
+            if (!isNumber(val)) throw new Error(`Invalid parameter size, it must be of type number, was given ${getTypeOf(val)}`);
+            if (isNaN(val)) throw new Error('Invalid size parameter, must be a number');
+            if (val <= 0) throw new Error('Invalid size parameter, must be greater than zero');
+        }
+    },
+    start: {
+        doc: 'The start date (ISOstring or in ms) to which it will read from ',
+        default: null,
+        format(val: unknown): void {
+            if (val) {
+                if (typeof val === 'string' || typeof val === 'number') {
+                    if (!moment(new Date(val)).isValid()) {
+                        try {
+                            dateMath.parse(val);
+                        } catch (err) {
+                            throw new Error(`Invalid start parameter, value: "${val}" cannot be coerced into a proper date`);
+                        }
+                    }
+                } else {
+                    throw new Error('Invalid start parameter, must be a string or number IF specified');
+                }
+            }
+        }
+    },
+    end: {
+        doc: 'The end date (ISOstring or in ms) to which it will read to',
+        default: null,
+        format(val: unknown): void {
+            if (val) {
+                if (typeof val === 'string' || typeof val === 'number') {
+                    if (!moment(new Date(val)).isValid()) {
+                        try {
+                            dateMath.parse(val);
+                        } catch (err) {
+                            throw new Error(`Invalid end parameter, value: "${val}" cannot be coerced into a proper date`);
+                        }
+                    }
+                } else {
+                    throw new Error('Invalid end parameter, must be a string or number IF specified');
+                }
+            }
+        }
+    },
+    interval: {
+        doc: 'The time interval in which it will read from, the number must be separated from the unit of time by an underscore. The unit of time may be months, weeks, days, hours, minutes, seconds, millesconds or their appropriate abbreviations',
+        default: 'auto',
+        format(val: unknown): void {
+            if (!isString(val)) throw new Error(`Invalid parameter interval, it must be of type string, was given ${getTypeOf(val)}`);
+            if (val === 'auto') return;
+            const regex = /(\d+)(\D+)/i;
+            const interval = regex.exec(val);
+            if (!interval) throw new Error('Invalid date interval, it is not formatted correctly');
+            dateOptions(interval[2]);
+        }
+    },
+    date_field_name: {
+        doc: 'field name where the date of the doc is located',
+        default: null,
+        format: 'optional_String'
+    },
+    query: {
+        doc: 'You may place a lucene query here, and the slicer will use it when making slices',
+        default: '',
+        format: 'optional_String'
+    },
+    fields: {
+        doc: 'used to only return fields that you are interested in',
+        default: null,
+        format(val: unknown): void {
+            if (isNotNil(val)) {
+                if (!Array.isArray(val)) throw new Error('Fields parameter must be an array');
+                if (!val.every(isString)) throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
+            }
+        }
+    },
+    delay: {
+        doc: 'used for persistent',
+        default: '30s',
+        format: 'optional_String'
+    },
+    subslice_by_key: {
+        doc: 'determine if slice should be further divided up by id if slice is to too big',
+        default: false,
+        format: Boolean
+    },
+    subslice_key_threshold: {
+        doc: 'After subslicing as far as possible, the docs threshold to initiate division by keys',
+        default: 50000,
+        format(val: unknown): void {
+            if (!isNumber(val)) throw new Error(`Invalid parameter subslice_key_threshold, it must be of type number, was given ${getTypeOf(val)}`);
+            if (isNaN(val)) throw new Error('Invalid subslice_key_threshold parameter, must be a number');
+            if (val <= 0) throw new Error('Invalid subslice_key_threshold parameter, must be greater than zero');
+        }
+    },
+    key_type: {
+        doc: 'The type of id used in index',
+        default: 'base64url',
+        format: Object.keys(IDType)
+    },
+    time_resolution: {
+        doc: 'indicate if data reading has second or millisecond resolutions',
+        default: 's',
+        format(val: unknown): string {
+            const obj = {
+                seconds: 's',
+                second: 's',
+                s: 's',
+                milliseconds: 'ms',
+                millisecond: 'ms',
+                ms: 'ms'
+            };
+            if (!isString(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
+            if (!obj[val]) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
+
+            return obj[val];
+        }
+    },
+    geo_field: {
+        doc: 'field name where the geolocation data is located',
+        default: '',
+        format: 'optional_String'
+    },
+    geo_box_top_left: {
+        doc: 'used for a bounding box query',
+        default: '',
+        format: geoPointValidation
+    },
+    geo_box_bottom_right: {
+        doc: 'used for a bounding box query',
+        default: '',
+        format: geoPointValidation
+    },
+    geo_point: {
+        doc: 'used for a geo distance query',
+        default: '',
+        format: geoPointValidation
+    },
+    geo_distance: {
+        doc: 'used for a geo distance query',
+        default: '',
+        format: validGeoDistance
+    },
+    geo_sort_point: {
+        doc: 'used for sorting geo queries',
+        default: '',
+        format: geoPointValidation
+    },
+    geo_sort_order: {
+        doc: 'used for sorting geo queries',
+        default: '',
+        format: (val: unknown): void => {
+            if (val) {
+                const options = { asc: true, desc: true };
+                if (typeof val !== 'string') throw new Error('Invalid geo_sort_order parameter, must be a string IF specified');
+                if (!options[val]) throw new Error('If geo_sort_order is specified it must be either "asc" or "desc"');
+            }
+        }
+    },
+    geo_sort_unit: {
+        doc: 'used for sorting geo queries',
+        default: '',
+        format: checkUnits
+    },
+    connection: {
+        doc: 'Name of the elasticsearch connection to use when sending data.',
+        default: 'default',
+        format: 'optional_String'
+    },
+    api_name: {
+        doc: 'name of api to be used by elasticearch reader',
+        default: DEFAULT_API_NAME,
+        format: (val: unknown): void => {
+            if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+            if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+        }
+    }
+};
+
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
@@ -67,200 +262,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
     }
 
     build(): AnyObject {
-        return {
-            index: {
-                doc: 'Which index to read from',
-                default: null,
-                format(val: unknown): void {
-                    if (isNotNil(val)) checkIndex(val as any);
-                }
-            },
-            field: {
-                doc: 'field to use for id_slicer if subslice_by_key is set to true',
-                default: '',
-                format: 'optional_String'
-            },
-            size: {
-                doc: 'The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the interval exceeds this number, it will cause the function to recurse to provide a smaller batch',
-                default: 5000,
-                format(val: unknown): void {
-                    if (!isNumber(val)) throw new Error(`Invalid parameter size, it must be of type number, was given ${getTypeOf(val)}`);
-                    if (isNaN(val)) throw new Error('Invalid size parameter, must be a number');
-                    if (val <= 0) throw new Error('Invalid size parameter, must be greater than zero');
-                }
-            },
-            start: {
-                doc: 'The start date (ISOstring or in ms) to which it will read from ',
-                default: null,
-                format(val: unknown): void {
-                    if (val) {
-                        if (typeof val === 'string' || typeof val === 'number') {
-                            if (!moment(new Date(val)).isValid()) {
-                                try {
-                                    dateMath.parse(val);
-                                } catch (err) {
-                                    throw new Error(`Invalid start parameter, value: "${val}" cannot be coerced into a proper date`);
-                                }
-                            }
-                        } else {
-                            throw new Error('Invalid start parameter, must be a string or number IF specified');
-                        }
-                    }
-                }
-            },
-            end: {
-                doc: 'The end date (ISOstring or in ms) to which it will read to',
-                default: null,
-                format(val: unknown): void {
-                    if (val) {
-                        if (typeof val === 'string' || typeof val === 'number') {
-                            if (!moment(new Date(val)).isValid()) {
-                                try {
-                                    dateMath.parse(val);
-                                } catch (err) {
-                                    throw new Error(`Invalid end parameter, value: "${val}" cannot be coerced into a proper date`);
-                                }
-                            }
-                        } else {
-                            throw new Error('Invalid end parameter, must be a string or number IF specified');
-                        }
-                    }
-                }
-            },
-            interval: {
-                doc: 'The time interval in which it will read from, the number must be separated from the unit of time by an underscore. The unit of time may be months, weeks, days, hours, minutes, seconds, millesconds or their appropriate abbreviations',
-                default: 'auto',
-                format(val: unknown): void {
-                    if (!isString(val)) throw new Error(`Invalid parameter interval, it must be of type string, was given ${getTypeOf(val)}`);
-                    if (val === 'auto') return;
-                    const regex = /(\d+)(\D+)/i;
-                    const interval = regex.exec(val);
-                    if (!interval) throw new Error('Invalid date interval, it is not formatted correctly');
-                    dateOptions(interval[2]);
-                }
-            },
-            date_field_name: {
-                doc: 'field name where the date of the doc is located',
-                default: null,
-                format: 'optional_String'
-            },
-            query: {
-                doc: 'You may place a lucene query here, and the slicer will use it when making slices',
-                default: '',
-                format: 'optional_String'
-            },
-            fields: {
-                doc: 'used to only return fields that you are interested in',
-                default: null,
-                format(val: unknown): void {
-                    if (isNotNil(val)) {
-                        if (!Array.isArray(val)) throw new Error('Fields parameter must be an array');
-                        if (!val.every(isString)) throw new Error('Invalid fields paramter, the values listed in the fields array must be of type string');
-                    }
-                }
-            },
-            delay: {
-                doc: 'used for persistent',
-                default: '30s',
-                format: 'optional_String'
-            },
-            subslice_by_key: {
-                doc: 'determine if slice should be further divided up by id if slice is to too big',
-                default: false,
-                format: Boolean
-            },
-            subslice_key_threshold: {
-                doc: 'After subslicing as far as possible, the docs threshold to initiate division by keys',
-                default: 50000,
-                format(val: unknown): void {
-                    if (!isNumber(val)) throw new Error(`Invalid parameter subslice_key_threshold, it must be of type number, was given ${getTypeOf(val)}`);
-                    if (isNaN(val)) throw new Error('Invalid subslice_key_threshold parameter, must be a number');
-                    if (val <= 0) throw new Error('Invalid subslice_key_threshold parameter, must be greater than zero');
-                }
-            },
-            key_type: {
-                doc: 'The type of id used in index',
-                default: 'base64url',
-                format: Object.keys(IDType)
-            },
-            time_resolution: {
-                doc: 'indicate if data reading has second or millisecond resolutions',
-                default: 's',
-                format(val: unknown): string {
-                    const obj = {
-                        seconds: 's',
-                        second: 's',
-                        s: 's',
-                        milliseconds: 'ms',
-                        millisecond: 'ms',
-                        ms: 'ms'
-                    };
-                    if (!isString(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
-                    if (!obj[val]) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
-
-                    return obj[val];
-                }
-            },
-            geo_field: {
-                doc: 'field name where the geolocation data is located',
-                default: '',
-                format: 'optional_String'
-            },
-            geo_box_top_left: {
-                doc: 'used for a bounding box query',
-                default: '',
-                format: geoPointValidation
-            },
-            geo_box_bottom_right: {
-                doc: 'used for a bounding box query',
-                default: '',
-                format: geoPointValidation
-            },
-            geo_point: {
-                doc: 'used for a geo distance query',
-                default: '',
-                format: geoPointValidation
-            },
-            geo_distance: {
-                doc: 'used for a geo distance query',
-                default: '',
-                format: validGeoDistance
-            },
-            geo_sort_point: {
-                doc: 'used for sorting geo queries',
-                default: '',
-                format: geoPointValidation
-            },
-            geo_sort_order: {
-                doc: 'used for sorting geo queries',
-                default: '',
-                format: (val: unknown): void => {
-                    if (val) {
-                        const options = { asc: true, desc: true };
-                        if (typeof val !== 'string') throw new Error('Invalid geo_sort_order parameter, must be a string IF specified');
-                        if (!options[val]) throw new Error('If geo_sort_order is specified it must be either "asc" or "desc"');
-                    }
-                }
-            },
-            geo_sort_unit: {
-                doc: 'used for sorting geo queries',
-                default: '',
-                format: checkUnits
-            },
-            connection: {
-                doc: 'Name of the elasticsearch connection to use when sending data.',
-                default: 'default',
-                format: 'optional_String'
-            },
-            api_name: {
-                doc: 'name of api to be used by elasticearch reader',
-                default: DEFAULT_API_NAME,
-                format: (val: unknown): void => {
-                    if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-                    if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
-                }
-            }
-        };
+        return schema;
     }
 }
 

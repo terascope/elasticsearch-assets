@@ -1,6 +1,6 @@
 # spaces_reader_api
 
-The `spaces_reader_api` will provide a factory that can create file reader apis that can be accessed in any operation through the `getAPI` method on the operation.
+The `spaces_reader_api` will provide a factory that can create a reader apis that can be accessed in any operation through the `getAPI` method on the operation.
 
 
 This is a [Factory API](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/apifactoryregistry), which can be used to fully manage api creation and configuration.
@@ -29,16 +29,15 @@ parameters:
 - name: String
 - configOverrides: Check options below, optional
 
-this will create an instance of a reader api, and cache it with the name given. Any
-config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
+this will create an instance of a reader api, and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
 
 ```typescript
-    const apiManager = this.getAPI<FileReaderFactoryAPI>(apiName);
+    const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
     // this will return an api cached at "normalClient" and this instance will use all configurations listed on the apiConfig
     const client = apiManager.create('normalClient')
 
-    // this will return an api cached at "overrideClient" and this instance will have an override setting the parameter compression to "gzip", this will use the rest of the configurations listed in the apiConfig
-    const overrideClient = apiManager.create('overrideClient', { compression: 'gzip'})
+    // this will return an api cached at "overrideClient" and this instance will have an override setting the parameter index to "other_index", this will use the rest of the configurations listed in the apiConfig
+    const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
 ```
 
 ### remove (async)
@@ -61,29 +60,27 @@ This will allow you to iterate over the clients of the cache
 
 
 ## Spaces Reader Instance
-This is the reader class that is returned from the create method of the APIFactory
+This is the reader class that is returned from the create method of the APIFactory. This returns a restricted [elastic-api](https://terascope.github.io/teraslice/docs/packages/elasticsearch-api/overview). Only the search and count methods will work appropriately.
 
 ### search
-```(query: ElasticsearchQuery) => Promise<ESSearchResults>```
+```(query: ElasticsearchQuery) => Promise<DataEntities[]>```
 parameters:
 - query: an elasticsearch query object
 
-### search
-```(query: ElasticsearchQuery) => Promise<ESSearchResults>```
+### count
+```(query: ElasticsearchQuery) => Promise<number>```
 parameters:
 - query: an elasticsearch query object
 
-This method will send the records to file
 
 ```js
-    // this will read the first 500 bytes of the file
-    const slice = {
-        path: 'some/data/path',
-        total: 10000,
-        length: 500,
-        offset: 0
-    }
-    const results = await api.read(docs)
+    const query: {
+        q: '(test:query OR other:thing AND bytes:>=2000)',
+        size: 100,
+        fields: 'foo,bar,date'
+    };
+
+    const results = await api.search(query)
 ```
 
 ## Options
@@ -120,21 +117,21 @@ This method will send the records to file
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort paramter is specified on the query. Sorting on geo distance while specifiying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
 
-### Example Processor using a file reader api
+### Example Processor using a spaces reader api
 ```typescript
-export default class SomeFetcher extends Fetcher<SomeConfig> {
-    api!: S3Reader
+export default class SomeReader extends Fetcher<ESDateConfig> {
+    api!: elasticAPI.Client;
 
     async initialize(): Promise<void> {
         await super.initialize();
         const apiName = this.opConfig.api_name;
-        const apiManager = this.getAPI<FilereaderFactoryAPI>(apiName);
-        this.api = await apiManager.create(apiName);
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, {});
     }
 
-    async fetch(slice: SlicedFileResults): Promise<DataEntity[]> {
-        // can do anything with the slice before reading
-        return this.api.read(slice);
+    async fetch(slice: SlicerDateResults): Promise<DataEntity[]> {
+        const query = buildQuery(this.opConfig, slice);
+        return this.api.search(query);
     }
 }
 ```

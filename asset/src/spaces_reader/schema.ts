@@ -7,11 +7,33 @@ import {
     ValidatedJobConfig,
     isNil,
     isNumber,
-    isNotNil
+    isNotNil,
+    cloneDeep
 } from '@terascope/job-components';
-import ReaderSchema from '../elasticsearch_reader/schema';
+import { schema } from '../elasticsearch_reader/schema';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import { DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
+
+const clone = cloneDeep(schema);
+
+const apiSchema = {
+    endpoint: {
+        doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
+        default: null,
+        format: 'optional_String'
+    },
+    token: {
+        doc: 'API access token for making requests',
+        default: null,
+        format: 'optional_String'
+    },
+    timeout: {
+        doc: 'Time in milliseconds to wait for a connection to timeout.',
+        default: 300000
+    },
+};
+
+export const spacesSchema = Object.assign({}, clone, apiSchema);
 
 export default class Schema extends ConvictSchema<ApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -39,10 +61,7 @@ export default class Schema extends ConvictSchema<ApiConfig> {
     }
 
     build(): AnyObject {
-        const schema = new ReaderSchema(this.context, this.opType);
-        const esSchema = schema.build();
-
-        esSchema.api_name = {
+        spacesSchema.api_name = {
             doc: 'name of api to be used by elasticearch reader',
             default: DEFAULT_API_NAME,
             format: (val: unknown) => {
@@ -51,23 +70,6 @@ export default class Schema extends ConvictSchema<ApiConfig> {
             }
         };
 
-        const apiSchema = {
-            endpoint: {
-                doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
-                default: null,
-                format: 'optional_String'
-            },
-            token: {
-                doc: 'API access token for making requests',
-                default: null,
-                format: 'optional_String'
-            },
-            timeout: {
-                doc: 'Time in milliseconds to wait for a connection to timeout.',
-                default: 300000
-            },
-        };
-
-        return Object.assign({}, esSchema, apiSchema);
+        return spacesSchema;
     }
 }
