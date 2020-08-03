@@ -1,4 +1,3 @@
-
 # elasticsearch_reader #
 Used to retrieve elasticsearch data based on dates. This reader has different behaviour if lifecycle is set to "once" or "persistent"
 
@@ -46,14 +45,14 @@ Note: for geo distance queries, it defaults to sorting the returning results bas
 
 Example configuration if lifecycle is set to "persistent"
 
-```
+```json
 {
     "_op": "elasticsearch_reader",
     "index": "someindex",
     "size": 5000,
     "interval": "5s",
     "delay": "1m",
-    "date_field_name": "created",
+    "date_field_name": "created"
 }
 ```
 
@@ -77,8 +76,8 @@ No start or end keys
 
 - this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
 
-```
-//simplified using defaults
+```javascript
+// simplified using defaults
 {
     "_op": "elasticsearch_reader",
     "index": "events-*",
@@ -135,7 +134,7 @@ No start or end keys
         {
             "_op": "noop"
         }
-    ],
+    ]
 }
 
 ```
@@ -150,8 +149,8 @@ this configuration will be expanded out to the long form underneath the hood
     "slicers" : 1,
     "lifecycle" : "once",
     "assets" : [
-            "elasticsearch"
-        ],
+        "elasticsearch"
+    ],
     "apis" : [
         {
             "_name": "elasticsearch_reader_api",
@@ -170,7 +169,7 @@ this configuration will be expanded out to the long form underneath the hood
         {
             "_op": "noop"
         }
-    ],
+    ]
 }
 ```
 

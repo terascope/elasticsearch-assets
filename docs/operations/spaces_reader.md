@@ -58,7 +58,7 @@ This is a wrapper around the elasticsearch_reader so it has all of the functiona
         {
             "_op" : "noop"
         }
-    ],
+    ]
 }
 
 ```
@@ -73,8 +73,8 @@ this configuration will be expanded out to the long form underneath the hood
     "slicers" : 1,
     "lifecycle" : "once",
     "assets" : [
-            "elasticsearch"
-        ],
+        "elasticsearch"
+    ],
     "apis" : [
         {
             "_name" : "spaces_reader_api",
@@ -93,7 +93,7 @@ this configuration will be expanded out to the long form underneath the hood
         {
             "_op" : "noop"
         }
-    ],
+    ]
 }
 ```
 

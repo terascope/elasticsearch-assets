@@ -32,12 +32,12 @@ parameters:
 this will create an instance of a sender api, and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
 
 ```typescript
-    const apiManager = this.getAPI<ElasticSenderFactoryAPI>(apiName);
-    // this will return an api cached at "normalClient" and this instance will use all configurations listed on the apiConfig
-    const client = apiManager.create('normalClient')
+const apiManager = this.getAPI<ElasticSenderFactoryAPI>(apiName);
+// this will return an api cached at "normalClient" and it will use the default api config
+const client = apiManager.create('normalClient')
 
-    // this will return an api cached at "overrideClient" and this instance will have an override setting the parameter index to "other_index", this will use the rest of the configurations listed in the apiConfig
-    const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
+// this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
+const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
 ```
 
 ### remove (async)
@@ -56,7 +56,7 @@ This will allow you to iterate over the cache name of the cache
 
 ### values
 
-This will allow you to iterate over the clients of the cache
+This will allow you to iterate over the values of the cache
 
 
 ## Elasticsearch Sender Instance
@@ -69,12 +69,9 @@ parameters:
 
 
 ```js
-    // this will read the first 500 bytes of the file
-    const data = [
-            DataEntity.make({ some: 'data', name: 'someName', job: 'to be awesome!' })
-    ];
-
-    await api.send(data)
+await api.send([
+    DataEntity.make({ some: 'data', name: 'someName', job: 'to be awesome!' })
+]);
 ```
 
 ## Options
@@ -99,7 +96,7 @@ parameters:
 
 
 
-### Example Processor using a file sender api
+### Example Processor using a elasticsearch sender API
 ```typescript
 export default class SomeSender extends BatchProcessor<ElasticsearchBulkConfig> {
     client!: ElasticsearchSender;

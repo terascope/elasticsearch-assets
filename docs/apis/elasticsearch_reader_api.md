@@ -32,12 +32,12 @@ parameters:
 this will create an instance of a reader api, and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
 
 ```typescript
-    const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
-    // this will return an api cached at "normalClient" and this instance will use all configurations listed on the apiConfig
-    const client = apiManager.create('normalClient')
+const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+// this will return an api cached at "normalClient" and it will use the default api config
+const client = apiManager.create('normalClient')
 
-    // this will return an api cached at "overrideClient" and this instance will have an override setting the parameter index to "other_index", this will use the rest of the configurations listed in the apiConfig
-    const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
+// this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
+const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
 ```
 
 ### remove (async)
@@ -56,7 +56,7 @@ This will allow you to iterate over the cache name of the cache
 
 ### values
 
-This will allow you to iterate over the clients of the cache
+This will allow you to iterate over the values of the cache
 
 
 ## Elasticsearch Reader Instance
@@ -74,13 +74,13 @@ parameters:
 
 
 ```js
-    const query: {
-        q: '(test:query OR other:thing AND bytes:>=2000)',
-        size: 100,
-        fields: 'foo,bar,date'
-    };
+const query: {
+    q: '(test:query OR other:thing AND bytes:>=2000)',
+    size: 100,
+    fields: 'foo,bar,date'
+};
 
-    const results = await api.search(query)
+const results = await api.search(query)
 ```
 
 ## Options
@@ -88,8 +88,6 @@ parameters:
 | Configuration | Description | Type |  Notes   |
 | --------- | -------- | ------ | ------ |
 | \_name | Name of operation, it must reflect the exact name of the file | String | required |
-| endpoint | The base API endpoint to read from: i.e.http://yourdomain.com/api/v1 | String | required |
-| token | teraserver API access token for making requests | String | required |
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
 | index | Which index to read from | String | required |
 | type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id|String | required if using elasticsearch v5, optional otherwise, defaults to '_doc' |
@@ -117,7 +115,7 @@ parameters:
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort paramter is specified on the query. Sorting on geo distance while specifiying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
 
-### Example Processor using a elasticsearch reader api
+### Example Processor using a elasticsearch reader API
 ```typescript
 export default class SomeReader extends Fetcher<ESDateConfig> {
     api!: elasticAPI.Client;

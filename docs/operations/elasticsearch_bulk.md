@@ -63,8 +63,8 @@ this configuration will be expanded out to the long form underneath the hood
     "slicers" : 1,
     "lifecycle" : "once",
     "assets" : [
-            "elasticsearch"
-        ],
+        "elasticsearch"
+    ],
     "apis" : [
         {
             "_name": "elasticsearch_reader_api",
@@ -74,12 +74,12 @@ this configuration will be expanded out to the long form underneath the hood
             "key_type": "base64url",
             "connection": "default"
         },
-         {
+        {
             "_name": "elasticsearch_sender_api",
             "index": "other_index",
             "size": 1000,
             "index": true
-        },
+        }
     ],
     "operations" : [
         {
@@ -90,7 +90,7 @@ this configuration will be expanded out to the long form underneath the hood
             "_op": "elasticsearch_bulk",
             "api_name" : "elasticsearch_sender_api"
         }
-    ],
+    ]
 }
 ```
 

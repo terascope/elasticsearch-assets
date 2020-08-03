@@ -16,16 +16,16 @@ teraslice-cli assets deploy <cluster-alias> --build
 ```
 ## APIS
 
- * [Elasticsearch Reader API](./docs/apis/es_reader.md)
- * [Elasticsearch Sender API](./docs/apis/es_sender.md)
- * [Spaces Reader API](./docs/apis/spaces_reader.md)
- * [Elasticsearch State Storage](./docs/apis/es_state_storage.md)
+ * [Elasticsearch Reader API](./docs/apis/elasticsearch_reader_api.md)
+ * [Elasticsearch Sender API](./docs/apis/elasticsearch_sender_api.md)
+ * [Spaces Reader API](./docs/apis/spaces_reader_api.md)
+ * [Elasticsearch State Storage](./docs/apis/elasticsearch_state_storage.md)
 
 
 ## Operations
- * [elasticsearch_reader](./docs/operations/es_reader.md)
- * [elasticsearch_bulk](./docs/operations/es_bulk.md)
- * [elasticsearch_data_generator](./docs/operations/data_generator.md)
+ * [elasticsearch_reader](./docs/operations/elasticsearch_reader.md)
+ * [elasticsearch_bulk](./docs/operations/elasticsearch_bulk.md)
+ * [elasticsearch_data_generator](./docs/operations/elasticsearch_data_generator.md)
  * [id_reader](./docs/operations/id_reader.md)
  * [spaces_reader](./docs/operations/spaces_reader.md)
 

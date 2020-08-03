@@ -19,39 +19,45 @@ please refer to that guide for api references
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
 
 
-### Example Processor using a elasticsearch reader api
+### Example Processor using the elasticsearch state storage API
 ```typescript
 
-export default class SomeStorage extends OperationAPI {
-    stateStorage: ESCachedStateStorage;
+export default class SomeStorage extends BatchProcessor {
+    stateStorage!: ESCachedStateStorage;
 
-    constructor(
-        context: WorkerContext,
-        apiConfig: ESStateStorageConfig,
-        executionConfig: ExecutionConfig
-    ) {
-        super(context, apiConfig, executionConfig);
-        const { client } = this.context.foundation.getConnection({
-            endpoint: this.apiConfig.connection,
-            type: 'elasticsearch',
-            cached: true
-        });
-        // @ts-expect-error
-        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig);
+    async initialize() {
+        await super.intialize();
+        this.stateStorage = this.getAPI<ElasticsearchStateStorage>(this.opConfig.api_name);;
     }
 
-    async initialize(): Promise<void> {
-        await super.initialize();
-        await this.stateStorage.initialize();
+     async shutdown() {
+        await super.intialize();
+        this.stateStorage = this.getAPI<ElasticsearchStateStorage>(this.opConfig.api_name);;
     }
 
-    async shutdown(): Promise<void> {
-        await super.shutdown();
-        await this.stateStorage.shutdown();
+    compareRecord(incData:DataEntity, cachedRecord:DataEntity) {
+        return incData.time > cachedRecord.time
     }
 
-    async createAPI(): Promise<ESCachedStateStorage> {
-        return this.stateStorage;
+    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
+        const results: DataEntity[] = [];
+        const setRecords: DataEntity[] = [];
+
+        for (const record of data) {
+            if (!this.stateStorage.isCached(record)) {
+                setRecords.push(record);
+                continue;
+            }
+
+            if (this.compareRecord(record, this.stateStorage.getFromCache(record))) {
+                this.stateStorage.set(record);
+                results.push(record);
+            }
+        }
+
+        if (fetchRecords.length > 0) await this.stateStorage.mset(fetchRecords);
+
+        return results;
     }
 }
 ```

@@ -45,7 +45,7 @@ Currently the id_reader and makes keys for base64url (elasticsearch native id ge
         {
             "_op" : "noop"
         }
-    ],
+    ]
 }
 
 ```
@@ -60,8 +60,8 @@ this configuration will be expanded out to the long form underneath the hood
     "slicers" : 1,
     "lifecycle" : "once",
     "assets" : [
-            "elasticsearch"
-        ],
+        "elasticsearch"
+    ],
     "apis" : [
         {
             "_name": "elasticsearch_reader_api",
@@ -70,7 +70,7 @@ this configuration will be expanded out to the long form underneath the hood
             "size": 1000,
             "key_type": "base64url",
             "connection": "default"
-        },
+        }
     ],
     "operations" : [
         {
@@ -80,7 +80,7 @@ this configuration will be expanded out to the long form underneath the hood
         {
             "_op" : "noop"
         }
-    ],
+    ]
 }
 ```
 

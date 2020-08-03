@@ -1,11 +1,9 @@
-
-
 # elasticsearch_data_generator #
 ## Deprecated, please use data_generator from standard assets
 Used to generate sample data for your elasticsearch cluster. You may use the default data generator which creates randomized data fitting the format listed below or you may create your own custom schema using the [mocker-data-generator](https://github.com/danibram/mocker-data-generator) package to create data to whatever schema you desire.
 
 Default generated data :
-```
+```json
 {
     "ip": "1.12.146.136",
     "userAgent": "Mozilla/5.0 (Windows NT 5.2; WOW64; rv:8.9) Gecko/20100101 Firefox/8.9.9",
@@ -20,7 +18,7 @@ Default generated data :
 ```
 
 Example configuration
-```
+```json
 {
     "_op": "elasticsearch_data_generator",
     "size": 25000000,
@@ -85,7 +83,7 @@ There are two categories of formats, ones that return the current date at which 
             "size": 1000,
             "index": true
         }
-    ],
+    ]
 }
 
 ```
