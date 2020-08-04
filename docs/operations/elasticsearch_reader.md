@@ -321,7 +321,7 @@ this configuration will be expanded out to the long form underneath the hood
     ],
     "operations" : [
         {
-            "_op" : "id_reader",
+            "_op" : "elasticsearch_reader",
             "api_name" : "elasticsearch_reader_api"
         },
         {
