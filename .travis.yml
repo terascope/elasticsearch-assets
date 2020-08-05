@@ -23,9 +23,7 @@ env:
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:
   exclude:
-  # Only build 6 on osx
-  - os: osx
-    env: ELASTICSEARCH_VERSION=5.6
+  # Don't build es 7 on osx because it is redunant
   - os: osx
     env: ELASTICSEARCH_VERSION=7.2.1
   # Don't build es 7 on node 10
