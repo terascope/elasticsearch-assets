@@ -345,7 +345,6 @@ describe('spaces_reader', () => {
                 token: 'test-token',
             };
             async function getMeta(test: SlicerTestHarness) {
-                // @ts-expect-error
                 return test.context.apis.executionContext.getMetadata('spaces_reader');
             }
 

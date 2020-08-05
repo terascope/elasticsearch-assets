@@ -23,8 +23,18 @@ env:
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:
   exclude:
+  # Don't build es 7 on osx because it is redunant
   - os: osx
     env: ELASTICSEARCH_VERSION=7.2.1
+  # Don't build es 7 on node 10
+  - node_js: '10.19'
+    env: ELASTICSEARCH_VERSION=7.2.1
+  # Don't build es 6 on node 10
+  - node_js: '10.19'
+    env: ELASTICSEARCH_VERSION=6.8.6
+  # Don't build es 5 on node 12
+  - node_js: '12.18'
+    env: ELASTICSEARCH_VERSION=5.6
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
         docker run -d --publish "9200:9200"
