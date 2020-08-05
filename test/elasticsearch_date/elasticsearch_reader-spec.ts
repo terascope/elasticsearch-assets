@@ -53,7 +53,6 @@ describe('elasticsearch_reader', () => {
     }
 
     async function getMeta(test: SlicerTestHarness) {
-        // @ts-expect-error
         return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
     }
 
