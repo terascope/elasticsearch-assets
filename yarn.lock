@@ -552,40 +552,29 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.11.3":
-  version "0.11.3"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.11.3.tgz#45de38bbd2d1b023d567b05201e0a124ad3f0691"
-  integrity sha512-3/MMsRn0HwRGrM9wtsPj943osJ2fZFCETuWCiJ18E6AtAlq/thnl56h5Tp4Ag3gZsvTUq0Kq9m+ScxkAzRgWGw==
+"@terascope/data-mate@^0.12.3":
+  version "0.12.3"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.12.3.tgz#e929f97ebd432be796ba43e87813525946042078"
+  integrity sha512-QNyTe5jQCEWBLbUFZ5s9bfFvbEKyl0xOXUAQ3IE2CLr0svRXametMo/7TOlQxfufelG+78DFeXFhrle7gefs6w==
   dependencies:
-    "@terascope/data-types" "^0.19.3"
+    "@terascope/data-types" "^0.20.2"
     "@terascope/types" "^0.4.0"
-    "@terascope/utils" "^0.28.1"
+    "@terascope/utils" "^0.29.2"
     "@turf/bbox" "^6.0.1"
     "@turf/bbox-polygon" "^6.0.1"
     "@turf/boolean-point-in-polygon" "^6.0.1"
     "@turf/circle" "^6.0.1"
     "@turf/clean-coords" "^6.0.1"
     "@turf/helpers" "^6.1.4"
-    awesome-phonenumber "^2.35.0"
-    date-fns "^2.14.0"
+    awesome-phonenumber "^2.36.0"
+    date-fns "^2.15.0"
     ip6addr "^0.2.3"
     ipaddr.js "^1.9.1"
     is-cidr "^4.0.0"
     jexl "^2.2.2"
     valid-url "^1.0.9"
     validator "^13.1.1"
-    xlucene-parser "^0.23.1"
-
-"@terascope/data-types@^0.19.3":
-  version "0.19.3"
-  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.19.3.tgz#2c3028166edcfe07944dec32dfcb7ea56eb5ae2c"
-  integrity sha512-xjoPO9+MtOGoiIgvEe+yhaEehs3GNorQeIlWZUPu/A1peDVTlrvBeoF0qpNmbsEg4yG71U1UFZho0/bFdVj5iA==
-  dependencies:
-    "@terascope/types" "^0.4.0"
-    "@terascope/utils" "^0.28.1"
-    graphql "^15.3.0"
-    lodash.defaultsdeep "^4.6.1"
-    yargs "^15.4.1"
+    xlucene-parser "^0.24.2"
 
 "@terascope/data-types@^0.20.2":
   version "0.20.2"
@@ -1412,10 +1401,10 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-awesome-phonenumber@^2.35.0:
-  version "2.35.0"
-  resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.35.0.tgz#4c8fe5ec74bde86c86f7535fe74b588ce98b9327"
-  integrity sha512-d9PgzixrJqYnk5GHOL+7yKVcgpDAxHCmaiMS4NkuPhCC37I9rDFYbMM9cHftDmCiZ85q24FmXOC1/O6mnD+RbQ==
+awesome-phonenumber@^2.36.0:
+  version "2.36.0"
+  resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.36.0.tgz#b702b74094c7a63dfdabe37e316a4a621cc6f303"
+  integrity sha512-VHxah9DgKjzSJvaGWAaWSaQm/p6Ri7EczfjIJg/oPa5+bGQLS+rJuQdSaEIlHFgo+lSafENkPTYVXucJk39fug==
 
 aws-sign2@~0.7.0:
   version "0.7.0"
@@ -1900,10 +1889,10 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^2.14.0:
-  version "2.14.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.14.0.tgz#359a87a265bb34ef2e38f93ecf63ac453f9bc7ba"
-  integrity sha512-1zD+68jhFgDIM0rF05rcwYO8cExdNqxjq4xP1QKM60Q45mnO6zaMWB4tOzrIr4M4GSLntsKeE4c9Bdl2jhL/yw==
+date-fns@^2.15.0:
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.15.0.tgz#424de6b3778e4e69d3ff27046ec136af58ae5d5f"
+  integrity sha512-ZCPzAMJZn3rNUvvQIMlXhDr4A+Ar07eLeGsGREoWU19a3Pqf5oYa+ccd+B3F6XVtQY6HANMFdOQ8A+ipFnvJdQ==
 
 datemath-parser@^1.0.6:
   version "1.0.6"
@@ -2081,18 +2070,18 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-elasticsearch-store@^0.31.3:
-  version "0.31.3"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.31.3.tgz#724166e3c58dd63f11f688c749fd215dd9a302b9"
-  integrity sha512-i78aNC9ClQoVXhtZh1I1EKXv+okIkfbjHcYMPXhHeEaC5jdBClk2TxQTg1Z8DfaxndWrDIjaPYu3gtLLVBBsUw==
+elasticsearch-store@^0.32.3:
+  version "0.32.3"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.32.3.tgz#7afcf1884d63eda4c3e1647e8cf6ac003e2ca1ba"
+  integrity sha512-AgO8aj7ID98e/WHt2yXMbXFY9zwWDK+EasrGtJVoZgJdCj1yTtdOc0gDksKO5Tcx99qFXwWTgifEjHnmjGolFw==
   dependencies:
-    "@terascope/data-mate" "^0.11.3"
-    "@terascope/data-types" "^0.19.3"
+    "@terascope/data-mate" "^0.12.3"
+    "@terascope/data-types" "^0.20.2"
     "@terascope/types" "^0.4.0"
-    "@terascope/utils" "^0.28.1"
+    "@terascope/utils" "^0.29.2"
     ajv "^6.12.3"
-    uuid "^8.2.0"
-    xlucene-translator "^0.7.1"
+    uuid "^8.3.0"
+    xlucene-translator "^0.8.2"
 
 elasticsearch@^15.4.1:
   version "15.5.0"
@@ -5577,10 +5566,10 @@ uuid@^7.0.3:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-7.0.3.tgz#c5c9f2c8cf25dc0a372c4df1441c41f5bd0c680b"
   integrity sha512-DPSke0pXhTZgoF/d+WSt2QaKMCFSfx7QegxEWT+JOuHF5aWrKEn0G+ztjuJg/gG8/ItK+rbPCD/yNv8yyih6Cg==
 
-uuid@^8.2.0:
-  version "8.2.0"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.2.0.tgz#cb10dd6b118e2dada7d0cd9730ba7417c93d920e"
-  integrity sha512-CYpGiFTUrmI6OBMkAdjSDM0k5h8SkkiTP4WAjQgDgNB1S3Ou9VBEvr6q0Kv2H1mMk7IWfxYGpMH5sd5AvcIV2Q==
+uuid@^8.2.0, uuid@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.0.tgz#ab738085ca22dc9a8c92725e459b1d507df5d6ea"
+  integrity sha512-fX6Z5o4m6XsXBdli9g7DtWgAx+osMsRRZFKma1mIUsLCz6vRvv+pz5VNbyu9UEDzpMWulZfvpgb/cmDXVulYFQ==
 
 v8-compile-cache@^2.0.3:
   version "2.1.1"
@@ -5740,13 +5729,13 @@ ws@^7.2.3:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.3.0.tgz#4b2f7f219b3d3737bc1a2fbf145d825b94d38ffd"
   integrity sha512-iFtXzngZVXPGgpTlP1rBqsUK82p9tKqsWRPg5L56egiljujJT3vGAYnHANvFxBieXrTFavhzhxW52jnaWV+w2w==
 
-xlucene-parser@^0.23.1:
-  version "0.23.1"
-  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.23.1.tgz#fcf84d9bb278bfb8a3071508c7b1243b953ec287"
-  integrity sha512-9KieC/GR9qpMenKlIIoncWbuQol9+OYtXJzDXOiqEvFVnU3w8I/5vKUV1xnJGeB94t5ij2mO7Fkj9XeGVdKLmw==
+xlucene-parser@^0.24.2:
+  version "0.24.2"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.24.2.tgz#e68b1046b79d65d011516b58951e73a567bd9741"
+  integrity sha512-p0gkITP+pcQaMgFpMlCFaGzBEC9wb39jWbiqd5XffoYAZPbd9wjWX18+jaaUatj6ONhXkWpyxeXAoVmNYWUHVQ==
   dependencies:
     "@terascope/types" "^0.4.0"
-    "@terascope/utils" "^0.28.1"
+    "@terascope/utils" "^0.29.2"
     "@turf/bbox" "^6.0.1"
     "@turf/bbox-polygon" "^6.0.1"
     "@turf/boolean-contains" "^6.0.1"
@@ -5762,14 +5751,14 @@ xlucene-parser@^0.23.1:
     "@turf/line-to-polygon" "^6.0.1"
     "@turf/random" "^6.0.2"
 
-xlucene-translator@^0.7.1:
-  version "0.7.1"
-  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.7.1.tgz#d048951046b48d161d2ba53d36f76074a22e8b86"
-  integrity sha512-aC8h/RCVr2lnXitIkI+8tabhqXRMWsQ24ypBm3Mc/uWhJeyvcSArrA+17BOGyyBaS58AnJ+ZzBcwDQAidiGZqg==
+xlucene-translator@^0.8.2:
+  version "0.8.2"
+  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.8.2.tgz#e90f6f0de8335a922275f8600232b35b3dafee5c"
+  integrity sha512-h8DFJf2bykJlotd4aRZhb6gWEOhboEq1B4fhy4AmoiT0BwiZUs0yII9Otosb9Iff5TXHgF5ZxHmH3PDUHoe5yg==
   dependencies:
     "@terascope/types" "^0.4.0"
-    "@terascope/utils" "^0.28.1"
-    xlucene-parser "^0.23.1"
+    "@terascope/utils" "^0.29.2"
+    xlucene-parser "^0.24.2"
 
 xml-name-validator@^3.0.0:
   version "3.0.0"
