@@ -1,5 +1,5 @@
 # id_reader #
-The id_reader reads data from an Elasticsearch index using an algorithm that partitions the data using regex queries. Although regex queries are a bit more taxing on the cluster, its a more reliable way of dividing up data.
+The id_reader reads data from an elasticsearch index using an algorithm that partitions the data based on a string field of the record. This field value needs to have high uniqueness, like an id of some sort.
 
 The behavior of this reader changes with the version of elasticsearch being searched.
 
@@ -7,7 +7,7 @@ For this reader to function correctly the [connection config](https://terascope.
 
 when searching against elasticsearch <= v5, it will query directly against the _uid (the elasticsearch _id of the record) so parameter `field` is NOT needed. However the `type` of the record must be set
 
-when searching against elasticsearch >= 6,  parameter `field` IS needed. This field needs to have a string value of high uniqueness, like an id of some sort.
+when searching against elasticsearch >= 6,  parameter `field` IS needed.
 
 Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 
@@ -43,7 +43,9 @@ teraslice:
 ```
 
 ### Batch read the entire content of an index with elasticsearch v6 or newer and return filtered fields
-This will run queries against the uuid field on the records to split them up. Since `fields` parameter was set, then only those fields of the records will be returned
+This is an example of using the id_reader to run queries against the uuid field on the records to split them up. Since `fields` parameter was set, then only those fields of the records will be returned
+
+Example Job:
 ```json
 {
   "name": "ID_Reader",
@@ -60,14 +62,15 @@ This will run queries against the uuid field on the records to split them up. Si
       "connection": "default"
     },
     {
-      "_op": "noop",
+      "_op": "noop"
     }
   ]
 }
 ```
-
+Here is representation of elasticsearch data being sliced by the uuid field and returning only the fields requested
 ```javascript
-const elasticsearchData = [
+// elasticsearch index data
+[
     {
         "_index" : "test_index",
         "_type" : "events",
@@ -148,6 +151,8 @@ const thirdSliceResults = [
 
 ### Batch read the index with filter with key_range and query parameters
 This will run queries against the uuid field on the records to split them up. The results will be filtered by the `query` parameter, and will only search against a subset of of the uuid specified in `key_range`.
+
+Example Job:
 ```json
 {
   "name": "ID_Reader",
@@ -165,12 +170,12 @@ This will run queries against the uuid field on the records to split them up. Th
       "connection": "default"
     },
     {
-      "_op": "noop",
+      "_op": "noop"
     }
   ]
 }
 ```
-
+Here is representation of elasticsearch data being sliced and filtered by the query parameter
 ```javascript
 const elasticsearchData = [
     {
@@ -276,12 +281,12 @@ This is a job that will run against an elasticsearch v5 cluster. This will query
       "connection": "es5"
     },
     {
-      "_op": "noop",
+      "_op": "noop"
     }
   ]
 }
 ```
-
+Here is a simplified version of elasticsearch data being queried by its _id
 ```javascript
 const elasticsearchData = [
     {
@@ -327,7 +332,7 @@ const secondSliceResults = [
 | index | Which index to read from | String | required
 | type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | only required for elasticsearch v5
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000
-| key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`, `HEXADECIMAL` (which is uppercase version of hexadecimal)|
+| key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`|
 | key_range | if provided, slicer will only recurse on these given keys | Array | optional |
 | starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting | Number | optional |
 | fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
