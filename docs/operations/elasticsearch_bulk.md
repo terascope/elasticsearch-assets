@@ -1,7 +1,44 @@
 # elasticsearch_bulk #
-This operator sends bulk requests to elasticsearch
+The elasticsearch_bulk operator is a high throughput bulk sender to an elasticsearch index.
 
+There are four types of [bulk requests](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/docs-bulk.html#docs-bulk-api-desc): index, create, update and delete.
 
+This operation requires that the incoming data-entities to this processors
+have a `_key` metadata field set to the id of the record for `update` and `delete` requests.
+
+Although not needed for `index` and `create` bulk requests, setting the `_key` on the record will create the new record with that id as opposed to one that is automatically generated for you.
+
+When using the elasticsearch_reader or the elasticsearch_reader_api to fetch records, the `_key` will automatically be set to the elasticsearch records _id.
+You can use other processors to remove or alter that if it is not wanted.
+
+## Usage
+### Send index batch request, setting the _id of the records
+Example Job
+```json
+{
+    "name" : "testing",
+    "workers" : 1,
+    "slicers" : 1,
+    "lifecycle" : "once",
+    "assets" : [
+        "elasticsearch"
+    ],
+    "operations" : [
+        {
+            "_op": "elasticsearch_reader",
+            "index": "test_index",
+            "field": "created",
+            "query": "bytes:>= 1000",
+            "connection": "es-1"
+        },
+        {
+            "_op": "elasticsearch_bulk"
+        }
+    ]
+}
+```
+
+## Parameters
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
@@ -9,16 +46,16 @@ This operator sends bulk requests to elasticsearch
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
 | index | Index to where the data will be sent to, it must be lowercase | String | required |
 | type | Set the type of the data for elasticsearch | String | optional defaults to '_doc', is required for elasticsearch v5|
-| delete| Use the id_field from the incoming records to bulk delete documents | Boolean | optional, defaults to false |
+| delete | Use the id_field from the incoming records to bulk delete documents | Boolean | optional, defaults to false |
 | upsert| Specify if the incoming records should be used to perform an upsert. If update_fields is also specified then existing records will be updated with those fields otherwise the full incoming  record will be inserted | Boolean | optional, defaults to false |
-| create| Specify if the incoming records should be used to perform an create event ("put-if-absent" behavior)| Boolean | optional, defaults to false |
+| create | Specify if the incoming records should be used to perform an create event ("put-if-absent" behavior)| Boolean | optional, defaults to false |
 | update | Specify if the data should update existing records, if false it will index them | Boolean | optional, defaults to false |
 | update_fields | if you are updating the documents, you can specify fields to update here (it should be an array containing all the field names you want), it defaults to sending the entire document | Array | optional, defaults to [] |
 | script_file | Name of the script file to run as part of an update request | String | optional |
 | script | Inline script to include in each indexing request. Only very simple painless scripts are currently supported | String | optional |
 | script_params | key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key | Object | optional |
 | update_retry_on_conflict | If there is a version conflict from an update how often should it be retried | Number | optional, defaults to 0 |
-| api_name | name of api to be used by elasticearch bulk sender | String | optional, defaults to 'elasticsearch_sender_api' |
+| api_name | name of api to be used by elasticsearch bulk sender | String | optional, defaults to 'elasticsearch_sender_api' |
 
 
 ## Example Job
@@ -94,7 +131,7 @@ this configuration will be expanded out to the long form underneath the hood
 }
 ```
 
-`NOTE`: If start with the long form (which means to set up the apis manually and specify the api_name on the operation) then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimalized. The api configs take precendence.
+`NOTE`: If start with the long form (which means to set up the apis manually and specify the api_name on the operation) then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
 - `index`

@@ -10,7 +10,7 @@ This is a [Factory API](https://terascope.github.io/teraslice/docs/packages/job-
 
 ### size
 
-this will return how many seperate sender apis are in the cache
+this will return how many separate sender apis are in the cache
 
 ### get
 parameters:

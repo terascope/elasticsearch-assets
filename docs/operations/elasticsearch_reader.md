@@ -101,10 +101,10 @@ const expected fetchResults = [
     { created: "2020-08-04T16:38:18.372Z", id: 1, bytes: 213 },
 ]
 ```
-`Notes`: be careful to take note of the `start` and `end` dates you specify, espeically the formatting (UTC vs ISO etc) compared to the data in elasticsearch. Make sure to use the same formatting so you can filter the data you want. If one date encapsulates time zones but the other doesn't, you could be several hours off and get the wrong results.
+`Notes`: be careful to take note of the `start` and `end` dates you specify, especially the formatting (UTC vs ISO etc) compared to the data in elasticsearch. Make sure to use the same formatting so you can filter the data you want. If one date encapsulates time zones but the other doesn't, you could be several hours off and get the wrong results.
 
 ### Higher Throughput Job
-This job has 4 slicers, it will determine the date range for the entire index and divide it by four which will be the date range for each slicer. Each slicer will determine processable slice chunks from earliest to latest within their assinged ranges. The slices will be doled out to the 35 workers as they come in so a given worker make process later dates, then on the next slice process early dates. Some slicers may finish earlier than others.
+This job has 4 slicers, it will determine the date range for the entire index and divide it by four which will be the date range for each slicer. Each slicer will determine processable slice chunks from earliest to latest within their assigned ranges. The slices will be doled out to the 35 workers as they come in so a given worker make process later dates, then on the next slice process early dates. Some slicers may finish earlier than others.
 
 Example Job
 ```json
@@ -131,7 +131,7 @@ Example Job
 ```
 
 ### Persistent Job
-When lifecyle is set to peristent, this will try reading from a stream of input. When the execution starts, it will try to read within the range of the `interval` with a latency time specified in `delay`
+When lifecycle is set to persistent, this will try reading from a stream of input. When the execution starts, it will try to read within the range of the `interval` with a latency time specified in `delay`
 
 Example Job
 ```json
@@ -175,7 +175,7 @@ const endRange = "2020-08-04T16:30:00";
 ```
 
 ### Hinting the algorithm to optimize performance
-By default the reader will do its best to quickly slice the data down to a reasonable size however sometimes really large jobs can use a few hints to run more efficiently. If the record's date allow, changing the `interval` and `time_resolution` allows more fine granined control.
+By default the reader will do its best to quickly slice the data down to a reasonable size however sometimes really large jobs can use a few hints to run more efficiently. If the record's date allow, changing the `interval` and `time_resolution` allows more fine grained control.
 
 The example job will try to read in 1 minute chunks, and if it needs make smaller chunks, it can chunk at the millisecond resolution.
 
@@ -214,15 +214,15 @@ Example Job
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000 |
 | start | The start date to which it will read from | String/Number/ elasticsearch date math syntax | optional, inclusive , if not provided the index will be queried for earliest date, this date will be reflected in the opConfig saved in the execution context |
 | end | The end date to which it will read to| String/Number/ elasticsearch date math syntax | optional, exclusive, if not provided the index will be queried for latest date, this date will be reflected in the opConfig saved in the execution context |
-| interval | The time interval in which the reader will increment by. The unit of time may be months, weeks, days, hours, minutes, seconds, millesconds or their appropriate abbreviations | String | optional, defaults to auto which tries to calculate the interval by dividing date_range / (numOfRecords / size) |
+| interval | The time interval in which the reader will increment by. The unit of time may be months, weeks, days, hours, minutes, seconds, milliseconds or their appropriate abbreviations | String | optional, defaults to auto which tries to calculate the interval by dividing date_range / (numOfRecords / size) |
 | delay | Offset applied to reader of when to begin reading, must be in interval syntax e.g "5s" | String | Only used in persistent mode |
 | time_resolution | Not all dates have millisecond resolutions, specify 's' if you need second level date slicing | String | optional, defaults to milliseconds 'ms' |
 | date_field_name | document field name where the date used for searching resides | String | required |
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
 | fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
 | subslice_by_key | determine if slice should be further divided up by id if slice is to too big | Boolean | optional, defaults to false |
-| subslice_key_threshold | used in determining when to slice a chunk by thier \_ids | Number | optional, defaults to 50000 |
-| key_type | Used to specify the key type of the \_ids of the documents being queryed | String | optional, defaults to elasticsearch id generator (base64url) |
+| subslice_key_threshold | used in determining when to slice a chunk by their \_ids | Number | optional, defaults to 50000 |
+| key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
 | geo_field | document field name where the geo data used for searching resides | String | optional, is required if any geo parameter is set |
 | geo_box_top_left | used for a bounding box query | String/Geo Point | optional, must be paired with geo_box_bottom_right if used |
@@ -236,21 +236,21 @@ Example Job
 
 - as the query parameter expects a lucene query (which does not support geo queries), the geo parameters provide additional ways to filter records and will be used in conjunction with query
 
-- Geo points are written in the format of: '33.4484,112.0740' , which is 'latitude,longitutde'
+- Geo points are written in the format of: '33.4484,112.0740' , which is 'latitude,longitude'
 
 - start and end may be specified in elasticsearch's [date math syntax](https://www.elastic.co/guide/en/elasticsearch/reference/2.x/common-options.html#date-math)
 
-- for geo distance queries, it defaults to sorting the returning results based off either the geo_point, or the geo_sort_point if specified. The results from a bounding box querires are not sorted by default.
+- for geo distance queries, it defaults to sorting the returning results based off either the geo_point, or the geo_sort_point if specified. The results from a bounding box queriers are not sorted by default.
 
 
 ## Advanced Configuration
 
 #### interval
-by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most cirumstances but this assumes a semi-evenly distributed data across the time range.
+by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
 
-If the data is sparse, or heavliy lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
+If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
 
-Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestable.
+Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
 
 #### subslice_by_key
 When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
@@ -264,7 +264,7 @@ When you have a very large slice that cannot be further broken up by time, as in
 
 
 #### API usage in a job
-In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimalized. The api configs take precendence.
+In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
 - `index`

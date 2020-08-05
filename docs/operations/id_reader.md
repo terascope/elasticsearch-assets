@@ -1,15 +1,15 @@
 # id_reader #
-The id_readr reads data from an Elasticsearch index using an algorithm that partitions the data using regex queries. Although regex queries are a bit more taxing on the cluster, its a more reliable way of dividing up data.
+The id_reader reads data from an Elasticsearch index using an algorithm that partitions the data using regex queries. Although regex queries are a bit more taxing on the cluster, its a more reliable way of dividing up data.
 
-The behaviour of this reader changes with the version of elasticsearch being searched.
+The behavior of this reader changes with the version of elasticsearch being searched.
 
-For this reader to function correctly the [connection config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors) must have an appropriatly set `apiVersion` for the elasticsearch connection. The behaviour changes according to the apiVersion
+For this reader to function correctly the [connection config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors) must have an appropriately set `apiVersion` for the elasticsearch connection. The behavior changes according to the apiVersion
 
 when searching against elasticsearch <= v5, it will query directly against the _uid (the elasticsearch _id of the record) so parameter `field` is NOT needed. However the `type` of the record must be set
 
 when searching against elasticsearch >= 6,  parameter `field` IS needed. This field needs to have a string value of high uniqueness, like an id of some sort.
 
-Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexidecimal. However at this point the hexidecimal only works if the keys are lowercase, future updates will fix this.
+Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 
 this is a [recoverable](https://terascope.github.io/teraslice/docs/management-apis/endpoints-json#post-v1jobsjobid_recover) reader, meaning that this job can be stopped, and then pick back up where it left off.
 
@@ -39,14 +39,14 @@ teraslice:
     master: true
     master_hostname: "127.0.0.1"
     port: 5678
-    name: "localteracluster"
+    name: "local_tera_cluster"
 ```
 
 ### Batch read the entire content of an index with elasticsearch v6 or newer and return filtered fields
 This will run queries against the uuid field on the records to split them up. Since `fields` parameter was set, then only those fields of the records will be returned
 ```json
 {
-  "name": "ID_Reindex",
+  "name": "ID_Reader",
   "lifecycle": "once",
   "slicers": 1,
   "workers": 1,
@@ -135,7 +135,7 @@ const secondSliceResults = [
     }
 ];
 
-// only "e" uuids are left
+// only "e" uuid's are left
 const thirdSliceResults = [
     {
         "ip" : "228.67.139.88",
@@ -147,10 +147,10 @@ const thirdSliceResults = [
 ```
 
 ### Batch read the index with filter with key_range and query parameters
-This will run queries against the uuid field on the records to split them up. The results will be filtered by the `query` parameter, and will only search against a subset of uuids specified in `key_range`.
+This will run queries against the uuid field on the records to split them up. The results will be filtered by the `query` parameter, and will only search against a subset of of the uuid specified in `key_range`.
 ```json
 {
-  "name": "ID_Reindex",
+  "name": "ID_Reader",
   "lifecycle": "once",
   "slicers": 1,
   "workers": 1,
@@ -238,9 +238,9 @@ const firstSliceResults = [
 This will create 4 slicers that will divide up the the chars that it will search against, making more slices. The workers run each slice independently
 ```json
 {
-  "name": "ID_Reindex",
+  "name": "ID_Reader",
   "lifecycle": "once",
-  "slicers": 4
+  "slicers": 4,
   "workers": 25,
   "assets": ["elasticsearch"],
   "operations": [
@@ -251,7 +251,7 @@ This will create 4 slicers that will divide up the the chars that it will search
       "connection": "default"
     },
     {
-      "_op": "noop",
+      "_op": "noop"
     }
   ]
 }
@@ -263,7 +263,7 @@ This is a job that will run against an elasticsearch v5 cluster. This will query
 
 ```json
 {
-  "name": "ID_Reindex",
+  "name": "ID_Reader",
   "lifecycle": "once",
   "slicers": 1,
   "workers": 1,
@@ -327,7 +327,7 @@ const secondSliceResults = [
 | index | Which index to read from | String | required
 | type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | only required for elasticsearch v5
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000
-| key_type | Used to specify the key type of the \_ids of the documents being queryed | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`, `HEXADECIMAL` (which is uppercase version of hexadecimal)|
+| key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`, `HEXADECIMAL` (which is uppercase version of hexadecimal)|
 | key_range | if provided, slicer will only recurse on these given keys | Array | optional |
 | starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting | Number | optional |
 | fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
@@ -339,16 +339,16 @@ const secondSliceResults = [
 ## Advanced Configuration
 
 #### starting_key_depth
-This processor works by taking a char from a list of possible chars for a given key_type (base64url) and checking the count of each char to see if its digestable.
+This processor works by taking a char from a list of possible chars for a given key_type (base64url) and checking the count of each char to see if its digestible.
 
-If the count is too large it will extend the key_depth to attempt to further divide up the data to digestable chunks.
+If the count is too large it will extend the key_depth to attempt to further divide up the data to digestible chunks.
 ```
 a =>
 aa, ab, ac ...aK, ...a4, a_ =>
 aaa, aab, aac ...aaK
 ```
 
-It does this repeatedly until its comes to a digestable chunk.
+It does this repeatedly until its comes to a digestible chunk.
 
 If the initial key size was to small and its corresponding data count too big, it could potentially hurt your cluster and/or timeout the job since its trying to fetch the size of a really large number of records.
 
@@ -357,7 +357,7 @@ If its in the tens of billions, usually setting it to `5` works.
 The higher the key_depth, the longer it take to finish to slice through all the permutations of keys possible, but it will be safer with larger data sets. Please know your data requirements when using this operator.
 
 #### API usage in a job
-In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimalized. The api configs take precendence.
+In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
 - `index`

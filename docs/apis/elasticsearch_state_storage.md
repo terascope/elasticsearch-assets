@@ -15,7 +15,7 @@ please refer to that guide for api references
 | concurrency | Number of concurrent elasticsearch mget requests | Number | optional, defaults to 10 |
 | chunk_size | Number of documents in each elasticsearch mget request | optional,defaults to 2,500 |
 | persist | Saves the record to elasticsearch upon caching the document | optional, defaults to false |
-| meta_key_field | Field in the metadata to use as the key for cacheing and searching in elasticsearch | String | optional, defaults to "_key" |
+| meta_key_field | Field in the metadata to use as the key for caching and searching in elasticsearch | String | optional, defaults to "_key" |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
 
 
@@ -26,12 +26,12 @@ export default class SomeStorage extends BatchProcessor {
     stateStorage!: ESCachedStateStorage;
 
     async initialize() {
-        await super.intialize();
+        await super.initialize();
         this.stateStorage = this.getAPI<ElasticsearchStateStorage>(this.opConfig.api_name);;
     }
 
      async shutdown() {
-        await super.intialize();
+        await super.initialize();
         this.stateStorage = this.getAPI<ElasticsearchStateStorage>(this.opConfig.api_name);;
     }
 
