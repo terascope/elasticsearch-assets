@@ -587,12 +587,12 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^15.4.1"
 
-"@terascope/elasticsearch-api@^2.10.1":
-  version "2.10.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.10.1.tgz#ddf8c20184bc5cafc2235deb28db337440372c57"
-  integrity sha512-XmHEcMT/AdTTs3s7qBhYlz4kj+ekPETdr4O80TTlKcvJcuPvELBgn0Co0bzR3CPrijGPZ67AdSweD1OsKT9tYg==
+"@terascope/elasticsearch-api@^2.10.1", "@terascope/elasticsearch-api@^2.11.2":
+  version "2.11.2"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.11.2.tgz#6aa96780f5fb986415b6d933cf35445a86510c83"
+  integrity sha512-j5Tbxaz3UmDyjZryFunhwQVCh5EhChcgzUjYSXem+qMhctEspMq6jD8m5rhNt/n0E34TQjQRhu4hFvmGzWPt0g==
   dependencies:
-    "@terascope/utils" "^0.28.1"
+    "@terascope/utils" "^0.29.2"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -651,6 +651,24 @@
     "@terascope/types" "^0.4.0"
     debug "^4.1.1"
     is-plain-object "^3.0.1"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash.get "^4.4.2"
+    lodash.has "^4.5.2"
+    lodash.set "^4.3.2"
+    lodash.unset "^4.5.2"
+    p-map "^4.0.0"
+    shallow-clone "^3.0.1"
+
+"@terascope/utils@^0.29.2":
+  version "0.29.2"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.29.2.tgz#14b76615e5ee2d8f13d54da664801cf1f8dfee99"
+  integrity sha512-sYWgF5WxtkP/hPOFXIyZY90hiiNQN+Lo5i0zGJNc6SPgNzJzPIphwra8l2Ct88ulsWo9UQxR//lML621n00wLA==
+  dependencies:
+    "@terascope/types" "^0.4.0"
+    debug "^4.1.1"
+    is-plain-object "^4.1.1"
     js-string-escape "^1.0.1"
     kind-of "^6.0.3"
     latlon-geohash "^1.1.0"
@@ -3096,6 +3114,11 @@ is-plain-object@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-3.0.1.tgz#662d92d24c0aa4302407b0d45d21f2251c85f85b"
   integrity sha512-Xnpx182SBMrr/aBik8y+GuR4U1L9FqMSojwDQwPMmxyC6bvEqly9UBCxhauBF5vNh2gwWJNX6oDV7O+OM4z34g==
+
+is-plain-object@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/is-plain-object/-/is-plain-object-4.1.1.tgz#1a14d6452cbd50790edc7fdaa0aed5a40a35ebb5"
+  integrity sha512-5Aw8LLVsDlZsETVMhoMXzqsXwQqr/0vlnBYzIXJbYo2F4yYlhLHs+Ez7Bod7IIQKWkJbJfxrWD7pA1Dw1TKrwA==
 
 is-potential-custom-element-name@^1.0.0:
   version "1.0.0"
