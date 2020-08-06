@@ -288,7 +288,6 @@ If submitting the job in long form, here is a list of parameters that will throw
             "index": "test_index",
             "field": "uuid",
             "size": 1000,
-            "key_type": "base64url",
             "connection": "default"
         },
         {
@@ -317,7 +316,6 @@ this configuration will be expanded out to the long form underneath the hood
             "index": "test_index",
             "field": "uuid",
             "size": 1000,
-            "key_type": "base64url",
             "connection": "default"
         }
     ],

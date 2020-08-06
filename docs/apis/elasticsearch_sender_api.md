@@ -1,10 +1,69 @@
 # elasticsearch_sender_api
 
-The `elasticsearch_sender_api` will provide a factory that can create sender apis that can be accessed in any operation through the `getAPI` method on the operation.
+This is a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis), which encapsulates a specific functionality that can be utilized by any processor, reader or slicer.
 
+ The `elasticsearch_sender_api` will provide an [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory), which is a singleton that can create, cache and manage multiple elasticsearch readers that can be accessed in any operation through the `getAPI` method on the operation.
 
-This is a [Factory API](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/apifactoryregistry), which can be used to fully manage api creation and configuration.
+This api is the core of the [elasticsearch_bulk](../operations/elasticsearch_bulk.md). This contains all the same behavior, functionality and configuration of that reader
 
+## Usage
+### Example Processor using a elasticsearch sender API
+This is an example of a custom fetcher using the elasticsearch_reader_api to make its own queries to elasticsearch.
+
+Example Job
+
+```json
+{
+    "name" : "testing",
+    "workers" : 1,
+    "slicers" : 1,
+    "lifecycle" : "once",
+    "assets" : [
+        "elasticsearch"
+    ],
+    "apis" : [
+        {
+            "_name": "elasticsearch_sender_api",
+            "index": "new_index",
+            "size": 1000,
+            "type": "events",
+            "connection": "default"
+        }
+    ],
+    "operations" : [
+        {
+            "_op" : "test-reader",
+        },
+         {
+            "_op" : "some_sender",
+            "api_name" : "elasticsearch_sender_api"
+        },
+    ]
+}
+```
+Here is a custom processor for the job described above
+
+```typescript
+// located at /some_sender/processor.ts
+
+export default class SomeSender extends BatchProcessor<ElasticsearchBulkConfig> {
+    client!: ElasticsearchSender;
+    apiManager!: ElasticSenderAPI;
+
+    async initialize(): Promise<void> {
+        await super.initialize();
+        const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig.api_name);
+        this.client = await apiManager.create('bulkSender', {});
+    }
+
+    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
+        if (data == null || data.length === 0) return data;
+        await this.client.send(data);
+        // NOTE: its important to return original data so operators afterwards can run
+        return data;
+    }
+}
+```
 
 ## Elasticsearch Sender Factory API Methods
 
@@ -29,16 +88,7 @@ parameters:
 - name: String
 - configOverrides: Check options below, optional
 
-this will create an instance of a sender api, and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
-
-```typescript
-const apiManager = this.getAPI<ElasticSenderFactoryAPI>(apiName);
-// this will return an api cached at "normalClient" and it will use the default api config
-const client = apiManager.create('normalClient')
-
-// this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
-const overrideClient = apiManager.create('overrideClient', { index: 'other_index'})
-```
+this will create an instance of a [sender api](#elasticsearch_sender_instance), and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
 
 ### remove (async)
 parameters:
@@ -59,23 +109,83 @@ This will allow you to iterate over the cache name of the cache
 This will allow you to iterate over the values of the cache
 
 
-## Elasticsearch Sender Instance
-This is the sender class that is returned from the create method of the APIFactory. This returns an [elastic-api](https://terascope.github.io/teraslice/docs/packages/elasticsearch-api/overview).
+## Example of using the factory methods in a processor
+```typescript
+// example of api configuration
+const apiConfig = {
+  _name: "elasticsearch_sender_api",
+  index: "new_index",
+  size: 1000,
+  type: "events",
+  connection: "default"
+};
 
-### send
+
+const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+
+apiManager.size() === 0
+
+// this will return an api cached at "normalClient" and it will use the default api config
+const normalClient = await apiManager.create('normalClient', {})
+
+apiManager.size() === 1
+
+apiManager.get('normalClient') === normalClient
+
+// this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other", update: true })
+
+apiManager.size() === 2
+
+// this will return the full configuration for this client
+apiManger.getConfig('overrideClient') === {
+  _name: "elasticsearch_sender_api",
+  index: "other_index",
+  size: 1000,
+  type: "events",
+  connection: "other",
+  update: true
+}
+
+
+await apiManger.remove('normalClient');
+
+apiManager.size() === 1
+
+apiManager.get('normalClient') === undefined
+
+```
+
+## Elasticsearch Sender Instance
+This is the sender class that is returned from the create method of the APIFactory. This returns a [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/routesenderapi), which is a common interface used for sender apis.
+
+### send (async)
 ```(records: DataEntities[]) => Promise<void>```
+This method will format the records into an elasticsearch bulk request and send them to elasticsearch
+
 parameters:
 - records: an array of data-entities
 
+### verify (async)
+```(route?: string) => Promise<void>```
+This method ensures that the index is created. However, this currently is a noop as the bulk index request will make the index, this might change in the future. This exists because this follows a common interface. Other senders might need to verify that the destination exists before sending data.
 
+parameters:
+- route: a string representing the index to create
+
+
+### Usage of the elasticsearch sender instance
 ```js
 await api.send([
-    DataEntity.make({ some: 'data', name: 'someName', job: 'to be awesome!' })
+    DataEntity.make({
+        some: 'data',
+        name: 'someName',
+        job: 'to be awesome!'
+    })
 ]);
 ```
 
-## Options
-
+## Parameters
 
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
@@ -93,26 +203,3 @@ await api.send([
 | script | Inline script to include in each indexing request. Only very simple painless scripts are currently supported | String | optional |
 | script_params | key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key | Object | optional |
 | update_retry_on_conflict | If there is a version conflict from an update how often should it be retried | Number | optional, defaults to 0 |
-
-
-
-### Example Processor using a elasticsearch sender API
-```typescript
-export default class SomeSender extends BatchProcessor<ElasticsearchBulkConfig> {
-    client!: ElasticsearchSender;
-    apiManager!: ElasticSenderAPI;
-
-    async initialize(): Promise<void> {
-        await super.initialize();
-        const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig.api_name);
-        this.client = await apiManager.create('bulkSender', this.opConfig);
-    }
-
-    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
-        if (data == null || data.length === 0) return data;
-        await this.client.send(data);
-        // NOTE: its important to return original data so operators afterwards can run
-        return data;
-    }
-}
-```
