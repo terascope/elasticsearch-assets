@@ -54,7 +54,7 @@ function validateBulk(data: BulkData) {
             const secondDoc = clone.shift();
 
             if (getMeta(secondDoc)) throw new Error('an elasticsearch meta object must be paired with data if it is not a delete operation');
-            if (!isObjectEntity(secondDoc)) throw new Error('data paired with elasitcsearhc bulk meta must be an object');
+            if (!isObjectEntity(secondDoc)) throw new Error('data paired with elasticsearch bulk meta must be an object');
             if (Object.keys(secondDoc as AnyObject).length === 0) throw new Error('data must not be an empty object');
         }
     }
@@ -85,7 +85,7 @@ export default class MockClient {
         this.indices.getSettings = async () => {
             const window = 10000;
             return {
-                someindex: {
+                some_index: {
                     settings: {
                         index: {
                             max_result_window: window
