@@ -13,8 +13,8 @@ export default class SpacesReaderApi extends APIFactory<elasticAPI.Client, ApiCo
         if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         if (isNil(config.connection) || !isString(config.connection)) throw new Error('Invalid parameter "connection", must provide a valid connection');
         if (isNil(config.index) || !isString(config.index)) throw new Error('Invalid parameter "index", must provide a valid index');
-        if (isNil(config.token) || !isString(config.token)) throw new Error(`Invalid parameter "token", it must be of type string, recieved ${getTypeOf(config.token)}`);
-        if (isNil(config.timeout) || !isNumber(config.timeout)) throw new Error(`Invalid parameter "timeout", it must be of type number, recieved ${getTypeOf(config.timeout)}`);
+        if (isNil(config.token) || !isString(config.token)) throw new Error(`Invalid parameter "token", it must be of type string, received ${getTypeOf(config.token)}`);
+        if (isNil(config.timeout) || !isNumber(config.timeout)) throw new Error(`Invalid parameter "timeout", it must be of type number, received ${getTypeOf(config.timeout)}`);
 
         return config as ApiConfig;
     }
