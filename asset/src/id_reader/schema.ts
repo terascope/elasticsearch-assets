@@ -6,7 +6,8 @@ import {
     AnyObject,
     getTypeOf,
     isNotNil,
-    isNil
+    isNil,
+    isNumber
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
@@ -61,16 +62,14 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             size: {
                 doc: 'The keys will attempt to recurse until the chunk will be <= size',
                 default: 10000,
-                format(val: any) {
-                    if (isNaN(val)) {
-                        throw new Error('Invalid size parameter, must be a number');
-                    } else if (val <= 0) {
-                        throw new Error('Invalid size parameter, must be greater than zero');
-                    }
+                format(val: unknown): void {
+                    if (!isNumber(val)) throw new Error(`Invalid parameter size, it must be of type number, was given ${getTypeOf(val)}`);
+                    if (isNaN(val)) throw new Error('Invalid size parameter, must be a number');
+                    if (val <= 0) throw new Error('Invalid size parameter, must be greater than zero');
                 }
             },
             field: {
-                doc: 'The field in which searches will be queryed from',
+                doc: 'The field in which searches will be queried from',
                 default: null,
                 format: 'optional_String'
             },
@@ -84,8 +83,11 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 default: null,
                 format(val: any) {
                     if (val) {
-                        if (!Array.isArray(val) && val.length === 0) {
-                            throw new Error('Invalid key_range parameter, must be an array with length > 0');
+                        if (Array.isArray(val)) {
+                            if (val.length === 0) throw new Error('Invalid key_range parameter, must be an array with length > 0');
+                            if (!val.every(isString)) throw new Error('Invalid key_range parameter, must be an array of strings');
+                        } else {
+                            throw new Error('Invalid key_range parameter, must be an array of strings');
                         }
                     }
                 }
@@ -124,7 +126,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 format: 'optional_String'
             },
             api_name: {
-                doc: 'name of api to be used by elasticearch reader',
+                doc: 'name of api to be used by elasticsearch reader',
                 default: DEFAULT_API_NAME,
                 format: (val: unknown) => {
                     if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
