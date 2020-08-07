@@ -4,12 +4,12 @@ import {
 } from 'teraslice-test-harness';
 import path from 'path';
 import { getESVersion } from 'elasticsearch-store';
-import { getKeyArray } from '../asset/src/id_reader/helpers';
+import { getKeyArray } from '../../asset/src/id_reader/helpers';
 import {
     makeClient, cleanupIndex, populateIndex
-} from './helpers/elasticsearch';
-import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from './helpers';
-import evenSpread from './fixtures/id/even-spread';
+} from '../helpers/elasticsearch';
+import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from '../helpers';
+import evenSpread from '../fixtures/id/even-spread';
 
 describe('id_reader', () => {
     const assetDir = path.join(__dirname, '..');

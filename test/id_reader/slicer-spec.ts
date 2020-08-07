@@ -3,8 +3,8 @@ import {
     AnyObject, DataEntity, SlicerRecoveryData, TestContext
 } from '@terascope/job-components';
 import path from 'path';
-import MockClient from './mock_client';
-import Schema from '../asset/src/id_reader/schema';
+import MockClient from '../mock_client';
+import Schema from '../../asset/src/id_reader/schema';
 
 describe('id_reader', () => {
     const assetDir = path.join(__dirname, '..');

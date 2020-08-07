@@ -3,7 +3,7 @@
 import { SlicerRecoveryData, LifeCycle } from '@terascope/job-components';
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import path from 'path';
-import MockClient from './mock_client';
+import MockClient from '../mock_client';
 
 interface SlicerTestArgs {
     opConfig: any;
