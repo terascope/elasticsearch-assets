@@ -7,7 +7,9 @@ import {
     getTypeOf,
     isNotNil,
     isNil,
-    isNumber
+    isNumber,
+    toNumber,
+    isEmpty
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
@@ -47,6 +49,17 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                 connection,
                 full_response: false
             });
+        }
+
+        const opConnection = ElasticReaderAPI ? ElasticReaderAPI.connection : opConfig.connection;
+        const { connectors } = this.context.sysconfig.terafoundation;
+        const endpointConfig = connectors.elasticsearch[opConnection];
+
+        if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${opConnection}`);
+        if (endpointConfig.apiVersion) {
+            const type = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
+            const versionNumber = toNumber(endpointConfig.apiVersion.charAt(0));
+            if (versionNumber <= 5 && (type == null || !isString(type) || type.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
         }
     }
 
@@ -132,7 +145,12 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
                     if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
                     if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
                 }
-            }
+            },
+            type: {
+                doc: 'Set the elasticsearch mapping type, required for elasticsearch v5 or lower, accepted in v6, and depreciated in v7 or above',
+                default: null,
+                format: 'optional_String'
+            },
         };
     }
 }

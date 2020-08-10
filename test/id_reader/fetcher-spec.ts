@@ -1,8 +1,6 @@
+import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
-import {
-    JobTestHarness, newTestJobConfig, SlicerTestHarness
-} from 'teraslice-test-harness';
-import path from 'path';
+import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
 import { getKeyArray } from '../../asset/src/id_reader/helpers';
 import {
@@ -12,9 +10,7 @@ import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from '../helpers
 import evenSpread from '../fixtures/id/even-spread';
 
 describe('id_reader fetcher', () => {
-    const assetDir = path.join(__dirname, '..');
     let harness: JobTestHarness;
-    let slicerHarness: SlicerTestHarness;
     let clients: any;
     const esClient = makeClient();
     const idIndex = `${TEST_INDEX_PREFIX}_id_`;
@@ -62,7 +58,6 @@ describe('id_reader fetcher', () => {
 
     afterEach(async () => {
         if (harness) await harness.shutdown();
-        if (slicerHarness) await slicerHarness.shutdown();
     });
 
     async function makeTest(opConfig?: any, numOfSlicers = 1) {
@@ -80,11 +75,10 @@ describe('id_reader fetcher', () => {
             ],
         });
 
-        harness = new JobTestHarness(job, { assetDir, clients });
-        slicerHarness = new SlicerTestHarness(job, { assetDir, clients });
+        harness = new JobTestHarness(job, { clients });
 
         await harness.initialize();
-        await slicerHarness.initialize();
+
         return harness;
     }
 
@@ -147,52 +141,28 @@ describe('id_reader fetcher', () => {
             expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
         });
     });
-});
 
-describe('fetcher', () => {
-    it('can search and fetch data from elasticsearch', async () => {
+    it('will have all appropriate metadata on records', async () => {
         const opConfig = {
-            _op: 'id_reader',
-            field: 'someField',
-            key_type: 'hexadecimal',
-            key_range: ['a', 'b'],
-            index: 'some_index',
-            size: 200
-        };
-        const slice = { count: 100, wildcard: { field: 'someField', value: 'a*' } };
-        const finalQuery = {
-            index: 'some_index',
-            size: 100,
-            body: {
-                query: {
-                    bool: {
-                        must: [
-                            {
-                                wildcard: { [opConfig.field]: 'a*' }
-                            }
-                        ]
-                    }
-                }
-            }
+            index: evenIndex,
+            key_range: ['a']
         };
 
-        const test = await makeFetcherTest(opConfig);
-        const [results] = await test.runSlice(slice);
+        const test = await makeTest(opConfig);
+        const results = await test.runToCompletion();
+        const record = results[0].data[0];
 
-        expect(defaultClient.searchQuery).toEqual(finalQuery);
-        expect(results).toBeDefined();
-        expect(DataEntity.isDataEntity(results)).toEqual(true);
+        expect(DataEntity.isDataEntity(record)).toBeTrue();
 
-        const metaData = results.getMetadata();
+        const metadata = record.getMetadata();
 
-        expect(typeof metaData._createTime).toEqual('number');
-        expect(typeof metaData._processTime).toEqual('number');
-        expect(typeof metaData._ingestTime).toEqual('number');
-        expect(typeof metaData._eventTime).toEqual('number');
-
-        expect(results.getKey()).toEqual('someId');
-        expect(metaData._index).toEqual('test-index');
-        expect(metaData._type).toEqual('test-type');
-        expect(metaData._version).toEqual(1);
+        expect(metadata._createTime).toBeNumber();
+        expect(metadata._processTime).toBeNumber();
+        expect(metadata._ingestTime).toBeNumber();
+        expect(metadata._eventTime).toBeNumber();
+        expect(metadata._key).toBeString();
+        expect(metadata._index).toEqual(evenIndex);
+        expect(metadata._type).toEqual(docType);
+        expect(metadata._eventTime).toBeNumber();
     });
 });

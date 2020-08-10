@@ -330,7 +330,7 @@ const secondSliceResults = [
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
 | index | Which index to read from | String | required
-| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | only required for elasticsearch v5
+| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | only required for elasticsearch v5 and lower
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000
 | key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`|
 | key_range | if provided, slicer will only recurse on these given keys | Array | optional |

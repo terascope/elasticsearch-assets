@@ -48,7 +48,7 @@ export const schema = {
         }
     },
     start: {
-        doc: 'The start date (ISOstring or in ms) to which it will read from ',
+        doc: 'The start date (ISOString or in ms) to which it will read from ',
         default: null,
         format(val: unknown): void {
             if (val) {
@@ -67,7 +67,7 @@ export const schema = {
         }
     },
     end: {
-        doc: 'The end date (ISOstring or in ms) to which it will read to',
+        doc: 'The end date (ISOString or in ms) to which it will read to',
         default: null,
         format(val: unknown): void {
             if (val) {
@@ -86,7 +86,7 @@ export const schema = {
         }
     },
     interval: {
-        doc: 'The time interval in which it will read from, the number must be separated from the unit of time by an underscore. The unit of time may be months, weeks, days, hours, minutes, seconds, millesconds or their appropriate abbreviations',
+        doc: 'The time interval in which it will read from, the number must be separated from the unit of time by an underscore. The unit of time may be months, weeks, days, hours, minutes, seconds, milliseconds or their appropriate abbreviations',
         default: 'auto',
         format(val: unknown): void {
             if (!isString(val)) throw new Error(`Invalid parameter interval, it must be of type string, was given ${getTypeOf(val)}`);
@@ -128,7 +128,7 @@ export const schema = {
         format: Boolean
     },
     subslice_key_threshold: {
-        doc: 'After subslicing as far as possible, the docs threshold to initiate division by keys',
+        doc: 'After sub-slicing as far as possible, the docs threshold to initiate division by keys',
         default: 50000,
         format(val: unknown): void {
             if (!isNumber(val)) throw new Error(`Invalid parameter subslice_key_threshold, it must be of type number, was given ${getTypeOf(val)}`);
@@ -211,7 +211,7 @@ export const schema = {
         format: 'optional_String'
     },
     api_name: {
-        doc: 'name of api to be used by elasticearch reader',
+        doc: 'name of api to be used by elasticsearch reader',
         default: DEFAULT_API_NAME,
         format: (val: unknown): void => {
             if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
@@ -273,10 +273,10 @@ function geoPointValidation(point: string | null):void {
         const pieces = point.split(',');
         if (pieces.length !== 2) throw new Error(`Invalid geo_point, received ${point}`);
         const latitude = toNumber(pieces[0]);
-        const longitutde = toNumber(pieces[1]);
+        const longitude = toNumber(pieces[1]);
 
         if (latitude > 90 || latitude < -90) throw new Error(`Invalid latitude parameter, was given ${latitude}, should be >= -90 and <= 90`);
-        if (longitutde > 180 || longitutde < -180) throw new Error(`Invalid longitutde parameter, was given ${longitutde}, should be >= -180 and <= 180`);
+        if (longitude > 180 || longitude < -180) throw new Error(`Invalid longitude parameter, was given ${longitude}, should be >= -180 and <= 180`);
     }
 }
 
@@ -290,7 +290,7 @@ function checkUnits(unit: string | null):void {
             m: true
         };
         if (typeof unit !== 'string') throw new Error('Invalid parameter, must be a string IF specified');
-        if (!unitOptions[unit]) throw new Error('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');
+        if (!unitOptions[unit]) throw new Error('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
     }
 }
 
