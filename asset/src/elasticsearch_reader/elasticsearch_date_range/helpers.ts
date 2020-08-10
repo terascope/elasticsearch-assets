@@ -78,7 +78,7 @@ export function processInterval(
         throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
     }
 
-    // dont need first parameter, its the full string
+    // don't need first parameter, its the full string
     intervalMatch.shift();
 
     const newInterval: ParsedInterval = [toNumber(intervalMatch[0]), dateOptions(intervalMatch[1])];
@@ -111,7 +111,7 @@ export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
 
 type RetryCb = (msg: any) => Promise<any>
 
-// TODO: this migth be broken, there is no msg
+// TODO: this might be broken, there is no msg
 export function retryModule(logger: Logger, numOfRetries: number) {
     const retry = {};
     return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: any) => {
@@ -191,7 +191,7 @@ function compactDivisions(
 ): DateRanges {
     const recoveryData = _recoveryData.slice();
     const holes: DateConfig[] = [];
-    // we condense recoveryDate to the appopriate buckets
+    // we condense recoveryDate to the appropriate buckets
     const compactedDivision = buckets.reduce<SlicerDateResults[][]>((list, num) => {
         const pocket: SlicerDateResults[] = [];
         for (let i = 0; i < num; i += 1) {
@@ -339,7 +339,7 @@ function compareRangeToRecoveryData(
     const finalDates = Object.assign({}, newDates) as Partial<SlicerDateConfig> & DateRanges;
     const holes = [];
 
-    // expasnion of slicers already takes into account the end
+    // expansion of slicers already takes into account the end
     // we need this for exact match and compaction
     if (rData && recoveryData.length >= numOfSlicers) {
         finalDates.start = moment(recoveryData[id].end);
@@ -366,7 +366,7 @@ function compareRangeToRecoveryData(
             // we encapsulate the hole so we can drop it
             holes.pop();
         } else if (finalDates.limit.isBefore(finalHole.end)) {
-            // we keep hole for future boundry increase
+            // we keep hole for future boundary increase
             finalDates.limit = moment(finalHole.start);
 
             if (finalDates.start.isSameOrAfter(finalDates.limit)) {

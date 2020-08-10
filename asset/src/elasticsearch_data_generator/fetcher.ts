@@ -8,14 +8,14 @@ import { deprecate } from 'util';
 import { DataGenerator, CounterResults } from './interfaces';
 import defaultSchema from './data-schema';
 
-const isDeperecated = deprecate(() => {}, 'elasticsearch_data_generator is deprecated, please use data_generator from standard assets');
+const isDeprecated = deprecate(() => {}, 'elasticsearch_data_generator is deprecated, please use data_generator from standard assets');
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     dataSchema: any;
 
     constructor(context: WorkerContext, opConfig: DataGenerator, exConfig: ExecutionConfig) {
         super(context, opConfig, exConfig);
         this.dataSchema = parsedSchema(opConfig);
-        isDeperecated();
+        isDeprecated();
     }
 
     async fetch(slice?: CounterResults): Promise<AnyObject[]> {

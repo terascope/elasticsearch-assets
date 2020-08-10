@@ -74,7 +74,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
     const currentWindow = primaryRange || {} as DateSegments;
 
     if (isPersistent && windowState == null) {
-        throw new Error('WindowState must be provided if lifecyle is persistent');
+        throw new Error('WindowState must be provided if lifecycle is persistent');
     }
 
     async function determineSlice(
@@ -259,7 +259,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             const { dates } = await determineStartingPoint(config);
 
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
-                // we have succesfuly jumped, move window
+                // we have successfully jumped, move window
                 currentWindow.start = newStart;
                 currentWindow.limit = newLimit;
                 return dates;
@@ -274,7 +274,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
         if (holes.length > 0 && dateParams.start.isSameOrAfter(holes[0].start)) {
             // we are in a hole, need to shift where it is looking at
-            // we mutate on pupose, eject hole that is already passed
+            // we mutate on purpose, eject hole that is already passed
             const hole = holes.shift() as DateConfig;
             let newStart = moment(hole.end);
 
@@ -342,7 +342,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             adjustDates(dateParams, holes);
 
             if (shouldDivideByID && data.count >= threshold) {
-                logger.debug('date slicer is recursing by keylist');
+                logger.debug('date slicer is recursing by key list');
                 try {
                     const list = await makeKeyList(data, dateParams.limit.format(dateFormat));
                     return list.map((obj) => {
@@ -350,7 +350,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
                         return obj;
                     }) as SlicerDateResults[];
                 } catch (err) {
-                    return Promise.reject(new TSError(err, { reason: 'error while subslicing by key' }));
+                    return Promise.reject(new TSError(err, { reason: 'error while sub-slicing by key' }));
                 }
             }
 

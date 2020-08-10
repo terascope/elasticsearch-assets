@@ -26,11 +26,11 @@ describe('WindowState', () => {
         expect(state.checkin(0)).toEqual(false);
         // the other slicer has not been called yet
         expect(state.checkin(0)).toEqual(false);
-        // we reset now, can immediatly continue 1
+        // we reset now, can immediately continue 1
         expect(state.checkin(1)).toEqual(true);
         // cannot continue until 0 is called
         expect(state.checkin(1)).toEqual(false);
-        // we reset which means I can immediatly continue
+        // we reset which means I can immediately continue
         expect(state.checkin(0)).toEqual(true);
         // 1 is done we we are complete, can continue
         expect(state.checkin(1)).toEqual(true);

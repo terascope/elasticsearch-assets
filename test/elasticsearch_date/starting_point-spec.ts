@@ -209,7 +209,7 @@ describe('determineStartingPoint', () => {
             expect(dates.start.isSame(moment(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment(holeStart))).toBeTrue();
             expect(dates.limit.isSame(moment(holeStart))).toBeTrue();
-            // we keep holes because a persistent reader might need it on next boundry increase
+            // we keep holes because a persistent reader might need it on next boundary increase
             expect(dates.holes).toEqual(holes);
 
             expect(range.start.isSame(config.dates.start)).toBeTrue();

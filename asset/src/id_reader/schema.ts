@@ -8,8 +8,7 @@ import {
     isNotNil,
     isNil,
     isNumber,
-    toNumber,
-    isEmpty
+    toNumber
 } from '@terascope/job-components';
 import { ESIDReaderConfig, IDType } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';

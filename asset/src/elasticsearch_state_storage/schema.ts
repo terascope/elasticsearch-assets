@@ -15,11 +15,11 @@ export default class Schema extends ConvictSchema<ESStateStorageConfig> {
                 format: 'optional_String'
             },
             concurrency: {
-                doc: 'number of cuncurrent requests to elasticsearch, defaults to 10',
+                doc: 'number of concurrent requests to elasticsearch, defaults to 10',
                 default: 10
             },
             source_fields: {
-                doc: 'fields to retreive from elasticsearch, array of fields, defaults to all fields',
+                doc: 'fields to retrieve from elasticsearch, array of fields, defaults to all fields',
                 default: []
             },
             chunk_size: {
