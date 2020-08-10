@@ -1,10 +1,10 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 
-describe('Id Reader Schema', () => {
+describe('id_reader Schema', () => {
     const index = 'some_index';
     const name = 'id_reader';
     const field = 'someField';
@@ -32,6 +32,11 @@ describe('Id Reader Schema', () => {
         );
 
         return validConfig as ESIDReaderConfig;
+    }
+
+    async function testValidation(job: ValidatedJobConfig) {
+        harness = new WorkerTestHarness(job, { clients });
+        await harness.initialize();
     }
 
     afterEach(async () => {
@@ -90,6 +95,23 @@ describe('Id Reader Schema', () => {
             harness = new WorkerTestHarness(job, { clients });
 
             await expect(harness.initialize()).toResolve();
+        });
+
+        it('can validateJob to make sure its configured correctly', async () => {
+            const job1 = newTestJobConfig({ slicers: 1, operations: [{ _op: 'id_reader', index: 'some-index', key_range: ['a', 'b'] }, { _op: 'noop' }] });
+            const job2 = newTestJobConfig({ slicers: 2, operations: [{ _op: 'id_reader', index: 'some-index', key_range: ['a'] }, { _op: 'noop' }] });
+            const job3 = newTestJobConfig({ slicers: 4, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'hexadecimal' }, { _op: 'noop' }] });
+            const job4 = newTestJobConfig({ slicers: 20, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'hexadecimal' }, { _op: 'noop' }] });
+            const job5 = newTestJobConfig({ slicers: 20, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'base64url' }, { _op: 'noop' }] });
+            const job6 = newTestJobConfig({ slicers: 70, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'base64url' }, { _op: 'noop' }] });
+
+            await expect(testValidation(job1)).toResolve();
+            await expect(testValidation(job3)).toResolve();
+            await expect(testValidation(job5)).toResolve();
+
+            await expect(testValidation(job2)).toReject();
+            await expect(testValidation(job4)).toReject();
+            await expect(testValidation(job6)).toReject();
         });
     });
 });

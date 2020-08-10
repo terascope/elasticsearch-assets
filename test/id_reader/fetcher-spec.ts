@@ -11,7 +11,7 @@ import {
 import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from '../helpers';
 import evenSpread from '../fixtures/id/even-spread';
 
-describe('id_reader', () => {
+describe('id_reader fetcher', () => {
     const assetDir = path.join(__dirname, '..');
     let harness: JobTestHarness;
     let slicerHarness: SlicerTestHarness;
@@ -146,5 +146,53 @@ describe('id_reader', () => {
             expect(evenSpreadIds.has(idChar)).toEqual(true);
             expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
         });
+    });
+});
+
+describe('fetcher', () => {
+    it('can search and fetch data from elasticsearch', async () => {
+        const opConfig = {
+            _op: 'id_reader',
+            field: 'someField',
+            key_type: 'hexadecimal',
+            key_range: ['a', 'b'],
+            index: 'some_index',
+            size: 200
+        };
+        const slice = { count: 100, wildcard: { field: 'someField', value: 'a*' } };
+        const finalQuery = {
+            index: 'some_index',
+            size: 100,
+            body: {
+                query: {
+                    bool: {
+                        must: [
+                            {
+                                wildcard: { [opConfig.field]: 'a*' }
+                            }
+                        ]
+                    }
+                }
+            }
+        };
+
+        const test = await makeFetcherTest(opConfig);
+        const [results] = await test.runSlice(slice);
+
+        expect(defaultClient.searchQuery).toEqual(finalQuery);
+        expect(results).toBeDefined();
+        expect(DataEntity.isDataEntity(results)).toEqual(true);
+
+        const metaData = results.getMetadata();
+
+        expect(typeof metaData._createTime).toEqual('number');
+        expect(typeof metaData._processTime).toEqual('number');
+        expect(typeof metaData._ingestTime).toEqual('number');
+        expect(typeof metaData._eventTime).toEqual('number');
+
+        expect(results.getKey()).toEqual('someId');
+        expect(metaData._index).toEqual('test-index');
+        expect(metaData._type).toEqual('test-type');
+        expect(metaData._version).toEqual(1);
     });
 });

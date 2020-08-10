@@ -127,7 +127,7 @@ describe('elasticsearch_reader', () => {
             expect(resolution).toEqual('s');
         });
 
-        it('can geo validatie', async () => {
+        it('can geo validate', async () => {
             const schema = getSchema();
             const geoPointValidation = schema.geo_box_top_left.format;
             const validGeoDistance = schema.geo_distance.format;
@@ -140,12 +140,12 @@ describe('elasticsearch_reader', () => {
             expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
             expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
             expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
-            expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitutde parameter, was given 185.2134, should be >= -180 and <= 180');
+            expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitude parameter, was given 185.2134, should be >= -180 and <= 180');
             expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
 
             expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
             expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
-            expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measuerment (ie m, km, yd, ft)');
+            expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
             expect(() => validGeoDistance('200km')).not.toThrowError();
 
             expect(() => geoSortOrder(1234)).toThrowError('Invalid geo_sort_order parameter, must be a string IF specified');
@@ -186,7 +186,7 @@ describe('elasticsearch_reader', () => {
                 time_resolution: 's',
                 date_field_name: '@timestamp',
                 size: 50,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '12hrs',
                 start: new Date().getTime(),
                 end: new Date().getTime()
@@ -204,7 +204,7 @@ describe('elasticsearch_reader', () => {
                 time_resolution: 's',
                 date_field_name: '@timestamp',
                 size: 50,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '12hrs',
                 start: new Date().getTime(),
                 end: new Date().getTime()
@@ -224,12 +224,12 @@ describe('elasticsearch_reader', () => {
                 date_field_name: 'date',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
                 start: '2015-08-25T00:00:00',
                 end: '2015-08-25T00:02:00'
             };
-            const errMsg = 'Invalid date_field_name: "date" for index: someindex, field does not exist on record';
+            const errMsg = 'Invalid date_field_name: "date" for index: some_index, field does not exist on record';
 
             try {
                 await makeSlicerTest({ opConfig });
@@ -247,7 +247,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs'
             };
 
@@ -256,7 +256,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
                 start: firstDate.format()
             };
@@ -266,7 +266,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
                 end: moment(laterDate).add(1, 's').format()
             };
@@ -276,7 +276,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
                 start: firstDate.format(),
                 end: moment(laterDate).add(1, 's').format()
@@ -336,7 +336,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: 'auto',
                 start: firstDate.format(),
                 end: moment(laterDate).add(1, 's').format()
@@ -362,7 +362,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
                 query: 'some:luceneQueryWithNoResults'
             };
@@ -384,7 +384,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs'
             };
 
@@ -417,7 +417,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 'ms',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '100ms',
                 delay: delay.join('')
             };
@@ -463,7 +463,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 'ms',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '200ms',
                 delay: delay.join('')
             };
@@ -513,7 +513,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '100ms',
                 delay: '3s'
             };
@@ -572,7 +572,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 'ms',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '100ms',
                 delay: delay.join('')
             };
@@ -627,7 +627,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 50,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2hrs',
             };
 
@@ -681,7 +681,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -735,7 +735,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -783,7 +783,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
             // first two objects are consumed for determining start and end dates,
@@ -832,7 +832,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '3m',
             };
 
@@ -892,7 +892,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 10,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -923,7 +923,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 'ms',
                 size: 10,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -935,7 +935,7 @@ describe('elasticsearch_reader', () => {
                 { '@timestamp': endDate, count: 100 }
             ]);
 
-            // Need to run them seperatly so they get a different client
+            // Need to run them separately so they get a different client
             const test = await makeSlicerTest({ opConfig });
             const [resultsMS] = await test.createSlices();
 
@@ -956,7 +956,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 10,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
                 subslice_by_key: true,
                 subslice_key_threshold: 50,
@@ -1005,7 +1005,7 @@ describe('elasticsearch_reader', () => {
                 size: 100,
                 start: firstDate.format(dateFormatSeconds),
                 end: closingDate.format(dateFormatSeconds),
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -1052,7 +1052,7 @@ describe('elasticsearch_reader', () => {
                 size: 100,
                 start: firstDate.format(dateFormatSeconds),
                 end: secondFinalDate.format(dateFormatSeconds),
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -1120,7 +1120,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
                 delay: delay.join('')
             };
@@ -1163,7 +1163,7 @@ describe('elasticsearch_reader', () => {
                 size: 100,
                 start: firstDate.format(dateFormatSeconds),
                 end: endDate.format(dateFormatSeconds),
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -1222,7 +1222,7 @@ describe('elasticsearch_reader', () => {
                 size: 10000,
                 start: firstDate.format(dateFormatSeconds),
                 end: endDate.format(dateFormatSeconds),
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
             };
 
@@ -1329,7 +1329,7 @@ describe('elasticsearch_reader', () => {
                 size: 100,
                 start: firstDate.format(dateFormatSeconds),
                 end: endDate.format(dateFormatSeconds),
-                index: 'someindex',
+                index: 'some_index',
                 interval: '2m',
             };
 
@@ -1478,7 +1478,7 @@ describe('elasticsearch_reader', () => {
                 date_field_name: '@timestamp',
                 time_resolution: 's',
                 size: 100,
-                index: 'someindex',
+                index: 'some_index',
                 interval: '5m',
                 delay: delay.join('')
             };
@@ -1498,11 +1498,11 @@ describe('elasticsearch_reader', () => {
             const test = await makeSlicerTest({ opConfig, recoveryData, lifecycle: 'persistent' });
 
             // add the time (in seconds) took to run the tests
-            const elasped = Math.round((Date.now() - startTime) / 1000);
+            const elapsed = Math.round((Date.now() - startTime) / 1000);
             const expectedResult = {
-                start: middleDate.add(elasped, 's').format(dateFormatSeconds),
-                end: endingData.add(elasped, 's').format(dateFormatSeconds),
-                limit: endingData.add(elasped, 's').format(dateFormatSeconds),
+                start: middleDate.add(elapsed, 's').format(dateFormatSeconds),
+                end: endingData.add(elapsed, 's').format(dateFormatSeconds),
+                limit: endingData.add(elapsed, 's').format(dateFormatSeconds),
                 holes: [],
                 count: 100
             };
@@ -1520,7 +1520,7 @@ describe('elasticsearch_reader', () => {
                 _op: 'elasticsearch_reader',
                 date_field_name: '@timestamp',
                 size: 50,
-                index: 'someindex',
+                index: 'some_index',
                 full_response: true
             };
 
@@ -1528,7 +1528,7 @@ describe('elasticsearch_reader', () => {
             expect(test).toBeDefined();
         });
 
-        it('fetcher can return formated data', async () => {
+        it('fetcher can return formatted data', async () => {
             const firstDate = makeDate(dateFormatSeconds);
             const laterDate = moment(firstDate).add(5, 'm');
 
@@ -1536,7 +1536,7 @@ describe('elasticsearch_reader', () => {
                 _op: 'elasticsearch_reader',
                 date_field_name: '@timestamp',
                 size: 50,
-                index: 'someindex'
+                index: 'some_index'
             };
 
             const slice = {

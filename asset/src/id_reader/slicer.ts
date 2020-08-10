@@ -62,12 +62,15 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             const parsedRetry = this.recoveryData.map((obj: any) => {
                 // regex to get str between # and *
                 if (obj.lastSlice) {
-                    // eslint-disable-next-line no-useless-escape
-                    return obj.lastSlice.key.match(/\#(.*)\*/)[1];
+                    if (this.version <= 5) return obj.lastSlice.key.match(/#(.*)\*/)[1];
+                    const { value } = obj.lastSlice.wildcard;
+                    // get rid of the * char which is at the end of the string
+                    return value.slice(0, value.length - 1);
                 }
                 // some slicers might not have a previous slice, need to start from scratch
                 return '';
             })[id];
+
             args.retryData = parsedRetry;
         }
 

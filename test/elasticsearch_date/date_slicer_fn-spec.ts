@@ -20,7 +20,7 @@ import {
     DateSegments,
     SlicerDateResults
 } from '../../asset/src/elasticsearch_reader/interfaces';
-import MockClient from '../mock_client';
+import MockClient from '../helpers/mock_client';
 import { dateFormatSeconds, dateFormat, divideRange } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 
 interface TestConfig {
@@ -129,7 +129,7 @@ describe('date slicer function', () => {
         expect(fn).toBeFunction();
     });
 
-    describe('can gerenate dates in once mode', () => {
+    describe('can generate dates in once mode', () => {
         it('with zero count at end of slice it expands', async () => {
             const interval: ParsedInterval = [5, 'm'];
             const start = makeDate(dateFormatSeconds);
@@ -333,7 +333,7 @@ describe('date slicer function', () => {
             const results2 = await slicer();
 
             expect(results2).toEqual(null);
-            // we test this to show that it is null not becuase the mock client ran out
+            // we test this to show that it is null not because the mock client ran out
             expect(client.sequence.length > 0).toBeTrue();
         });
 

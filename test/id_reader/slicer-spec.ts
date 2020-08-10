@@ -1,32 +1,57 @@
-import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
+import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
+import { SlicerRecoveryData, DataEntity, AnyObject } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
 import {
-    AnyObject, DataEntity, SlicerRecoveryData, TestContext
-} from '@terascope/job-components';
-import path from 'path';
-import MockClient from '../mock_client';
-import Schema from '../../asset/src/id_reader/schema';
+    TEST_INDEX_PREFIX, cleanupIndex, makeClient, populateIndex, waitForData
+} from '../helpers';
+import evenSpread from '../fixtures/id/even-spread';
 
-describe('id_reader', () => {
-    const assetDir = path.join(__dirname, '..');
-    let harness: WorkerTestHarness | SlicerTestHarness;
+describe('id_reader slicer', () => {
+    jest.setTimeout(30 * 1000);
+
+    const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
+    const esClient = makeClient();
+
+    const version = getESVersion(esClient);
+    const docType = version === 5 ? 'events' : '_doc';
+    const field = 'uuid';
+
+    // for compatibility tests for older elasticsearch version,
+    // we make the _id of the record the same as its uuid field
+    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+
+    let harness: SlicerTestHarness;
     let clients: any;
-    let defaultClient: MockClient;
+
+    interface ESData {
+        count: number;
+        key: string;
+    }
+
+    function formatExpectedData(data: ESData[]) {
+        return data.map((obj) => {
+            if (version <= 5) return { key: `${docType}#${obj.key}`, count: obj.count };
+            return { wildcard: { field, value: obj.key }, count: obj.count };
+        });
+    }
+
+    beforeAll(async () => {
+        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+        await populateIndex(esClient, apiReaderIndex, evenSpread.types, bulkData, docType);
+        await waitForData(esClient, apiReaderIndex, bulkData.length);
+    });
+
+    afterAll(async () => {
+        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+    });
 
     beforeEach(() => {
-        defaultClient = new MockClient();
         clients = [
             {
                 type: 'elasticsearch',
                 endpoint: 'default',
                 create: () => ({
-                    client: defaultClient
-                }),
-            },
-            {
-                type: 'elasticsearch',
-                endpoint: 'otherConnection',
-                create: () => ({
-                    client: new MockClient()
+                    client: esClient
                 }),
             }
         ];
@@ -36,17 +61,19 @@ describe('id_reader', () => {
         if (harness) await harness.shutdown();
     });
 
-    async function makeFetcherTest(config: any) {
-        harness = WorkerTestHarness.testFetcher(config, { assetDir, clients });
-        await harness.initialize();
-        return harness;
-    }
+    const defaults = {
+        _op: 'id_reader',
+        field,
+        index: apiReaderIndex,
+        type: docType
+    };
 
     async function makeSlicerTest(
-        config: any,
+        opConfig: AnyObject = {},
         numOfSlicers = 1,
         recoveryData?: SlicerRecoveryData[]
     ) {
+        const config = Object.assign({}, defaults, opConfig);
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
@@ -57,301 +84,232 @@ describe('id_reader', () => {
                 }
             ]
         });
-        harness = new SlicerTestHarness(job, { assetDir, clients });
+        harness = new SlicerTestHarness(job, { clients });
         await harness.initialize(recoveryData);
         return harness;
     }
 
-    describe('schema', () => {
-        it('can validateJob to make sure its configured correctly', () => {
-            const errorStr1 = 'The number of slicers specified on the job cannot be more the length of key_range';
-            const errorStr2 = 'The number of slicers specified on the job cannot be more than 16';
-            const errorStr3 = 'The number of slicers specified on the job cannot be more than 64';
+    it('can create a slicer', async () => {
+        const test = await makeSlicerTest();
+        const slicer = test.slicer();
 
-            const job1 = { slicers: 1, operations: [{ _op: 'id_reader', index: 'some-index', key_range: ['a', 'b'] }] };
-            const job2 = { slicers: 2, operations: [{ _op: 'id_reader', index: 'some-index', key_range: ['a'] }] };
-            const job3 = { slicers: 4, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'hexadecimal' }] };
-            const job4 = { slicers: 20, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'hexadecimal' }] };
-            const job5 = { slicers: 20, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'base64url' }] };
-            const job6 = { slicers: 70, operations: [{ _op: 'id_reader', index: 'some-index', key_type: 'base64url' }] };
+        expect(slicer.slicers()).toEqual(1);
+    });
 
-            function testValidation(job: AnyObject) {
-                const context = new TestContext('test');
-                const schema = new Schema(context);
-                schema.validateJob(job as any);
-            }
+    it('can create multiple slicers', async () => {
+        const test = await makeSlicerTest({}, 2);
+        const slicer = test.slicer();
 
-            expect(() => {
-                testValidation(job1);
-            }).not.toThrow();
-            expect(() => {
-                testValidation(job2);
-            }).toThrowError(errorStr1);
+        expect(slicer.slicers()).toEqual(2);
+    });
 
-            expect(() => {
-                testValidation(job3);
-            }).not.toThrow();
-            expect(() => {
-                testValidation(job4);
-            }).toThrowError(errorStr2);
+    it('a single slicer can produces values', async () => {
+        const test = await makeSlicerTest();
+        const results = await test.getAllSlices();
 
-            expect(() => {
-                testValidation(job5);
-            }).not.toThrow();
-            expect(() => {
-                testValidation(job6);
-            }).toThrowError(errorStr3);
+        // null shows we are done, we remove to compare objects
+        expect(results.pop()).toBeNull();
 
-            expect(() => {
-                testValidation(job5);
-            }).not.toThrow();
-            expect(() => {
-                testValidation(job6);
-            }).toThrowError(errorStr3);
+        const expectedResults = formatExpectedData([
+            { key: 'a*', count: 58 },
+            { key: 'b*', count: 82 },
+            { key: 'c*', count: 64 },
+            { key: 'd*', count: 49 },
+            { key: 'e*', count: 59 },
+            { key: 'f*', count: 51 },
+            { key: '0*', count: 70 },
+            { key: '1*', count: 55 },
+            { key: '2*', count: 55 },
+            { key: '3*', count: 54 },
+            { key: '4*', count: 68 },
+            { key: '5*', count: 64 },
+            { key: '6*', count: 52 },
+            { key: '7*', count: 80 },
+            { key: '8*', count: 75 },
+            { key: '9*', count: 64 },
+        ]);
+
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
         });
     });
 
-    describe('slicer', () => {
-        it('can create a slicer', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                field: 'someField',
-                index: 'someindex'
-            };
+    it('can call on a subset of keys', async () => {
+        const test = await makeSlicerTest({ key_range: ['a', 'b'] });
+        const results = await test.getAllSlices();
 
-            const test = await makeSlicerTest(opConfig);
-            const slicer = test.slicer();
-            expect(slicer.slicers()).toEqual(1);
-        });
+        // null shows we are done, we remove to compare objects
+        expect(results.pop()).toBeNull();
 
-        it('can create multiple slicers', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                field: 'someField',
-                index: 'someindex'
-            };
+        const expectedResults = formatExpectedData([
+            { key: 'a*', count: 58 },
+            { key: 'b*', count: 82 },
+        ]);
 
-            const test = await makeSlicerTest(opConfig, 2);
-            const slicer = test.slicer();
-
-            expect(slicer.slicers()).toEqual(2);
-        });
-
-        it('a single slicer can produces values', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                field: 'someField',
-                index: 'someindex',
-                size: 200
-            };
-
-            const test = await makeSlicerTest(opConfig);
-
-            const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
-
-            const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
-
-            const slice3 = await test.createSlices();
-            expect(slice3).toEqual([null]);
-        });
-
-        it('produces values starting at a specific depth', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b', 'c', 'd'],
-                starting_key_depth: 3,
-                field: 'someField',
-                index: 'someindex',
-                size: 200
-            };
-
-            const test = await makeSlicerTest(opConfig);
-
-            const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a00*' } });
-
-            const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a01*' } });
-
-            const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a02*' } });
-        });
-
-        it('produces values even with an initial search error', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                field: 'someField',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                index: 'someindex',
-                size: 200
-            };
-            const { sequence } = defaultClient;
-            sequence.pop();
-            defaultClient.sequence = [{
-                _shards: {
-                    failed: 1,
-                    failures: [{ reason: { type: 'some Error' } }]
-                }
-            },
-            ...sequence
-            ];
-
-            const test = await makeSlicerTest(opConfig);
-
-            const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
-
-            const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
-
-            const slice3 = await test.createSlices();
-            expect(slice3).toEqual([null]);
-        });
-
-        it('key range gets divided up by number of slicers', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                field: 'someField',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                index: 'someindex',
-                size: 200
-            };
-
-            const test = await makeSlicerTest(opConfig, 2);
-
-            const slices1 = await test.createSlices();
-
-            expect(slices1[0]).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
-            expect(slices1[1]).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b*' } });
-
-            const slices2 = await test.createSlices();
-
-            expect(slices2).toEqual([null, null]);
-        });
-
-        it('key range gets divided up by number of slicers by size', async () => {
-            const newSequence = [
-                { _shards: { failed: 0 }, hits: { total: 100 } },
-                { _shards: { failed: 0 }, hits: { total: 500 } },
-                { _shards: { failed: 0 }, hits: { total: 200 } },
-                { _shards: { failed: 0 }, hits: { total: 200 } },
-                { _shards: { failed: 0 }, hits: { total: 100 } }
-            ];
-
-            const opConfig = {
-                _op: 'id_reader',
-                field: 'someField',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                index: 'someindex',
-                size: 200
-            };
-            defaultClient.sequence = newSequence;
-
-            const test = await makeSlicerTest(opConfig);
-
-            const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a*' } });
-
-            const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 200, wildcard: { field: 'someField', value: 'b0*' } });
-
-            const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 200, wildcard: { field: 'someField', value: 'b1*' } });
-
-            const [slice4] = await test.createSlices();
-            expect(slice4).toEqual({ count: 100, wildcard: { field: 'someField', value: 'b2*' } });
-
-            const slice5 = await test.createSlices();
-            expect(slice5).toEqual([null]);
-        });
-
-        it('can return to previous position', async () => {
-            const retryData = [{ lastSlice: { key: 'events-#a6*' }, slicer_id: 0 }];
-            const opConfig = {
-                _op: 'id_reader',
-                field: 'someField',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                index: 'someindex',
-                size: 200
-            };
-
-            const test = await makeSlicerTest(opConfig, 1, retryData);
-
-            const [slice1] = await test.createSlices();
-            expect(slice1).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a7*' } });
-
-            const [slice2] = await test.createSlices();
-            expect(slice2).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a8*' } });
-
-            const [slice3] = await test.createSlices();
-            expect(slice3).toEqual({ count: 100, wildcard: { field: 'someField', value: 'a9*' } });
-
-            const [slice4] = await test.createSlices();
-            expect(slice4).toEqual({ count: 100, wildcard: { field: 'someField', value: 'aa*' } });
-
-            const [slice5] = await test.createSlices();
-            expect(slice5).toEqual({ count: 100, wildcard: { field: 'someField', value: 'ab*' } });
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
         });
     });
 
-    describe('fetcher', () => {
-        it('can search and fetch data from elasticsearch', async () => {
-            const opConfig = {
-                _op: 'id_reader',
-                field: 'someField',
-                key_type: 'hexadecimal',
-                key_range: ['a', 'b'],
-                index: 'someindex',
-                size: 200
-            };
-            const slice = { count: 100, wildcard: { field: 'someField', value: 'a*' } };
-            const finalQuery = {
-                index: 'someindex',
-                size: 100,
-                body: {
-                    query: {
-                        bool: {
-                            must: [
-                                {
-                                    wildcard: { [opConfig.field]: 'a*' }
-                                }
-                            ]
-                        }
-                    }
-                }
-            };
+    it('can fit slices down to size', async () => {
+        const opConfig = {
+            _op: 'id_reader',
+            key_type: 'hexadecimal',
+            key_range: ['a'],
+            field,
+            index: apiReaderIndex,
+            size: 40
+        };
 
-            const test = await makeFetcherTest(opConfig);
-            const [results] = await test.runSlice(slice);
+        const test = await makeSlicerTest(opConfig);
+        const results = await test.getAllSlices();
 
-            expect(defaultClient.searchQuery).toEqual(finalQuery);
-            expect(results).toBeDefined();
-            expect(DataEntity.isDataEntity(results)).toEqual(true);
+        expect(results.pop()).toBeNull();
 
-            const metaData = results.getMetadata();
+        const expectedResults = formatExpectedData([
+            { key: 'a0*', count: 5 },
+            { key: 'a1*', count: 7 },
+            { key: 'a3*', count: 2 },
+            { key: 'a4*', count: 3 },
+            { key: 'a5*', count: 3 },
+            { key: 'a6*', count: 3 },
+            { key: 'a7*', count: 4 },
+            { key: 'a8*', count: 5 },
+            { key: 'a9*', count: 8 },
+            { key: 'aa*', count: 3 },
+            { key: 'ab*', count: 3 },
+            { key: 'ac*', count: 3 },
+            { key: 'ad*', count: 4 },
+            { key: 'ae*', count: 4 },
+            { key: 'af*', count: 1 },
+        ]);
 
-            expect(typeof metaData._createTime).toEqual('number');
-            expect(typeof metaData._processTime).toEqual('number');
-            expect(typeof metaData._ingestTime).toEqual('number');
-            expect(typeof metaData._eventTime).toEqual('number');
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
+        });
+    });
 
-            expect(results.getKey()).toEqual('someId');
-            expect(metaData._index).toEqual('test-index');
-            expect(metaData._type).toEqual('test-type');
-            expect(metaData._version).toEqual(1);
+    it('produces values starting at a specific depth', async () => {
+        const opConfig = {
+            key_range: ['a'],
+            starting_key_depth: 3,
+        };
+
+        const test = await makeSlicerTest(opConfig);
+        const results = await test.getAllSlices();
+
+        const expectedResults = formatExpectedData([
+            { key: 'aa5*', count: 1 },
+            { key: 'aa6*', count: 1 },
+            { key: 'aa7*', count: 1 },
+            { key: 'aba*', count: 1 },
+            { key: 'abc*', count: 1 },
+            { key: 'ab4*', count: 1 },
+            { key: 'ac3*', count: 1 },
+            { key: 'ac5*', count: 1 },
+            { key: 'ac8*', count: 1 },
+            { key: 'ad1*', count: 1 },
+            { key: 'ad4*', count: 1 },
+            { key: 'ad5*', count: 1 },
+            { key: 'ad6*', count: 1 },
+            { key: 'aea*', count: 1 },
+            { key: 'aef*', count: 1 },
+            { key: 'ae0*', count: 1 },
+            { key: 'ae8*', count: 1 },
+            { key: 'af4*', count: 1 },
+            { key: 'a0c*', count: 1 },
+            { key: 'a0f*', count: 2 },
+            { key: 'a01*', count: 1 },
+            { key: 'a04*', count: 1 },
+            { key: 'a1b*', count: 1 },
+            { key: 'a1c*', count: 1 },
+            { key: 'a1e*', count: 1 },
+            { key: 'a1f*', count: 1 },
+            { key: 'a11*', count: 2 },
+            { key: 'a17*', count: 1 },
+            { key: 'a36*', count: 2 },
+            { key: 'a4e*', count: 1 },
+            { key: 'a42*', count: 1 },
+            { key: 'a43*', count: 1 },
+            { key: 'a50*', count: 1 },
+            { key: 'a52*', count: 1 },
+            { key: 'a53*', count: 1 },
+            { key: 'a6d*', count: 1 },
+            { key: 'a6e*', count: 1 },
+            { key: 'a69*', count: 1 },
+            { key: 'a7a*', count: 1 },
+            { key: 'a7d*', count: 2 },
+            { key: 'a7e*', count: 1 },
+            { key: 'a8d*', count: 1 },
+            { key: 'a8f*', count: 2 },
+            { key: 'a89*', count: 2 },
+            { key: 'a9d*', count: 1 },
+            { key: 'a9e*', count: 2 },
+            { key: 'a94*', count: 2 },
+            { key: 'a95*', count: 1 },
+            { key: 'a97*', count: 2 },
+        ]);
+
+        expect(results.pop()).toBeNull();
+
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
+        });
+    });
+
+    it('key range gets divided up by number of slicers', async () => {
+        const opConfig = {
+            key_range: ['a', 'b'],
+        };
+
+        const test = await makeSlicerTest(opConfig, 2);
+
+        // @ts-expect-error
+        const [slicer1, slicer2] = test.slicer()._slicers;
+
+        await Promise.all([
+            // @ts-expect-error
+            test.slicer().processSlicer(slicer1),
+            // @ts-expect-error
+            test.slicer().processSlicer(slicer2),
+        ]);
+
+        const [slices1, slices2] = test.slicer().getSlices(1000);
+
+        const expectedResults = formatExpectedData([{ key: 'a*', count: 58 }, { key: 'b*', count: 82 }]);
+
+        expect(slices1.slicer_id).toEqual(0);
+        expect(slices1.slicer_order).toEqual(1);
+        expect(slices1.request).toMatchObject(expectedResults[0]);
+
+        expect(slices2.slicer_id).toEqual(1);
+        expect(slices2.slicer_order).toEqual(1);
+        expect(slices2.request).toMatchObject(expectedResults[1]);
+
+        const results = await test.createSlices();
+        expect(results).toEqual([null, null]);
+        // @ts-expect-error
+        expect(test.slicer().isFinished).toBeTrue();
+    });
+
+    it('can return to previous position', async () => {
+        const lastSlice = formatExpectedData([{ key: 'a6*', count: 3 }])[0];
+        const retryData = [{ lastSlice, slicer_id: 0 }];
+        const opConfig = { key_range: ['a'] };
+
+        const test = await makeSlicerTest(opConfig, 1, retryData);
+        const results = await test.getAllSlices();
+
+        expect(results.pop()).toBeNull();
+
+        const expectedResults = formatExpectedData([
+            { key: 'a7*', count: 4 },
+            { key: 'a8*', count: 5 },
+            { key: 'a9*', count: 8 },
+        ]);
+
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
         });
     });
 });
