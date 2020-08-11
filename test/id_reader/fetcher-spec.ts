@@ -154,7 +154,7 @@ describe('id_reader fetcher', () => {
         });
     });
 
-    fit('will have all appropriate metadata on records', async () => {
+    it('will have all appropriate metadata on records', async () => {
         const opConfig = {
             index: evenIndex,
             key_range: ['a']
