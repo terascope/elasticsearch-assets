@@ -120,7 +120,14 @@ export const schema = {
     delay: {
         doc: 'used for persistent',
         default: '30s',
-        format: 'optional_String'
+        format(val: unknown): void {
+            if (!isString(val)) throw new Error(`Invalid parameter interval, it must be of type string, was given ${getTypeOf(val)}`);
+            if (val === 'auto') return;
+            const regex = /(\d+)(\D+)/i;
+            const interval = regex.exec(val);
+            if (!interval) throw new Error('Invalid date interval, it is not formatted correctly');
+            dateOptions(interval[2]);
+        }
     },
     subslice_by_key: {
         doc: 'determine if slice should be further divided up by id if slice is to too big',
