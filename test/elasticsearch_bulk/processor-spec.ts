@@ -3,7 +3,6 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import { getESVersion } from 'elasticsearch-store';
 import { DataEntity, OpConfig } from '@terascope/job-components';
-import path from 'path';
 import {
     makeClient,
     cleanupIndex,
@@ -18,7 +17,6 @@ interface ClientCalls {
 }
 
 describe('elasticsearch_bulk', () => {
-    const assetDir = path.join(__dirname, '..');
     let harness: WorkerTestHarness;
     let clients: any;
     let clientCalls: ClientCalls = {};
@@ -94,7 +92,7 @@ describe('elasticsearch_bulk', () => {
             ],
         });
 
-        harness = new WorkerTestHarness(job, { assetDir, clients });
+        harness = new WorkerTestHarness(job, { clients });
         await harness.initialize();
         return harness;
     }

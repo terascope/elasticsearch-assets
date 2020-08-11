@@ -1,5 +1,4 @@
 import 'jest-extended';
-import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { DataEntity } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
@@ -81,10 +80,7 @@ describe('elasticsearch state storage api', () => {
     });
 
     beforeEach(async () => {
-        harness = new WorkerTestHarness(job, {
-            assetDir: path.join(__dirname, '../asset'),
-            clients,
-        });
+        harness = new WorkerTestHarness(job, { clients });
 
         await harness.initialize();
 

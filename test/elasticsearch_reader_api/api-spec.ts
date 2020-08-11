@@ -1,5 +1,4 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import path from 'path';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
@@ -8,9 +7,6 @@ import {
 } from '../helpers';
 
 describe('elasticsearch reader api', () => {
-    const dir = __dirname;
-    const assetDir = path.join(dir, '../../asset');
-
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const esClient = makeClient();
 
@@ -66,10 +62,7 @@ describe('elasticsearch reader api', () => {
             ],
         });
 
-        harness = new WorkerTestHarness(job, {
-            assetDir,
-            clients
-        });
+        harness = new WorkerTestHarness(job, { clients });
 
         const processor = harness.getOperation('noop');
         // @ts-expect-error\

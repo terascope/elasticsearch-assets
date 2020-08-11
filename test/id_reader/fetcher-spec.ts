@@ -4,16 +4,21 @@ import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
 import { getKeyArray } from '../../asset/src/id_reader/helpers';
 import {
-    makeClient, cleanupIndex, populateIndex
-} from '../helpers/elasticsearch';
-import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from '../helpers';
+    TEST_INDEX_PREFIX,
+    ELASTICSEARCH_VERSION,
+    getListOfIds,
+    getTotalSliceCounts,
+    makeClient,
+    cleanupIndex,
+    populateIndex
+} from '../helpers';
 import evenSpread from '../fixtures/id/even-spread';
 
 describe('id_reader fetcher', () => {
     let harness: JobTestHarness;
     let clients: any;
     const esClient = makeClient();
-    const idIndex = `${TEST_INDEX_PREFIX}_id_`;
+    const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
 
     const version = getESVersion(esClient);
 
@@ -45,6 +50,9 @@ describe('id_reader fetcher', () => {
                 create: () => ({
                     client: esClient
                 }),
+                config: {
+                    apiVersion: ELASTICSEARCH_VERSION
+                }
             },
             {
                 type: 'elasticsearch',
@@ -52,6 +60,9 @@ describe('id_reader fetcher', () => {
                 create: () => ({
                     client: esClient
                 }),
+                config: {
+                    apiVersion: ELASTICSEARCH_VERSION
+                }
             }
         ];
     });
@@ -66,6 +77,7 @@ describe('id_reader fetcher', () => {
             opConfig,
             { type: docType, field }
         );
+
         const job = newTestJobConfig({
             slicers: numOfSlicers,
             max_retries: 0,
@@ -142,7 +154,7 @@ describe('id_reader fetcher', () => {
         });
     });
 
-    it('will have all appropriate metadata on records', async () => {
+    fit('will have all appropriate metadata on records', async () => {
         const opConfig = {
             index: evenIndex,
             key_range: ['a']

@@ -2,7 +2,6 @@
 
 import { SlicerRecoveryData, LifeCycle } from '@terascope/job-components';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import path from 'path';
 
 interface SlicerTestArgs {
     opConfig: any;
@@ -13,7 +12,6 @@ interface SlicerTestArgs {
 }
 
 describe('elasticsearch_data_generator', () => {
-    const assetDir = path.join(__dirname, '..');
     let harness: SlicerTestHarness;
     let clients: any;
 
@@ -40,7 +38,7 @@ describe('elasticsearch_data_generator', () => {
                 }
             ],
         });
-        harness = new SlicerTestHarness(job, { assetDir, clients });
+        harness = new SlicerTestHarness(job, { clients });
         await harness.initialize(recoveryData);
         return harness;
     }

@@ -35,7 +35,9 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             }
         }
 
-        const { index, connection, api_name } = opConfig;
+        const {
+            index, connection, api_name, type
+        } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
@@ -45,6 +47,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
             job.apis.push({
                 _name: DEFAULT_API_NAME,
                 index,
+                type,
                 connection,
                 full_response: false
             });
@@ -56,9 +59,9 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
 
         if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${opConnection}`);
         if (endpointConfig.apiVersion) {
-            const type = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
+            const configType = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
             const versionNumber = toNumber(endpointConfig.apiVersion.charAt(0));
-            if (versionNumber <= 5 && (type == null || !isString(type) || type.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
+            if (versionNumber <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
         }
     }
 

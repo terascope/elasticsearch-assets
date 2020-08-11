@@ -1,8 +1,6 @@
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import path from 'path';
 
 describe('elasticsearch_data_generator fetcher', () => {
-    const assetDir = path.join(__dirname, '..');
     let harness: WorkerTestHarness;
     let clients: any;
 
@@ -11,7 +9,7 @@ describe('elasticsearch_data_generator fetcher', () => {
     });
 
     async function makeFetcherTest(config: any) {
-        harness = WorkerTestHarness.testFetcher(config, { assetDir, clients });
+        harness = WorkerTestHarness.testFetcher(config, { clients });
         await harness.initialize();
         return harness;
     }

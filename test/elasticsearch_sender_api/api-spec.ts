@@ -1,6 +1,5 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { isNil } from '@terascope/job-components';
-import path from 'path';
 import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, fetch, waitForData
@@ -8,9 +7,6 @@ import {
 import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces';
 
 describe('elasticsearch sender api', () => {
-    const dir = __dirname;
-    const assetDir = path.join(dir, '../../asset');
-
     const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;
     const esClient = makeClient();
 
@@ -64,10 +60,7 @@ describe('elasticsearch sender api', () => {
             ],
         });
 
-        harness = new WorkerTestHarness(job, {
-            assetDir,
-            clients
-        });
+        harness = new WorkerTestHarness(job, { clients });
 
         const processor = harness.getOperation('noop');
         // @ts-expect-error\

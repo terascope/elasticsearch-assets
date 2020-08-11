@@ -2,7 +2,12 @@ import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SlicerRecoveryData, DataEntity, AnyObject } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import {
-    TEST_INDEX_PREFIX, cleanupIndex, makeClient, populateIndex, waitForData
+    TEST_INDEX_PREFIX,
+    ELASTICSEARCH_VERSION,
+    cleanupIndex,
+    makeClient,
+    populateIndex,
+    waitForData
 } from '../helpers';
 import evenSpread from '../fixtures/id/even-spread';
 
@@ -53,6 +58,9 @@ describe('id_reader slicer', () => {
                 create: () => ({
                     client: esClient
                 }),
+                config: {
+                    apiVersion: ELASTICSEARCH_VERSION
+                }
             }
         ];
     });

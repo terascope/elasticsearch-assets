@@ -11,7 +11,7 @@ import {
 import path from 'path';
 import moment from 'moment';
 import { WorkerTestHarness, SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import MockClient from '../mock_client';
+import MockClient from '../helpers/mock_client';
 import Schema from '../../asset/src/elasticsearch_reader/schema';
 import { IDType } from '../../asset/src/id_reader/interfaces';
 import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
