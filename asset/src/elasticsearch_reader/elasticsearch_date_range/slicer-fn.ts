@@ -216,7 +216,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             logger,
             api,
             range,
-            keySet: getKeyArray(opConfig)
+            keySet: getKeyArray(opConfig.key_type)
         };
         const idSlicers = idSlicer(idSlicerArs);
 

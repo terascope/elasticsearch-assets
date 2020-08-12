@@ -10016,5 +10016,5 @@ const types: TypeConfigFields = {
 export = {
     data: cloneDeep(data),
     types,
-    index: 'id_even_spread'
+    index: 'even_spread'
 }

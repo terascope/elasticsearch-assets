@@ -11,7 +11,7 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/id/even-spread';
+import evenSpread from '../fixtures/data/even-spread';
 
 describe('elasticsearch_reader fetcher', () => {
     const esClient = makeClient();
@@ -26,7 +26,8 @@ describe('elasticsearch_reader fetcher', () => {
     const version = getESVersion(esClient);
     const docType = version === 5 ? 'events' : '_doc';
 
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const unevenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const clients = [
         {
@@ -47,7 +48,7 @@ describe('elasticsearch_reader fetcher', () => {
 
     beforeAll(async () => {
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
     });
 
     afterAll(async () => {
@@ -62,10 +63,6 @@ describe('elasticsearch_reader fetcher', () => {
 
         if (jobHarness) await jobHarness.shutdown();
     });
-
-    function makeDate(format: string) {
-        return moment(moment().format(format));
-    }
 
     const defaults = {
         _op: 'elasticsearch_reader',

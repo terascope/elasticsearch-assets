@@ -7,9 +7,10 @@ import {
     cleanupIndex,
     makeClient,
     populateIndex,
-    waitForData
+    waitForData,
+    formatWildcardQuery
 } from '../helpers';
-import evenSpread from '../fixtures/id/even-spread';
+import evenSpread from '../fixtures/data/even-spread';
 
 describe('id_reader slicer', () => {
     jest.setTimeout(30 * 1000);
@@ -31,13 +32,6 @@ describe('id_reader slicer', () => {
     interface ESData {
         count: number;
         key: string;
-    }
-
-    function formatExpectedData(data: ESData[]) {
-        return data.map((obj) => {
-            if (version <= 5) return { key: `${docType}#${obj.key}`, count: obj.count };
-            return { wildcard: { field, value: obj.key }, count: obj.count };
-        });
     }
 
     beforeAll(async () => {
@@ -118,7 +112,7 @@ describe('id_reader slicer', () => {
         // null shows we are done, we remove to compare objects
         expect(results.pop()).toBeNull();
 
-        const expectedResults = formatExpectedData([
+        const expectedResults = formatWildcardQuery([
             { key: 'a*', count: 58 },
             { key: 'b*', count: 82 },
             { key: 'c*', count: 64 },
@@ -135,7 +129,7 @@ describe('id_reader slicer', () => {
             { key: '7*', count: 80 },
             { key: '8*', count: 75 },
             { key: '9*', count: 64 },
-        ]);
+        ], version, docType, field);
 
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);
@@ -149,10 +143,10 @@ describe('id_reader slicer', () => {
         // null shows we are done, we remove to compare objects
         expect(results.pop()).toBeNull();
 
-        const expectedResults = formatExpectedData([
+        const expectedResults = formatWildcardQuery([
             { key: 'a*', count: 58 },
             { key: 'b*', count: 82 },
-        ]);
+        ], version, docType, field);
 
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);
@@ -174,7 +168,7 @@ describe('id_reader slicer', () => {
 
         expect(results.pop()).toBeNull();
 
-        const expectedResults = formatExpectedData([
+        const expectedResults = formatWildcardQuery([
             { key: 'a0*', count: 5 },
             { key: 'a1*', count: 7 },
             { key: 'a3*', count: 2 },
@@ -190,7 +184,7 @@ describe('id_reader slicer', () => {
             { key: 'ad*', count: 4 },
             { key: 'ae*', count: 4 },
             { key: 'af*', count: 1 },
-        ]);
+        ], version, docType, field);
 
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);
@@ -206,7 +200,7 @@ describe('id_reader slicer', () => {
         const test = await makeSlicerTest(opConfig);
         const results = await test.getAllSlices();
 
-        const expectedResults = formatExpectedData([
+        const expectedResults = formatWildcardQuery([
             { key: 'aa5*', count: 1 },
             { key: 'aa6*', count: 1 },
             { key: 'aa7*', count: 1 },
@@ -256,7 +250,7 @@ describe('id_reader slicer', () => {
             { key: 'a94*', count: 2 },
             { key: 'a95*', count: 1 },
             { key: 'a97*', count: 2 },
-        ]);
+        ], version, docType, field);
 
         expect(results.pop()).toBeNull();
 
@@ -284,7 +278,7 @@ describe('id_reader slicer', () => {
 
         const [slices1, slices2] = test.slicer().getSlices(1000);
 
-        const expectedResults = formatExpectedData([{ key: 'a*', count: 58 }, { key: 'b*', count: 82 }]);
+        const expectedResults = formatWildcardQuery([{ key: 'a*', count: 58 }, { key: 'b*', count: 82 }], version, docType, field);
 
         expect(slices1.slicer_id).toEqual(0);
         expect(slices1.slicer_order).toEqual(1);
@@ -301,7 +295,7 @@ describe('id_reader slicer', () => {
     });
 
     it('can return to previous position', async () => {
-        const lastSlice = formatExpectedData([{ key: 'a6*', count: 3 }])[0];
+        const lastSlice = formatWildcardQuery([{ key: 'a6*', count: 3 }], version, docType, field)[0];
         const retryData = [{ lastSlice, slicer_id: 0 }];
         const opConfig = { key_range: ['a'] };
 
@@ -310,11 +304,11 @@ describe('id_reader slicer', () => {
 
         expect(results.pop()).toBeNull();
 
-        const expectedResults = formatExpectedData([
+        const expectedResults = formatWildcardQuery([
             { key: 'a7*', count: 4 },
             { key: 'a8*', count: 5 },
             { key: 'a9*', count: 8 },
-        ]);
+        ], version, docType, field);
 
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);

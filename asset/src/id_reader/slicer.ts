@@ -35,7 +35,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
-        const baseKeyArray = getKeyArray(this.opConfig);
+        const baseKeyArray = getKeyArray(this.opConfig.key_type);
         // we slice as not to mutate for when this is called again
         const keyArray = this.opConfig.key_range
             ? this.opConfig.key_range.slice()

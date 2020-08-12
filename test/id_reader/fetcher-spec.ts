@@ -12,7 +12,7 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/id/even-spread';
+import evenSpread from '../fixtures/data/even-spread';
 
 describe('id_reader fetcher', () => {
     let harness: JobTestHarness;

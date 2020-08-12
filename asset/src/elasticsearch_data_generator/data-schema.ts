@@ -30,6 +30,7 @@ function dateNow() {
 
 function isoBetween(start: number, diff: number) {
     // ex.   "2016-01-19T13:48:08.426-07:00"
+    console.log('shoudl be here', start, diff)
     return () => moment(start + (Math.random() * diff)).format(dateFormat);
 }
 
