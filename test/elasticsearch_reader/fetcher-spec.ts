@@ -97,9 +97,9 @@ describe('elasticsearch_reader fetcher', () => {
     it('fetcher can return formatted data', async () => {
         // this range has 48 records
         const slice = {
-            start: '2019-04-26T08:00:23.201-07:00',
-            end: '2019-04-26T08:00:23.220-07:00',
-            limit: '2019-04-26T08:00:23.394-07:00',
+            start: '2019-04-26T15:00:23.201Z',
+            end: '2019-04-26T15:00:23.220Z',
+            limit: '2019-04-26T15:00:23.394Z',
             count: 10000
         };
 

@@ -37,7 +37,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     api!: elasticAPI.Client;
     dateFormat: string;
     windowState: WindowState
-    startTime = moment();
+    startTime = moment.utc();
 
     constructor(
         context: WorkerContext,
@@ -124,7 +124,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
         // end date is non-inclusive, adding 1s so range will cover it
         const newDate = data[this.opConfig.date_field_name];
-        const time = moment(newDate).add(1, this.opConfig.time_resolution);
+        const time = moment.utc(newDate).add(1, this.opConfig.time_resolution);
         return parseDate(time.format(this.dateFormat));
     }
 
@@ -238,8 +238,8 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             slicerFnArgs.interval = interval;
 
             await this.updateJob({
-                start: esDates.start.format(this.dateFormat),
-                end: esDates.limit.format(this.dateFormat),
+                start: moment(esDates.start.format(this.dateFormat)).toISOString(),
+                end: moment(esDates.limit.format(this.dateFormat)).toISOString(),
                 interval
             });
 

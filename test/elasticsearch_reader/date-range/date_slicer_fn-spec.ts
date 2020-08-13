@@ -107,14 +107,14 @@ describe('date slicer function', () => {
     }
 
     function makeDate(format: string) {
-        return moment(moment().format(format));
+        return moment.utc(moment.utc().format(format));
     }
 
     it('returns a function', () => {
         const interval: ParsedInterval = [5, 'm'];
         const start = makeDate(dateFormatSeconds);
-        const end = moment(start).add(2, 'm');
-        const limit = moment(start).add(interval[0], interval[1]);
+        const end = moment.utc(start).add(2, 'm');
+        const limit = moment.utc(start).add(interval[0], interval[1]);
 
         const testConfig: TestConfig = {
             interval,
@@ -133,8 +133,8 @@ describe('date slicer function', () => {
         it('with zero count at end of slice it expands', async () => {
             const interval: ParsedInterval = [5, 'm'];
             const start = makeDate(dateFormatSeconds);
-            const end = moment(start).add(2, 'm');
-            const limit = moment(start).add(interval[0], interval[1]);
+            const end = moment.utc(start).add(2, 'm');
+            const limit = moment.utc(start).add(interval[0], interval[1]);
 
             const client = new MockClient([{ count: 0 }], 0);
 
@@ -148,9 +148,9 @@ describe('date slicer function', () => {
                 client
             };
             const expectedResults = {
-                start: moment(start).format(dateFormatSeconds),
-                end: moment(limit).format(dateFormatSeconds),
-                limit: moment(limit).format(dateFormatSeconds),
+                start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
+                limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 0,
                 holes: []
             };
@@ -164,8 +164,8 @@ describe('date slicer function', () => {
         it('with zero count, then to big a count at end of slice', async () => {
             const interval: ParsedInterval = [5, 'm'];
             const start = makeDate(dateFormatSeconds);
-            const end = moment(start).add(2, 'm');
-            const limit = moment(start).add(3, 'm');
+            const end = moment.utc(start).add(2, 'm');
+            const limit = moment.utc(start).add(3, 'm');
             const client = new MockClient([], 2000);
             client.setSequenceData([{ count: 0 }]);
 
@@ -179,9 +179,9 @@ describe('date slicer function', () => {
                 client
             };
             const expectedResults = {
-                start: moment(start).format(dateFormatSeconds),
-                end: moment(end).add(1, 's').format(dateFormatSeconds),
-                limit: moment(limit).format(dateFormatSeconds),
+                start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(end).add(1, 's').format(dateFormatSeconds)).toISOString(),
+                limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 2000,
                 holes: []
             };
@@ -195,8 +195,8 @@ describe('date slicer function', () => {
         it('with expanded slice count, then to large a size', async () => {
             const interval: ParsedInterval = [5, 'm'];
             const start = makeDate(dateFormatSeconds);
-            const end = moment(start).add(2, 'm');
-            const limit = moment(start).add(interval[0], interval[1]);
+            const end = moment.utc(start).add(2, 'm');
+            const limit = moment.utc(start).add(interval[0], interval[1]);
 
             const client = new MockClient([{ count: 2000 }], 2000);
 
@@ -210,9 +210,9 @@ describe('date slicer function', () => {
                 client
             };
             const expectedResults = {
-                start: moment(start).format(dateFormatSeconds),
-                end: moment(start).add(1, 's').format(dateFormatSeconds),
-                limit: moment(limit).format(dateFormatSeconds),
+                start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(start).add(1, 's').format(dateFormatSeconds)).toISOString(),
+                limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 2000,
                 holes: []
             };
@@ -231,19 +231,19 @@ describe('date slicer function', () => {
 
             const currentTime = makeDate(dateFormat);
 
-            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-            const start = moment(limit).subtract(interval[0], interval[1]);
-            const end = moment(start).add(interval[0], interval[1]);
+            const limit = moment.utc(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment.utc(limit).subtract(interval[0], interval[1]);
+            const end = moment.utc(start).add(interval[0], interval[1]);
 
             const dates = { start, end, limit };
 
-            const secondStart = moment(limit);
-            const secondEnd = moment(secondStart).add(interval[0], interval[1]);
-            const secondLimit = moment(secondStart).add(interval[0], interval[1]);
+            const secondStart = moment.utc(limit);
+            const secondEnd = moment.utc(secondStart).add(interval[0], interval[1]);
+            const secondLimit = moment.utc(secondStart).add(interval[0], interval[1]);
 
-            const thirdStart = moment(secondLimit);
-            const thirdEnd = moment(thirdStart).add(interval[0], interval[1]);
-            const thirdLimit = moment(thirdStart).add(interval[0], interval[1]);
+            const thirdStart = moment.utc(secondLimit);
+            const thirdEnd = moment.utc(thirdStart).add(interval[0], interval[1]);
+            const thirdLimit = moment.utc(thirdStart).add(interval[0], interval[1]);
 
             const testConfig: TestConfig = {
                 interval,
@@ -259,9 +259,9 @@ describe('date slicer function', () => {
             const results = await slicer() as SlicerDateResults;
 
             expect(results).toBeDefined();
-            expect(moment(results.start).isSame(start)).toBeTrue();
-            expect(moment(results.end).isSame(moment(limit))).toBeTrue();
-            expect(moment(results.limit).isSame(moment(limit))).toBeTrue();
+            expect(moment.utc(results.start).isSame(start)).toBeTrue();
+            expect(moment.utc(results.end).isSame(moment.utc(limit))).toBeTrue();
+            expect(moment.utc(results.limit).isSame(moment.utc(limit))).toBeTrue();
 
             const results2 = await slicer();
             expect(results2).toEqual(null);
@@ -271,9 +271,9 @@ describe('date slicer function', () => {
             const results4 = await slicer() as SlicerDateResults;
 
             expect(results4).toBeDefined();
-            expect(moment(results4.start).isSame(secondStart)).toBeTrue();
-            expect(moment(results4.end).isSame(secondEnd)).toBeTrue();
-            expect(moment(results4.limit).isSame(secondLimit)).toBeTrue();
+            expect(moment.utc(results4.start).isSame(secondStart)).toBeTrue();
+            expect(moment.utc(results4.end).isSame(secondEnd)).toBeTrue();
+            expect(moment.utc(results4.limit).isSame(secondLimit)).toBeTrue();
 
             const results5 = await slicer();
             expect(results5).toEqual(null);
@@ -283,9 +283,9 @@ describe('date slicer function', () => {
             const results6 = await slicer() as SlicerDateResults;
 
             expect(results6).toBeDefined();
-            expect(moment(results6.start).isSame(thirdStart)).toBeTrue();
-            expect(moment(results6.end).isSame(thirdEnd)).toBeTrue();
-            expect(moment(results6.limit).isSame(thirdLimit)).toBeTrue();
+            expect(moment.utc(results6.start).isSame(thirdStart)).toBeTrue();
+            expect(moment.utc(results6.end).isSame(thirdEnd)).toBeTrue();
+            expect(moment.utc(results6.limit).isSame(thirdLimit)).toBeTrue();
         });
 
         it('with one slicer with zero records returned in client then with size to large', async () => {
@@ -305,9 +305,9 @@ describe('date slicer function', () => {
 
             const currentTime = makeDate(dateFormat);
 
-            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-            const start = moment(limit).subtract(interval[0], interval[1]);
-            const end = moment(start).add(interval[0], interval[1]);
+            const limit = moment.utc(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment.utc(limit).subtract(interval[0], interval[1]);
+            const end = moment.utc(start).add(interval[0], interval[1]);
 
             const dates = { start, end, limit };
 
@@ -326,9 +326,9 @@ describe('date slicer function', () => {
             const results = await slicer() as SlicerDateResults;
 
             expect(results).toBeDefined();
-            expect(moment(results.start)).toBeDefined();
-            expect(moment(results.end).isSame(moment(limit))).toBeDefined();
-            expect(moment(results.limit).isSame(moment(limit))).toBeDefined();
+            expect(moment.utc(results.start)).toBeDefined();
+            expect(moment.utc(results.end).isSame(moment.utc(limit))).toBeDefined();
+            expect(moment.utc(results.limit).isSame(moment.utc(limit))).toBeDefined();
 
             const results2 = await slicer();
 
@@ -345,33 +345,37 @@ describe('date slicer function', () => {
 
             const currentTime = makeDate(dateFormat);
 
-            const limit = moment(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
-            const start = moment(limit).subtract(interval[0], interval[1]);
+            const limit = moment.utc(currentTime).subtract(latencyInterval[0], latencyInterval[1]);
+            const start = moment.utc(limit).subtract(interval[0], interval[1]);
 
             const primaryRange = { start, limit };
 
             const ranges = divideRange(start, limit, numOfSlicer);
 
             const secondRanges = divideRange(
-                moment(start).add(interval[0], interval[1]),
-                moment(limit).add(interval[0], interval[1]),
+                moment.utc(start).add(interval[0], interval[1]),
+                moment.utc(limit).add(interval[0], interval[1]),
                 numOfSlicer
             );
 
             const date1 = Object.assign(
-                {}, ranges[0], { end: moment(ranges[0].start).add(half[0], half[1]) }
+                {}, ranges[0], { end: moment.utc(ranges[0].start).add(half[0], half[1]) }
             );
             const date2 = Object.assign(
-                {}, ranges[1], { end: moment(ranges[1].start).add(half[0], half[1]) }
+                {}, ranges[1], { end: moment.utc(ranges[1].start).add(half[0], half[1]) }
             );
 
             const windowState = new WindowState(numOfSlicer);
 
             const date3 = Object.assign(
-                {}, secondRanges[0], { end: moment(secondRanges[0].start).add(half[0], half[1]) }
+                {},
+                secondRanges[0],
+                { end: moment.utc(secondRanges[0].start).add(half[0], half[1]) }
             );
             const date4 = Object.assign(
-                {}, secondRanges[1], { end: moment(secondRanges[1].start).add(half[0], half[1]) }
+                {},
+                secondRanges[1],
+                { end: moment.utc(secondRanges[1].start).add(half[0], half[1]) }
             );
 
             const testConfig1: TestConfig = {
@@ -391,8 +395,8 @@ describe('date slicer function', () => {
                 latencyInterval,
                 lifecycle: 'persistent',
                 primaryRange: {
-                    start: moment(primaryRange.start),
-                    limit: moment(primaryRange.limit)
+                    start: moment.utc(primaryRange.start),
+                    limit: moment.utc(primaryRange.limit)
                 },
                 dates: date2,
                 timeResolution: 'ms',
@@ -407,16 +411,16 @@ describe('date slicer function', () => {
             const results = await slicer1() as SlicerDateResults;
 
             expect(results).toBeDefined();
-            expect(moment(results.start).isSame(date1.start)).toBeTrue();
-            expect(moment(results.end).isSame(moment(date1.limit))).toBeTrue();
-            expect(moment(results.limit).isSame(moment(date1.limit))).toBeTrue();
+            expect(moment.utc(results.start).isSame(date1.start)).toBeTrue();
+            expect(moment.utc(results.end).isSame(moment.utc(date1.limit))).toBeTrue();
+            expect(moment.utc(results.limit).isSame(moment.utc(date1.limit))).toBeTrue();
 
             const results2 = await slicer2() as SlicerDateResults;
 
             expect(results2).toBeDefined();
-            expect(moment(results2.start).isSame(date2.start)).toBeTrue();
-            expect(moment(results2.end).isSame(moment(date2.limit))).toBeTrue();
-            expect(moment(results2.limit).isSame(moment(date2.limit))).toBeTrue();
+            expect(moment.utc(results2.start).isSame(date2.start)).toBeTrue();
+            expect(moment.utc(results2.end).isSame(moment.utc(date2.limit))).toBeTrue();
+            expect(moment.utc(results2.limit).isSame(moment.utc(date2.limit))).toBeTrue();
 
             // slicer 1 is all done
             const results3 = await slicer1();
@@ -431,9 +435,9 @@ describe('date slicer function', () => {
             const results6 = await slicer1() as SlicerDateResults;
 
             expect(results6).toBeDefined();
-            expect(moment(results6.start).isSame(date3.start)).toBeTrue();
-            expect(moment(results6.end).isSame(moment(date3.limit))).toBeTrue();
-            expect(moment(results6.limit).isSame(moment(date3.limit))).toBeTrue();
+            expect(moment.utc(results6.start).isSame(date3.start)).toBeTrue();
+            expect(moment.utc(results6.end).isSame(moment.utc(date3.limit))).toBeTrue();
+            expect(moment.utc(results6.limit).isSame(moment.utc(date3.limit))).toBeTrue();
 
             // slicer 1 is all done
             const results7 = await slicer1();
@@ -448,9 +452,9 @@ describe('date slicer function', () => {
             const results9 = await slicer2() as SlicerDateResults;
 
             expect(results9).toBeDefined();
-            expect(moment(results9.start).isSame(date4.start)).toBeTrue();
-            expect(moment(results9.end).isSame(moment(date4.limit))).toBeTrue();
-            expect(moment(results9.limit).isSame(moment(date4.limit))).toBeTrue();
+            expect(moment.utc(results9.start).isSame(date4.start)).toBeTrue();
+            expect(moment.utc(results9.end).isSame(moment.utc(date4.limit))).toBeTrue();
+            expect(moment.utc(results9.limit).isSame(moment.utc(date4.limit))).toBeTrue();
         });
     });
 });

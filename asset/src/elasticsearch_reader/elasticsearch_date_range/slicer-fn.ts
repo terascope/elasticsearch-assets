@@ -41,8 +41,8 @@ function splitTime(
 ) {
     let diff = Math.floor(end.diff(start) / 2);
 
-    if (moment(start).add(diff, 'ms').isAfter(limit)) {
-        diff = moment(limit).diff(start);
+    if (moment.utc(start).add(diff, 'ms').isAfter(limit)) {
+        diff = moment.utc(limit).diff(start);
     }
 
     if (timeResolution === 'ms') {
@@ -96,10 +96,10 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
                 // recurse down to the appropriate size
-                const newStart = moment(dateParams.prevEnd);
+                const newStart = moment.utc(dateParams.prevEnd);
                 // get diff from new start
                 const diff = splitTime(newStart, end, limit, timeResolution);
-                const newEnd = moment(newStart).add(diff, timeResolution);
+                const newEnd = moment.utc(newStart).add(diff, timeResolution);
 
                 const cloneDates: DateParams = {
                     interval: dateParams.interval,
@@ -126,7 +126,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
             // find difference in milliseconds and divide in half
             const diff = splitTime(start, end, limit, timeResolution);
-            const newEnd = moment(start).add(diff, timeResolution);
+            const newEnd = moment.utc(start).add(diff, timeResolution);
             // prevent recursive call if difference is one millisecond
             if (diff <= 0) {
                 return { start, end, count };
@@ -148,16 +148,16 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             // increase the slice range to find documents
             let makeLimitQuery = false;
             // we make a mark of the last end spot before expansion
-            dateParams.prevEnd = moment(end);
+            dateParams.prevEnd = moment.utc(end);
 
-            const newEnd = moment(dateParams.end).add(step, unit);
+            const newEnd = moment.utc(dateParams.end).add(step, unit);
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;
-                dateParams.end = moment(dateParams.limit);
+                dateParams.end = moment.utc(dateParams.limit);
             } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
                 makeLimitQuery = true;
-                dateParams.end = moment(holes[0].start);
+                dateParams.end = moment.utc(holes[0].start);
             } else {
                 dateParams.end = newEnd;
             }
@@ -200,13 +200,15 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
     async function makeKeyList(data: DetermineSliceResults, limit: string) {
         const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
+        const dates = {
+            start: moment(data.start.format(dateFormat)).toISOString(),
+            end: moment(data.end.format(dateFormat)).toISOString(),
+            limit: moment(moment(limit).format(dateFormat)).toISOString(),
+        };
+
         const range: SlicerDateResults = Object.assign(
             data,
-            {
-                start: data.start.format(),
-                end: data.end.format(),
-                limit
-            }
+            dates
         );
 
         const idSlicerArs: ESIDSlicerArgs = {
@@ -242,15 +244,15 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
             const [step, unit] = interval as ParsedInterval;
             const [lStep, lUnit] = latencyInterval as ParsedInterval;
-            const delayedBarrier = moment().subtract(lStep, lUnit);
+            const delayedBarrier = moment.utc().subtract(lStep, lUnit);
 
             const { start, limit } = currentWindow as DateSegments;
 
-            const newStart = moment(start).add(step, unit);
-            const newLimit = moment(limit).add(step, unit);
+            const newStart = moment.utc(start).add(step, unit);
+            const newLimit = moment.utc(limit).add(step, unit);
 
             const config: StartPointConfig = {
-                dates: { start: moment(newStart), limit: moment(newLimit) },
+                dates: { start: moment.utc(newStart), limit: moment.utc(newLimit) },
                 id,
                 numOfSlicers: executionConfig.slicers,
                 interval
@@ -276,21 +278,21 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             // we are in a hole, need to shift where it is looking at
             // we mutate on purpose, eject hole that is already passed
             const hole = holes.shift() as DateConfig;
-            let newStart = moment(hole.end);
+            let newStart = moment.utc(hole.end);
 
             if (newStart.isAfter(dateParams.limit)) {
-                newStart = moment(dateParams.limit);
+                newStart = moment.utc(dateParams.limit);
             }
 
             dateParams.start = newStart;
         }
 
-        const newEnd = moment(dateParams.start).add(step, unit);
+        const newEnd = moment.utc(dateParams.start).add(step, unit);
 
         if (newEnd.isSameOrAfter(dateParams.limit)) {
-            dateParams.end = moment(dateParams.limit);
+            dateParams.end = moment.utc(dateParams.limit);
         } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
-            dateParams.end = moment(holes[0].start);
+            dateParams.end = moment.utc(holes[0].start);
         } else {
             dateParams.end = newEnd;
         }
@@ -304,10 +306,10 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         const dateParams: DateParams = {
             size: opConfig.size,
             interval,
-            start: moment(dates.start),
-            end: moment(dates.end),
+            start: moment.utc(dates.start),
+            end: moment.utc(dates.end),
             holes,
-            limit: moment(dates.limit)
+            limit: moment.utc(dates.limit)
         };
 
         logger.debug('all date configurations for date slicer', dateParams);
@@ -322,9 +324,9 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
                 const { start, end, limit } = next;
                 // TODO: check if we jumped a hole here at start, remove hole
-                dateParams.start = moment(start);
-                dateParams.end = moment(end);
-                dateParams.limit = moment(limit);
+                dateParams.start = moment.utc(start);
+                dateParams.end = moment.utc(end);
+                dateParams.limit = moment.utc(limit);
                 adjustDates(dateParams, holes);
             }
 
@@ -337,7 +339,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
                 return retryError(retryInput, err, sliceDate, '');
             }
 
-            dateParams.start = moment(data.end);
+            dateParams.start = moment.utc(data.end);
 
             adjustDates(dateParams, holes);
 
@@ -346,7 +348,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
                 try {
                     const list = await makeKeyList(data, dateParams.limit.format(dateFormat));
                     return list.map((obj) => {
-                        obj.limit = dateParams.limit.format(dateFormat);
+                        obj.limit = moment(dateParams.limit.format(dateFormat)).toISOString();
                         return obj;
                     }) as SlicerDateResults[];
                 } catch (err) {
@@ -355,9 +357,9 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             }
 
             return {
-                start: data.start.format(dateFormat),
-                end: data.end.format(dateFormat),
-                limit: dateParams.limit.format(dateFormat),
+                start: moment(data.start.format(dateFormat)).toISOString(),
+                end: moment(data.end.format(dateFormat)).toISOString(),
+                limit: moment(dateParams.limit.format(dateFormat)).toISOString(),
                 holes: dateParams.holes,
                 count: data.count
             };
