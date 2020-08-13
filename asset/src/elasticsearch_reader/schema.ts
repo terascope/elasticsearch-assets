@@ -272,7 +272,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             ? ElasticReaderAPI.subslice_by_key
             : opConfig.subslice_by_key;
 
-        const configField = ElasticReaderAPI
+            const configField = ElasticReaderAPI
             ? ElasticReaderAPI.field
             : opConfig.field;
 
@@ -285,7 +285,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         if (subsliceByKey) {
             const configType = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
             if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
-            if (apiVersion > 5 && (configField == null || !configField(configType) || configField.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
+            if (apiVersion > 5 && (configField == null || !isString(configField) || configField.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
         }
     }
 
