@@ -568,9 +568,9 @@ describe('elasticsearch_reader slicer', () => {
         });
     });
 
-    it('slicer can do a simple expansion of date slices up to find data', async () => {
+    fit('slicer can do a simple expansion of date slices up to find data', async () => {
         // stopping before big slice
-        const end = '2020-08-12T16:00:00.000';
+        const end = '2020-08-12T16:00:00.000Z';
         const opConfig = {
             time_resolution: 's',
             size: 100,
