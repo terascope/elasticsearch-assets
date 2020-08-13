@@ -13,6 +13,7 @@ import {
     populateIndex
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
+import { IDType } from '../../asset/src/id_reader/interfaces';
 
 describe('id_reader fetcher', () => {
     let harness: JobTestHarness;
@@ -96,7 +97,7 @@ describe('id_reader fetcher', () => {
 
     it('can fetch all even-data', async () => {
         const opConfig = { index: evenIndex };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
@@ -115,7 +116,7 @@ describe('id_reader fetcher', () => {
 
     it('can fetch all even-data with multiple slicers', async () => {
         const opConfig = { index: evenIndex };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig, 2);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
@@ -137,7 +138,7 @@ describe('id_reader fetcher', () => {
             index: evenIndex,
             key_range: ['a']
         };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 

@@ -6,6 +6,7 @@ import {
     LifeCycle,
     SlicerRecoveryData,
     AnyObject,
+    sortBy
 } from '@terascope/job-components';
 import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
@@ -1186,522 +1187,215 @@ describe('elasticsearch_reader slicer', () => {
         });
     });
 
-    // it('slicer can enter recovery and return to the last slice state', async () => {
-    //     const firstDate = makeDate(dateFormatSeconds);
-    //     const middleDate = moment(firstDate).add(5, 'm');
-    //     const endDate = moment(firstDate).add(10, 'm');
-    //     const closingDate = moment(endDate).add(10, 's');
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         start: firstDate.format(dateFormatSeconds),
-    //         end: closingDate.format(dateFormatSeconds),
-    //         index: 'some_index',
-    //         interval: '5m',
-    //     };
-
-    //     const recoveryData = [
-    //         {
-    //             lastSlice: {
-    //                 start: middleDate.format(dateFormatSeconds),
-    //                 end: endDate.format(dateFormatSeconds),
-    //                 limit: closingDate.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 0
-    //         }
-    //     ];
-
-    //     const expectedSlice = {
-    //         start: endDate.format(dateFormatSeconds),
-    //         end: closingDate.format(dateFormatSeconds),
-    //         limit: closingDate.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData });
-
-    //     const [results] = await test.createSlices();
-    //     expect(results).toEqual(expectedSlice);
-
-    //     const [results2] = await test.createSlices();
-    //     expect(results2).toEqual(null);
-    // });
-
-    // it('multiple slicers can enter recovery and return to the last slice state', async () => {
-    //     const firstDate = makeDate(dateFormatSeconds);
-    //     const firstMiddleDate = moment(firstDate).add(5, 'm');
-    //     const firstFinalDate = moment(firstDate).add(10, 'm');
-    //     const secondMiddleDate = moment(firstDate).add(15, 'm');
-    //     const secondFinalDate = moment(firstDate).add(20, 'm');
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         start: firstDate.format(dateFormatSeconds),
-    //         end: secondFinalDate.format(dateFormatSeconds),
-    //         index: 'some_index',
-    //         interval: '5m',
-    //     };
-
-    //     const recoveryData = [
-    //         {
-    //             lastSlice: {
-    //                 start: firstDate.format(dateFormatSeconds),
-    //                 end: firstMiddleDate.format(dateFormatSeconds),
-    //                 limit: firstFinalDate.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 0
-    //         },
-    //         {
-    //             lastSlice: {
-    //                 start: firstFinalDate.format(dateFormatSeconds),
-    //                 end: secondMiddleDate.format(dateFormatSeconds),
-    //                 limit: secondFinalDate.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 1
-    //         }
-    //     ];
-
-    //     const numOfSlicers = 2;
-
-    //     const test = await makeSlicerTest({ opConfig, numOfSlicers, recoveryData });
-
-    //     const slicers = test.slicer();
-    //     expect(slicers.slicers()).toEqual(2);
-
-    //     const [resultsSlicer1, resultsSlicer2] = await test.createSlices();
-
-    //     expect(resultsSlicer1).toEqual({
-    //         start: firstMiddleDate.format(dateFormatSeconds),
-    //         end: firstFinalDate.format(dateFormatSeconds),
-    //         limit: firstFinalDate.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     });
-
-    //     expect(resultsSlicer2).toEqual({
-    //         start: secondMiddleDate.format(dateFormatSeconds),
-    //         end: secondFinalDate.format(dateFormatSeconds),
-    //         limit: secondFinalDate.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     });
-
-    //     const [resultsSlicer3, resultsSlicer4] = await test.createSlices();
-    //     expect(resultsSlicer3).toEqual(null);
-    //     expect(resultsSlicer4).toEqual(null);
-    // });
-
-    // it('slicer can enter recovery and return to the last slice state in persistent mode', async () => {
-    //     const delay: [number, moment.unitOfTime.Base] = [30, 's'];
-    //     const currentDate = makeDate(dateFormatSeconds);
-    //     const startDate = moment(currentDate).subtract(10, 'm');
-    //     const middleDate = moment(currentDate).subtract(5, 'm');
-    //     // end is delayed by setting
-    //     const endingData = moment(currentDate).subtract(delay[0], delay[1]);
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         index: 'some_index',
-    //         interval: '5m',
-    //         delay: delay.join('')
-    //     };
-
-    //     const recoveryData = [
-    //         {
-    //             lastSlice: {
-    //                 start: startDate.format(dateFormatSeconds),
-    //                 end: middleDate.format(dateFormatSeconds),
-    //                 limit: endingData.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 0
-    //         }
-    //     ];
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData, lifecycle: 'persistent' });
-
-    //     const expectedResult = {
-    //         start: middleDate.format(dateFormatSeconds),
-    //         end: endingData.format(dateFormatSeconds),
-    //         limit: endingData.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const [results] = await test.createSlices();
-    //     expect(results).toEqual(expectedResult);
-    // });
-
-    // it('slicer can enter recovery and return to the last slice state when number of slicers have increased (1 => 2, even increase)', async () => {
-    //     const firstDate = makeDate(dateFormatSeconds);
-    //     const middleDate = moment(firstDate).add(5, 'm');
-    //     const endDate = moment(firstDate).add(10, 'm');
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         start: firstDate.format(dateFormatSeconds),
-    //         end: endDate.format(dateFormatSeconds),
-    //         index: 'some_index',
-    //         interval: '5m',
-    //     };
-
-    //     const recoveryData = [
-    //         {
-    //             lastSlice: {
-    //                 start: firstDate.format(dateFormatSeconds),
-    //                 end: middleDate.format(dateFormatSeconds),
-    //                 limit: endDate.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 0
-    //         }
-    //     ];
-
-    //     const newRange = divideRange(middleDate, endDate, 2);
-
-    //     const expectedSlice1 = {
-    //         start: newRange[0].start.format(dateFormatSeconds),
-    //         end: newRange[0].limit.format(dateFormatSeconds),
-    //         limit: newRange[0].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const expectedSlice2 = {
-    //         start: newRange[1].start.format(dateFormatSeconds),
-    //         end: newRange[1].limit.format(dateFormatSeconds),
-    //         limit: newRange[1].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 2 });
-
-    //     const [results, results2] = await test.createSlices();
-    //     expect(results).toEqual(expectedSlice1);
-    //     expect(results2).toEqual(expectedSlice2);
-
-    //     const [results3] = await test.createSlices();
-    //     expect(results3).toEqual(null);
-    // });
-
-    // it('slicer can enter recovery and return to the last slice state when number of slicers have increased (3 => 5, odd increase)', async () => {
-    //     const firstDate = makeDate(dateFormatSeconds);
-    //     const endDate = moment(firstDate).add(20, 'm');
-
-    //     const oldRange = divideRange(firstDate, endDate, 3);
-
-    //     defaultClient.setSequenceData(times(30, () => ({ count: 100, '@timestamp': new Date() })));
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 10000,
-    //         start: firstDate.format(dateFormatSeconds),
-    //         end: endDate.format(dateFormatSeconds),
-    //         index: 'some_index',
-    //         interval: '5m',
-    //     };
-
-    //     const recoveryData = oldRange.map((segment, index) => {
-    //         const obj = {
-    //             start: moment(segment.start).format(dateFormatSeconds),
-    //             end: moment(segment.start).add(2, 'm').format(dateFormatSeconds),
-    //             limit: moment(segment.limit).format(dateFormatSeconds),
-    //             count: 1234,
-    //         };
-
-    //         return { lastSlice: obj, slicer_id: index };
-    //     });
-
-    //     const rs1Start = moment(recoveryData[0].lastSlice.end);
-    //     const rs1End = moment(recoveryData[0].lastSlice.limit);
-
-    //     const rs2Start = moment(recoveryData[1].lastSlice.end);
-    //     const rs2End = moment(recoveryData[1].lastSlice.limit);
-
-    //     const rs3Start = moment(recoveryData[2].lastSlice.end);
-    //     const rs3End = moment(recoveryData[2].lastSlice.limit);
-
-    //     const newRangeSegment1 = divideRange(rs1Start, rs1End, 2);
-    //     const newRangeSegment2 = divideRange(rs2Start, rs2End, 2);
-
-    //     const expectedSlice1 = {
-    //         start: newRangeSegment1[0].start.format(dateFormatSeconds),
-    //         end: newRangeSegment1[0].limit.format(dateFormatSeconds),
-    //         limit: newRangeSegment1[0].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-    //     const expectedSlice2 = {
-    //         start: newRangeSegment1[1].start.format(dateFormatSeconds),
-    //         end: newRangeSegment1[1].limit.format(dateFormatSeconds),
-    //         limit: newRangeSegment1[1].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-    //     const expectedSlice3 = {
-    //         start: newRangeSegment2[0].start.format(dateFormatSeconds),
-    //         end: newRangeSegment2[0].limit.format(dateFormatSeconds),
-    //         limit: newRangeSegment2[0].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-    //     const expectedSlice4 = {
-    //         start: newRangeSegment2[1].start.format(dateFormatSeconds),
-    //         end: newRangeSegment2[1].limit.format(dateFormatSeconds),
-    //         limit: newRangeSegment2[1].limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-    //     const expectedSlice5 = {
-    //         start: rs3Start,
-    //         end: rs3End,
-    //         limit: rs3End,
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 5 });
-
-    //     const [results, results2, results3, results4, results5] = await test.createSlices();
-
-    //     expect(results).toEqual(expectedSlice1);
-    //     expect(moment(results?.start).isSame(expectedSlice1.start)).toBeTrue();
-    //     expect(moment(results?.end).isSame(moment(expectedSlice1.end))).toBeTrue();
-    //     expect(moment(results?.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
-
-    //     expect(moment(results2?.start).isSame(expectedSlice2.start)).toBeTrue();
-    //     expect(moment(results2?.end).isSame(moment(expectedSlice2.end))).toBeTrue();
-    //     expect(moment(results2?.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
-
-    //     expect(moment(results3?.start).isSame(expectedSlice3.start)).toBeTrue();
-    //     expect(moment(results3?.end).isSame(moment(expectedSlice3.end))).toBeTrue();
-    //     expect(moment(results3?.limit).isSame(moment(expectedSlice3.limit))).toBeTrue();
-
-    //     expect(moment(results4?.start).isSame(expectedSlice4.start)).toBeTrue();
-    //     expect(moment(results4?.end).isSame(moment(expectedSlice4.end))).toBeTrue();
-    //     expect(moment(results4?.limit).isSame(moment(expectedSlice4.limit))).toBeTrue();
-
-    //     expect(moment(results5?.start).isSame(expectedSlice5.start)).toBeTrue();
-    //     expect(moment(results5?.end).isSame(moment(expectedSlice5.end))).toBeTrue();
-    //     expect(moment(results5?.limit).isSame(moment(expectedSlice5.limit))).toBeTrue();
-
-    //     const [results6] = await test.createSlices();
-    //     expect(results6).toEqual(null);
-    // });
-
-    // it('slicer can enter recovery and return to the last slice state when number of slicers have decreased (2 => 1, even increase)', async () => {
-    //     const firstDate = makeDate(dateFormatSeconds);
-    //     const endDate = moment(firstDate).add(11, 'm');
-
-    //     defaultClient.setSequenceData(times(30, () => ({ count: 100, '@timestamp': new Date() })));
-
-    //     const oldRange = divideRange(firstDate, endDate, 2);
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         start: firstDate.format(dateFormatSeconds),
-    //         end: endDate.format(dateFormatSeconds),
-    //         index: 'some_index',
-    //         interval: '2m',
-    //     };
-
-    //     const recoveryData = oldRange.map((segment, index) => {
-    //         const obj = {
-    //             start: moment(segment.start).format(dateFormatSeconds),
-    //             end: moment(segment.start).add(1, 'm').format(dateFormatSeconds),
-    //             limit: moment(segment.limit).format(dateFormatSeconds),
-    //             count: 1234,
-    //         };
-
-    //         return { lastSlice: obj, slicer_id: index };
-    //     });
-
-    //     const hole = {
-    //         start: moment(recoveryData[0].lastSlice.limit).format(dateFormat),
-    //         end: moment(recoveryData[1].lastSlice.end).format(dateFormat)
-    //     };
-
-    //     const limit = moment(recoveryData[1].lastSlice.limit);
-
-    //     // we slice 2 mins
-    //     const rs1Start = moment(recoveryData[0].lastSlice.end);
-    //     const rs1End = moment(rs1Start).add(2, 'm');
-
-    //     // we slice 2 mins
-    //     const rs2Start = moment(rs1End);
-    //     const rs2End = moment(rs2Start).add(2, 'm');
-
-    //     // we are up against the hole now
-    //     const rs3Start = moment(rs2End);
-    //     const rs3End = moment(hole.start);
-
-    //     // we jump over the hole
-    //     const rs4Start = moment(hole.end);
-    //     const rs4End = moment(rs4Start).add(2, 'm');
-
-    //     // we slice 2 mins
-    //     const rs5Start = moment(rs4End);
-    //     const rs5End = moment(rs5Start).add(2, 'm');
-
-    //     // we slice 2 mins
-    //     const rs6Start = moment(rs5End);
-
-    //     const expectedSlice1 = {
-    //         start: rs1Start.format(dateFormatSeconds),
-    //         end: rs1End.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [hole],
-    //         count: 100
-    //     };
-    //         // we slice 2 mins
-    //     const expectedSlice2 = {
-    //         start: rs2Start.format(dateFormatSeconds),
-    //         end: rs2End.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [hole],
-    //         count: 100
-    //     };
-    //         // we are up against the hole so we can drop it, internally it jumps pass the hole
-    //     const expectedSlice3 = {
-    //         start: rs3Start.format(dateFormatSeconds),
-    //         end: rs3End.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const expectedSlice4 = {
-    //         start: rs4Start.format(dateFormatSeconds),
-    //         end: rs4End.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const expectedSlice5 = {
-    //         start: rs5Start.format(dateFormatSeconds),
-    //         end: rs5End.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const expectedSlice6 = {
-    //         start: rs6Start.format(dateFormatSeconds),
-    //         end: limit.format(dateFormatSeconds),
-    //         limit: limit.format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 1 });
-
-    //     const [results] = await test.createSlices();
-
-    //     expect(moment(results?.start).isSame(expectedSlice1.start)).toBeTrue();
-    //     expect(moment(results?.end).isSame(moment(expectedSlice1.end))).toBeTrue();
-    //     expect(moment(results?.limit).isSame(moment(expectedSlice1.limit))).toBeTrue();
-    //     expect(
-    //         moment(results?.holes[0].start).isSame(moment(expectedSlice1.holes[0].start))
-    //     ).toBeTrue();
-    //     expect(
-    //         moment(results?.holes[0].end).isSame(moment(expectedSlice1.holes[0].end))
-    //     ).toBeTrue();
-
-    //     const [results2] = await test.createSlices();
-
-    //     expect(moment(results2?.start).isSame(expectedSlice2.start)).toBeTrue();
-    //     expect(moment(results2?.end).isSame(moment(expectedSlice2.end))).toBeTrue();
-    //     expect(moment(results2?.limit).isSame(moment(expectedSlice2.limit))).toBeTrue();
-    //     expect(
-    //         moment(results2?.holes[0].start).isSame(moment(expectedSlice2.holes[0].start))
-    //     ).toBeTrue();
-    //     expect(
-    //         moment(results2?.holes[0].end).isSame(moment(expectedSlice2.holes[0].end))
-    //     ).toBeTrue();
-
-    //     const [results3] = await test.createSlices();
-    //     expect(results3).toEqual(expectedSlice3);
-
-    //     const [results4] = await test.createSlices();
-    //     expect(results4).toEqual(expectedSlice4);
-
-    //     const [results5] = await test.createSlices();
-    //     expect(results5).toEqual(expectedSlice5);
-
-    //     const [results6] = await test.createSlices();
-    //     expect(results6).toEqual(expectedSlice6);
-
-    //     const [results7] = await test.createSlices();
-    //     expect(results7).toEqual(null);
-    // });
-
-    // it('slicer can enter recovery and return to the last slice state in persistent mode with slicer changes (1 => 2)', async () => {
-    //     const delay: [number, moment.unitOfTime.Base] = [30, 's'];
-    //     const currentDate = makeDate(dateFormatSeconds);
-    //     const startDate = moment(currentDate).subtract(10, 'm');
-    //     const middleDate = moment(currentDate).subtract(5, 'm');
-    //     // end is delayed by setting
-    //     const endingData = moment(currentDate).subtract(delay[0], delay[1]);
-    //     const startTime = Date.now();
-
-    //     const opConfig = {
-    //         _op: 'elasticsearch_reader',
-    //         date_field_name: '@timestamp',
-    //         time_resolution: 's',
-    //         size: 100,
-    //         index: 'some_index',
-    //         interval: '5m',
-    //         delay: delay.join('')
-    //     };
-
-    //     const recoveryData = [
-    //         {
-    //             lastSlice: {
-    //                 start: startDate.format(dateFormatSeconds),
-    //                 end: middleDate.format(dateFormatSeconds),
-    //                 limit: endingData.format(dateFormatSeconds),
-    //                 count: 2445
-    //             },
-    //             slicer_id: 0
-    //         }
-    //     ];
-
-    //     const test = await makeSlicerTest({ opConfig, recoveryData, lifecycle: 'persistent' });
-
-    //     // add the time (in seconds) took to run the tests
-    //     const elapsed = Math.round((Date.now() - startTime) / 1000);
-    //     const expectedResult = {
-    //         start: middleDate.add(elapsed, 's').format(dateFormatSeconds),
-    //         end: endingData.add(elapsed, 's').format(dateFormatSeconds),
-    //         limit: endingData.add(elapsed, 's').format(dateFormatSeconds),
-    //         holes: [],
-    //         count: 100
-    //     };
-
-    //     const [results] = await test.createSlices();
-    //     expect(results).toEqual(expectedResult);
-    // });
+    it('slicer can enter recovery and return to the last slice state', async () => {
+        const opConfig = {
+            time_resolution: 'ms',
+            size: 200
+        };
+
+        const expectedNextSlice = {
+            start: '2019-04-26T08:00:23.334-07:00',
+            end: '2019-04-26T08:00:23.372-07:00',
+            limit: '2019-04-26T08:00:23.394-07:00',
+            holes: [],
+            count: 199
+        };
+
+        const recoveryData = [
+            {
+                lastSlice: {
+                    start: formatDate('2019-04-26T08:00:23.315-07:00', dateFormat),
+                    end: formatDate('2019-04-26T08:00:23.334-07:00', dateFormat),
+                    limit: formatDate('2019-04-26T08:00:23.394-07:00', dateFormat),
+                    holes: [],
+                    count: 148
+                },
+                slicer_id: 0
+            }
+        ];
+
+        const test = await makeSlicerTest({ opConfig, recoveryData });
+
+        const [results] = await test.createSlices();
+        expect(results).toMatchObject(expectedNextSlice);
+    });
+
+    it('multiple slicers can enter recovery and return to the last slice state', async () => {
+        const opConfig = {
+            time_resolution: 'ms',
+            size: 200,
+            index: unevenIndex
+        };
+
+        const recoveryData = [
+            {
+                lastSlice: {
+                    start: formatDate('2020-08-12T15:40:48.470Z', dateFormat),
+                    end: formatDate('2020-08-12T15:50:46.470Z', dateFormat),
+                    limit: formatDate('2020-08-12T15:50:48.470Z', dateFormat),
+                    holes: [],
+                    count: 148
+                },
+                slicer_id: 0
+            },
+            {
+                lastSlice: {
+                    start: formatDate('2020-08-12T16:04:00.000Z', dateFormat),
+                    end: formatDate('2020-08-12T16:04:59.000Z', dateFormat),
+                    limit: formatDate('2020-08-12T16:05:00.000Z', dateFormat),
+                    holes: [],
+                    count: 111
+                },
+                slicer_id: 1
+            }
+        ];
+
+        const numOfSlicers = 2;
+
+        const test = await makeSlicerTest({ opConfig, numOfSlicers, recoveryData });
+
+        const allSlices = await test.getAllSlices();
+        const slices = allSlices.filter(Boolean);
+
+        expect(slices).toBeArrayOfSize(2);
+    });
+
+    it('slicer can enter recovery and return to the last slice state when number of slicers have increased (1 => 2, even increase)', async () => {
+        const opConfig = {
+            time_resolution: 'ms',
+            size: 200
+        };
+
+        const recoveryData = [
+            {
+                lastSlice: {
+                    start: formatDate('2019-04-26T08:00:23.315-07:00', dateFormat),
+                    end: formatDate('2019-04-26T08:00:23.334-07:00', dateFormat),
+                    limit: formatDate('2019-04-26T08:00:23.394-07:00', dateFormat),
+                    holes: [],
+                    count: 148
+                },
+                slicer_id: 0
+            }
+        ];
+
+        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 2 });
+
+        const allSlices = await test.getAllSlices();
+
+        const [firstSlice, secondSlice, thirdSlice] = sortBy(allSlices.filter(Boolean), 'start') as AnyObject[];
+
+        expect(firstSlice.limit).toEqual(secondSlice.start);
+
+        expect(secondSlice.limit).toEqual(thirdSlice.limit);
+    });
+
+    it('slicer can enter recovery and return to the last slice state when number of slicers have increased (3 => 5, odd increase)', async () => {
+        const opConfig = {
+            time_resolution: 's',
+            size: 100,
+            index: unevenIndex,
+            interval: '5m',
+        };
+
+        const recoveryData = [
+            {
+                lastSlice: {
+                    start: '2020-08-12T08:41:01-07:00',
+                    end: '2020-08-12T08:46:01-07:00',
+                    limit: '2020-08-12T08:49:01-07:00',
+                    holes: [],
+                    count: 58
+                },
+                slicer_id: 0
+            },
+            {
+                lastSlice: {
+                    start: '2020-08-12T08:49:01-07:00',
+                    end: '2020-08-12T08:54:01-07:00',
+                    limit: '2020-08-12T08:57:01-07:00',
+                    holes: [],
+                    count: 16
+                },
+                slicer_id: 1
+            },
+            {
+                lastSlice: {
+                    start: '2020-08-12T08:57:01-07:00',
+                    end: '2020-08-12T09:02:01-07:00',
+                    limit: '2020-08-12T09:05:01-07:00',
+                    holes: [],
+                    count: 60
+                },
+                slicer_id: 2
+            }
+        ];
+
+        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 5 });
+
+        const allSlices = await test.getAllSlices({ fullResponse: true });
+
+        const [
+            slice1, slice2, slice3, slice4, slice5
+        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as AnyObject[];
+
+        // the first and second slicers break up the first segment
+        expect(slice1.request.start).toEqual(recoveryData[0].lastSlice.end);
+        expect(slice2.request.limit).toEqual(recoveryData[0].lastSlice.limit);
+
+        // the third and fourth slicers break up the second segment
+        expect(slice3.request.start).toEqual(recoveryData[1].lastSlice.end);
+        expect(slice4.request.limit).toEqual(recoveryData[1].lastSlice.limit);
+
+        // the fifth slicers break up the last segment
+        expect(slice5.request.start).toEqual(recoveryData[2].lastSlice.end);
+        expect(slice5.request.limit).toEqual(recoveryData[2].lastSlice.limit);
+    });
+
+    it('slicer can enter recovery and return to the last slice state when number of slicers have decreased (2 => 1, even increase)', async () => {
+        const opConfig = {
+            time_resolution: 's',
+            size: 100,
+            index: unevenIndex,
+            interval: '5m',
+        };
+        // 58, 63 => 121
+        const recoveryData = [
+            {
+                lastSlice: {
+                    start: '2020-08-12T08:41:01-07:00',
+                    end: '2020-08-12T08:46:01-07:00',
+                    limit: '2020-08-12T08:53:01-07:00',
+                    holes: [],
+                    count: 58
+                },
+                slicer_id: 0
+            },
+            {
+                lastSlice: {
+                    start: '2020-08-12T08:53:01-07:00',
+                    end: '2020-08-12T08:58:01-07:00',
+                    limit: '2020-08-12T09:05:01-07:00',
+                    holes: [],
+                    count: 63
+                },
+                slicer_id: 1
+            }
+        ];
+
+        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 1 });
+
+        const allSlices = await test.getAllSlices({ fullResponse: true });
+        const [
+            slice1, slice2, slice3, slice4
+        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as AnyObject[];
+
+        // the first and second slicers break up the first segment
+        expect(slice1.request.start).toEqual(recoveryData[0].lastSlice.end);
+        expect(slice2.request.end).toEqual(recoveryData[1].lastSlice.start);
+
+        // the third and fourth slicers break up the second segment
+        expect(slice3.request.start).toEqual(recoveryData[1].lastSlice.end);
+        expect(slice4.request.limit).toEqual(recoveryData[1].lastSlice.limit);
+    });
 });

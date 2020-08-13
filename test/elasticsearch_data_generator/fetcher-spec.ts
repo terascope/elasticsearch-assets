@@ -18,7 +18,7 @@ describe('elasticsearch_data_generator fetcher', () => {
         const opConfig = { _op: 'elasticsearch_data_generator' };
 
         const test = await makeFetcherTest(opConfig);
-        const results = await test.runSlice({ count: 100 });
+        const results = await test.runSlice({ count: 1 });
 
         expect(results.length).toEqual(1);
         expect(Object.keys(results[0]).length).toBeGreaterThan(1);
