@@ -272,7 +272,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             ? ElasticReaderAPI.subslice_by_key
             : opConfig.subslice_by_key;
 
-            const configField = ElasticReaderAPI
+        const configField = ElasticReaderAPI
             ? ElasticReaderAPI.field
             : opConfig.field;
 
