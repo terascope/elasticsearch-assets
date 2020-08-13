@@ -9,7 +9,7 @@ describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
     const esClient = makeClient();
     const version = getESVersion(esClient);
-    const docType = version === 5 ? 'type' : '_doc';
+    const docType = version === 5 ? 'events' : '_doc';
 
     let harness: WorkerTestHarness;
 
@@ -69,7 +69,7 @@ describe('elasticsearch sender api schema', () => {
         } = await makeSchema({ index: apiSenderIndex });
 
         expect(size).toEqual(500);
-        expect(type).toEqual('_doc');
+        expect(type).toEqual(docType);
         expect(create).toEqual(false);
         expect(upsert).toEqual(false);
         expect(update_fields).toBeArrayOfSize(0);

@@ -57,7 +57,8 @@ describe('spaces_reader fetcher', () => {
             key_type: IDType.base64,
             connection: 'default',
             time_resolution: 's',
-            api_name: 'someName'
+            api_name: 'someName',
+            type: 'someType'
         };
         const client = new SpacesClient(opConfig, logger);
 

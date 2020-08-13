@@ -1,43 +1,31 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'jest-extended';
-import {
-    TestContext,
-    DataEntity,
-    pDelay,
-    LifeCycle,
-    SlicerRecoveryData,
-    times,
-    AnyObject
-} from '@terascope/job-components';
-import moment from 'moment';
-import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client';
+import { AnyObject } from '@terascope/job-components';
+import { getESVersion } from 'elasticsearch-store';
+import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader/schema';
-
-import { IDType } from '../../asset/src/id_reader/interfaces';
-import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
+import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
 
 describe('elasticsearch_reader schema', () => {
     const index = 'some_index';
     const name = 'elasticsearch_reader';
 
-    let harness: WorkerTestHarness;
-    let clients: any;
-    let defaultClient: MockClient;
+    const esClient = makeClient();
 
-    beforeEach(() => {
-        defaultClient = new MockClient();
-        clients = [
-            {
-                type: 'elasticsearch',
-                endpoint: 'default',
-                create: () => ({
-                    client: defaultClient
-                }),
+    const clients = [
+        {
+            type: 'elasticsearch',
+            endpoint: 'default',
+            create: () => ({
+                client: esClient
+            }),
+            config: {
+                apiVersion: ELASTICSEARCH_VERSION
             }
-        ];
-    });
+        }
+    ];
+
+    let harness: WorkerTestHarness;
 
     afterEach(async () => {
         if (harness) {
@@ -45,6 +33,10 @@ describe('elasticsearch_reader schema', () => {
             await harness.shutdown();
         }
     });
+
+    const version = getESVersion(esClient);
+
+    const docType = version === 5 ? 'events' : '_doc';
 
     async function makeSchema(config: AnyObject = {}): Promise<ESReaderConfig> {
         const opConfig = Object.assign({}, { _op: name, index, date_field_name: 'created' }, config);
@@ -106,9 +98,8 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const errorString = 'If subslice_by_key is set to true, the field parameter of the documents must also be set';
         const badOP = { subslice_by_key: true };
-        const goodOP = { subslice_by_key: true, field: 'events-' };
+        const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
         const otherGoodOP = { subslice_by_key: false, other: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
@@ -118,9 +109,7 @@ describe('elasticsearch_reader schema', () => {
             date_field_name: 'created'
         };
 
-        await expect(makeSchema(Object.assign({}, testOpConfig, badOP)))
-            .rejects
-            .toThrowError(errorString);
+        await expect(makeSchema(Object.assign({}, testOpConfig, badOP))).toReject();
 
         const goodOp = await makeSchema(Object.assign({}, testOpConfig, goodOP));
         expect(goodOp).toBeDefined();
@@ -166,5 +155,15 @@ describe('elasticsearch_reader schema', () => {
         await expect(makeSchema({ key_type: 'something' })).toReject();
 
         await expect(makeSchema({ time_resolution: 'something' })).toReject();
+    });
+
+    it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
+        if (version <= 5) {
+            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
+        } else {
+            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
+        }
     });
 });

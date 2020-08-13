@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'jest-extended';
 import {
     DataEntity,
@@ -12,8 +11,7 @@ import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '../../asset/src/id_reader/interfaces';
-import { getKeyArray } from '../../asset/src/id_reader/helpers';
-import { dateFormatSeconds, divideRange, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
+import { dateFormatSeconds, dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
@@ -39,7 +37,7 @@ describe('elasticsearch_reader slicer', () => {
     const version = getESVersion(esClient);
     const docType = version === 5 ? 'events' : '_doc';
 
-    const evenOriginalStart = '2019-04-26T08:00:23.201-07:00';
+    const evenOriginalStart = formatDate('2019-04-26T08:00:23.201-07:00');
     const evenOriginalEnd = '2019-04-26T08:00:23.394-07:00';
 
     let harness: SlicerTestHarness;
@@ -68,9 +66,9 @@ describe('elasticsearch_reader slicer', () => {
         ]);
     });
 
-    afterAll(async () => {
-        await cleanupIndex(esClient, makeIndex('*'));
-    });
+    // afterAll(async () => {
+    //     await cleanupIndex(esClient, makeIndex('*'));
+    // });
 
     afterEach(async () => {
         if (harness) {
@@ -172,7 +170,7 @@ describe('elasticsearch_reader slicer', () => {
         it('with no start or end (auto)', async () => {
             const test = await makeSlicerTest({ opConfig: {} });
             const update = await getMeta(test);
-
+            // console.log('update', update, evenOriginalStart)
             expect(update.start).toEqual(evenOriginalStart);
             expect(update.end).toEqual(evenOriginalEnd);
             expect(update.interval).toEqual([9, 'ms']);
@@ -1095,13 +1093,12 @@ describe('elasticsearch_reader slicer', () => {
             subslice_key_threshold: 50,
             key_type: IDType.hexadecimal,
             field: 'uuid',
+            type: docType,
             start: formatDate('2020-08-12T16:05:00.000Z', dateFormatSeconds)
         };
 
         const test = await makeSlicerTest({ opConfig });
         const allSlices = await test.getAllSlices();
-
-        const hexadecimal = getKeyArray(IDType.hexadecimal);
 
         const dates = {
             start: '2020-08-12T09:05:00-07:00',

@@ -108,7 +108,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
         const {
-            index, connection, size, api_name
+            api_name, ...apiConfig
         } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
@@ -118,9 +118,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                index,
-                connection,
-                size
+                ...apiConfig
             });
         }
     }

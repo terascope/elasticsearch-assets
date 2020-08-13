@@ -36,7 +36,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
         }
 
         const {
-            index, connection, api_name, type
+            api_name, ...newConfig
         } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
@@ -46,9 +46,7 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                index,
-                type,
-                connection,
+                ...newConfig,
                 full_response: false
             });
         }

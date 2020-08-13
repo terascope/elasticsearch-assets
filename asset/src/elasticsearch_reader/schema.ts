@@ -148,6 +148,11 @@ export const schema = {
         default: 'base64url',
         format: Object.keys(IDType)
     },
+    type: {
+        doc: 'The type of the records in the index, only used if subslice_by_key is set to true and in elasticsearch <= v5 ',
+        default: null,
+        format: 'optional_String'
+    },
     time_resolution: {
         doc: 'indicate if data reading has second or millisecond resolutions',
         default: 's',
@@ -233,12 +238,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         const opConfig = getOpConfig(job, 'elasticsearch_reader');
         if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
-        if (opConfig.subslice_by_key) {
-            if (!opConfig.field) {
-                throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
-            }
-        }
-
         elasticAPI({}, logger).validateGeoParameters(opConfig);
 
         if (job.lifecycle === 'persistent') {
@@ -251,7 +250,9 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
             }
         }
 
-        const { index, connection, api_name } = opConfig;
+        const {
+            api_name, ...newConfig
+        } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
@@ -261,10 +262,30 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                index,
-                connection,
-                full_response: false
+                ...newConfig,
+                full_response: false,
             });
+        }
+
+        const opConnection = ElasticReaderAPI ? ElasticReaderAPI.connection : opConfig.connection;
+        const subsliceByKey = ElasticReaderAPI
+            ? ElasticReaderAPI.subslice_by_key
+            : opConfig.subslice_by_key;
+
+        const configField = ElasticReaderAPI
+            ? ElasticReaderAPI.field
+            : opConfig.field;
+
+        const { connectors } = this.context.sysconfig.terafoundation;
+        const endpointConfig = connectors.elasticsearch[opConnection];
+        const apiVersion = endpointConfig.apiVersion
+            ? toNumber(endpointConfig.apiVersion.charAt(0))
+            : 6;
+
+        if (subsliceByKey) {
+            const configType = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
+            if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
+            if (apiVersion > 5 && (configField == null || !configField(configType) || configField.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
         }
     }
 

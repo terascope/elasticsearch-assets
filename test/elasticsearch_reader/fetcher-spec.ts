@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import 'jest-extended';
 import { DataEntity, AnyObject } from '@terascope/job-components';
-import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
 import {
@@ -27,7 +25,6 @@ describe('elasticsearch_reader fetcher', () => {
     const docType = version === 5 ? 'events' : '_doc';
 
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    const unevenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const clients = [
         {
