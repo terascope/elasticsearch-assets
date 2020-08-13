@@ -66,9 +66,9 @@ describe('elasticsearch_reader slicer', () => {
         ]);
     });
 
-    // afterAll(async () => {
-    //     await cleanupIndex(esClient, makeIndex('*'));
-    // });
+    afterAll(async () => {
+        await cleanupIndex(esClient, makeIndex('*'));
+    });
 
     afterEach(async () => {
         if (harness) {
