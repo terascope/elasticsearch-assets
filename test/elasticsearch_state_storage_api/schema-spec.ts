@@ -30,6 +30,7 @@ describe('elasticsearch state storage api schema', () => {
             _name: apiName,
             index: apiReaderIndex,
             type: docType,
+            cache_size: 100000,
         };
         if (version <= 5) base.type = docType;
         const apiConfig = Object.assign({ _name: apiName }, base, config);
