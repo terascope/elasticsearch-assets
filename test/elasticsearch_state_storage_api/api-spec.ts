@@ -52,7 +52,7 @@ describe('elasticsearch state storage api', () => {
             {
                 _name: apiName,
                 index: apiReaderIndex,
-                cache_size: (2 ** 16) - 1,
+                cache_size: 100000,
                 type: docType,
                 persist: true
             }
