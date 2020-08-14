@@ -162,7 +162,7 @@ describe('elasticsearch_reader slicer', () => {
         await expect(makeSlicerTest({ opConfig })).toReject();
     });
 
-    describe('it can generate updates for changes', () => {
+    describe('it can respect start and end parameters and generate updates for range of job', () => {
         it('with no start or end (auto)', async () => {
             const test = await makeSlicerTest({ opConfig: {} });
             const update = await getMeta(test);
@@ -170,6 +170,11 @@ describe('elasticsearch_reader slicer', () => {
             expect(update.start).toEqual(evenOriginalStart);
             expect(update.end).toEqual(evenOriginalEnd);
             expect(update.interval).toEqual([9, 'ms']);
+
+            const [slice] = await test.createSlices();
+
+            expect(slice!.start).toEqual(evenOriginalStart);
+            expect(slice!.limit).toEqual(evenOriginalEnd);
         });
 
         it('with start specified', async () => {
@@ -180,6 +185,11 @@ describe('elasticsearch_reader slicer', () => {
             expect(update.start).toEqual(start);
             expect(update.end).toEqual(evenOriginalEnd);
             expect(update.interval).toEqual([8, 'ms']);
+
+            const [slice] = await test.createSlices();
+
+            expect(slice!.start).toEqual(start);
+            expect(slice!.limit).toEqual(evenOriginalEnd);
         });
 
         it('with end specified', async () => {
@@ -190,6 +200,11 @@ describe('elasticsearch_reader slicer', () => {
             expect(update.start).toEqual(evenOriginalStart);
             expect(update.end).toEqual(end);
             expect(update.interval).toEqual([13, 'ms']);
+
+            const [slice] = await test.createSlices();
+
+            expect(slice!.start).toEqual(evenOriginalStart);
+            expect(slice!.limit).toEqual(end);
         });
     });
 
@@ -598,128 +613,114 @@ describe('elasticsearch_reader slicer', () => {
             {
                 start: '2020-08-12T15:41:01.000Z',
                 end: '2020-08-12T15:42:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 13
             },
             {
                 start: '2020-08-12T15:42:01.000Z',
                 end: '2020-08-12T15:43:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 13
             },
             {
                 start: '2020-08-12T15:43:01.000Z',
                 end: '2020-08-12T15:44:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 5
             },
             {
                 start: '2020-08-12T15:44:01.000Z',
                 end: '2020-08-12T15:45:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 18
             },
             {
                 start: '2020-08-12T15:45:01.000Z',
                 end: '2020-08-12T15:46:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 9
             },
             {
                 start: '2020-08-12T15:46:01.000Z',
                 end: '2020-08-12T15:47:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 10
             },
             {
                 start: '2020-08-12T15:47:01.000Z',
                 end: '2020-08-12T15:48:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 6
             },
             {
                 start: '2020-08-12T15:48:01.000Z',
                 end: '2020-08-12T15:49:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 10
             },
             {
                 start: '2020-08-12T15:49:01.000Z',
                 end: '2020-08-12T15:50:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 9
             },
             {
                 start: '2020-08-12T15:50:01.000Z',
                 end: '2020-08-12T15:51:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 7
             },
             {
                 start: '2020-08-12T15:51:01.000Z',
                 end: '2020-08-12T15:55:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 4
             },
             {
                 start: '2020-08-12T15:55:01.000Z',
                 end: '2020-08-12T15:56:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 20
             },
             {
                 start: '2020-08-12T15:56:01.000Z',
                 end: '2020-08-12T15:57:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 16
             },
             {
                 start: '2020-08-12T15:57:01.000Z',
                 end: '2020-08-12T15:58:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 23
             },
             {
                 start: '2020-08-12T15:58:01.000Z',
                 end: '2020-08-12T15:59:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 18
             },
             {
                 start: '2020-08-12T15:59:01.000Z',
-                end: '2020-08-12T16:00:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
+                end: '2020-08-12T16:00:00.000Z',
+                limit: '2020-08-12T16:00:00.000Z',
                 holes: [],
                 count: 19
-            },
-            {
-                start: '2020-08-12T16:00:01.000Z',
-                end: '2020-08-12T16:05:01.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
-                holes: [],
-                count: 100
-            },
-            {
-                start: '2020-08-12T16:05:01.000Z',
-                end: '2020-08-12T23:00:00.000Z',
-                limit: '2020-08-12T23:00:00.000Z',
-                holes: [],
-                count: 0
             }
         ];
 
