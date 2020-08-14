@@ -156,20 +156,6 @@ describe('spaces_reader slicer', () => {
             };
 
             scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 1 }, query))
-                .reply(200, {
-                    results: [{ created: start.toISOString() }],
-                    total: 1
-                });
-
-            scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 1 }, query))
-                .reply(200, {
-                    results: [{ created: end.toISOString() }],
-                    total: 1
-                });
-
-            scope.get(`/${testIndex}`)
                 .query(Object.assign({ size: 0 }, query))
                 .reply(200, {
                     results: [],

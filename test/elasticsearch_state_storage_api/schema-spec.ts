@@ -72,7 +72,6 @@ describe('elasticsearch state storage api schema', () => {
             persist: false,
             meta_key_field: '_key',
             connection: 'default',
-            cache_size: 2147483647
         });
     });
 
