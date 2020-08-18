@@ -3,7 +3,6 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import { getESVersion } from 'elasticsearch-store';
 import { DataEntity, OpConfig } from '@terascope/job-components';
-import path from 'path';
 import {
     makeClient,
     cleanupIndex,
@@ -11,14 +10,13 @@ import {
     upload,
     waitForData,
     TEST_INDEX_PREFIX,
-} from './helpers';
+} from '../helpers';
 
 interface ClientCalls {
     [key: string]: BulkIndexDocumentsParams
 }
 
 describe('elasticsearch_bulk', () => {
-    const assetDir = path.join(__dirname, '..');
     let harness: WorkerTestHarness;
     let clients: any;
     let clientCalls: ClientCalls = {};
@@ -94,30 +92,10 @@ describe('elasticsearch_bulk', () => {
             ],
         });
 
-        harness = new WorkerTestHarness(job, { assetDir, clients });
+        harness = new WorkerTestHarness(job, { clients });
         await harness.initialize();
         return harness;
     }
-
-    it('schema has defaults', async () => {
-        const opName = 'elasticsearch_bulk';
-        const test = await makeTest();
-        const {
-            opConfig: {
-                size,
-                type,
-                create,
-                upsert,
-                update_fields
-            }
-        } = test.getOperation(opName);
-
-        expect(size).toEqual(500);
-        expect(type).toEqual(docType);
-        expect(create).toEqual(false);
-        expect(upsert).toEqual(false);
-        expect(update_fields).toBeArrayOfSize(0);
-    });
 
     it('if no docs, returns an empty array', async () => {
         const test = await makeTest();

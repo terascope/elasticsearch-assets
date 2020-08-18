@@ -20,6 +20,7 @@ export interface ESReaderConfig extends OpConfig {
     subslice_by_key: boolean;
     subslice_key_threshold: number;
     key_type: IDType;
+    type: string | null;
     time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
     geo_box_top_left?: string;

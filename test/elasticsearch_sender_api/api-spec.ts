@@ -1,24 +1,18 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import path from 'path';
-import elasticAPI from '@terascope/elasticsearch-api';
-import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
+import { isNil } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import {
-    TEST_INDEX_PREFIX, cleanupIndex, makeClient, upload, waitForData
+    TEST_INDEX_PREFIX, cleanupIndex, makeClient, fetch, waitForData
 } from '../helpers';
+import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces';
 
-describe('elasticsearch reader api', () => {
-    const dir = __dirname;
-    const assetDir = path.join(dir, '../../asset');
-
-    const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
+describe('elasticsearch sender api', () => {
+    const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;
     const esClient = makeClient();
 
     const version = getESVersion(esClient);
 
     const docType = version === 5 ? 'events' : '_doc';
-
-    type API = APIFactoryRegistry<elasticAPI.Client, AnyObject>
 
     const clients = [
         {
@@ -33,11 +27,11 @@ describe('elasticsearch reader api', () => {
     let harness: WorkerTestHarness;
 
     beforeAll(async () => {
-        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+        await cleanupIndex(esClient, `${apiSendIndex}*`);
     });
 
     afterAll(async () => {
-        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+        await cleanupIndex(esClient, `${apiSendIndex}*`);
     });
 
     afterEach(async () => {
@@ -49,8 +43,8 @@ describe('elasticsearch reader api', () => {
             max_retries: 3,
             apis: [
                 {
-                    _name: 'elasticsearch_reader_api',
-                    index: apiReaderIndex,
+                    _name: 'elasticsearch_sender_api',
+                    index: apiSendIndex,
                     type: docType
                 },
             ],
@@ -61,22 +55,23 @@ describe('elasticsearch reader api', () => {
                 },
                 {
                     _op: 'noop',
-                    apiName: 'elasticsearch_reader_api'
+                    apiName: 'elasticsearch_sender_api'
                 }
             ],
         });
 
-        harness = new WorkerTestHarness(job, {
-            assetDir,
-            clients
-        });
+        harness = new WorkerTestHarness(job, { clients });
 
         const processor = harness.getOperation('noop');
         // @ts-expect-error\
         processor.onBatch = async function test(data: DataEntity[]) {
-            const apiManager = processor.getAPI<API>(processor.opConfig.apiName);
-            const api = await apiManager.create('test', {});
-            return api.search(data[0]);
+            const { apiName } = processor.opConfig;
+            const apiManager = processor.getAPI<ElasticSenderAPI>(apiName);
+            let api = apiManager.get(apiName);
+
+            if (isNil(api)) api = await apiManager.create(apiName, this.opConfig);
+            await api.send(data);
+            return data;
         };
 
         await harness.initialize();
@@ -84,16 +79,16 @@ describe('elasticsearch reader api', () => {
         return harness;
     }
 
-    it('can read data from an index', async () => {
+    it('can send data to an index', async () => {
         const data = [{ some: 'data' }, { other: 'data' }];
-
-        await upload(esClient, { index: apiReaderIndex, type: docType }, data);
-
-        await waitForData(esClient, apiReaderIndex, 2);
-
-        const slice = [{ index: apiReaderIndex, q: '*' }];
         const test = await setupTest();
-        const results = await test.runSlice(slice);
-        expect(results.length).toEqual(2);
+        const results = await test.runSlice(data);
+
+        expect(results).toEqual(data);
+
+        await waitForData(esClient, apiSendIndex, 2);
+
+        const fetchResults = await fetch(esClient, { index: apiSendIndex, q: '*' });
+        expect(fetchResults.length).toEqual(2);
     });
 });

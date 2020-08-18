@@ -108,7 +108,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
         const {
-            index, connection, size, api_name
+            api_name, ...apiConfig
         } = opConfig;
         if (!Array.isArray(job.apis)) job.apis = [];
         const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
@@ -118,9 +118,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                index,
-                connection,
-                size
+                ...apiConfig
             });
         }
     }
@@ -128,7 +126,7 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
     build(): AnyObject {
         const clone = cloneDeep(schema);
         clone.api_name = {
-            doc: 'name of api to be used by elasticearch reader',
+            doc: 'name of api to be used by elasticsearch reader',
             default: DEFAULT_API_NAME,
             format: (val: unknown): void => {
                 if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);

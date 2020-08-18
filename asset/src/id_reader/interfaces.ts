@@ -21,6 +21,7 @@ export interface ESIDReaderConfig extends OpConfig {
     query?: string;
     fields: null | string[];
     connection: string;
+    type: string | null | undefined;
 }
 
 export interface ESIDSlicerArgs {
@@ -32,6 +33,7 @@ export interface ESIDSlicerArgs {
     api: elasticAPI.Client;
     keySet: string[];
     events: EventEmitter;
+    type?: string | null | undefined;
 }
 
 export interface WildCardQuery {

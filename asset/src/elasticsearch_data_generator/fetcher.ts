@@ -4,15 +4,18 @@ import {
 import mocker from 'mocker-data-generator';
 import path from 'path';
 import { existsSync } from 'fs';
+import { deprecate } from 'util';
 import { DataGenerator, CounterResults } from './interfaces';
 import defaultSchema from './data-schema';
 
+const isDeprecated = deprecate(() => {}, 'elasticsearch_data_generator is deprecated, please use data_generator from standard assets');
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     dataSchema: any;
 
     constructor(context: WorkerContext, opConfig: DataGenerator, exConfig: ExecutionConfig) {
         super(context, opConfig, exConfig);
         this.dataSchema = parsedSchema(opConfig);
+        isDeprecated();
     }
 
     async fetch(slice?: CounterResults): Promise<AnyObject[]> {

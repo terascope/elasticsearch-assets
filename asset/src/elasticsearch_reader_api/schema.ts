@@ -1,7 +1,7 @@
 import {
     ConvictSchema, AnyObject,
 } from '@terascope/job-components';
-import { ReaderConfig } from './interfaces';
+import { ElasticsearchReaderConfig } from './interfaces';
 
 export const schema = {
     connection: {
@@ -21,7 +21,7 @@ export const schema = {
     },
 };
 
-export default class Schema extends ConvictSchema<ReaderConfig> {
+export default class Schema extends ConvictSchema<ElasticsearchReaderConfig> {
     build(): AnyObject {
         return schema;
     }

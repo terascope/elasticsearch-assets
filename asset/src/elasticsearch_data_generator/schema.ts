@@ -46,12 +46,12 @@ export default class Schema extends ConvictSchema<DataGenerator> {
                 }
             },
             start: {
-                doc: 'The start date (ISOstring or in ms) to which it will read from ',
+                doc: 'The start date (ISOString or in ms) to which it will read from ',
                 default: '',
                 format: 'optional_Date'
             },
             end: {
-                doc: 'The end date (ISOstring or in ms) to which it will read to',
+                doc: 'The end date (ISOString or in ms) to which it will read to',
                 default: '',
                 format: 'optional_Date'
             },

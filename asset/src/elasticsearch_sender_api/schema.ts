@@ -13,9 +13,9 @@ newSchema.size = {
     default: 500,
     format(val: any) {
         if (isNaN(val)) {
-            throw new Error('Invalid size parameter for elasticsearch_bulk opConfig, it must be a number');
+            throw new Error('Invalid size parameter for elasticsearch_sender_api opConfig, it must be a number');
         } else if (val <= 0) {
-            throw new Error('Invalid size parameter for elasticsearch_bulk, it must be greater than zero');
+            throw new Error('Invalid size parameter for elasticsearch_sender_api, it must be greater than zero');
         }
     }
 };

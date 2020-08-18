@@ -15,7 +15,7 @@ export default class ElasticsearchSender implements RouteSenderAPI {
     client: elasticAPI.Client;
     config: ElasticsearchSenderConfig;
     clientVersion: number;
-    isRouter = false;
+    private isRouter = false;
 
     constructor(client: elasticAPI.Client, config: ElasticsearchSenderConfig) {
         this.client = client;

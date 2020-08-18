@@ -19,6 +19,7 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment,
+    buildQuery
 } from './helpers';
 import {
     ESDateConfig,
@@ -37,7 +38,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     api!: elasticAPI.Client;
     dateFormat: string;
     windowState: WindowState
-    startTime = moment();
+    startTime = moment.utc();
 
     constructor(
         context: WorkerContext,
@@ -72,34 +73,26 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     }
 
     async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
+        // we have a date, parse and return it
+        if (date) return parseDate(date);
+        // we are in auto, so we determine each part
         const sortObj = {};
-        let givenDate: any = null;
-        let query: any = null;
+        const sortOrder = order === 'start' ? 'asc' : 'desc';
 
-        if (date) {
-            givenDate = parseDate(date);
-            query = this.api.buildQuery(
-                this.opConfig,
-                { count: 1, start: this.opConfig.start, end: this.opConfig.end }
-            );
-        } else {
-            const sortOrder = order === 'start' ? 'asc' : 'desc';
+        sortObj[this.opConfig.date_field_name] = { order: sortOrder };
 
-            sortObj[this.opConfig.date_field_name] = { order: sortOrder };
-
-            query = {
-                index: this.opConfig.index,
-                size: 1,
-                body: {
-                    sort: [
-                        sortObj
-                    ]
-                }
-            };
-
-            if (this.opConfig.query) {
-                query.q = this.opConfig.query;
+        const query: AnyObject = {
+            index: this.opConfig.index,
+            size: 1,
+            body: {
+                sort: [
+                    sortObj
+                ]
             }
+        };
+
+        if (this.opConfig.query) {
+            query.q = this.opConfig.query;
         }
 
         // using this query to catch potential errors even if a date is given already
@@ -115,17 +108,15 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             throw new TSError(`Invalid date_field_name: "${this.opConfig.date_field_name}" for index: ${this.opConfig.index}, field does not exist on record`);
         }
 
-        if (givenDate) {
-            return givenDate;
-        }
-
         if (order === 'start') {
             return parseDate(data[this.opConfig.date_field_name]);
         }
         // end date is non-inclusive, adding 1s so range will cover it
         const newDate = data[this.opConfig.date_field_name];
-        const time = moment(newDate).add(1, this.opConfig.time_resolution);
-        return parseDate(time.format(this.dateFormat));
+        const time = moment.utc(newDate).add(1, this.opConfig.time_resolution);
+        const parsedDate = parseDate(time.format(this.dateFormat));
+
+        return parsedDate;
     }
 
     async updateJob(data: AnyObject): Promise<void> {
@@ -147,7 +138,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             range.key = key;
         }
 
-        const query = this.api.buildQuery(this.opConfig, range);
+        const query = buildQuery(this.opConfig, range);
         // TODO: review types here
         return this.api.count(query as any);
     }
@@ -238,8 +229,8 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             slicerFnArgs.interval = interval;
 
             await this.updateJob({
-                start: esDates.start.format(this.dateFormat),
-                end: esDates.limit.format(this.dateFormat),
+                start: moment(esDates.start.format(this.dateFormat)).toISOString(),
+                end: moment(esDates.limit.format(this.dateFormat)).toISOString(),
                 interval
             });
 

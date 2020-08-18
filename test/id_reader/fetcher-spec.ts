@@ -1,23 +1,25 @@
+import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
-import {
-    JobTestHarness, newTestJobConfig, SlicerTestHarness
-} from 'teraslice-test-harness';
-import path from 'path';
+import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
-import { getKeyArray } from '../asset/src/id_reader/helpers';
+import { getKeyArray } from '../../asset/src/id_reader/helpers';
 import {
-    makeClient, cleanupIndex, populateIndex
-} from './helpers/elasticsearch';
-import { TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts } from './helpers';
-import evenSpread from './fixtures/id/even-spread';
+    TEST_INDEX_PREFIX,
+    ELASTICSEARCH_VERSION,
+    getListOfIds,
+    getTotalSliceCounts,
+    makeClient,
+    cleanupIndex,
+    populateIndex
+} from '../helpers';
+import evenSpread from '../fixtures/data/even-spread';
+import { IDType } from '../../asset/src/id_reader/interfaces';
 
-describe('id_reader', () => {
-    const assetDir = path.join(__dirname, '..');
+describe('id_reader fetcher', () => {
     let harness: JobTestHarness;
-    let slicerHarness: SlicerTestHarness;
     let clients: any;
     const esClient = makeClient();
-    const idIndex = `${TEST_INDEX_PREFIX}_id_`;
+    const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
 
     const version = getESVersion(esClient);
 
@@ -49,6 +51,9 @@ describe('id_reader', () => {
                 create: () => ({
                     client: esClient
                 }),
+                config: {
+                    apiVersion: ELASTICSEARCH_VERSION
+                }
             },
             {
                 type: 'elasticsearch',
@@ -56,13 +61,15 @@ describe('id_reader', () => {
                 create: () => ({
                     client: esClient
                 }),
+                config: {
+                    apiVersion: ELASTICSEARCH_VERSION
+                }
             }
         ];
     });
 
     afterEach(async () => {
         if (harness) await harness.shutdown();
-        if (slicerHarness) await slicerHarness.shutdown();
     });
 
     async function makeTest(opConfig?: any, numOfSlicers = 1) {
@@ -71,6 +78,7 @@ describe('id_reader', () => {
             opConfig,
             { type: docType, field }
         );
+
         const job = newTestJobConfig({
             slicers: numOfSlicers,
             max_retries: 0,
@@ -80,17 +88,16 @@ describe('id_reader', () => {
             ],
         });
 
-        harness = new JobTestHarness(job, { assetDir, clients });
-        slicerHarness = new SlicerTestHarness(job, { assetDir, clients });
+        harness = new JobTestHarness(job, { clients });
 
         await harness.initialize();
-        await slicerHarness.initialize();
+
         return harness;
     }
 
     it('can fetch all even-data', async () => {
         const opConfig = { index: evenIndex };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
@@ -109,7 +116,7 @@ describe('id_reader', () => {
 
     it('can fetch all even-data with multiple slicers', async () => {
         const opConfig = { index: evenIndex };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig, 2);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
@@ -131,7 +138,7 @@ describe('id_reader', () => {
             index: evenIndex,
             key_range: ['a']
         };
-        const keyList = getKeyArray({ key_type: 'base64url' } as any);
+        const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
         const evenSpreadIds = getListOfIds(evenSpread.data, field);
 
@@ -146,5 +153,29 @@ describe('id_reader', () => {
             expect(evenSpreadIds.has(idChar)).toEqual(true);
             expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
         });
+    });
+
+    it('will have all appropriate metadata on records', async () => {
+        const opConfig = {
+            index: evenIndex,
+            key_range: ['a']
+        };
+
+        const test = await makeTest(opConfig);
+        const results = await test.runToCompletion();
+        const record = results[0].data[0];
+
+        expect(DataEntity.isDataEntity(record)).toBeTrue();
+
+        const metadata = record.getMetadata();
+
+        expect(metadata._createTime).toBeNumber();
+        expect(metadata._processTime).toBeNumber();
+        expect(metadata._ingestTime).toBeNumber();
+        expect(metadata._eventTime).toBeNumber();
+        expect(metadata._key).toBeString();
+        expect(metadata._index).toEqual(evenIndex);
+        expect(metadata._type).toEqual(docType);
+        expect(metadata._eventTime).toBeNumber();
     });
 });

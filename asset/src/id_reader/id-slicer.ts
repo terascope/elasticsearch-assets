@@ -16,7 +16,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         range,
         keySet,
     } = args;
-    const baseKeyArray = getKeyArray(opConfig);
+    const baseKeyArray = getKeyArray(opConfig.key_type);
     const startingKeyDepth = opConfig.starting_key_depth;
     const version = api.getESVersion();
     const retryError = retryModule(logger, executionConfig.max_retries);
