@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.0.2",
+    "version": "2.1.0",
     "private": true,
     "workspaces": [
         "asset"
