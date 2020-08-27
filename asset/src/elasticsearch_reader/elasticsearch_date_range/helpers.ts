@@ -465,9 +465,13 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
 }
 
 export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): SearchParams {
+    // we put a large size so we can have unbounded fetches. This is mainly for active indicies
+    // so that it can pull all records in the range that exist at fetch time, we
+    // leave the slicer to do its job to make a manageable chunk even though we can pull
+    // more than the original. This should have no bearing on non-active indicies
     const query: SearchParams = {
         index: opConfig.index,
-        size: slice.count,
+        size: 1000000,
         body: _buildRangeQuery(opConfig, slice),
     };
 
