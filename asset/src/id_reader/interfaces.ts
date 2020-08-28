@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
+import Reader from '../elasticsearch_reader_api/reader';
 
 export enum IDType {
     base64url = 'base64url',
@@ -14,7 +14,6 @@ export interface ESIDReaderConfig extends OpConfig {
     index: string;
     size: number;
     field: string;
-    full_response: boolean;
     key_type: IDType;
     key_range: null | string[];
     starting_key_depth: number;
@@ -30,7 +29,7 @@ export interface ESIDSlicerArgs {
     retryData?: any;
     logger: Logger;
     range: SlicerDateResults;
-    api: elasticAPI.Client;
+    api: Reader;
     keySet: string[];
     events: EventEmitter;
     type?: string | null | undefined;

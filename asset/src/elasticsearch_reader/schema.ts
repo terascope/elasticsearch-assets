@@ -262,8 +262,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                ...newConfig,
-                full_response: false,
+                ...newConfig
             });
         }
 

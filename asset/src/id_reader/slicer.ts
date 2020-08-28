@@ -4,21 +4,21 @@ import {
     TSError,
     SlicerRecoveryData
 } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
 import idSlicer from './id-slicer';
+import Reader from '../elasticsearch_reader_api/reader';
 import { getKeyArray } from './helpers';
 import { ESIDReaderConfig, ESIDSlicerArgs } from './interfaces';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
-    api!: elasticAPI.Client;
+    api!: Reader;
     version!: number;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         const apiName = this.opConfig.api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
-        const version = this.api.getESVersion();
+        const { version } = this.api;
         this.version = version;
         if (version !== 5 && this.opConfig.field == null) {
             throw new Error('Paramter field must be set if querying against elasticsearch version >= 6.x');

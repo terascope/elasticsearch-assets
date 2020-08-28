@@ -1,12 +1,8 @@
 import { APIConfig, APIFactoryRegistry, AnyObject } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
+import Reader from './reader';
+import { ESReaderOptions } from '../elasticsearch_reader/interfaces';
 
 export const DEFAULT_API_NAME = 'elasticsearch_reader_api';
 
-export type ElasticReaderFactoryAPI = APIFactoryRegistry<elasticAPI.Client, AnyObject>
-
-export interface ElasticsearchReaderConfig extends APIConfig {
-    connection: string
-    index?: string;
-    full_response?: boolean
-}
+export type ElasticReaderFactoryAPI = APIFactoryRegistry<Reader, AnyObject>
+export interface ElasticsearchReaderAPIConfig extends ESReaderOptions, APIConfig {}

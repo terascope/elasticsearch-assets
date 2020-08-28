@@ -1,8 +1,7 @@
-import { TSError, SlicerFn } from '@terascope/job-components';
-import { CountParams } from 'elasticsearch';
+import { TSError, SlicerFn, AnyObject } from '@terascope/job-components';
 import { ESIDSlicerArgs } from './interfaces';
 import { getKeyArray } from './helpers';
-import { buildQuery, retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
+import { retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 import { SlicerDateResults, IDReaderSlice } from '../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
@@ -18,7 +17,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
     } = args;
     const baseKeyArray = getKeyArray(opConfig.key_type);
     const startingKeyDepth = opConfig.starting_key_depth;
-    const version = api.getESVersion();
+    const { version } = api;
     const retryError = retryModule(logger, executionConfig.max_retries);
 
     async function determineKeySlice(
@@ -48,13 +47,11 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
             query.key = `${opConfig.type}#${data.value}*`;
         }
 
-        const countQuery = buildQuery(opConfig, query as IDReaderSlice) as CountParams;
-
-        async function getKeySlice(esQuery: CountParams): Promise<IDReaderSlice | null> {
+        async function getKeySlice(esQuery: AnyObject): Promise<IDReaderSlice | null> {
             let count: number;
 
             try {
-                count = await api.count(esQuery);
+                count = await api.count(query);
             } catch (err) {
                 return retryError(esQuery, err, getKeySlice, esQuery);
             }
@@ -73,7 +70,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
             return determineKeySlice(generator, true, rangeObj);
         }
 
-        return getKeySlice(countQuery);
+        return getKeySlice(query);
     }
 
     function keyGenerator(

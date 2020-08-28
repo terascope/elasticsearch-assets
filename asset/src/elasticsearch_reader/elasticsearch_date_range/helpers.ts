@@ -14,13 +14,8 @@ import {
     SlicerDateResults,
     ParsedInterval,
     DateConfig,
-    ESReaderConfig,
-    IDReaderSlice,
+    ESReaderOptions,
 } from '../interfaces';
-import { ESIDReaderConfig } from '../../id_reader/interfaces';
-
-type ReaderConfig = ESReaderConfig | ESIDReaderConfig;
-type BuildQueryInput = SlicerDateResults | IDReaderSlice;
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -464,14 +459,12 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
     return { dates: newDates as SlicerDateConfig, range: dates };
 }
 
-export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): SearchParams {
-    // we put a large size so we can have unbounded fetches. This is mainly for active indicies
-    // so that it can pull all records in the range that exist at fetch time, we
-    // leave the slicer to do its job to make a manageable chunk even though we can pull
-    // more than the original. This should have no bearing on non-active indicies
+export function buildQuery(
+    opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>
+): SearchParams {
     const query: SearchParams = {
         index: opConfig.index,
-        size: 1000000,
+        size: slice.count,
         body: _buildRangeQuery(opConfig, slice),
     };
 
@@ -480,7 +473,7 @@ export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): Sear
     return query;
 }
 
-function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
+function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>) {
     const body: AnyObject = {
         query: {
             bool: {
@@ -499,8 +492,7 @@ function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
 
         body.query.bool.must.push({ range: dateObj });
     }
-    // TODO: deprecate this logic and remove in the future
-    // elasticsearch _id based query
+    // elasticsearch _id based query, we keep for v5 and lower
     if (slice.key) {
         body.query.bool.must.push({ wildcard: { _uid: slice.key } });
     }
@@ -529,7 +521,7 @@ function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
     return body;
 }
 
-export function validateGeoParameters(opConfig: ReaderConfig): void {
+export function validateGeoParameters(opConfig: ESReaderOptions): void {
     const {
         geo_field: geoField,
         geo_box_top_left: geoBoxTopLeft,
@@ -584,7 +576,7 @@ export function validateGeoParameters(opConfig: ReaderConfig): void {
     }
 }
 
-export function geoSearch(opConfig: ReaderConfig): AnyObject {
+export function geoSearch(opConfig: ESReaderOptions): AnyObject {
     let isGeoSort = false;
     const queryResults: AnyObject = {};
     // check for key existence to see if they are user defined

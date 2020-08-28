@@ -9,8 +9,8 @@ import {
     SlicerRecoveryData,
 } from '@terascope/job-components';
 import moment from 'moment';
-import elasticAPI from '@terascope/elasticsearch-api';
 import dateSlicerFn from './slicer-fn';
+import Reader from '../../elasticsearch_reader_api/reader';
 import {
     processInterval,
     dateFormat,
@@ -35,7 +35,7 @@ import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfac
 type FetchDate = moment.Moment | null;
 
 export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
-    api!: elasticAPI.Client;
+    api!: Reader;
     dateFormat: string;
     windowState: WindowState
     startTime = moment.utc();
@@ -96,7 +96,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
 
         // using this query to catch potential errors even if a date is given already
-        const results = await this.api.search(query);
+        const results = await this.api.client.search(query);
         const [data] = results;
 
         if (data == null) {
@@ -183,7 +183,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             events: this.context.apis.foundation.getSystemEvents()
         };
 
-        await this.api.version();
+        await this.api.client.version();
 
         const recoveryData = this.recoveryData.map(
             (slice) => slice.lastSlice

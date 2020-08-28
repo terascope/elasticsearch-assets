@@ -8,7 +8,8 @@ import {
     isString,
     getTypeOf,
     cloneDeep,
-    isNumber
+    isNumber,
+    isNotNil
 } from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
@@ -39,9 +40,11 @@ export const schema: AnyObject = {
         doc: 'Which index to read from',
         default: null,
         format(val: unknown): void {
-            if (!isString(val)) throw new Error('Invalid index parameter, must be of type string');
-            if (val.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
-            if (val.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+            if (isNotNil(val)) {
+                if (!isString(val)) throw new Error('Invalid index parameter, must be of type string');
+                if (val.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
+                if (val.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+            }
         }
     },
     type: {

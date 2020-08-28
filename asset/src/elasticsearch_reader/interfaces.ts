@@ -1,11 +1,15 @@
 import { EventEmitter } from 'events';
 import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 import WindowState from './window-state';
+import Reader from '../elasticsearch_reader_api/reader';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
-export interface ESReaderConfig extends OpConfig {
+export interface ESReaderConfig extends ESReaderOptions, OpConfig {
+    api_name: string;
+}
+
+export interface ESReaderOptions {
     index: string;
     field?: string;
     size: number;
@@ -31,7 +35,6 @@ export interface ESReaderConfig extends OpConfig {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
-    api_name: string;
 }
 
 export interface DateSegments {
@@ -68,7 +71,7 @@ export interface SlicerArgs {
     dates: SlicerDateConfig;
     primaryRange?: DateSegments;
     id: number;
-    api: elasticAPI.Client;
+    api: Reader;
     events: EventEmitter;
     windowState: WindowState;
 }
