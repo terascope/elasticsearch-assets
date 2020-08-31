@@ -621,10 +621,10 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.18.1", "@terascope/teraslice-state-storage@^0.18.2":
-  version "0.18.2"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.18.2.tgz#b1db4c84c3a790ce8f7953e5b5154ee2e5a58055"
-  integrity sha512-u0B69+yplDi/3oU5F9CqWwukYPhDulhuMwWIt6ARYMHktGmnF6vVxP7X/kzHPIfrKO8S5vg2HSJ/NofFAZedng==
+"@terascope/teraslice-state-storage@^0.18.3":
+  version "0.18.3"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.18.3.tgz#2ca59f9c17fecb0f6e557db541f8aae9df6833fa"
+  integrity sha512-M1V1Pm5yul0DUykJ1Xr1wYkmY9C0dQsFIvS1qJsYnw4CjO/yFuSrKBm0AFsVUr5I/2X1z92642z732O/g2yCbg==
   dependencies:
     "@terascope/elasticsearch-api" "^2.11.2"
     "@terascope/utils" "^0.29.2"
