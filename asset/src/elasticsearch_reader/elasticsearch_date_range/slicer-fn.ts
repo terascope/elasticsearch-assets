@@ -16,8 +16,7 @@ import {
     dateFormatSeconds,
     dateOptions,
     retryModule,
-    determineStartingPoint,
-    buildQuery
+    determineStartingPoint
 } from './helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../../id_reader/helpers';
@@ -228,13 +227,12 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
     async function getCount(dates: DateParams) {
         const end = dates.end ? dates.end : dates.limit;
-        const range: any = {
+        const query = {
             start: dates.start.format(dateFormat),
             end: end.format(dateFormat)
         };
-        const query = buildQuery(opConfig, range);
-        // TODO: review types here
-        return api.count(query as any);
+
+        return api.count(query);
     }
 
     async function nextRange() {

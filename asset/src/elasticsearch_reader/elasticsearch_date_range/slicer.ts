@@ -18,8 +18,7 @@ import {
     dateFormatSeconds,
     parseDate,
     determineStartingPoint,
-    delayedStreamSegment,
-    buildQuery
+    delayedStreamSegment
 } from './helpers';
 import {
     ESDateConfig,
@@ -96,7 +95,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
         }
 
         // using this query to catch potential errors even if a date is given already
-        const results = await this.api.client.search(query);
+        const results = await this.api._searchRequest(query);
         const [data] = results;
 
         if (data == null) {
@@ -129,18 +128,16 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
 
     async getCount(dates: DateSegments, key?: string): Promise<number> {
         const end = dates.limit;
-        const range: any = {
+        const query: any = {
             start: dates.start.format(this.dateFormat),
             end: end.format(this.dateFormat)
         };
 
         if (key) {
-            range.key = key;
+            query.key = key;
         }
 
-        const query = buildQuery(this.opConfig, range);
-        // TODO: review types here
-        return this.api.count(query as any);
+        return this.api.count(query);
     }
 
     async getInterval(
@@ -183,7 +180,7 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
             events: this.context.apis.foundation.getSystemEvents()
         };
 
-        await this.api.client.version();
+        await this.api.verifyIndex();
 
         const recoveryData = this.recoveryData.map(
             (slice) => slice.lastSlice

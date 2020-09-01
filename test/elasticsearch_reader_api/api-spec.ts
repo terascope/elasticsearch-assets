@@ -1,7 +1,7 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { APIFactoryRegistry, AnyObject } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
+import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
@@ -9,7 +9,6 @@ import {
     upload,
     waitForData
 } from '../helpers';
-import Reader from '../../asset/src/elasticsearch_reader_api/reader';
 
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
@@ -18,8 +17,6 @@ describe('elasticsearch reader api', () => {
     const version = getESVersion(esClient);
 
     const docType = version === 5 ? 'events' : '_doc';
-
-    type API = APIFactoryRegistry<Reader, AnyObject>
 
     const clients = [
         {
@@ -45,7 +42,7 @@ describe('elasticsearch reader api', () => {
         if (harness) await harness.shutdown();
     });
 
-    async function setupAPITest() {
+    async function setupAPITest(): Promise<ElasticReaderFactoryAPI> {
         const job = newTestJobConfig({
             max_retries: 3,
             apis: [
@@ -61,8 +58,7 @@ describe('elasticsearch reader api', () => {
                     passthrough_slice: true
                 },
                 {
-                    _op: 'noop',
-                    apiName: 'elasticsearch_reader_api'
+                    _op: 'noop'
                 }
             ],
         });
@@ -88,7 +84,7 @@ describe('elasticsearch reader api', () => {
         expect(apiFactory.size).toEqual(1);
     });
 
-    fit('can read data from an index', async () => {
+    it('can read data from an index', async () => {
         const data = [{ some: 'data' }, { other: 'data' }];
 
         await upload(esClient, { index: apiReaderIndex, type: docType }, data);
@@ -98,7 +94,44 @@ describe('elasticsearch reader api', () => {
         const apiFactory = await setupAPITest();
         const api = await apiFactory.create('test', { query: '*' });
 
+        // @ts-expect-error
+        expect(api.windowSize).toBeUndefined();
+
         const results = await api.fetch({});
         expect(results.length).toEqual(2);
+
+        // @ts-expect-error
+        expect(api.windowSize).toEqual(10000);
+    });
+
+    it('can count data from an index', async () => {
+        const index = `${apiReaderIndex}_count`;
+        const data = [{ some: 'data' }, { other: 'data' }];
+
+        await upload(esClient, { index, type: docType }, data);
+
+        await waitForData(esClient, index, 2);
+
+        const apiFactory = await setupAPITest();
+        const api = await apiFactory.create('test', { query: '*' });
+
+        const results = await api.count();
+        expect(results).toEqual(2);
+    });
+
+    it('can check for index existence', async () => {
+        const index = `${apiReaderIndex}_test`;
+        const data = [{ some: 'data' }, { other: 'data' }];
+
+        const apiFactory = await setupAPITest();
+        const api = await apiFactory.create('test', { query: '*', index });
+
+        await expect(api.verifyIndex()).toReject();
+
+        await upload(esClient, { index, type: docType }, data);
+
+        await waitForData(esClient, index, 2);
+
+        await expect(api.verifyIndex()).toResolve();
     });
 });

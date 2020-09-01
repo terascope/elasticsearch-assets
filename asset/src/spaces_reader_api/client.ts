@@ -27,6 +27,7 @@ export default class SpacesClient {
                 timeout: this.opConfig.timeout,
                 retry: 0
             });
+
             return body;
         } catch (err) {
             if (err instanceof got.TimeoutError) {
@@ -156,8 +157,8 @@ export default class SpacesClient {
 
         try {
             const response = await this.makeRequest(uri, query);
-
             let esResults: any[] = [];
+
             if (response.results) {
                 esResults = response.results.map((result: any) => ({
                     _source: result
@@ -190,6 +191,8 @@ export default class SpacesClient {
         return this.apiSearch(queryConfig);
     }
 
+    async version(): Promise<void> {}
+
     get cluster(): Partial<Client['cluster']> {
         const { index } = this.opConfig;
         return {
@@ -216,6 +219,48 @@ export default class SpacesClient {
 
                     resolve(result);
                 }));
+            }
+        };
+    }
+
+    get indices(): Partial<Client['indices']> {
+        const { index, endpoint, token } = this.opConfig;
+        return {
+            async getSettings() {
+                const uri = `${endpoint}/${index}/_info`;
+
+                try {
+                    const { body: { params: { size: { max } } } } = await got(uri, {
+                        searchParams: { token },
+                        responseType: 'json',
+                        timeout: 1000000,
+                        retry: 0
+                    });
+
+                    return {
+                        [index]: {
+                            settings: {
+                                'index.max_result_window': max
+                            },
+                            defaults: {}
+                        }
+                    };
+                } catch (err) {
+                    if (err instanceof got.TimeoutError) {
+                        throw new TSError('HTTP request timed out connecting to API endpoint.', {
+                            statusCode: 408,
+                            context: {
+                                endpoint: uri,
+                            }
+                        });
+                    }
+                    throw new TSError(err, {
+                        reason: 'Failure making search request',
+                        context: {
+                            endpoint: uri,
+                        }
+                    });
+                }
             }
         };
     }
