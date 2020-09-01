@@ -43,7 +43,7 @@
         "@types/elasticsearch": "^5.0.35",
         "@types/got": "^9.6.11",
         "@types/jest": "^26.0.5",
-        "@types/node": "^14.6.0",
+        "@types/node": "^14.6.2",
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.32.4",
         "eslint": "^7.7.0",
