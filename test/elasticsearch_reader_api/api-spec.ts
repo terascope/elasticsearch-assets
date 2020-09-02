@@ -81,6 +81,8 @@ describe('elasticsearch reader api', () => {
         expect(api.fetch).toBeFunction();
         expect(api.count).toBeFunction();
 
+        expect(api.version).toEqual(version);
+
         expect(apiFactory.size).toEqual(1);
     });
 

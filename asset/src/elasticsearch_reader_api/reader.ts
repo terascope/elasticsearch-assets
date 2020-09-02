@@ -73,7 +73,7 @@ export default class APIReader {
         return this.client.search(query);
     }
 
-    async getWindowSize(): Promise<void> {
+    private async getWindowSize(): Promise<void> {
         const window = 'index.max_result_window';
         const { index } = this.config;
 
