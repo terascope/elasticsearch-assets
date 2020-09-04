@@ -27,6 +27,7 @@ describe('elasticsearch reader api schema', () => {
     ];
 
     const apiName = DEFAULT_API_NAME;
+    const harnesses: WorkerTestHarness[] = [];
 
     async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchReaderAPIConfig> {
         const defaults = {
@@ -53,13 +54,14 @@ describe('elasticsearch reader api schema', () => {
         harness = new WorkerTestHarness(job, { clients });
 
         await harness.initialize();
+        harnesses.push(harness);
 
         const { apis } = harness.executionContext.config;
         return apis.find((settings) => settings._name === apiName) as ElasticsearchReaderAPIConfig;
     }
 
     afterEach(async () => {
-        await harness.shutdown();
+        await Promise.all(harnesses.map((testHarness) => testHarness.shutdown()));
     });
 
     it('should have defaults', async () => {
@@ -75,7 +77,7 @@ describe('elasticsearch reader api schema', () => {
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true };
+        const badOP = { subslice_by_key: true, type: undefined };
         const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
         const otherGoodOP = { subslice_by_key: false, other: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
@@ -97,7 +99,7 @@ describe('elasticsearch reader api schema', () => {
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
         if (version <= 5) {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: undefined })).toReject();
             await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
         } else {
             await expect(makeSchema({ subslice_by_key: true })).toReject();
