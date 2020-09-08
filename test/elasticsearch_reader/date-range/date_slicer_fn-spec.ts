@@ -86,7 +86,7 @@ describe('date slicer function', () => {
 
         const executionConfig = newTestExecutionConfig(job);
         const opConfig = executionConfig.operations[0];
-        const api = new Reader(opConfig as any, client, logger);
+        const api = new Reader(opConfig as any, client as any, logger);
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
         const slicerArgs: SlicerArgs = {
