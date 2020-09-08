@@ -7,19 +7,22 @@ import {
     Logger,
     toNumber,
 } from '@terascope/job-components';
-import { CountParams, SearchParams } from 'elasticsearch';
+import { CountParams, SearchParams, Client } from 'elasticsearch';
 import { buildQuery } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
 import { ESReaderOptions, SlicerDateResults } from '../elasticsearch_reader/interfaces';
+import SpacesClient from '../spaces_reader_api/client';
+
+type ReaderClient = Client | SpacesClient
 
 export default class APIReader {
     readonly config: ESReaderOptions;
     logger: Logger;
-    _baseClient: AnyObject;
-    client: elasticAPI.Client;
+    private _baseClient: AnyObject;
+    protected readonly client: elasticAPI.Client;
     private hasDefaultQueries = false;
     private windowSize: undefined | number = undefined;
 
-    constructor(config: ESReaderOptions, client: AnyObject, logger: Logger) {
+    constructor(config: ESReaderOptions, client: ReaderClient, logger: Logger) {
         const { connection, index } = config;
         const clientConfig = {
             full_response: false,
