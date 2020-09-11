@@ -1,7 +1,6 @@
 import { EventEmitter } from 'events';
-import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
+import { OpConfig, AnyObject, Logger } from '@terascope/job-components';
 import { SlicerDateResults } from '../elasticsearch_reader/interfaces';
-import Reader from '../elasticsearch_reader_api/reader';
 
 export enum IDType {
     base64url = 'base64url',
@@ -14,25 +13,26 @@ export interface ESIDReaderConfig extends OpConfig {
     index: string;
     size: number;
     field: string;
-    key_type: IDType;
     key_range: null | string[];
     starting_key_depth: number;
     query?: string;
     fields: null | string[];
     connection: string;
-    type: string | null | undefined;
 }
 
 export interface ESIDSlicerArgs {
-    opConfig: ESIDReaderConfig;
-    executionConfig: ExecutionConfig;
     retryData?: any;
     logger: Logger;
-    range: SlicerDateResults;
-    api: Reader;
+    range?: SlicerDateResults;
     keySet: string[];
+    baseKeyArray: string[];
     events: EventEmitter;
-    type?: string | null | undefined;
+    starting_key_depth: number;
+    version: number;
+    countFn: (args: AnyObject) => Promise<number>;
+    type: string | null;
+    field: string | null;
+    size: number;
 }
 
 export interface WildCardQuery {

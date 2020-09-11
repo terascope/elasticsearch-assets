@@ -2,7 +2,7 @@ import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
-import { getKeyArray } from '../../asset/src/id_reader/helpers';
+import { getKeyArray } from '../../asset/src/elasticsearch_reader_api/elasticsearch_id_slicer/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,

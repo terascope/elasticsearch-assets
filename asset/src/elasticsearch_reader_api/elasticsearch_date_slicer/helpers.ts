@@ -1,5 +1,8 @@
 import {
-    Logger, times, AnyObject, toNumber, parseGeoPoint,
+    times,
+    AnyObject,
+    toNumber,
+    parseGeoPoint,
 } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
@@ -15,7 +18,7 @@ import {
     ParsedInterval,
     DateConfig,
     ESReaderOptions,
-} from '../interfaces';
+} from '../../elasticsearch_reader/interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -103,31 +106,6 @@ export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 
 // 2016-06-29T12:44:57-07:00
 export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
-
-type RetryCb = (msg: any) => Promise<any>
-
-// TODO: this might be broken, there is no msg
-export function retryModule(logger: Logger, numOfRetries: number) {
-    const retry = {};
-    return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: any) => {
-        logger.error(err, 'error while getting next slice');
-        const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
-
-        if (!retry[key]) {
-            retry[key] = 1;
-            return fn(msg);
-        }
-
-        retry[key] += 1;
-        if (retry[key] > numOfRetries) {
-            return Promise.reject(
-                new Error(`max_retries met for slice, key: ${key}`)
-            );
-        }
-
-        return fn(msg);
-    };
-}
 
 export function existsSync(filename: string): boolean {
     try {
@@ -276,7 +254,7 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
-    startTime: moment.Moment,
+    startTime: moment.Moment | Date | string,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
 ): { start: moment.Moment, limit: moment.Moment } {

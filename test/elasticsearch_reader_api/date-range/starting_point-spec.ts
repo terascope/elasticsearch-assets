@@ -1,7 +1,7 @@
 import 'jest-extended';
 import moment from 'moment';
 import { cloneDeep } from '@terascope/job-components';
-import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
+import { determineStartingPoint, dateFormatSeconds, divideRange } from '../../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import { StartPointConfig, ParsedInterval } from '../../../asset/src/elasticsearch_reader/interfaces';
 
 function makeDate(format: string) {

@@ -1,6 +1,6 @@
 import { cloneDeep, TSError, SlicerFn } from '@terascope/job-components';
 import moment from 'moment';
-import idSlicer from '../../id_reader/id-slicer';
+import idSlicer from '../elasticsearch_id_slicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -10,16 +10,15 @@ import {
     StartPointConfig,
     DateSegments,
     DetermineSliceResults
-} from '../interfaces';
+} from '../../elasticsearch_reader/interfaces';
 import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
-    retryModule,
     determineStartingPoint
 } from './helpers';
 import { ESIDSlicerArgs } from '../../id_reader/interfaces';
-import { getKeyArray } from '../../id_reader/helpers';
+import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
 
 interface DateParams {
     start: moment.Moment;
@@ -57,19 +56,20 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
     const {
         events,
         opConfig,
-        executionConfig,
+        numOfSlicers,
+        lifecycle,
         logger,
-        api,
         dates: sliceDates,
         id,
         interval,
         latencyInterval,
         primaryRange,
-        windowState
+        windowState,
+        countFn,
+        version
     } = args;
-    const isPersistent = executionConfig.lifecycle === 'persistent';
+    const isPersistent = lifecycle === 'persistent';
     const timeResolution = dateOptions(opConfig.time_resolution);
-    const retryError = retryModule(logger, executionConfig.max_retries);
     const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
     const currentWindow = primaryRange || {} as DateSegments;
 
@@ -199,7 +199,6 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
     }
 
     async function makeKeyList(data: DetermineSliceResults, limit: string) {
-        const idConfig = Object.assign({}, opConfig, { starting_key_depth: 0 });
         const dates = {
             start: moment(data.start.format(dateFormat)).toISOString(),
             end: moment(data.end.format(dateFormat)).toISOString(),
@@ -211,15 +210,24 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             dates
         );
 
+        const { type, field, size } = opConfig;
+
+        const keyArray = getKeyArray(opConfig.key_type);
+
         const idSlicerArs: ESIDSlicerArgs = {
             events,
-            opConfig: idConfig,
-            executionConfig,
             logger,
-            api,
             range,
-            keySet: getKeyArray(opConfig.key_type)
+            keySet: keyArray,
+            baseKeyArray: keyArray,
+            countFn,
+            version,
+            type,
+            field,
+            size,
+            starting_key_depth: 0
         };
+
         const idSlicers = idSlicer(idSlicerArs);
 
         return getIdData(idSlicers);
@@ -232,7 +240,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             end: end.format(dateFormat)
         };
 
-        return api.count(query);
+        return countFn(query);
     }
 
     async function nextRange() {
@@ -253,7 +261,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             const config: StartPointConfig = {
                 dates: { start: moment.utc(newStart), limit: moment.utc(newLimit) },
                 id,
-                numOfSlicers: executionConfig.slicers,
+                numOfSlicers,
                 interval
             };
 
@@ -329,14 +337,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
                 adjustDates(dateParams, holes);
             }
 
-            let data: DetermineSliceResults;
-
-            try {
-                data = await determineSlice(dateParams, slicerId, false);
-            } catch (err) {
-                const retryInput = dateParams.start.format(dateFormat);
-                return retryError(retryInput, err, sliceDate, '');
-            }
+            const data = await determineSlice(dateParams, slicerId, false);
 
             dateParams.start = moment.utc(data.end);
 

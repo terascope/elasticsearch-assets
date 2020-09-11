@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
-import { OpConfig, ExecutionConfig, Logger } from '@terascope/job-components';
+import {
+    OpConfig, Logger, LifeCycle, AnyObject
+} from '@terascope/job-components';
 import moment from 'moment';
-import WindowState from './window-state';
-import Reader from '../elasticsearch_reader_api/reader';
+import WindowState from '../elasticsearch_reader_api/window-state';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
 export interface ESReaderConfig extends ESReaderOptions, OpConfig {
@@ -66,14 +67,16 @@ export interface SlicerArgs {
     opConfig: any;
     interval: ParsedInterval;
     latencyInterval?: ParsedInterval;
-    executionConfig: ExecutionConfig;
+    lifecycle: LifeCycle;
+    numOfSlicers: number;
     logger: Logger;
     dates: SlicerDateConfig;
     primaryRange?: DateSegments;
     id: number;
-    api: Reader;
     events: EventEmitter;
     windowState: WindowState;
+    version: number;
+    countFn: (args: AnyObject) => Promise<number>
 }
 export interface SlicerDateResults {
     start: string;

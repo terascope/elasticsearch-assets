@@ -1,3 +1,3 @@
-import ESDateFetcher from './elasticsearch_date_range/reader';
+import ElasticsearchDateFetcher from '../__lib/reader';
 
-export default ESDateFetcher;
+export default ElasticsearchDateFetcher;

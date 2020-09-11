@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { AnyObject, isEmpty } from '@terascope/utils';
 import { DataGenerator, DateOptions, IDType } from './interfaces';
-import { dateFormat } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
+import { dateFormat } from '../elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 
 function regexID(type: IDType) {
     const reg = { randexp: '' };

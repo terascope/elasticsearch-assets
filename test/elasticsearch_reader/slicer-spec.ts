@@ -5,13 +5,14 @@ import {
     LifeCycle,
     SlicerRecoveryData,
     AnyObject,
-    sortBy
+    sortBy,
+    SliceRequest
 } from '@terascope/job-components';
-import moment from 'moment';
+import moment, { MomentBuiltinFormat } from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '../../asset/src/id_reader/interfaces';
-import { dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
+import { dateFormat } from '../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
@@ -41,6 +42,24 @@ describe('elasticsearch_reader slicer', () => {
     const evenOriginalEnd = '2019-04-26T15:00:23.394Z';
 
     let harness: SlicerTestHarness;
+
+    async function consume(test: SlicerTestHarness): Promise<SliceRequest[]> {
+        const results: SliceRequest[] = [];
+
+        async function recurse(): Promise<void> {
+            const slices = await test.createSlices();
+            const data = slices.filter(Boolean) as SliceRequest[];
+
+            if (data.length > 0) {
+                results.push(...data);
+                return recurse();
+            }
+        }
+
+        await recurse();
+
+        return results;
+    }
 
     const clients = [
         {
@@ -135,200 +154,210 @@ describe('elasticsearch_reader slicer', () => {
         return harness;
     }
 
-    it('can create a slicer', async () => {
-        const opConfig = {
-            time_resolution: 's',
-            size: 50,
-        };
+    // it('can create a slicer', async () => {
+    //     const opConfig = {
+    //         time_resolution: 's',
+    //         size: 50,
+    //     };
 
-        const test = await makeSlicerTest({ opConfig });
-        const slicer = test.slicer();
+    //     const test = await makeSlicerTest({ opConfig });
+    //     const slicer = test.slicer();
 
-        expect(slicer.slicers()).toEqual(1);
-    });
+    //     expect(slicer.slicers()).toEqual(1);
+    // });
 
-    it('can create multiple slicers', async () => {
-        const opConfig = {};
-        const numOfSlicers = 2;
-        const test = await makeSlicerTest({ opConfig, numOfSlicers });
-        const slicer = test.slicer();
+    // it('can create multiple slicers', async () => {
+    //     const opConfig = {};
+    //     const numOfSlicers = 2;
+    //     const test = await makeSlicerTest({ opConfig, numOfSlicers });
+    //     const slicer = test.slicer();
 
-        expect(slicer.slicers()).toEqual(2);
-    });
+    //     expect(slicer.slicers()).toEqual(2);
+    // });
 
-    it('slicers will throw if date_field_name does not exist on docs in the index', async () => {
-        const opConfig = { date_field_name: 'date' };
+    // it('slicers will throw if date_field_name does not exist on docs in the index', async () => {
+    //     const opConfig = { date_field_name: 'date' };
 
-        await expect(makeSlicerTest({ opConfig })).toReject();
-    });
+    //     await expect(makeSlicerTest({ opConfig })).toReject();
+    // });
 
-    describe('it can respect start and end parameters and generate updates for range of job', () => {
-        it('with no start or end (auto)', async () => {
-            const test = await makeSlicerTest({ opConfig: {} });
-            const update = await getMeta(test);
+    // describe('it can respect start and end parameters and generate updates for range of job', () => {
+    //     it('with no start or end (auto)', async () => {
+    //         const test = await makeSlicerTest({ opConfig: {} });
+    //         const update = await getMeta(test);
 
-            expect(update.start).toEqual(evenOriginalStart);
-            expect(update.end).toEqual(evenOriginalEnd);
-            expect(update.interval).toEqual([9, 'ms']);
+    //         expect(update.start).toEqual(evenOriginalStart);
+    //         expect(update.end).toEqual(evenOriginalEnd);
+    //         expect(update.interval).toEqual([9, 'ms']);
 
-            const [slice] = await test.createSlices();
+    //         const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(evenOriginalStart);
-            expect(slice!.limit).toEqual(evenOriginalEnd);
-        });
+    //         expect(slice!.start).toEqual(evenOriginalStart);
+    //         expect(slice!.limit).toEqual(evenOriginalEnd);
+    //     });
 
-        it('with start specified', async () => {
-            const start = '2019-04-26T15:00:23.250Z';
-            const test = await makeSlicerTest({ opConfig: { start } });
-            const update = await getMeta(test);
+    //     it('with start specified', async () => {
+    //         const start = '2019-04-26T15:00:23.250Z';
+    //         const test = await makeSlicerTest({ opConfig: { start } });
+    //         const update = await getMeta(test);
 
-            expect(update.start).toEqual(start);
-            expect(update.end).toEqual(evenOriginalEnd);
-            expect(update.interval).toEqual([8, 'ms']);
+    //         expect(update.start).toEqual(start);
+    //         expect(update.end).toEqual(evenOriginalEnd);
+    //         expect(update.interval).toEqual([8, 'ms']);
 
-            const [slice] = await test.createSlices();
+    //         const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(start);
-            expect(slice!.limit).toEqual(evenOriginalEnd);
-        });
+    //         expect(slice!.start).toEqual(start);
+    //         expect(slice!.limit).toEqual(evenOriginalEnd);
+    //     });
 
-        it('with end specified', async () => {
-            const end = '2019-04-26T15:00:23.280Z';
-            const test = await makeSlicerTest({ opConfig: { end } });
-            const update = await getMeta(test);
+    //     it('with end specified', async () => {
+    //         const end = '2019-04-26T15:00:23.280Z';
+    //         const test = await makeSlicerTest({ opConfig: { end } });
+    //         const update = await getMeta(test);
 
-            expect(update.start).toEqual(evenOriginalStart);
-            expect(update.end).toEqual(end);
-            expect(update.interval).toEqual([13, 'ms']);
+    //         expect(update.start).toEqual(evenOriginalStart);
+    //         expect(update.end).toEqual(end);
+    //         expect(update.interval).toEqual([13, 'ms']);
 
-            const [slice] = await test.createSlices();
+    //         const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(evenOriginalStart);
-            expect(slice!.limit).toEqual(end);
-        });
-    });
+    //         expect(slice!.start).toEqual(evenOriginalStart);
+    //         expect(slice!.limit).toEqual(end);
+    //     });
+    // });
 
-    it('slicer will not error out if query returns no results', async () => {
-        const opConfig = {
-            query: 'some:luceneQueryWithNoResults'
-        };
-        const test = await makeSlicerTest({ opConfig });
-        const results = await test.createSlices();
+    // it('slicer will not error out if query returns no results', async () => {
+    //     const opConfig = {
+    //         query: 'some:luceneQueryWithNoResults'
+    //     };
+    //     const test = await makeSlicerTest({ opConfig });
+    //     const results = await test.createSlices();
 
-        expect(results).toEqual([null]);
-    });
+    //     expect(results).toEqual([null]);
+    // });
 
-    it('slicer can produce date slices', async () => {
-        const opConfig = {
-            time_resolution: 'ms',
-            size: 200
-        };
+    // it('slicer can produce date slices', async () => {
+    //     const opConfig = {
+    //         time_resolution: 'ms',
+    //         size: 200
+    //     };
 
-        const test = await makeSlicerTest({ opConfig });
-        const getAllSlices = await test.getAllSlices();
+    //     const test = await makeSlicerTest({ opConfig });
+    //     const getAllSlices = await test.getAllSlices();
 
-        const expectedResults = [
-            {
-                start: '2019-04-26T15:00:23.201Z',
-                end: '2019-04-26T15:00:23.239Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 99
-            },
-            {
-                start: '2019-04-26T15:00:23.239Z',
-                end: '2019-04-26T15:00:23.277Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 169
-            },
-            {
-                start: '2019-04-26T15:00:23.277Z',
-                end: '2019-04-26T15:00:23.315Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 172
-            },
-            {
-                start: '2019-04-26T15:00:23.315Z',
-                end: '2019-04-26T15:00:23.334Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 148
-            },
-            {
-                start: '2019-04-26T15:00:23.334Z',
-                end: '2019-04-26T15:00:23.372Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 199
-            },
-            {
-                start: '2019-04-26T15:00:23.372Z',
-                end: '2019-04-26T15:00:23.383Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 111
-            },
-            {
-                start: '2019-04-26T15:00:23.383Z',
-                end: '2019-04-26T15:00:23.394Z',
-                limit: '2019-04-26T15:00:23.394Z',
-                holes: [],
-                count: 102
-            }
-        ];
+    //     const expectedResults = [
+    //         {
+    //             start: '2019-04-26T15:00:23.201Z',
+    //             end: '2019-04-26T15:00:23.239Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 99
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.239Z',
+    //             end: '2019-04-26T15:00:23.277Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 169
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.277Z',
+    //             end: '2019-04-26T15:00:23.315Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 172
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.315Z',
+    //             end: '2019-04-26T15:00:23.334Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 148
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.334Z',
+    //             end: '2019-04-26T15:00:23.372Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 199
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.372Z',
+    //             end: '2019-04-26T15:00:23.383Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 111
+    //         },
+    //         {
+    //             start: '2019-04-26T15:00:23.383Z',
+    //             end: '2019-04-26T15:00:23.394Z',
+    //             limit: '2019-04-26T15:00:23.394Z',
+    //             holes: [],
+    //             count: 102
+    //         }
+    //     ];
 
-        // this signals the end of slices
-        expect(getAllSlices.pop()).toBeNull();
+    //     // this signals the end of slices
+    //     expect(getAllSlices.pop()).toBeNull();
 
-        getAllSlices.forEach((slice, index) => {
-            expect(slice).toMatchObject(expectedResults[index]);
-        });
-    });
+    //     getAllSlices.forEach((slice, index) => {
+    //         expect(slice).toMatchObject(expectedResults[index]);
+    //     });
+    // });
 
-    it('can run a persistent reader', async () => {
+    fit('can run a persistent reader', async () => {
         const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
-        const start = evenOriginalStart;
-        const delayedBoundary = moment.utc(start).subtract(delay[0], delay[1]);
+        const proximateBeforeStartTime = new Date();
+        const proximateBeforeDelayedBoundary = moment.utc(proximateBeforeStartTime)
+            .subtract(delay[0], delay[1]);
 
         const opConfig = {
             size: 100,
             interval: '100ms',
-            delay: delay.join('')
+            delay: delay.join(''),
+
         };
+
+        function isInBetween(val: string, firstDate: any, secondDate: any) {
+            return moment(val).isBetween(firstDate, secondDate);
+        }
 
         const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
 
-        const [results] = await test.createSlices();
+        const firstWall = await consume(test);
+        const secondWall = await consume(test);
 
-        expect(results).toBeDefined();
+        const proximateAfterStartTime = new Date();
+        const proximateAfterDelayedBoundary = moment.utc(proximateAfterStartTime)
+            .subtract(delay[0], delay[1]);
 
-        expect(results?.start).toBeDefined();
-        expect(results?.end).toBeDefined();
-        expect(results?.count).toBeDefined();
+        const firstSlice = firstWall[0];
+        const lastSlice = firstWall[firstWall.length - 1];
+        console.log({ firstWall })
+        expect(
+            isInBetween(
+                firstSlice.start,
+                proximateBeforeStartTime,
+                proximateAfterStartTime
+            )
+        ).toBeTrue();
 
-        const now1 = makeDate(dateFormat);
-        expect(moment.utc(results?.end).isBetween(delayedBoundary, now1)).toEqual(true);
+        expect(
+            isInBetween(
+                lastSlice.end,
+                proximateBeforeDelayedBoundary,
+                proximateAfterDelayedBoundary
+            )
+        ).toBeTrue();
 
-        const [results2] = await test.createSlices();
+        console.log('diff', moment(lastSlice.end).diff(firstSlice.start));
 
-        expect(results2).toEqual(null);
+        // we are filtering out nulls
+        expect(secondWall).toBeArrayOfSize(0);
 
         await pDelay(110);
 
-        const [results3] = await test.createSlices();
-
-        expect(results3).toBeDefined();
-        expect(results3?.start).toBeDefined();
-        expect(results3?.end).toBeDefined();
-        expect(results3?.count).toBeDefined();
-
-        const [results4] = await test.createSlices();
-        expect(results4).toEqual(null);
-
-        const [results5] = await test.createSlices();
-        expect(results5).toEqual(null);
     });
 
     it('slicer can reduce date slices down to size', async () => {
