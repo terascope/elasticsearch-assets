@@ -8,11 +8,10 @@ import {
     sortBy,
     SliceRequest
 } from '@terascope/job-components';
-import moment, { MomentBuiltinFormat } from 'moment';
+import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '../../asset/src/id_reader/interfaces';
-import { dateFormat } from '../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
@@ -95,10 +94,6 @@ describe('elasticsearch_reader slicer', () => {
             await harness.shutdown();
         }
     });
-
-    function makeDate(format: string) {
-        return moment.utc(moment.utc().format(format));
-    }
 
     async function getMeta(test: SlicerTestHarness) {
         return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
