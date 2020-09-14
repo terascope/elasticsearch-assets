@@ -302,7 +302,7 @@ export default class ElasticsearchAPI {
                 this.determineSliceInterval(this.config.interval),
                 this.determineSliceInterval(this.config.delay)
             ]);
-            console.log({ interval, latencyInterval });
+
             slicerFnArgs.interval = interval;
             slicerFnArgs.latencyInterval = latencyInterval;
             slicerFnArgs.windowState = config.windowState as WindowState;
@@ -410,7 +410,7 @@ export default class ElasticsearchAPI {
         }
         // end date is non-inclusive, adding 1s so range will cover it
         const newDate = data[this.config.date_field_name];
-        const time = moment.utc(newDate).add(1, this.config.time_resolution);
+        const time = moment(newDate).add(1, this.config.time_resolution);
         const parsedDate = parseDate(time.format(this.dateFormat));
 
         return parsedDate;

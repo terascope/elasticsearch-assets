@@ -13,7 +13,7 @@ import { ElasticReaderFactoryAPI, DateSlicerArgs } from '../elasticsearch_reader
 export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     protected api!: ElasticsearchAPI;
     protected hasUpdated = false;
-    protected startTime = moment.utc().format();
+    protected startTime = moment().toISOString();
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         const apiName = this.opConfig.api_name;
