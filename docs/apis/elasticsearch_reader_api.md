@@ -177,14 +177,14 @@ let results = await api.fetch(dateRangeQuery);
 results === [ { some: 'record', created: '2019-04-26T15:10:23.220Z' }]
 
 const oldUIDQuery = {
-   key:  `events#ba*`
+   key:  'events#ba*'
 };
 
 let results = await api.fetch(oldUIDQuery);
 results === [ { some: 'record', created: '2019-04-26T15:10:23.220Z' }]
 
 const wildcardQuery = {
-    field: 'uuid,
+    field: 'uuid',
     value: 'afe1*',
 };
 
@@ -214,14 +214,14 @@ let results = await api.count(dateRangeQuery);
 results === 122
 
 const oldUIDQuery = {
-   key:  `events#ba*`
+   key:  'events#ba*'
 };
 
 let results = await api.fetch(oldUIDQuery);
 results === 3552
 
 const wildcardQuery = {
-    field: 'uuid,
+    field: 'uuid',
     value: 'afe1*',
 };
 
@@ -244,12 +244,10 @@ const query: {
 };
 
 const results = await api._searchRequest(query);
-
-api.version === 6
 ```
 
 ### version
-```() => number```
+```number```
 This returns the major elasticsearch version that this client is connected to
 
 ```js
