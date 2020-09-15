@@ -444,44 +444,12 @@ const size = await api.getWindowSize();
 size === 100000
 ```
 
-
 ### makeWindowState
 ```(numOfSlicers: number) => WindowState```
 This is a helper api that will return a synchronization window to coordinate slicer date range progression. THIS IS ONLY NEEDED FOR A DATE SLICER IN *PERSISTENT* MODE. This needs to be made once at the top level of the processor/slicer and passed in each time `makeDateSlicer` is called.
 
-
 ```js
-const dateRangeQuery = {
-    start: '2019-04-26T15:00:23.201Z',
-    end: '2019-04-26T15:00:23.220Z',
-};
-
-const results = await api.fetch(dateRangeQuery);
-
-const oldUIDQuery = {
-   key:  `events#ba*`
-};
-
-const results = await api.fetch(oldUIDQuery);
-
-const wildcardQuery = {
-    field: 'uuid,
-    value: 'afe1*',
-};
-
-const results = await api.fetch(wildcardQuery);
-
-
-const query: {
-    q: '(test:query OR other:thing AND bytes:>=2000)',
-    size: 100,
-    fields: 'foo,bar,date'
-};
-
-const results = await api._searchRequest(query);
-results === [ { some: 'record', uuid: 'afe18550-0081-453f-9e80-93a90782a5bd' }]
-
-api.version === 6
+const windowState = await api.makeWindowState();
 ```
 
 ## Parameters
