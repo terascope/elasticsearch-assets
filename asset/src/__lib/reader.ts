@@ -1,11 +1,10 @@
 import { Fetcher, DataEntity } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
-import { ESDateConfig, SlicerDateResults } from '../interfaces';
-import { ElasticReaderFactoryAPI } from '../../elasticsearch_reader_api/interfaces';
-import { buildQuery } from './helpers';
+import ElasticsearchAPI from '../elasticsearch_reader_api/elasticsearch-api';
+import { ESDateConfig, SlicerDateResults } from '../elasticsearch_reader/interfaces';
+import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
 export default class DateReader extends Fetcher<ESDateConfig> {
-    api!: elasticAPI.Client;
+    api!: ElasticsearchAPI;
 
     async initialize(): Promise<void> {
         await super.initialize();
@@ -15,7 +14,6 @@ export default class DateReader extends Fetcher<ESDateConfig> {
     }
 
     async fetch(slice: SlicerDateResults): Promise<DataEntity[]> {
-        const query = buildQuery(this.opConfig, slice);
-        return this.api.search(query);
+        return this.api.fetch(slice);
     }
 }

@@ -1,25 +1,22 @@
-import { TSError, SlicerFn } from '@terascope/job-components';
-import { CountParams } from 'elasticsearch';
-import { ESIDSlicerArgs } from './interfaces';
-import { getKeyArray } from './helpers';
-import { buildQuery, retryModule } from '../elasticsearch_reader/elasticsearch_date_range/helpers';
-import { SlicerDateResults, IDReaderSlice } from '../elasticsearch_reader/interfaces';
+import { TSError, SlicerFn, AnyObject } from '@terascope/job-components';
+import { ESIDSlicerArgs } from '../../id_reader/interfaces';
+import { SlicerDateResults, IDReaderSlice } from '../../elasticsearch_reader/interfaces';
 
 export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
     const {
         events,
-        opConfig,
-        executionConfig,
         retryData,
-        logger,
-        api,
         range,
+        baseKeyArray,
         keySet,
+        version,
+        countFn,
+        starting_key_depth,
+        type,
+        field,
+        size
     } = args;
-    const baseKeyArray = getKeyArray(opConfig.key_type);
-    const startingKeyDepth = opConfig.starting_key_depth;
-    const version = api.getESVersion();
-    const retryError = retryModule(logger, executionConfig.max_retries);
+    const startingKeyDepth = starting_key_depth;
 
     async function determineKeySlice(
         generator: any,
@@ -43,23 +40,16 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         }
 
         if (version >= 6) {
-            query.wildcard = { field: opConfig.field, value: `${data.value}*` };
+            const fieldValue = field as string;
+            query.wildcard = { field: fieldValue, value: `${data.value}*` };
         } else {
-            query.key = `${opConfig.type}#${data.value}*`;
+            query.key = `${type}#${data.value}*`;
         }
 
-        const countQuery = buildQuery(opConfig, query as IDReaderSlice) as CountParams;
+        async function getKeySlice(esQuery: AnyObject): Promise<IDReaderSlice | null> {
+            const count = await countFn(esQuery);
 
-        async function getKeySlice(esQuery: CountParams): Promise<IDReaderSlice | null> {
-            let count: number;
-
-            try {
-                count = await api.count(esQuery);
-            } catch (err) {
-                return retryError(esQuery, err, getKeySlice, esQuery);
-            }
-
-            if (count > opConfig.size) {
+            if (count > size) {
                 events.emit('slicer:slice:recursion');
                 return determineKeySlice(generator, false, rangeObj);
             }
@@ -73,7 +63,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
             return determineKeySlice(generator, true, rangeObj);
         }
 
-        return getKeySlice(countQuery);
+        return getKeySlice(query);
     }
 
     function keyGenerator(

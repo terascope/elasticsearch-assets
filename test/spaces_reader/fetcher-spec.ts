@@ -14,6 +14,8 @@ describe('spaces_reader fetcher', () => {
     let clients: any;
     let defaultClient: MockClient;
 
+    const maxSize = 100000;
+
     beforeEach(() => {
         defaultClient = new MockClient();
         clients = [
@@ -209,7 +211,7 @@ describe('spaces_reader fetcher', () => {
                 interval: '30s',
                 delay: '30s',
                 timeout: 50
-            }, _opConfig);
+            }, _opConfig, { size: maxSize });
 
             const harness = new WorkerTestHarness(newTestJobConfig({
                 name: 'simple-api-reader-job',
@@ -221,11 +223,27 @@ describe('spaces_reader fetcher', () => {
                 ]
             }), { clients });
 
+            // query size are overridden for unbounded fetches
+            query.size = maxSize;
+
             beforeEach(async () => {
+                scope.get(`/${testIndex}/_info`)
+                    .query({ token: opConfig.token })
+                    .reply(200, {
+                        params: {
+                            size: {
+                                max: maxSize
+                            }
+                        }
+                    });
+
                 scope.get(`/${testIndex}`)
                     .query(query)
                     .reply(200, {
-                        results: [{ some: 'data' }],
+                        results: [{
+                            _index: opConfig.index,
+                            _source: { some: 'data' }
+                        }],
                         total: 1
                     });
 
@@ -238,6 +256,7 @@ describe('spaces_reader fetcher', () => {
 
             it('should make the request', async () => {
                 const results = await harness.runSlice(msg);
+
                 expect(results).toBeArrayOfSize(1);
                 expect(scope.isDone()).toBeTrue();
             });
@@ -267,15 +286,28 @@ describe('spaces_reader fetcher', () => {
             }), {});
 
             beforeEach(async () => {
+                scope.get(`/${testIndex}/_info`)
+                    .query({ token: 'test-token' })
+                    .reply(200, {
+                        params: {
+                            size: {
+                                max: maxSize
+                            }
+                        }
+                    });
+
                 scope.get(`/${testIndex}`)
                     .query({
                         token: 'test-token',
                         q: '(test:query)',
-                        size: 5000,
+                        size: 100000,
                     })
                     .delay(500)
                     .reply(200, {
-                        results: [{ some: 'data' }],
+                        results: [{
+                            _index: testIndex,
+                            _source: { some: 'data' }
+                        }],
                         total: 1
                     });
 

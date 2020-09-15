@@ -1,3 +1,3 @@
-import Processor from '../elasticsearch_reader/fetcher';
+import ElasticsearchIDFetcher from '../__lib/reader';
 
-export default Processor;
+export default ElasticsearchIDFetcher;

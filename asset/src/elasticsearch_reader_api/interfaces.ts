@@ -1,12 +1,55 @@
-import { APIConfig, APIFactoryRegistry, AnyObject } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
+import {
+    APIConfig,
+    APIFactoryRegistry,
+    AnyObject,
+    LifeCycle,
+    SlicerRecoveryData
+} from '@terascope/job-components';
+import Reader from './elasticsearch-api';
+import WindowState from './window-state';
+import { ESReaderOptions } from '../elasticsearch_reader/interfaces';
+import { IDType } from '../id_reader/interfaces';
 
 export const DEFAULT_API_NAME = 'elasticsearch_reader_api';
 
-export type ElasticReaderFactoryAPI = APIFactoryRegistry<elasticAPI.Client, AnyObject>
+export type ElasticReaderFactoryAPI = APIFactoryRegistry<Reader, AnyObject>
+export interface ElasticsearchReaderAPIConfig extends ESReaderOptions, APIConfig {}
+export interface DateSlicerArgs {
+    lifecycle: LifeCycle,
+    slicerID: number,
+    numOfSlicers: number,
+    recoveryData?: SlicerRecoveryData[];
+    windowState?: WindowState,
+    startTime?: Date | string
+    hook?: (args: AnyObject) => Promise<void>
+}
 
-export interface ElasticsearchReaderConfig extends APIConfig {
-    connection: string
-    index?: string;
-    full_response?: boolean
+export interface DateSlicerConfig {
+    lifecycle: LifeCycle,
+    slicerID: number,
+    numOfSlicers: number,
+    recoveryData: SlicerRecoveryData[],
+    windowState?: WindowState,
+    startTime?: Date | string,
+    hook?: (args: AnyObject) => Promise<void>
+}
+
+export interface IDSlicerArgs {
+    lifecycle: LifeCycle,
+    slicerID: number,
+    numOfSlicers: number,
+    recoveryData?: SlicerRecoveryData[];
+    key_type: IDType;
+    key_range?: string[];
+    starting_key_depth: number;
+}
+
+export interface IDSlicerConfig {
+    lifecycle: LifeCycle,
+    slicerID: number,
+    numOfSlicers: number,
+    recoveryData: SlicerRecoveryData[],
+    key_type: IDType;
+    key_range?: string[];
+    starting_key_depth: number
 }

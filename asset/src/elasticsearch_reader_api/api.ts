@@ -1,32 +1,38 @@
 import { APIFactory } from '@terascope/job-components';
 import {
-    isNil, isString, isPlainObject, getTypeOf, AnyObject
+    isNil,
+    isString,
+    isPlainObject,
+    getTypeOf,
+    AnyObject
 } from '@terascope/utils';
-import elasticAPI from '@terascope/elasticsearch-api';
-import { ElasticsearchReaderConfig } from './interfaces';
+import ElasticsearchAPI from './elasticsearch-api';
+import { ESReaderOptions } from '../elasticsearch_reader/interfaces';
 
-export default class ElasticsearchReaderAPI extends APIFactory<elasticAPI.Client, AnyObject > {
+export default class ElasticsearchReaderAPI extends APIFactory<ElasticsearchAPI, AnyObject > {
     // TODO: this needs more validation
-    validateConfig(config: unknown): ElasticsearchReaderConfig {
+    validateConfig(config: unknown): ESReaderOptions {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
         if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         if (isNil(config.connection) || !isString(config.connection)) throw new Error('Invalid parameter "connection", must provide a valid connection');
-        return config as ElasticsearchReaderConfig;
+        if (isNil(config.index) || !isString(config.index)) throw new Error('Invalid parameter "index", must provide a valid index');
+        return config as ESReaderOptions;
     }
 
     async create(
-        _name: string, overrideConfigs: Partial<ElasticsearchReaderConfig>
-    ): Promise<{ client: elasticAPI.Client, config: AnyObject }> {
+        _name: string, overrideConfigs: Partial<ESReaderOptions>
+    ): Promise<{ client: ElasticsearchAPI, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
-
+        const { connection } = config;
         const { client } = this.context.foundation.getConnection({
-            endpoint: config.connection,
+            endpoint: connection,
             type: 'elasticsearch',
             cached: true
         });
-        const esClient = elasticAPI(client, this.logger, config);
+        const emitter = this.context.apis.foundation.getSystemEvents();
+        const reader = new ElasticsearchAPI(config, client, emitter, this.logger);
 
-        return { client: esClient, config };
+        return { client: reader, config };
     }
 
     async remove(_index: string): Promise<void> {}

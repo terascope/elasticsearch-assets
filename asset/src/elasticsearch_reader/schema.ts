@@ -15,7 +15,7 @@ import moment from 'moment';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
 import { ESReaderConfig } from './interfaces';
-import { dateOptions } from './elasticsearch_date_range/helpers';
+import { dateOptions } from '../elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import { IDType } from '../id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
@@ -262,8 +262,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
             job.apis.push({
                 _name: DEFAULT_API_NAME,
-                ...newConfig,
-                full_response: false,
+                ...newConfig
             });
         }
 

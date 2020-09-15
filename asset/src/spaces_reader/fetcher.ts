@@ -1,3 +1,3 @@
-import ESDateFetcher from '../elasticsearch_reader/elasticsearch_date_range/reader';
+import SpacesFetcher from '../__lib/reader';
 
-export default ESDateFetcher;
+export default SpacesFetcher;

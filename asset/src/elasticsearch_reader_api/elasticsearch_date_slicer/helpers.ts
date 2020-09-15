@@ -1,5 +1,8 @@
 import {
-    Logger, times, AnyObject, toNumber, parseGeoPoint,
+    times,
+    AnyObject,
+    toNumber,
+    parseGeoPoint,
 } from '@terascope/job-components';
 import moment from 'moment';
 import fs from 'fs';
@@ -10,17 +13,13 @@ import { SearchParams } from 'elasticsearch';
 import {
     StartPointConfig,
     SlicerDateConfig,
+    InputDateSegments,
     DateSegments,
     SlicerDateResults,
     ParsedInterval,
     DateConfig,
-    ESReaderConfig,
-    IDReaderSlice,
-} from '../interfaces';
-import { ESIDReaderConfig } from '../../id_reader/interfaces';
-
-type ReaderConfig = ESReaderConfig | ESIDReaderConfig;
-type BuildQueryInput = SlicerDateResults | IDReaderSlice;
+    ESReaderOptions,
+} from '../../elasticsearch_reader/interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -68,7 +67,7 @@ export function dateOptions(value: string): moment.unitOfTime.Base {
 export function processInterval(
     interval: string,
     timeResolution: moment.unitOfTime.Base,
-    esDates?: DateSegments
+    esDates?: InputDateSegments
 ): ParsedInterval {
     // one or more digits, followed by one or more letters, case-insensitive
     const regex = /(\d+)(\w+)/i;
@@ -86,10 +85,10 @@ export function processInterval(
 }
 
 function compareInterval(
-    interval: ParsedInterval, timeResolution: string, esDates?: DateSegments,
+    interval: ParsedInterval, timeResolution: string, esDates?: InputDateSegments,
 ): ParsedInterval {
     if (esDates) {
-        const datesDiff = esDates.limit.diff(esDates.start);
+        const datesDiff = moment(esDates.limit).diff(esDates.start);
         const intervalDiff = moment.duration(Number(interval[0]), interval[1] as moment.unitOfTime.Base).as('milliseconds');
 
         if (intervalDiff > datesDiff) {
@@ -108,31 +107,6 @@ export const dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSSZ';
 
 // 2016-06-29T12:44:57-07:00
 export const dateFormatSeconds = 'YYYY-MM-DDTHH:mm:ssZ';
-
-type RetryCb = (msg: any) => Promise<any>
-
-// TODO: this might be broken, there is no msg
-export function retryModule(logger: Logger, numOfRetries: number) {
-    const retry = {};
-    return (_key: string | AnyObject, err: Error, fn: RetryCb, msg: any) => {
-        logger.error(err, 'error while getting next slice');
-        const key = typeof _key === 'string' ? _key : JSON.stringify(_key);
-
-        if (!retry[key]) {
-            retry[key] = 1;
-            return fn(msg);
-        }
-
-        retry[key] += 1;
-        if (retry[key] > numOfRetries) {
-            return Promise.reject(
-                new Error(`max_retries met for slice, key: ${key}`)
-            );
-        }
-
-        return fn(msg);
-    };
-}
 
 export function existsSync(filename: string): boolean {
     try {
@@ -281,7 +255,7 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
-    startTime: moment.Moment,
+    startTime: moment.Moment | Date | string,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
 ): { start: moment.Moment, limit: moment.Moment } {
@@ -464,7 +438,9 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
     return { dates: newDates as SlicerDateConfig, range: dates };
 }
 
-export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): SearchParams {
+export function buildQuery(
+    opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>
+): SearchParams {
     const query: SearchParams = {
         index: opConfig.index,
         size: slice.count,
@@ -476,7 +452,7 @@ export function buildQuery(opConfig: ReaderConfig, slice: BuildQueryInput): Sear
     return query;
 }
 
-function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
+function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>) {
     const body: AnyObject = {
         query: {
             bool: {
@@ -495,8 +471,7 @@ function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
 
         body.query.bool.must.push({ range: dateObj });
     }
-    // TODO: deprecate this logic and remove in the future
-    // elasticsearch _id based query
+    // elasticsearch _id based query, we keep for v5 and lower
     if (slice.key) {
         body.query.bool.must.push({ wildcard: { _uid: slice.key } });
     }
@@ -525,7 +500,7 @@ function _buildRangeQuery(opConfig: ReaderConfig, slice: BuildQueryInput) {
     return body;
 }
 
-export function validateGeoParameters(opConfig: ReaderConfig): void {
+export function validateGeoParameters(opConfig: ESReaderOptions): void {
     const {
         geo_field: geoField,
         geo_box_top_left: geoBoxTopLeft,
@@ -580,7 +555,7 @@ export function validateGeoParameters(opConfig: ReaderConfig): void {
     }
 }
 
-export function geoSearch(opConfig: ReaderConfig): AnyObject {
+export function geoSearch(opConfig: ESReaderOptions): AnyObject {
     let isGeoSort = false;
     const queryResults: AnyObject = {};
     // check for key existence to see if they are user defined

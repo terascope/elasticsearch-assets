@@ -1,3 +1,3 @@
-import DateSlicer from './elasticsearch_date_range/slicer';
+import DateSlicer from '../__lib/slicer';
 
 export default DateSlicer;

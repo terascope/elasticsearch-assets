@@ -9,10 +9,9 @@ import {
     times,
     pDelay,
 } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
-import WindowState from '../../../asset/src/elasticsearch_reader/window-state';
-import slicerFn from '../../../asset/src/elasticsearch_reader/elasticsearch_date_range/slicer-fn';
+import WindowState from '../../../asset/src/elasticsearch_reader_api/window-state';
+import slicerFn from '../../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer';
 import {
     SlicerArgs,
     ParsedInterval,
@@ -21,7 +20,7 @@ import {
     SlicerDateResults
 } from '../../../asset/src/elasticsearch_reader/interfaces';
 import MockClient from '../../helpers/mock_client';
-import { dateFormatSeconds, dateFormat, divideRange } from '../../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
+import { dateFormatSeconds, dateFormat, divideRange } from '../../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 
 interface TestConfig {
     slicers?: number;
@@ -72,6 +71,12 @@ describe('date slicer function', () => {
             time_resolution: timeResolution,
             size: 1000,
         };
+
+        async function countFn() {
+            const data = await client!.search({ index: 'test' });
+            return data.hits.total;
+        }
+
         const job = newTestJobConfig({
             analytics: true,
             slicers,
@@ -86,21 +91,22 @@ describe('date slicer function', () => {
 
         const executionConfig = newTestExecutionConfig(job);
         const opConfig = executionConfig.operations[0];
-        const api = elasticAPI(client, logger, opConfig as any);
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
         const slicerArgs: SlicerArgs = {
             events,
-            executionConfig,
-            logger,
             opConfig,
-            api,
-            id,
+            numOfSlicers: slicers,
+            lifecycle,
+            logger,
             dates,
-            primaryRange,
+            id,
             interval,
             latencyInterval,
-            windowState: _windowState
+            primaryRange,
+            windowState: _windowState,
+            countFn,
+            version: 6
         };
 
         return slicerFn(slicerArgs);

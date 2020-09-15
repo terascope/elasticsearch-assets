@@ -5,13 +5,13 @@ import {
     LifeCycle,
     SlicerRecoveryData,
     AnyObject,
-    sortBy
+    sortBy,
+    SliceRequest
 } from '@terascope/job-components';
 import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '../../asset/src/id_reader/interfaces';
-import { dateFormat } from '../../asset/src/elasticsearch_reader/elasticsearch_date_range/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
@@ -41,6 +41,24 @@ describe('elasticsearch_reader slicer', () => {
     const evenOriginalEnd = '2019-04-26T15:00:23.394Z';
 
     let harness: SlicerTestHarness;
+
+    async function consume(test: SlicerTestHarness): Promise<SliceRequest[]> {
+        const results: SliceRequest[] = [];
+
+        async function recurse(): Promise<void> {
+            const slices = await test.createSlices();
+            const data = slices.filter(Boolean) as SliceRequest[];
+
+            if (data.length > 0) {
+                results.push(...data);
+                return recurse();
+            }
+        }
+
+        await recurse();
+
+        return results;
+    }
 
     const clients = [
         {
@@ -76,10 +94,6 @@ describe('elasticsearch_reader slicer', () => {
             await harness.shutdown();
         }
     });
-
-    function makeDate(format: string) {
-        return moment.utc(moment.utc().format(format));
-    }
 
     async function getMeta(test: SlicerTestHarness) {
         return test.context.apis.executionContext.getMetadata('elasticsearch_reader');
@@ -289,46 +303,59 @@ describe('elasticsearch_reader slicer', () => {
 
     it('can run a persistent reader', async () => {
         const delay: [number, moment.unitOfTime.Base] = [100, 'ms'];
-        const start = evenOriginalStart;
-        const delayedBoundary = moment.utc(start).subtract(delay[0], delay[1]);
+        const proximateBeforeStartTime = new Date();
+        const proximateBeforeDelayedBoundary = moment.utc(proximateBeforeStartTime)
+            .subtract(delay[0], delay[1]);
 
         const opConfig = {
             size: 100,
             interval: '100ms',
-            delay: delay.join('')
+            delay: delay.join(''),
+
         };
+
+        function isInBetween(val: string, firstDate: any, secondDate: any) {
+            return moment(val).isBetween(firstDate, secondDate);
+        }
 
         const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
 
-        const [results] = await test.createSlices();
+        const firstSegment = await consume(test);
+        const secondSegment = await consume(test);
 
-        expect(results).toBeDefined();
+        const proximateAfterStartTime = new Date();
+        const proximateAfterDelayedBoundary = moment.utc(proximateAfterStartTime)
+            .subtract(delay[0], delay[1]);
 
-        expect(results?.start).toBeDefined();
-        expect(results?.end).toBeDefined();
-        expect(results?.count).toBeDefined();
+        const firstSegmentStartSlice = firstSegment[0];
+        const firstSegmentLastSlice = firstSegment[firstSegment.length - 1];
 
-        const now1 = makeDate(dateFormat);
-        expect(moment.utc(results?.end).isBetween(delayedBoundary, now1)).toEqual(true);
+        expect(
+            isInBetween(
+                firstSegmentLastSlice.end,
+                proximateBeforeDelayedBoundary,
+                proximateAfterDelayedBoundary
+            )
+        ).toBeTrue();
 
-        const [results2] = await test.createSlices();
+        expect(
+            moment(firstSegmentStartSlice.limit).diff(firstSegmentStartSlice.start)
+        ).toEqual(delay[0]);
 
-        expect(results2).toEqual(null);
+        expect(
+            proximateAfterDelayedBoundary.diff(firstSegmentLastSlice.limit) <= delay[0]
+        ).toBeTrue();
+
+        // we are filtering out nulls
+        expect(secondSegment).toBeArrayOfSize(0);
 
         await pDelay(110);
 
-        const [results3] = await test.createSlices();
+        const thirdSegment = await consume(test);
 
-        expect(results3).toBeDefined();
-        expect(results3?.start).toBeDefined();
-        expect(results3?.end).toBeDefined();
-        expect(results3?.count).toBeDefined();
+        expect(thirdSegment.length >= 1).toBeTrue();
 
-        const [results4] = await test.createSlices();
-        expect(results4).toEqual(null);
-
-        const [results5] = await test.createSlices();
-        expect(results5).toEqual(null);
+        expect(thirdSegment[0].start).toEqual(firstSegmentLastSlice.limit);
     });
 
     it('slicer can reduce date slices down to size', async () => {

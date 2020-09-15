@@ -56,8 +56,7 @@ export default class MyReader extends Fetcher<ESDateConfig> {
     }
 
     async fetch(slice: SlicerDateResults): Promise<DataEntity[]> {
-        const query = buildQuery(this.opConfig, slice);
-        return this.api.search(query);
+        return this.api.fetch(query);
     }
 }
 ```
@@ -158,25 +157,76 @@ apiManager.get('normalClient') === undefined
 ## Spaces Reader Instance
 This is the reader class that is returned from the create method of the APIFactory. This returns a restricted [elastic-api](https://terascope.github.io/teraslice/docs/packages/elasticsearch-api/overview). Only the search and count methods will work appropriately.
 
-### search (async)
-```(query: ElasticsearchQuery) => Promise<DataEntities[]>```
+### fetch
+```(query: ElasticsearchSliceQuery) => Promise<DataEntities[]>```
+This will perform an date range or wildcard query to elasticsearch and return the results of the query.
+
+parameters:
+- query: an slice query object
+  -  start: string, must be paired with end to do a date range query.
+  -  end: string, must be paired with start to do a date range query.
+  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
+
+
+### count
+```(query: ElasticsearchQuery) => Promise<number>```
+This will perform an count query and return the number of records in that query.
+
+parameters:
+- query: an slice query object
+  -  start: string, must be paired with end to do a date range query.
+  -  end: string, must be paired with start to do a date range query.
+  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
+
+### _searchRequest
+```(query: ElasticsearchSearchParams) => Promise<DataEntities[]>```
+This will allow you to pass in a whole elasticsearch query object to make custom queries. THIS IS AN UNSUPPORTED ESCAPE HATCH. Please do not overly rely on this as this is an internal api and will most likely change.
+
 parameters:
 - query: an elasticsearch query object
 
-### count (async)
-```(query: ElasticsearchQuery) => Promise<number>```
-parameters:
-- query: an elasticsearch query object
+### version
+```() => number```
+This returns the major elasticsearch version that this client is connected to
+
+### verifyIndex
+```() => Promise<void>```
+This check if the index exists and throw otherwise, this will also log the window_size of that given index.
 
 
 ```js
+const dateRangeQuery = {
+    start: '2019-04-26T15:00:23.201Z',
+    end: '2019-04-26T15:00:23.220Z',
+};
+
+const results = await api.fetch(dateRangeQuery);
+
+const oldUIDQuery = {
+   key:  `events#ba*`
+};
+
+const results = await api.fetch(oldUIDQuery);
+
+const wildcardQuery = {
+    field: 'uuid,
+    value: 'afe1*',
+};
+
+const results = await api.fetch(wildcardQuery);
+
+
 const query: {
     q: '(test:query OR other:thing AND bytes:>=2000)',
     size: 100,
     fields: 'foo,bar,date'
 };
 
-const results = await api.search(query);
+const results = await api._searchRequest(query);
+
+api.version === 6
 ```
 
 ## Parameters
@@ -184,7 +234,7 @@ const results = await api.search(query);
 | Configuration | Description | Type |  Notes   |
 | --------- | -------- | ------ | ------ |
 | \_name | Name of operation, it must reflect the exact name of the file | String | required |
-| endpoint | The base API endpoint to read from: i.e.http://yourdomain.com/api/v1 | String | required |
+| endpoint | The base API endpoint to read from: i.e.http://yourdomain.com/api/v2 | String | required |
 | token | teraserver API access token for making requests | String | required |
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
 | index | Which index to read from | String | required |

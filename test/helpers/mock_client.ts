@@ -61,7 +61,7 @@ function validateBulk(data: BulkData) {
 }
 
 export default class MockClient {
-    sequence: any[];
+    sequence!: any[];
     indices: AnyObject;
     cluster: AnyObject;
     deepRecursiveResponseCount: boolean | number;
@@ -76,7 +76,13 @@ export default class MockClient {
             { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } },
             { _shards: { failed: 0 }, hits: { total: 100, hits: [createData()] } }
         ];
-        this.sequence = _sequence || defaultSequence;
+
+        if (_sequence) {
+            this.setSequenceData(_sequence);
+        } else {
+            this.sequence = defaultSequence;
+        }
+
         this.indices = {};
         this.cluster = {};
         this.searchQuery = {};
@@ -109,6 +115,7 @@ export default class MockClient {
         if (sequence.length > 0) {
             return sequence.shift();
         }
+
         const total = this.deepRecursiveResponseCount || 0;
         return {
             _shards: { failed: 0 },
