@@ -38,6 +38,11 @@ export interface ESReaderOptions {
     connection: string;
 }
 
+export interface InputDateSegments {
+    start: moment.Moment | string | Date;
+    limit: moment.Moment | string | Date;
+}
+
 export interface DateSegments {
     start: moment.Moment;
     limit: moment.Moment;

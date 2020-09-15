@@ -35,6 +35,7 @@ import {
     ESReaderOptions,
     SlicerDateResults,
     DateSegments,
+    InputDateSegments,
     SlicerArgs,
     StartPointConfig
 } from '../elasticsearch_reader/interfaces';
@@ -107,7 +108,10 @@ export default class ElasticsearchAPI {
     async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]> {
         this.validate(queryParams);
         // attempt to get window if not set
-        if (!this.windowSize) await this.getWindowSize();
+        if (!this.windowSize) {
+            const size = await this.getWindowSize();
+            if (size) this.windowSize = size;
+        }
         // if we did go ahead and complete query
         if (this.windowSize) {
             const query = buildQuery(this.config, queryParams);
@@ -124,20 +128,21 @@ export default class ElasticsearchAPI {
     }
 
     async determineSliceInterval(
-        interval: string, esDates?: DateSegments
+        interval: string, esDates?: InputDateSegments
     ): Promise<[number, moment.unitOfTime.Base]> {
         if (this.config.interval !== 'auto') {
             return processInterval(interval, this.config.time_resolution, esDates);
         }
+
         if (esDates == null) throw new Error('must provide dates to create interval');
 
         const count = await this.count({
-            start: esDates.start.format(this.dateFormat),
-            end: esDates.limit.format(this.dateFormat),
+            start: moment(esDates.start).format(this.dateFormat),
+            end: moment(esDates.limit).format(this.dateFormat),
         });
 
         const numOfSlices = Math.ceil(count / this.config.size);
-        const timeRangeMilliseconds = esDates.limit.diff(esDates.start);
+        const timeRangeMilliseconds = moment(esDates.limit).diff(esDates.start);
         const millisecondInterval = Math.floor(timeRangeMilliseconds / numOfSlices);
 
         if (this.config.time_resolution === 's') {
@@ -368,8 +373,8 @@ export default class ElasticsearchAPI {
         const finalDates = { start: startDate, limit: endDate };
         return finalDates;
     }
-    // TODO: type this better
-    async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
+
+    private async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
         // we have a date, parse and return it
         if (date) return parseDate(date);
         // we are in auto, so we determine each part
@@ -416,7 +421,7 @@ export default class ElasticsearchAPI {
         return parsedDate;
     }
 
-    async getSettings(query: AnyObject): Promise<AnyObject | null> {
+    private async getSettings(query: AnyObject): Promise<AnyObject | null> {
         try {
             return this._baseClient.indices.getSettings(query);
         } catch (_err) {
@@ -425,7 +430,7 @@ export default class ElasticsearchAPI {
         }
     }
 
-    async getWindowSize(): Promise<void> {
+    async getWindowSize(): Promise<number | null> {
         const window = 'index.max_result_window';
         const { index } = this.config;
 
@@ -442,9 +447,11 @@ export default class ElasticsearchAPI {
             const defaultPath = settings[index].defaults[window];
             const configPath = settings[index].settings[window];
 
-            if (defaultPath) this.windowSize = toNumber(defaultPath);
-            if (configPath) this.windowSize = toNumber(configPath);
+            if (defaultPath) return toNumber(defaultPath);
+            if (configPath) return toNumber(configPath);
         }
+
+        return null;
     }
 
     get version(): number {

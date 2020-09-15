@@ -13,6 +13,7 @@ import { SearchParams } from 'elasticsearch';
 import {
     StartPointConfig,
     SlicerDateConfig,
+    InputDateSegments,
     DateSegments,
     SlicerDateResults,
     ParsedInterval,
@@ -66,7 +67,7 @@ export function dateOptions(value: string): moment.unitOfTime.Base {
 export function processInterval(
     interval: string,
     timeResolution: moment.unitOfTime.Base,
-    esDates?: DateSegments
+    esDates?: InputDateSegments
 ): ParsedInterval {
     // one or more digits, followed by one or more letters, case-insensitive
     const regex = /(\d+)(\w+)/i;
@@ -84,10 +85,10 @@ export function processInterval(
 }
 
 function compareInterval(
-    interval: ParsedInterval, timeResolution: string, esDates?: DateSegments,
+    interval: ParsedInterval, timeResolution: string, esDates?: InputDateSegments,
 ): ParsedInterval {
     if (esDates) {
-        const datesDiff = esDates.limit.diff(esDates.start);
+        const datesDiff = moment(esDates.limit).diff(esDates.start);
         const intervalDiff = moment.duration(Number(interval[0]), interval[1] as moment.unitOfTime.Base).as('milliseconds');
 
         if (intervalDiff > datesDiff) {
