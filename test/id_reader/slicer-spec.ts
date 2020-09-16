@@ -29,11 +29,6 @@ describe('id_reader slicer', () => {
     let harness: SlicerTestHarness;
     let clients: any;
 
-    interface ESData {
-        count: number;
-        key: string;
-    }
-
     beforeAll(async () => {
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
         await populateIndex(esClient, apiReaderIndex, evenSpread.types, bulkData, docType);
