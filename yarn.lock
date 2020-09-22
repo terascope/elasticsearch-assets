@@ -1217,7 +1217,7 @@ aggregate-error@^3.0.0:
     clean-stack "^2.0.0"
     indent-string "^4.0.0"
 
-ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.3, ajv@^6.12.4:
+ajv@^6.10.0, ajv@^6.10.2, ajv@^6.12.3, ajv@^6.12.4, ajv@^6.12.5:
   version "6.12.5"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.5.tgz#19b0e8bae8f476e5ba666300387775fb1a00a4da"
   integrity sha512-lRF8RORchjpKG50/WFf8xmg7sgCLFiYNNnqdKflk63whMQcWR5ngGjiSXkL9bjxy6B2npOK2HSMN49jEBMSkag==
@@ -2079,16 +2079,16 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-elasticsearch-store@^0.33.0:
-  version "0.33.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.33.0.tgz#bb8ede7ff9eede84cc3888c60f440dd1650250dc"
-  integrity sha512-incb0EGAlgxPkC1a/aFTEcN1C+Akb7fgs3eyP42o2f2v5W8x/UuzFQzNecEkHIMG47wTMjlQ6oSzm3O9q+5lKA==
+elasticsearch-store@^0.34.0:
+  version "0.34.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.34.0.tgz#e9311143ede72f6a144bf28c37e8d2db6e086c1d"
+  integrity sha512-wiMmI6c4Y2GjkGAUw9dtUzm8Uhxg5cDs4IBEHIijFaO3RgP0NgtJ7Ke1eMcpxT7FKaUdbxOw/w28enbciUBSUw==
   dependencies:
     "@terascope/data-mate" "^0.13.0"
     "@terascope/data-types" "^0.21.0"
     "@terascope/types" "^0.5.0"
     "@terascope/utils" "^0.30.0"
-    ajv "^6.12.3"
+    ajv "^6.12.5"
     uuid "^8.3.0"
     xlucene-translator "^0.9.0"
 
