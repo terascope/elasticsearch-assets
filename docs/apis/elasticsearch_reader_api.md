@@ -483,6 +483,88 @@ size === 100000
 
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
+### Example on Using Multiple Elasticsearch_Reader_API settings in the same job
+
+ You can specify which api config applies to which _op by appending a semi-colon and an id to the end of the api `_name`.
+
+ ```json
+ "apis": [
+     "_name": "elasticsearch_reader_api:ID"
+     ...
+ ]
+ ```
+
+ example job:
+```json
+{
+    "name": "test-job",
+    "lifecycle": "once",
+    "workers": 1,
+    "assets": ["elasticsearch"],
+    "apis": [
+        {
+            "_name": "elasticsearch_reader_api:id",
+            "connection": "connection-1",
+            "index": "index-1",
+            "field": "_key",
+            "query": "key:key-name",
+            "size": 10000
+        },
+        {
+            "_name": "elasticsearch_reader_api:custom",
+            "connection": "connection-2",
+            "index": "index2",
+            "field": "name",
+            "size": 10000
+        }
+    ],
+    "operations": [
+        {
+            "_op": "id_reader",
+            "api_name": "elasticsearch_reader_api:id"
+        },
+        {
+            "_op": "custom-api-reader-op",
+            "api_name": "elasticsearch_reader_api:custom"
+        }
+    ]
+}
+```
+
+Processor for the custom-api-reader-op
+```js
+'use strict';
+
+const { BatchProcessor } = require('@terascope/job-components');
+
+class CustomAPIReaderOp extends BatchProcessor {
+    async initialize() {
+        this.apiManager = this.getAPI(this.opConfig.api_name);
+        this.api = await this.apiManager.create('customClient', {});
+
+        // _searchRequest needs an index as part of the elasticsearch object query
+        this.index = this.apiManager.getConfig('customClient').index;
+    }
+
+    async onBatch(data) {
+        // function that builds a query from the id_readers output
+        const query = this._buildQuery(data);
+
+        const results = await this.newClient._searchRequest({
+            q: query,
+            index: this.index,
+            size: 1000
+        });
+
+        this.apiManager.remove('customClient');
+
+        return results;
+    }
+}
+
+module.exports = CustomAPIReaderOp;
+```
+
 ### Metadata
 Metadata is calculated or provided by elasticsearch and attached to each record fetched from elasticsearch.  The metadata fields can then be called or referenced during a job.
 
