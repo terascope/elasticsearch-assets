@@ -1,16 +1,11 @@
 # elasticsearch_reader_api
 
-This is a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis), which encapsulates a specific functionality that can be utilized by any processor, reader or slicer.
-
- The `elasticsearch_reader_api` will provide an [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory), which is a singleton that can create, cache and manage multiple elasticsearch readers that can be accessed in any operation through the `getAPI` method on the operation.
-
-This api is the core of the [elasticsearch reader](../operations/elasticsearch_reader.md) and [id reader](../operations/id_reader.md) operations.
-
-Fetched records will already have metadata associated with it, like the `_key` field. Please reference the [metadata section](#metadata) for more information.
+The `elasticsearch_reader_api` makes the elasticsearch reader functionality available to any processor, reader or slicer.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory) to create, cache, and manage multiple elasticsearch readers.   This api is the core of the [elasticsearch reader](../operations/elasticsearch_reader.md) and [id reader](../operations/id_reader.md) operations.
+The records fetched via this api will have the standard associated metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
 ## Usage
-### Example Processor using a elasticsearch reader API
-This is an example of a custom fetcher using the elasticsearch_reader_api to make its own queries to elasticsearch.
+### Example Processor using the elasticsearch reader API
+Custom fetcher
 
 Example Job
 
@@ -44,16 +39,13 @@ Example Job
 }
 ```
 
-Here is a custom fetcher for the job described above
-```typescript
+Custom fetcher code
+```js
 // found at  /some_reader/fetcher.js
 export default class SomeReader extends Fetcher {
-    api: elasticAPI.Client;
-
     async initialize() {
         await super.initialize();
-        const apiName = this.opConfig.api_name;
-        const apiManager = this.getAPI(apiName);
+        const apiManager = this.getAPI(this.opConfig.api_name;);
         this.api = await apiManager.create(apiName, {});
     }
 
@@ -67,48 +59,47 @@ export default class SomeReader extends Fetcher {
 
 ### size
 
-this will return how many separate reader apis are in the cache
+Returns the number of reader apis in the cache
 
 ### get
 parameters:
 - name: String
 
-this will fetch any reader api that is associated with the name provided
+Returns the reader api associated with the name
 
 ### getConfig
 parameters:
 - name: String
 
-this will fetch any reader api config that is associated with the name provided
+Returns the reader api config associated with the name
 
 ### create (async)
 parameters:
 - name: String
-- configOverrides: Check options below, optional
+- configOverrides (optional) see [parameters](#Parameters) for config fields
 
-this will create an instance of a [reader api](#elasticsearch_reader_instance), and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
+Creates an instance of a [reader api](#elasticsearch-reader-instance). Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if the api name has been previously used.  
 
 ### remove (async)
 parameters:
 - name: String
 
-this will remove an instance of a reader api from the cache and will follow any cleanup specified in the api code.
+Removes an instance of a reader api from the cache and will follow any cleanup specified in the api code.
 
 ### entries
 
-This will allow you to iterate over the cache name and client of the cache
+Returns a Map of objects, `{ api_name: api_instance }`, of the cached names and api instances.
 
 ### keys
 
-This will allow you to iterate over the cache name of the cache
+Returns a Map of the names of the cached api names
 
 ### values
 
-This will allow you to iterate over the values of the cache
+Returns a Map of the cached api instances
 
-
-## Example of using the factory methods in a processor
-```typescript
+## Example of using the factory api methods
+```javascript
 // example of api configuration
 const apiConfig = {
   _name: "elasticsearch_reader_api",
@@ -118,12 +109,11 @@ const apiConfig = {
   connection: "default"
 };
 
-
-const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+const apiManager = this.getAPI(apiName);
 
 apiManager.size() === 0
 
-// this will return an api cached at "normalClient" and it will use the default api config
+// this will return an api cached at "normalClient" 
 const normalClient = await apiManager.create('normalClient', {})
 
 apiManager.size() === 1
@@ -144,21 +134,33 @@ apiManger.getConfig('overrideClient') === {
   connection: "other"
 }
 
+// iterate through all the cached api names
+for (const keys of this.apiManager.keys()) {
+    console.log(keys); // normalClient then overrideClient
+}
 
 await apiManger.remove('normalClient');
 
 apiManager.size() === 1
 
 apiManager.get('normalClient') === undefined
-
 ```
 
 ## Elasticsearch Reader Instance
-This is the reader class that is returned from the create method of the APIFactory.
+This is the reader api instance that is returned from the create method of the APIFactory.  The api methods can then be used to fetch and query data from elasticsearch.
 
-### fetch
-```(query: ElasticsearchSliceQuery) => Promise<DataEntities[]>```
-This will perform an date range or wildcard query to elasticsearch and return the results of the query.
+Create a new reader instance:
+```js
+const api = apiManager.create('newApi', {});
+```
+
+Get a previously created reader instance:
+```js
+const api = apiManager.get('oldApi');
+```
+
+### fetch (async)
+Returns the results of a date range or wildcard query
 
 parameters:
 - query: an slice query object
@@ -168,6 +170,8 @@ parameters:
   -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
+const api = apiManager.create('newApi', {});
+
 const dateRangeQuery = {
     start: '2019-04-26T15:00:23.201Z',
     end: '2019-04-26T15:20:23.220Z',
@@ -193,9 +197,8 @@ results === [ { some: 'record', uuid: 'afe18550-0081-453f-9e80-93a90782a5bd' }]
 ```
 
 
-### count
-```(query: ElasticsearchQuery) => Promise<number>```
-This will perform an count query and return the number of records in that are in the range of the query.
+### count (async)
+Returns the number of records that are in the range of the query.
 
 parameters:
 - query: an slice query object
@@ -205,6 +208,8 @@ parameters:
   -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
+const api = apiManager.create('countApi', {});
+
 const dateRangeQuery = {
     start: '2019-04-26T15:00:23.201Z',
     end: '2019-04-26T15:20:23.220Z',
@@ -217,7 +222,7 @@ const oldUIDQuery = {
    key:  'events#ba*'
 };
 
-let results = await api.fetch(oldUIDQuery);
+let results = await api.count(oldUIDQuery);
 results === 3552
 
 const wildcardQuery = {
@@ -225,38 +230,39 @@ const wildcardQuery = {
     value: 'afe1*',
 };
 
-let results = await api.fetch(wildcardQuery);
+let results = await api.count(wildcardQuery);
 results === 1232
 ```
 
-### _searchRequest
-```(query: ElasticsearchSearchParams) => Promise<DataEntities[]>```
-This will allow you to pass in a whole elasticsearch query object to make custom queries. THIS IS AN UNSUPPORTED ESCAPE HATCH. Please do not overly rely on this as this is an internal api and will most likely change.
+### _searchRequest (async)
+Returns results from a elasticsearch query object.
+
+`WARNING: _searchRequest is an internal api and likely to change.`
 
 parameters:
 - query: an elasticsearch query object
 
 ```js
 const query: {
+    index: 'example-index',
     q: '(test:query OR other:thing AND bytes:>=2000)',
-    size: 100,
-    fields: 'foo,bar,date'
+    size: 100
 };
 
 const results = await api._searchRequest(query);
 ```
 
 ### version
-```number```
-This returns the major elasticsearch version that this client is connected to
+
+Returns the major elasticsearch version that this client is connected to
 
 ```js
 api.version === 6
 ```
 
-### verifyIndex
-```() => Promise<void>```
-This check if the index exists and throw otherwise, this will also log the window_size of that given index.
+### verifyIndex (async)
+
+Verifies that the index exists or throws an error if it is not found.  It also logs the window_size of the index.
 
 ```js
 try {
@@ -266,10 +272,9 @@ try {
 }
 ```
 
-### determineSliceInterval
-```(interval: string|duration, dateRange?: DateSegments) => Promise<[number, "time unit"]>```
+### determineSliceInterval (async)
 
-This is a helper api that will determine how big the slice interval should be for your date_slicer, this is already handled in `makeDateSlicer` for you. If you are constructing your own slicer you can use this to help determine the appropriate size. If interval is set to `auto`, dateRange must be provided and the function will calculate and interval for you. If passed in a duration, it will parse it for you in the format listed by the `time_resolution` configuration.
+A helper api used to determine the size of the slice interval for the date_slicer.  If interval is set to `auto`, dateRange must be provided and the function will calculate and interval. If passed in a duration, it will parse the duration in the format listed by the `time_resolution` configuration.
 
 parameters:
 - interval: a duration string (ie. `5min`, `30s`, `750ms`), or it may be set to `auto`
@@ -296,10 +301,9 @@ const interval = await api.determineSliceInterval('auto', dateRange);
 interval === [2763533, 'ms'];
 ```
 
-### makeDateSlicer
-```(args: DateSlicerArgs) => Promise<SlicerFn>```
+### makeDateSlicer (async)
 
-This function will generate a slicer which is the elasticsearch_reader slicer core component. You can use this to generate slice chunks for your reader.
+Generates a slicer based on the elasticsearch_reader slicer.
 
 parameters:
 - args: an slice query object
@@ -372,10 +376,18 @@ results === {
 }
 ```
 
-### makeIDSlicer
-```(args: IDSlicerArgs) => Promise<SlicerFn>```
+### makeWindowState (async)
 
-This function will generate a slicer which is the id_reader slicer core component. You can use this to generate slice chunks for your reader.
+A helper method that will return a synchronization window to coordinate slicer date range progression. THIS IS ONLY NEEDED FOR A DATE SLICER IN *PERSISTENT* MODE. This needs to be made once at the top level of the processor/slicer and passed in each time `makeDateSlicer` is called.
+See [makeDateSlicer](#makeDateSlicer) example above.
+
+```js
+const windowState = await api.makeWindowState();
+```
+
+### makeIDSlicer (async)
+
+Generates a slicer based on the id_reader slicer.
 
 parameters:
 - args: an slice query object
@@ -396,7 +408,7 @@ const recoveryData = [];
 const key_type = 'hexadecimal';
 const starting_key_depth = 2;
 
-const args: IDSlicerArgs = {
+const args = {
     lifecycle,
     numOfSlicers,
     slicerID,
@@ -405,15 +417,14 @@ const args: IDSlicerArgs = {
     starting_key_depth,
 };
 
-const slicer = await this.api.makeIDSlicer(args);
+const slicer = await api.makeIDSlicer(args);
 
 const results = await slicer();
 results ===  { key: 'a0*', count: 5 }
 ```
-### determineDateRanges
-```(args: IDSlicerArgs) => Promise<{ start: moment.Moment; limit: moment.Moment; }>```
+### determineDateRanges (async)
 
-This is a helper api to parse the start/end dates set on the apiConfig. If no start or end is specified, it will query against the index to find the earliest and latest record and produce dates to include them.
+A helper method used to parse the start/end dates set on the apiConfig. If no start or end is specified it will query against the index to find the earliest and latest record, and produce dates to include them.
 
 ```js
 
@@ -432,9 +443,8 @@ results ==== {
 ```
 
 ### getWindowSize
-```() => Promise<number | null>```
 
-this is a helper method to get the `index.max_result_window` size setting configured on the index. This is useful to determine how large a slice is permitted.
+A helper method used to get the `index.max_result_window` size setting configured on the index. This is useful to determine how large a slice is permitted.
 
 ```js
 const size = await api.getWindowSize();
@@ -442,19 +452,11 @@ const size = await api.getWindowSize();
 size === 100000
 ```
 
-### makeWindowState
-```(numOfSlicers: number) => WindowState```
-This is a helper api that will return a synchronization window to coordinate slicer date range progression. THIS IS ONLY NEEDED FOR A DATE SLICER IN *PERSISTENT* MODE. This needs to be made once at the top level of the processor/slicer and passed in each time `makeDateSlicer` is called.
-
-```js
-const windowState = await api.makeWindowState();
-```
-
 ## Parameters
 
 | Configuration | Description | Type |  Notes   |
 | --------- | -------- | ------ | ------ |
-| \_name | Name of operation, it must reflect the exact name of the file | String | required |
+| \_name | Name of the api being used | String | required |
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
 | index | Which index to read from | String | required |
 | type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id|String | required if using elasticsearch v5 and subslice_by_key is set to true, optional otherwise, defaults to '_doc' |
@@ -481,10 +483,8 @@ const windowState = await api.makeWindowState();
 
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
-
 ### Metadata
-When the records are fetched from elasticsearch, metadata will be attached
-based off of the what metadata elasticsearch results provides
+Metadata is calculated or provided by elasticsearch and attached to each record fetched from elasticsearch.  The metadata fields can then be called or referenced during a job.
 
 - `_key` is set to the _id
 - `_processTime` is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
