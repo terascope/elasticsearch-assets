@@ -4,8 +4,8 @@ The `elasticsearch_reader_api` makes the elasticsearch reader functionality avai
 The records fetched via this api will have the standard associated metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
 ## Usage
-### Example Processor using the elasticsearch reader API
-Custom fetcher
+### Example Processor using the elasticsearch_reader_api
+Example of a Custom fetcher
 
 Example Job
 
