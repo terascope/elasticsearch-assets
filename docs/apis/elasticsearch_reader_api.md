@@ -160,6 +160,7 @@ const api = apiManager.get('oldApi');
 ```
 
 ### fetch (async)
+
 Returns the results of a date range or wildcard query
 
 parameters:
@@ -198,10 +199,11 @@ results === [ { some: 'record', uuid: 'afe18550-0081-453f-9e80-93a90782a5bd' }]
 
 
 ### count (async)
+
 Returns the number of records that are in the range of the query.
 
 parameters:
-- query: an slice query object
+- query: a slice query object
   -  start: string, must be paired with end to do a date range query.
   -  end: string, must be paired with start to do a date range query.
   -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
@@ -235,7 +237,8 @@ results === 1232
 ```
 
 ### _searchRequest (async)
-Returns results from a elasticsearch query object.
+
+Returns results from a custom elasticsearch query
 
 `WARNING: _searchRequest is an internal api and likely to change.`
 
@@ -274,7 +277,7 @@ try {
 
 ### determineSliceInterval (async)
 
-A helper api used to determine the size of the slice interval for the date_slicer.  If interval is set to `auto`, dateRange must be provided and the function will calculate and interval. If passed in a duration, it will parse the duration in the format listed by the `time_resolution` configuration.
+A helper api used to determine the size of the slice interval for the date_slicer.  If interval is set to `auto`, dateRange must be provided and the function will calculate an interval. If passed in a duration, it will parse the duration in the format listed by the `time_resolution` configuration.
 
 parameters:
 - interval: a duration string (ie. `5min`, `30s`, `750ms`), or it may be set to `auto`
@@ -483,16 +486,9 @@ size === 100000
 
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
-### Example on Using Multiple Elasticsearch_Reader_API settings in the same job
+### Example on using multiple elasticsearch_reader_api settings in the same job
 
  You can specify which api config applies to which _op by appending a semi-colon and an id to the end of the api `_name`.
-
- ```json
- "apis": [
-     "_name": "elasticsearch_reader_api:ID"
-     ...
- ]
- ```
 
  example job:
 ```json
@@ -566,7 +562,7 @@ module.exports = CustomAPIReaderOp;
 ```
 
 ### Metadata
-Metadata is calculated or provided by elasticsearch and attached to each record fetched from elasticsearch.  The metadata fields can then be called or referenced during a job.
+The metadata fields are calculated  by teraslice or provided by elasticsearch and attached to each record fetched from elasticsearch.  The metadata fields can then be called or referenced during a job by using the `getMetadata` method.
 
 - `_key` is set to the _id
 - `_processTime` is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
