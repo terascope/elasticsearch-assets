@@ -17,10 +17,14 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         const apiName = this.opConfig.api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+
         this.api = await apiManager.create(apiName, {});
-        const { version } = this.api;
-        this.version = version;
-        if (version !== 5 && this.opConfig.field == null) {
+        this.version = this.api.version;
+
+        const apiConfig = apiManager.getConfig(apiName);
+        if (!apiConfig) throw new Error(`Could not find api config for api_name ${apiName}`);
+
+        if (this.version !== 5 && apiConfig.field == null) {
             throw new Error('Paramter field must be set if querying against elasticsearch version >= 6.x');
         }
         // NOTE ORDER MATTERS

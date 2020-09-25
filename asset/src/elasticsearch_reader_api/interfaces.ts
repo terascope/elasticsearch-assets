@@ -12,8 +12,8 @@ import { IDType } from '../id_reader/interfaces';
 
 export const DEFAULT_API_NAME = 'elasticsearch_reader_api';
 
-export type ElasticReaderFactoryAPI = APIFactoryRegistry<Reader, AnyObject>
 export interface ElasticsearchReaderAPIConfig extends ESReaderOptions, APIConfig {}
+export type ElasticReaderFactoryAPI = APIFactoryRegistry<Reader, ElasticsearchReaderAPIConfig>
 export interface DateSlicerArgs {
     lifecycle: LifeCycle,
     slicerID: number,
