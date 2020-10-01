@@ -254,7 +254,7 @@ describe('id_reader slicer', () => {
         });
     });
 
-    fit('key range gets divided up by number of slicers', async () => {
+    it('key range gets divided up by number of slicers', async () => {
         const opConfig = {
             key_range: ['a', 'b'],
         };
@@ -275,6 +275,9 @@ describe('id_reader slicer', () => {
 
         const slices1 = sliceResults.find((slice) => slice.slicer_id === 0);
         const slices2 = sliceResults.find((slice) => slice.slicer_id === 1);
+
+        if (!slices1) throw new Error('slice1 was not found');
+        if (!slices2) throw new Error('slice1 was not found');
 
         const expectedResults = formatWildcardQuery([{ key: 'a*', count: 58 }, { key: 'b*', count: 82 }], version, docType, field);
 
