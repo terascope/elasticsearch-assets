@@ -1,16 +1,18 @@
 import {
     ConvictSchema,
     AnyObject,
-    cloneDeep,
     ValidatedJobConfig,
     toNumber,
-    isString
+    isString,
+    cloneDeep
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from './interfaces';
 import { schema } from '../elasticsearch_reader/schema';
+import { schema as idSchema } from '../id_reader/schema';
 
-const clonedSchema = cloneDeep(schema) as AnyObject;
+const fullSchema = Object.assign({}, idSchema, schema) as AnyObject;
+const clonedSchema = cloneDeep(fullSchema);
 
 clonedSchema.index.format = 'required_String';
 
@@ -22,12 +24,14 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
         apiConfigs.forEach((apiConfig: AnyObject) => {
             elasticAPI({}, logger).validateGeoParameters(apiConfig);
 
-            const opConnection = apiConfig.connection;
+            const { connection, field } = apiConfig;
             const subsliceByKey = apiConfig.subslice_by_key;
-            const configField = apiConfig.field;
 
             const { connectors } = this.context.sysconfig.terafoundation;
-            const endpointConfig = connectors.elasticsearch[opConnection];
+            const endpointConfig = connectors.elasticsearch[connection];
+
+            if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+
             const apiVersion = endpointConfig.apiVersion
                 ? toNumber(endpointConfig.apiVersion.charAt(0))
                 : 6;
@@ -35,7 +39,23 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
             if (subsliceByKey) {
                 const configType = apiConfig.type;
                 if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
-                if (apiVersion > 5 && (configField == null || !isString(configField) || configField.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
+                if (apiVersion > 5 && (field == null || !isString(field) || field.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
+            }
+
+            if (apiConfig.key_range && job.slicers > apiConfig.key_range.length) {
+                throw new Error('The number of slicers specified on the job cannot be more the length of key_range');
+            }
+
+            if (apiConfig.key_type === 'base64url') {
+                if (job.slicers > 64) {
+                    throw new Error('The number of slicers specified on the job cannot be more than 64');
+                }
+            }
+
+            if (apiConfig.key_type === 'hexadecimal' || apiConfig.key_type === 'HEXADECIMAL') {
+                if (job.slicers > 16) {
+                    throw new Error('The number of slicers specified on the job cannot be more than 16');
+                }
             }
         });
     }

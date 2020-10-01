@@ -1,14 +1,13 @@
 import {
     ConvictSchema,
     ValidatedJobConfig,
-    getOpConfig,
     toNumber,
     AnyObject,
     getTypeOf,
     isString,
-    isNil,
     isNumber,
-    isNotNil
+    isNotNil,
+    mapValues, isNil
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -18,6 +17,7 @@ import { ESReaderConfig } from './interfaces';
 import { dateOptions } from '../elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import { IDType } from '../id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
+import { getNonDefaultValues } from '../__lib/helpers';
 
 export function checkIndex(index: string|undefined): void {
     if (!isString(index)) throw new Error('Invalid index parameter, must be of type string');
@@ -35,7 +35,7 @@ export const schema = {
     },
     field: {
         doc: 'field to use for id_slicer if subslice_by_key is set to true',
-        default: '',
+        default: null,
         format: 'optional_String'
     },
     size: {
@@ -224,18 +224,31 @@ export const schema = {
     },
     api_name: {
         doc: 'name of api to be used by elasticsearch reader',
-        default: DEFAULT_API_NAME,
+        default: null,
         format: (val: unknown): void => {
-            if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-            if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+            if (isNotNil(val)) {
+                if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
+                if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an elasticsearch_reader_api');
+            }
         }
     }
 };
 
+const defaultSchema = mapValues<AnyObject>(schema, (obj) => obj.default);
+
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
-        const opConfig = getOpConfig(job, 'elasticsearch_reader');
+        let opIndex = 0;
+
+        const opConfig = job.operations.find((op, ind) => {
+            if (op._op === 'elasticsearch_reader') {
+                opIndex = ind;
+                return op;
+            }
+            return false;
+        });
+
         if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
         elasticAPI({}, logger).validateGeoParameters(opConfig);
@@ -253,38 +266,21 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
         const {
             api_name, ...newConfig
         } = opConfig;
-        if (!Array.isArray(job.apis)) job.apis = [];
-        const ElasticReaderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
-        if (isNil(ElasticReaderAPI)) {
-            checkIndex(opConfig.index);
-            if (isNil(opConfig.date_field_name)) throw new Error(`Invalid parameter date_field_name, must be of type string, got ${getTypeOf(opConfig.date_field_name)}`);
+        const uniqueSchemaValues = getNonDefaultValues(newConfig, defaultSchema);
+        const apiName = api_name || `${DEFAULT_API_NAME}:${opConfig._op}-${opIndex}`;
 
-            job.apis.push({
-                _name: DEFAULT_API_NAME,
-                ...newConfig
-            });
-        }
+        // we set the new apiName back on the opConfig so it can reference the unique name
+        opConfig.api_name = apiName;
 
-        const opConnection = ElasticReaderAPI ? ElasticReaderAPI.connection : opConfig.connection;
-        const subsliceByKey = ElasticReaderAPI
-            ? ElasticReaderAPI.subslice_by_key
-            : opConfig.subslice_by_key;
+        this.ensureAPIFromConfig(apiName, job, uniqueSchemaValues);
 
-        const configField = ElasticReaderAPI
-            ? ElasticReaderAPI.field
-            : opConfig.field;
+        const elasticsearchReaderAPI = job.apis.find((jobApi) => jobApi._name === apiName);
 
-        const { connectors } = this.context.sysconfig.terafoundation;
-        const endpointConfig = connectors.elasticsearch[opConnection];
-        const apiVersion = endpointConfig.apiVersion
-            ? toNumber(endpointConfig.apiVersion.charAt(0))
-            : 6;
+        if (isNil(elasticsearchReaderAPI)) throw new Error(`Could not find job api ${apiName}`);
 
-        if (subsliceByKey) {
-            const configType = ElasticReaderAPI ? ElasticReaderAPI.type : opConfig.type;
-            if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
-            if (apiVersion > 5 && (configField == null || !isString(configField) || configField.length === 0)) throw new Error('If subslice_by_key is set to true, the field parameter of the documents must also be set');
+        if (isNil(elasticsearchReaderAPI.date_field_name)) {
+            throw new Error(`Invalid parameter date_field_name, must be of type string, was given ${getTypeOf(opConfig.date_field_name)}`);
         }
     }
 

@@ -68,7 +68,7 @@ describe('id_reader Schema', () => {
             expect(size).toEqual(10000);
             expect(key_type).toEqual('base64url');
             expect(connection).toEqual('default');
-            expect(api_name).toEqual(DEFAULT_API_NAME);
+            expect(api_name).toEqual('elasticsearch_reader_api:id_reader-0');
         });
 
         it('should throw if index is incorrect', async () => {
@@ -94,7 +94,21 @@ describe('id_reader Schema', () => {
             await expect(makeSchema({ api_name: 'hello' })).toReject();
         });
 
-        it('should throw if api is created but opConfig has index set', async () => {
+        it('should throw if api is created but opConfig has index set to another value', async () => {
+            const job = newTestJobConfig({
+                apis: [
+                    { _name: DEFAULT_API_NAME, index, type: docType }
+                ],
+                operations: [
+                    { _op: name, index: 'something_else', api_name: DEFAULT_API_NAME },
+                    { _op: 'noop' }
+                ]
+            });
+
+            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+        });
+
+        it('should not throw if base api is created but opConfig has index set to another value', async () => {
             const job = newTestJobConfig({
                 apis: [
                     { _name: DEFAULT_API_NAME, index, type: docType }
@@ -107,7 +121,53 @@ describe('id_reader Schema', () => {
 
             harness = new WorkerTestHarness(job, { clients });
 
-            await expect(harness.initialize()).toResolve();
+            await harness.initialize();
+
+            const apiConfig = harness.executionContext.config.apis.find(
+                (api) => api._name === 'elasticsearch_reader_api:id_reader-0'
+            );
+
+            expect(apiConfig).toBeDefined();
+            expect(apiConfig!.index).toEqual(index);
+        });
+
+        it('should throw if number of slicers are greater than key_range length', async () => {
+            const job = newTestJobConfig({
+                slicers: 72,
+                operations: [
+                    {
+                        _op: name,
+                        index: 'something_else',
+                        api_name: DEFAULT_API_NAME,
+                        key_range: ['a', 'b']
+                    },
+                    { _op: 'noop' }
+                ]
+            });
+
+            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+        });
+
+        it('should throw if number of slicers are greater than key_type length', async () => {
+            const job = newTestJobConfig({
+                slicers: 72,
+                operations: [
+                    { _op: name, index },
+                    { _op: 'noop' }
+                ]
+            });
+
+            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+
+            const job2 = newTestJobConfig({
+                slicers: 17,
+                operations: [
+                    { _op: name, index, key_type: 'hexadecimal' },
+                    { _op: 'noop' }
+                ]
+            });
+
+            expect(() => new WorkerTestHarness(job2, { clients })).toThrow();
         });
 
         it('can validateJob to make sure its configured correctly', async () => {

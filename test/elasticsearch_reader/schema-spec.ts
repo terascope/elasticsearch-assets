@@ -1,10 +1,11 @@
 import 'jest-extended';
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, newTestJobConfig } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader/schema';
 import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 
 describe('elasticsearch_reader schema', () => {
     const index = 'some_index';
@@ -165,5 +166,57 @@ describe('elasticsearch_reader schema', () => {
             await expect(makeSchema({ subslice_by_key: true })).toReject();
             await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
         }
+    });
+
+    it('should throw if api is created but opConfig has index set to another value', async () => {
+        const job = newTestJobConfig({
+            apis: [
+                {
+                    _name: DEFAULT_API_NAME,
+                    index,
+                    type: docType,
+                    date_field_name: 'created'
+                }
+            ],
+            operations: [
+                {
+                    _op: name,
+                    index: 'something_else',
+                    api_name: DEFAULT_API_NAME,
+                    date_field_name: 'created'
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+    });
+
+    it('should not throw if base api is created but opConfig has index set to another value', async () => {
+        const job = newTestJobConfig({
+            apis: [
+                {
+                    _name: DEFAULT_API_NAME,
+                    index,
+                    type: docType,
+                    date_field_name: 'created'
+                }
+            ],
+            operations: [
+                { _op: name, index, date_field_name: 'created' },
+                { _op: 'noop' }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const apiConfig = harness.executionContext.config.apis.find(
+            (api) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
+        );
+
+        expect(apiConfig).toBeDefined();
+        expect(apiConfig!.index).toEqual(index);
     });
 });

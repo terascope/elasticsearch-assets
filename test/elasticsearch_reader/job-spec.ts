@@ -2,30 +2,26 @@ import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
-import { getKeyArray } from '../../asset/src/elasticsearch_reader_api/elasticsearch_id_slicer/helpers';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
-    getListOfIds,
     getTotalSliceCounts,
     makeClient,
     cleanupIndex,
     populateIndex
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
-import { IDType } from '../../asset/src/id_reader/interfaces';
 
-describe('id_reader job', () => {
-    let harness: JobTestHarness;
-    let clients: any;
+describe('date_reader job', () => {
     const esClient = makeClient();
-    const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;
-
+    const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
+    const date_field_name = 'created';
     const version = getESVersion(esClient);
 
+    let harness: JobTestHarness;
+    let clients: any;
     const docType = version === 5 ? 'events' : '_doc';
     // in es5 this should be ignored
-    const field = 'uuid';
     const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     function makeIndex(str: string) {
@@ -76,9 +72,8 @@ describe('id_reader job', () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
             type: docType,
-            field,
             index: evenIndex,
-            key_type: IDType.base64url
+            date_field_name
         };
 
         const job = newTestJobConfig({
@@ -86,7 +81,7 @@ describe('id_reader job', () => {
             max_retries: 0,
             apis: [apiConfig],
             operations: [
-                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'elasticsearch_reader', api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
@@ -95,21 +90,9 @@ describe('id_reader job', () => {
 
         await harness.initialize();
 
-        const keyList = getKeyArray(IDType.base64url);
-
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
-
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-
-        sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
-
-            expect(keyList).toContain(idChar);
-            expect(evenSpreadIds.has(idChar)).toEqual(true);
-            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
-        });
     });
 
     it('can fetch all even-data with job in short form', async () => {
@@ -119,11 +102,10 @@ describe('id_reader job', () => {
             apis: [],
             operations: [
                 {
-                    _op: 'id_reader',
+                    _op: 'elasticsearch_reader',
                     type: docType,
-                    field,
                     index: evenIndex,
-                    key_type: IDType.base64url
+                    date_field_name
                 },
                 { _op: 'noop' }
             ],
@@ -133,43 +115,30 @@ describe('id_reader job', () => {
 
         await harness.initialize();
 
-        const keyList = getKeyArray(IDType.base64url);
-
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
-
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-
-        sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
-
-            expect(keyList).toContain(idChar);
-            expect(evenSpreadIds.has(idChar)).toEqual(true);
-            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
-        });
     });
 
     it('can fetch all even-data with job in long form but it makes its own api', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
             type: docType,
-            field,
             index: 'something_else',
-            key_type: IDType.base64url
         };
-        // KEY DIFFERENCE IS LACK OF API_NAME, it will make 'elasticsearch_reader_api:id_reader-0'
+
+        // KEY DIFFERENCE IS LACK OF API_NAME,
+        // it will make 'elasticsearch_reader_api:elasticsearch_reader-0'
         const job = newTestJobConfig({
             slicers: 1,
             max_retries: 0,
             apis: [apiConfig],
             operations: [
                 {
-                    _op: 'id_reader',
+                    _op: 'elasticsearch_reader',
                     type: docType,
-                    field,
                     index: evenIndex,
-                    key_type: IDType.base64url
+                    date_field_name
                 },
                 { _op: 'noop' }
             ],
@@ -179,20 +148,8 @@ describe('id_reader job', () => {
 
         await harness.initialize();
 
-        const keyList = getKeyArray(IDType.base64url);
-
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
-
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-
-        sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
-
-            expect(keyList).toContain(idChar);
-            expect(evenSpreadIds.has(idChar)).toEqual(true);
-            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
-        });
     });
 });
