@@ -28,7 +28,7 @@ describe('date_reader job', () => {
         return `${idIndex}_${str}`;
     }
 
-    const evenIndex = makeIndex(evenSpread.index);
+    const evenIndex = makeIndex(`${evenSpread.index}-2020.0.1`);
 
     beforeAll(async () => {
         await cleanupIndex(esClient, makeIndex('*'));
@@ -142,6 +142,41 @@ describe('date_reader job', () => {
                 },
                 { _op: 'noop' }
             ],
+        });
+
+        harness = new JobTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const sliceResults = await harness.runToCompletion();
+
+        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
+    });
+
+    it('can read indicies with a "*"', async () => {
+        const job = newTestJobConfig({
+            name: 'test_job',
+            lifecycle: 'once',
+            workers: 1,
+            apis: [
+                {
+                    _name: 'elasticsearch_reader_api',
+                    connection: 'otherConnection',
+                    index: `${makeIndex(evenSpread.index)}-*`,
+                    type: '_doc',
+                    date_field_name: 'created',
+                    interval: 'auto',
+                    time_resolution: 'ms',
+                    size: 100000
+                }
+            ],
+            operations: [
+                {
+                    _op: 'elasticsearch_reader',
+                    api_name: 'elasticsearch_reader_api'
+                },
+                { _op: 'noop' }
+            ]
         });
 
         harness = new JobTestHarness(job, { clients });

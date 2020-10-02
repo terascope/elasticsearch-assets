@@ -447,11 +447,15 @@ export default class ElasticsearchAPI {
         const settings = await this.getSettings(query);
 
         if (settings) {
-            const defaultPath = settings[index].defaults[window];
-            const configPath = settings[index].settings[window];
-
-            if (defaultPath) return toNumber(defaultPath);
-            if (configPath) return toNumber(configPath);
+            for (const [key, configs] of Object.entries(settings)) {
+                if (key.match(index)) {
+                    const defaultPath = configs.defaults[window];
+                    const configPath = configs.settings[window];
+                    // config goes first as it overrides an defaults
+                    if (configPath) return toNumber(configPath);
+                    if (defaultPath) return toNumber(defaultPath);
+                }
+            }
         }
 
         return null;
