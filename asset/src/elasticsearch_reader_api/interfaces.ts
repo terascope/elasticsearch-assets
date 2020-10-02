@@ -39,9 +39,10 @@ export interface IDSlicerArgs {
     slicerID: number,
     numOfSlicers: number,
     recoveryData?: SlicerRecoveryData[];
-    key_type: IDType;
-    key_range?: string[];
-    starting_key_depth: number;
+    keyType: IDType;
+    keyRange?: string[];
+    startingKeyDepth: number;
+    IDFieldName: string | null;
 }
 
 export interface IDSlicerConfig {
@@ -49,7 +50,8 @@ export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,
     recoveryData: SlicerRecoveryData[],
-    key_type: IDType;
-    key_range?: string[];
-    starting_key_depth: number
+    keyType: IDType;
+    keyRange?: string[];
+    startingKeyDepth: number,
+    IDFieldName: string | null;
 }

@@ -159,6 +159,7 @@ export default class ElasticsearchAPI {
             if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
             if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
+            if (this.version >= 6 && (!isString(input.IDFieldName) || input.IDFieldName.length === 0)) throw new Error(`Parameter IDFieldName must be a string, got ${getTypeOf(input.IDFieldName)}`);
 
             if (input.recoveryData) {
                 if (Array.isArray(input.recoveryData)) {
@@ -171,10 +172,10 @@ export default class ElasticsearchAPI {
                 input.recoveryData = [];
             }
 
-            if (!input.key_type || !Object.values(IDType).includes(input.key_type)) throw new Error(`Invalid parameter key_type, got ${input.key_type}`);
-            if (input.key_range) {
-                if (input.key_range.length === 0) throw new Error('Invalid key_range parameter, must be an array with length > 0');
-                if (!input.key_range.every(isString)) throw new Error('Invalid key_range parameter, must be an array of strings');
+            if (!input.keyType || !Object.values(IDType).includes(input.keyType)) throw new Error(`Invalid parameter key_type, got ${input.keyType}`);
+            if (input.keyRange) {
+                if (input.keyRange.length === 0) throw new Error('Invalid key_range parameter, must be an array with length > 0');
+                if (!input.keyRange.every(isString)) throw new Error('Invalid key_range parameter, must be an array of strings');
             }
         } else {
             throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
@@ -190,23 +191,24 @@ export default class ElasticsearchAPI {
         const {
             numOfSlicers,
             slicerID,
-            key_range,
-            key_type,
+            keyRange,
+            keyType,
             recoveryData,
-            starting_key_depth
+            startingKeyDepth,
+            IDFieldName
         } = config;
 
-        const baseKeyArray = getKeyArray(key_type);
+        const baseKeyArray = getKeyArray(keyType);
         // we slice as not to mutate for when this is called again
-        const keyArray = key_range ? key_range.slice() : baseKeyArray.slice();
+        const keyArray = keyRange ? keyRange.slice() : baseKeyArray.slice();
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            const error = new TSError(`key_range specified for id_reader contains keys not found in: ${key_type}`);
+            const error = new TSError(`key_range specified for id_reader contains keys not found in: ${keyType}`);
             return Promise.reject(error);
         }
 
         const keySet = divideKeyArray(keyArray, numOfSlicers);
-        const { type, field, size } = this.config;
+        const { type, size } = this.config;
 
         const slicerConfig: ESIDSlicerArgs = {
             events: this.emitter,
@@ -214,10 +216,10 @@ export default class ElasticsearchAPI {
             keySet: keySet[slicerID],
             version: this.version,
             baseKeyArray,
-            starting_key_depth,
+            startingKeyDepth,
             countFn,
             type,
-            field: field || null,
+            IDFieldName,
             size
         };
 
@@ -271,6 +273,7 @@ export default class ElasticsearchAPI {
 
         return input as unknown as DateSlicerConfig;
     }
+
     async makeDateSlicer(args: DateSlicerArgs): Promise<SlicerFn> {
         const config = this.validateDateSlicerConfig(args);
         const {

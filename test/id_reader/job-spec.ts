@@ -25,7 +25,7 @@ describe('id_reader job', () => {
 
     const docType = version === 5 ? 'events' : '_doc';
     // in es5 this should be ignored
-    const field = 'uuid';
+    const id_field_name = 'uuid';
     const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     function makeIndex(str: string) {
@@ -72,11 +72,11 @@ describe('id_reader job', () => {
         if (harness) await harness.shutdown();
     });
 
-    it('can fetch all even-data with job in long form', async () => {
+    it('can fetch all even-data with job in long form with deprecated "id_field_name"', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
             type: docType,
-            field,
+            field: id_field_name,
             index: evenIndex,
             key_type: IDType.base64url
         };
@@ -97,14 +97,54 @@ describe('id_reader job', () => {
 
         const keyList = getKeyArray(IDType.base64url);
 
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
+
+            expect(keyList).toContain(idChar);
+            expect(evenSpreadIds.has(idChar)).toEqual(true);
+            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
+        });
+    });
+
+    it('can fetch all even-data with job in long form with non-deprecated', async () => {
+        const apiConfig = {
+            _name: 'elasticsearch_reader_api',
+            type: docType,
+            id_field_name,
+            index: evenIndex,
+            key_type: IDType.base64url
+        };
+
+        const job = newTestJobConfig({
+            slicers: 1,
+            max_retries: 0,
+            apis: [apiConfig],
+            operations: [
+                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'noop' }
+            ],
+        });
+
+        harness = new JobTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const keyList = getKeyArray(IDType.base64url);
+
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
+
+        const sliceResults = await harness.runToCompletion();
+
+        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
+
+        sliceResults.forEach((results) => {
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);
@@ -121,7 +161,7 @@ describe('id_reader job', () => {
                 {
                     _op: 'id_reader',
                     type: docType,
-                    field,
+                    id_field_name,
                     index: evenIndex,
                     key_type: IDType.base64url
                 },
@@ -135,14 +175,14 @@ describe('id_reader job', () => {
 
         const keyList = getKeyArray(IDType.base64url);
 
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);
@@ -154,7 +194,7 @@ describe('id_reader job', () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
             type: docType,
-            field,
+            id_field_name,
             index: 'something_else',
             key_type: IDType.base64url
         };
@@ -167,7 +207,7 @@ describe('id_reader job', () => {
                 {
                     _op: 'id_reader',
                     type: docType,
-                    field,
+                    id_field_name,
                     index: evenIndex,
                     key_type: IDType.base64url
                 },
@@ -181,14 +221,14 @@ describe('id_reader job', () => {
 
         const keyList = getKeyArray(IDType.base64url);
 
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);

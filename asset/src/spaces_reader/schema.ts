@@ -1,26 +1,7 @@
-import {
-    ConvictSchema,
-    AnyObject,
-    isString,
-    getTypeOf,
-    ValidatedJobConfig,
-    isNotNil
-} from '@terascope/job-components';
+import { ConvictSchema, AnyObject, ValidatedJobConfig } from '@terascope/job-components';
+import { spacesOpSchema } from '../__lib/schema';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import { DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
-
-const schema = {
-    api_name: {
-        doc: 'name of api to be used by spaces reader',
-        default: null,
-        format: (val: unknown): void => {
-            if (isNotNil(val)) {
-                if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-                if (!val.includes(DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an spaces_reader_api');
-            }
-        }
-    }
-};
 
 export default class Schema extends ConvictSchema<ApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
@@ -47,6 +28,6 @@ export default class Schema extends ConvictSchema<ApiConfig> {
     }
 
     build(): AnyObject {
-        return schema;
+        return spacesOpSchema;
     }
 }

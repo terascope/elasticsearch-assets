@@ -58,16 +58,8 @@ describe('id_reader Schema', () => {
 
     describe('when validating the schema', () => {
         it('should have defaults', async () => {
-            const {
-                size,
-                key_type,
-                connection,
-                api_name
-            } = await makeSchema({ index });
+            const { api_name } = await makeSchema({ index });
 
-            expect(size).toEqual(10000);
-            expect(key_type).toEqual('base64url');
-            expect(connection).toEqual('default');
             expect(api_name).toEqual('elasticsearch_reader_api:id_reader-0');
         });
 

@@ -11,12 +11,11 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         keySet,
         version,
         countFn,
-        starting_key_depth,
+        startingKeyDepth,
         type,
-        field,
+        IDFieldName,
         size
     } = args;
-    const startingKeyDepth = starting_key_depth;
 
     async function determineKeySlice(
         generator: any,
@@ -40,7 +39,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         }
 
         if (version >= 6) {
-            const fieldValue = field as string;
+            const fieldValue = IDFieldName as string;
             query.wildcard = { field: fieldValue, value: `${data.value}*` };
         } else {
             query.key = `${type}#${data.value}*`;

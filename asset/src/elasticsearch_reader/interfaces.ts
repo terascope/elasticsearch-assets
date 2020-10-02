@@ -12,7 +12,7 @@ export interface ESReaderConfig extends ESReaderOptions, OpConfig {
 
 export interface ESReaderOptions {
     index: string;
-    field?: string;
+    id_field_name?: string;
     size: number;
     start: null | string;
     end: null | string;
@@ -36,6 +36,7 @@ export interface ESReaderOptions {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
+    starting_key_depth: number;
 }
 
 export interface InputDateSegments {

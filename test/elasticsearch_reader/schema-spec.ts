@@ -3,7 +3,7 @@ import { AnyObject, newTestJobConfig } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
-import * as ESReaderSchema from '../../asset/src/elasticsearch_reader/schema';
+import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
 import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 
@@ -54,21 +54,9 @@ describe('elasticsearch_reader schema', () => {
 
     it('has defaults', async () => {
         const schema = await makeSchema();
-        const {
-            connection,
-            size,
-            interval,
-            delay,
-            subslice_by_key,
-            time_resolution
-        } = schema;
+        const { api_name } = schema;
 
-        expect(connection).toEqual('default');
-        expect(size).toEqual(5000);
-        expect(interval).toEqual('auto');
-        expect(delay).toEqual('30s');
-        expect(subslice_by_key).toBeFalse();
-        expect(time_resolution).toEqual('s');
+        expect(api_name).toEqual('elasticsearch_reader_api:elasticsearch_reader-0');
     });
 
     it('can geo validate', async () => {

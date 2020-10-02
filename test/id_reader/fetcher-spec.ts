@@ -25,7 +25,7 @@ describe('id_reader fetcher', () => {
 
     const docType = version === 5 ? 'events' : '_doc';
     // in es5 this should be ignored
-    const field = 'uuid';
+    const id_field_name = 'uuid';
     const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     function makeIndex(str: string) {
@@ -76,7 +76,7 @@ describe('id_reader fetcher', () => {
         const idReader = Object.assign(
             { _op: 'id_reader' },
             opConfig,
-            { type: docType, field }
+            { type: docType, id_field_name }
         );
 
         const job = newTestJobConfig({
@@ -99,14 +99,14 @@ describe('id_reader fetcher', () => {
         const opConfig = { index: evenIndex };
         const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await test.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);
@@ -118,14 +118,14 @@ describe('id_reader fetcher', () => {
         const opConfig = { index: evenIndex };
         const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig, 2);
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await test.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);
@@ -140,14 +140,14 @@ describe('id_reader fetcher', () => {
         };
         const keyList = getKeyArray(IDType.base64url);
         const test = await makeTest(opConfig);
-        const evenSpreadIds = getListOfIds(evenSpread.data, field);
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
         const sliceResults = await test.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(evenSpreadIds.get('a'));
 
         sliceResults.forEach((results) => {
-            const idChar = results.data[0][field].charAt(0);
+            const idChar = results.data[0][id_field_name].charAt(0);
 
             expect(keyList).toContain(idChar);
             expect(evenSpreadIds.has(idChar)).toEqual(true);
