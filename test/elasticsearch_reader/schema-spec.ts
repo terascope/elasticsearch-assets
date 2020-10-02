@@ -40,7 +40,12 @@ describe('elasticsearch_reader schema', () => {
     const docType = version === 5 ? 'events' : '_doc';
 
     async function makeSchema(config: AnyObject = {}): Promise<ESReaderConfig> {
-        const opConfig = Object.assign({}, { _op: name, index, date_field_name: 'created' }, config);
+        const opConfig = Object.assign({}, {
+            _op: name,
+            index,
+            date_field_name: 'created',
+            type: docType
+        }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
         await harness.initialize();
@@ -87,9 +92,9 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true };
+        const badOP = { subslice_by_key: true, type: null };
         const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, other: 'events-', type: docType };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -148,10 +153,10 @@ describe('elasticsearch_reader schema', () => {
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
         if (version <= 5) {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
             await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
         } else {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
             await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
         }
     });
@@ -191,7 +196,12 @@ describe('elasticsearch_reader schema', () => {
                 }
             ],
             operations: [
-                { _op: name, index, date_field_name: 'created' },
+                {
+                    _op: name,
+                    index,
+                    date_field_name: 'created',
+                    type: docType,
+                },
                 { _op: 'noop' }
             ]
         });

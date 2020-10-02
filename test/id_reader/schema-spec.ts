@@ -9,7 +9,7 @@ import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
 describe('id_reader Schema', () => {
     const index = 'some_index';
     const name = 'id_reader';
-    const field = 'someField';
+    const id_field_name = 'someField';
 
     const esClient = makeClient();
 
@@ -35,7 +35,7 @@ describe('id_reader Schema', () => {
     async function makeSchema(config: AnyObject = {}): Promise<ESIDReaderConfig> {
         const base: AnyObject = {};
         if (version <= 5) base.type = docType;
-        const opConfig = Object.assign(base, { _op: name, index, field }, config);
+        const opConfig = Object.assign(base, { _op: name, index, id_field_name }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
         await harness.initialize();
@@ -106,7 +106,7 @@ describe('id_reader Schema', () => {
                     { _name: DEFAULT_API_NAME, index, type: docType }
                 ],
                 operations: [
-                    { _op: name, index },
+                    { _op: name, index, type: docType },
                     { _op: 'noop' }
                 ]
             });

@@ -118,6 +118,7 @@ describe('elasticsearch_reader slicer', () => {
         date_field_name: 'created',
         size: 50,
         index: evenIndex,
+        type: docType
     };
 
     async function makeSlicerTest({

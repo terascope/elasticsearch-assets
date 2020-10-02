@@ -260,6 +260,8 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
         const apiConfigs = job.apis.filter((config) => config._name.startsWith(DEFAULT_API_NAME));
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
+            const configType = apiConfig.type;
+
             elasticAPI({}, logger).validateGeoParameters(apiConfig);
 
             if (apiConfig.field) {
@@ -280,8 +282,9 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
                 ? toNumber(endpointConfig.apiVersion.charAt(0))
                 : 6;
 
+            if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
+
             if (subsliceByKey) {
-                const configType = apiConfig.type;
                 if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
                 if (apiVersion > 5 && (id_field_name == null || !isString(id_field_name) || id_field_name.length === 0)) throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
             }
