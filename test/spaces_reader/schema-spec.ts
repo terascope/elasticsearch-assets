@@ -63,19 +63,27 @@ describe('spaces-reader schema', () => {
         if (harness) await harness.shutdown();
     });
 
-    it('can properly instantiate and has defaults', async () => {
-        const test = await makeTest({
+    it('can properly instantiate', async () => {
+        const apiName = 'spaces_reader_api:spaces_reader-0';
+        const config = {
             index: 'test_index',
             date_field_name: 'created',
             endpoint: '127.0.0.1',
             token: 'someToken'
-        });
+        };
+        const test = await makeTest(config);
 
         const op = test.getOperation('spaces_reader');
-        const { api_name, connection } = op.opConfig;
+        const apiManager = test.getAPI(apiName);
 
-        expect(connection).toEqual('default');
-        expect(api_name).toEqual('spaces_reader_api:spaces_reader-0');
+        if (op == null) throw new Error('Could not find spaces_reader');
+        if (apiManager == null) throw new Error('Could not find spaces_reader_api:spaces_reader-0');
+
+        const apiConfig = apiManager.getConfig(apiName);
+        const { api_name } = op.opConfig;
+
+        expect(api_name).toEqual(apiName);
+        expect(apiConfig).toMatchObject(config);
     });
 
     it('will not throw if parameters are in api', async () => {
