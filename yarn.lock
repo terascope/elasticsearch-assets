@@ -618,17 +618,6 @@
     validator "^13.1.1"
     xlucene-parser "^0.27.0"
 
-"@terascope/data-types@^0.21.0":
-  version "0.21.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.21.0.tgz#ef65aea7c01b4fe6b3aa2a39c51683e35c0af895"
-  integrity sha512-Tx0bYSHkF1YIR7I1gZfJGixv4QV6u3PhRv1D6Bclt9fZ2fXW5AouZ/Oi9bSYapvKiQJSsi32ju3BL686Z4nKoA==
-  dependencies:
-    "@terascope/types" "^0.5.0"
-    "@terascope/utils" "^0.30.0"
-    graphql "^15.3.0"
-    lodash.defaultsdeep "^4.6.1"
-    yargs "^15.4.1"
-
 "@terascope/data-types@^0.23.0":
   version "0.23.0"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.23.0.tgz#4eadca741c8e8fcee2a9a410645bf218a4016678"
