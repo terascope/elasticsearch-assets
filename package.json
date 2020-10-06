@@ -45,7 +45,7 @@
         "@types/jest": "^26.0.14",
         "@types/node": "^14.11.2",
         "elasticsearch": "^15.4.1",
-        "elasticsearch-store": "^0.33.0",
+        "elasticsearch-store": "^0.36.0",
         "eslint": "^7.10.0",
         "jest": "^26.4.2",
         "jest-extended": "^0.11.5",
