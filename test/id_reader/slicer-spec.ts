@@ -277,7 +277,7 @@ describe('id_reader slicer', () => {
         const slices2 = sliceResults.find((slice) => slice.slicer_id === 1);
 
         if (!slices1) throw new Error('slice1 was not found');
-        if (!slices2) throw new Error('slice1 was not found');
+        if (!slices2) throw new Error('slice2 was not found');
 
         const expectedResults = formatWildcardQuery([{ key: 'a*', count: 58 }, { key: 'b*', count: 82 }], version, docType, field);
 

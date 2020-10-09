@@ -1,5 +1,5 @@
 import { ConvictSchema, ValidatedJobConfig, AnyObject } from '@terascope/job-components';
-import { elasticOpSchema } from '../__lib/schema';
+import { opSchema } from '../__lib/schema';
 import { ESIDReaderConfig } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
@@ -35,6 +35,6 @@ export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     }
 
     build(): AnyObject {
-        return elasticOpSchema;
+        return opSchema;
     }
 }

@@ -82,7 +82,7 @@ describe('elasticsearch_reader schema', () => {
 
         // @ts-expect-error
         expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
-        expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
+        expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance parameter, is formatted incorrectly');
         expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
         expect(() => validGeoDistance('200km')).not.toThrowError();
 

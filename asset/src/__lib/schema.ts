@@ -1,29 +1,15 @@
-import { getTypeOf, isString, isNotNil } from '@terascope/job-components';
-import { DEFAULT_API_NAME as ES_DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
-import { DEFAULT_API_NAME as SPACES_DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
+import { isString } from '@terascope/job-components';
 
-export const elasticOpSchema = {
+export const opSchema = {
     api_name: {
         doc: 'name of api to be used by spaces reader',
         default: null,
-        format: (val: unknown): void => {
-            if (isNotNil(val)) {
-                if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-                if (!val.includes(ES_DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an spaces_reader_api');
-            }
-        }
+        format: 'optional_String'
     }
 };
 
-export const spacesOpSchema = {
-    api_name: {
-        doc: 'name of api to be used by spaces reader',
-        default: null,
-        format: (val: unknown): void => {
-            if (isNotNil(val)) {
-                if (!isString(val)) throw new Error(`Invalid parameter api_name, it must be of type string, was given ${getTypeOf(val)}`);
-                if (!val.includes(SPACES_DEFAULT_API_NAME)) throw new Error('Invalid parameter api_name, it must be an spaces_reader_api');
-            }
-        }
-    }
-};
+export function isValidIndex(index: unknown): void {
+    if (!isString(index)) throw new Error('Invalid index parameter, must be of type string');
+    if (index.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
+    if (index.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+}

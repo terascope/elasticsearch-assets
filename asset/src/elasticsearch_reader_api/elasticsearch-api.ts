@@ -159,7 +159,7 @@ export default class ElasticsearchAPI {
             if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
             if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
-            if (this.version >= 6 && (!isString(input.IDFieldName) || input.IDFieldName.length === 0)) throw new Error(`Parameter IDFieldName must be a string, got ${getTypeOf(input.IDFieldName)}`);
+            if (this.version >= 6 && (!isString(input.idFieldName) || input.idFieldName.length === 0)) throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
 
             if (input.recoveryData) {
                 if (Array.isArray(input.recoveryData)) {
@@ -195,7 +195,7 @@ export default class ElasticsearchAPI {
             keyType,
             recoveryData,
             startingKeyDepth,
-            IDFieldName
+            idFieldName
         } = config;
 
         const baseKeyArray = getKeyArray(keyType);
@@ -219,7 +219,7 @@ export default class ElasticsearchAPI {
             startingKeyDepth,
             countFn,
             type,
-            IDFieldName,
+            idFieldName,
             size
         };
 

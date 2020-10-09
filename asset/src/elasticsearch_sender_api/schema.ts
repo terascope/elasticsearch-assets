@@ -1,8 +1,11 @@
 import {
-    ConvictSchema, AnyObject, cloneDeep, isString
+    ConvictSchema,
+    AnyObject,
+    cloneDeep,
+    ValidatedJobConfig
 } from '@terascope/job-components';
-import { ElasticsearchSenderConfig } from './interfaces';
-
+import { ElasticsearchSenderConfig, DEFAULT_API_NAME } from './interfaces';
+import { isValidIndex } from '../__lib/schema';
 import { schema } from '../elasticsearch_bulk/schema';
 
 const newSchema: AnyObject = cloneDeep(schema);
@@ -21,12 +24,26 @@ newSchema.size = {
 };
 // TODO: tests for this
 newSchema.index.format = (val: unknown) => {
-    if (!isString(val)) throw new Error('Invalid index parameter, must be of type string');
-    if (val.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
-    if (val.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
+    isValidIndex(val);
 };
 
 export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
+    validateJob(job: ValidatedJobConfig): void {
+        const apiConfigs = job.apis.filter((config) => {
+            const apiName = config._name;
+            return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
+        });
+
+        apiConfigs.forEach((apiConfig: AnyObject) => {
+            const { connection } = apiConfig;
+
+            const { connectors } = this.context.sysconfig.terafoundation;
+            const endpointConfig = connectors.elasticsearch[connection];
+
+            if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+        });
+    }
+
     build(): AnyObject {
         return newSchema;
     }

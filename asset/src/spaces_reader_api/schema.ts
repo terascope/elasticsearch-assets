@@ -1,9 +1,7 @@
 import {
     ConvictSchema,
     AnyObject,
-    getTypeOf,
     cloneDeep,
-    isNumber,
     ValidatedJobConfig
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
@@ -26,12 +24,8 @@ const apiSchema = {
     },
     timeout: {
         doc: 'Time in milliseconds to wait for a connection to timeout.',
-        default: 300000,
-        format(val: unknown): void {
-            if (!isNumber(val)) throw new Error(`Invalid parameter timeout, it must be of type number, was given ${getTypeOf(val)}`);
-            if (isNaN(val)) throw new Error('Invalid timeout parameter, must be a number');
-            if (val <= 0) throw new Error('Invalid timeout parameter, must be greater than zero');
-        }
+        default: '30 seconds',
+        format: 'duration'
     }
 };
 
@@ -46,7 +40,10 @@ export default class Schema extends ConvictSchema<ApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 
-        const apiConfigs = job.apis.filter((config) => config._name.startsWith(DEFAULT_API_NAME));
+        const apiConfigs = job.apis.filter((config) => {
+            const apiName = config._name;
+            return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
+        });
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
             elasticAPI({}, logger).validateGeoParameters(apiConfig);

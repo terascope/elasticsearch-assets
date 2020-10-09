@@ -61,7 +61,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             keyType: key_type,
             keyRange: key_range || undefined,
             startingKeyDepth: starting_key_depth,
-            IDFieldName: id_field_name || null
+            idFieldName: id_field_name || null
         };
 
         return this.api.makeIDSlicer(args as IDSlicerArgs);

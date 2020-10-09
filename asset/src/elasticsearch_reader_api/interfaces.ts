@@ -42,7 +42,7 @@ export interface IDSlicerArgs {
     keyType: IDType;
     keyRange?: string[];
     startingKeyDepth: number;
-    IDFieldName: string | null;
+    idFieldName: string | null;
 }
 
 export interface IDSlicerConfig {
@@ -53,5 +53,5 @@ export interface IDSlicerConfig {
     keyType: IDType;
     keyRange?: string[];
     startingKeyDepth: number,
-    IDFieldName: string | null;
+    idFieldName: string | null;
 }

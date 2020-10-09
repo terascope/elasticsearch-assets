@@ -32,7 +32,7 @@ export interface ESIDSlicerArgs {
     version: number;
     countFn: (args: AnyObject) => Promise<number>;
     type: string | null;
-    IDFieldName: string | null;
+    idFieldName: string | null;
     size: number;
 }
 

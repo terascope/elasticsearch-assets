@@ -1,6 +1,9 @@
 import { EventEmitter } from 'events';
 import {
-    OpConfig, Logger, LifeCycle, AnyObject
+    OpConfig,
+    Logger,
+    LifeCycle,
+    AnyObject
 } from '@terascope/job-components';
 import moment from 'moment';
 import WindowState from '../elasticsearch_reader_api/window-state';

@@ -13,7 +13,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         countFn,
         startingKeyDepth,
         type,
-        IDFieldName,
+        idFieldName,
         size
     } = args;
 
@@ -39,7 +39,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
         }
 
         if (version >= 6) {
-            const fieldValue = IDFieldName as string;
+            const fieldValue = idFieldName as string;
             query.wildcard = { field: fieldValue, value: `${data.value}*` };
         } else {
             query.key = `${type}#${data.value}*`;

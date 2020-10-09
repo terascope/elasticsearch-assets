@@ -6,7 +6,8 @@ import {
     isString,
     isNumber,
     getTypeOf,
-    isNotNil
+    isNotNil,
+    has
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -15,19 +16,14 @@ import dateMath from 'datemath-parser';
 import { dateOptions } from '../elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 import { IDType } from '../id_reader/interfaces';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from './interfaces';
-
-export function checkIndex(index: unknown): void {
-    if (!isString(index)) throw new Error('Invalid index parameter, must be of type string');
-    if (index.length === 0) throw new Error('Invalid index parameter, must not be an empty string');
-    if (index.match(/[A-Z]/)) throw new Error('Invalid index parameter, must be lowercase');
-}
+import { isValidIndex } from '../__lib/schema';
 
 export const schema = {
     index: {
         doc: 'Which index to read from',
         default: null,
         format(val: unknown): void {
-            checkIndex(val);
+            isValidIndex(val);
         }
     },
     field: {
@@ -257,26 +253,28 @@ export const schema = {
 export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
-        const apiConfigs = job.apis.filter((config) => config._name.startsWith(DEFAULT_API_NAME));
+
+        const apiConfigs = job.apis.filter((config) => {
+            const apiName = config._name;
+            return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
+        });
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
-            const configType = apiConfig.type;
-
-            elasticAPI({}, logger).validateGeoParameters(apiConfig);
-
             if (apiConfig.field) {
                 this.context.logger.warn(`For api "${apiConfig._name}", parameter "field" is deprecated and will be removed in later versions, please use "id_field_name" instead`);
                 apiConfig.id_field_name = apiConfig.field;
                 delete apiConfig.field;
             }
 
-            const { connection, id_field_name } = apiConfig;
-            const subsliceByKey = apiConfig.subslice_by_key;
+            const configType = apiConfig.type;
+            const { connection, id_field_name, subslice_by_key } = apiConfig;
 
             const { connectors } = this.context.sysconfig.terafoundation;
             const endpointConfig = connectors.elasticsearch[connection];
 
             if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+
+            elasticAPI({}, logger).validateGeoParameters(apiConfig);
 
             const apiVersion = endpointConfig.apiVersion
                 ? toNumber(endpointConfig.apiVersion.charAt(0))
@@ -284,7 +282,7 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
 
             if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
 
-            if (subsliceByKey) {
+            if (subslice_by_key) {
                 if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
                 if (apiVersion > 5 && (id_field_name == null || !isString(id_field_name) || id_field_name.length === 0)) throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
             }
@@ -304,8 +302,6 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
                     throw new Error('The number of slicers specified on the job cannot be more than 16');
                 }
             }
-
-            elasticAPI({}, logger).validateGeoParameters(apiConfig);
         });
     }
 
@@ -315,43 +311,45 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
 }
 
 function geoPointValidation(point: string | null):void {
-    if (point) {
-        if (typeof point !== 'string') throw new Error('Invalid geo_point, must be a string IF specified');
+    if (!point) return;
 
-        const pieces = point.split(',');
-        if (pieces.length !== 2) throw new Error(`Invalid geo_point, received ${point}`);
-        const latitude = toNumber(pieces[0]);
-        const longitude = toNumber(pieces[1]);
+    if (typeof point !== 'string') throw new Error('Invalid geo_point, must be a string IF specified');
 
-        if (latitude > 90 || latitude < -90) throw new Error(`Invalid latitude parameter, was given ${latitude}, should be >= -90 and <= 90`);
-        if (longitude > 180 || longitude < -180) throw new Error(`Invalid longitude parameter, was given ${longitude}, should be >= -180 and <= 180`);
-    }
+    const pieces = point.split(',');
+    if (pieces.length !== 2) throw new Error(`Invalid geo_point, received ${point}`);
+    const latitude = toNumber(pieces[0]);
+    const longitude = toNumber(pieces[1]);
+
+    if (latitude > 90 || latitude < -90) throw new Error(`Invalid latitude parameter, was given ${latitude}, should be >= -90 and <= 90`);
+    if (longitude > 180 || longitude < -180) throw new Error(`Invalid longitude parameter, was given ${longitude}, should be >= -180 and <= 180`);
 }
 
 function checkUnits(unit: string | null):void {
-    if (unit) {
-        const unitOptions = {
-            mi: true,
-            yd: true,
-            ft: true,
-            km: true,
-            m: true
-        };
-        if (typeof unit !== 'string') throw new Error('Invalid parameter, must be a string IF specified');
-        if (!unitOptions[unit]) throw new Error('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
-    }
+    if (!unit) return;
+    if (!isString(unit)) throw new Error('Invalid parameter, must be a string IF specified');
+
+    const unitOptions = {
+        mi: true,
+        yd: true,
+        ft: true,
+        km: true,
+        m: true
+    };
+
+    if (!has(unitOptions, unit)) throw new Error('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
 }
 
 function validGeoDistance(distance: string | null):void {
-    if (distance) {
-        if (typeof distance !== 'string') throw new Error('Invalid geo_distance parameter, must be a string IF specified');
-        const matches = distance.match(/(\d+)(.*)$/);
-        if (!matches) throw new Error('Invalid geo_distance paramter, is formatted incorrectly');
+    if (!distance) return;
 
-        const number = matches[1];
-        if (!number) throw new Error('Invalid geo_distance paramter, it must include a number');
+    if (typeof distance !== 'string') throw new Error('Invalid geo_distance parameter, must be a string IF specified');
 
-        const unit = matches[2];
-        checkUnits(unit);
-    }
+    const matches = distance.match(/(\d+)(.*)$/);
+    if (!matches) throw new Error('Invalid geo_distance parameter, is formatted incorrectly');
+
+    const number = matches[1];
+    if (!number) throw new Error('Invalid geo_distance parameter, it must include a number');
+
+    const unit = matches[2];
+    checkUnits(unit);
 }

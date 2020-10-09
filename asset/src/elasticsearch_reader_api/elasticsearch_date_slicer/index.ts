@@ -228,7 +228,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             countFn,
             version,
             type,
-            IDFieldName: id_field_name,
+            idFieldName: id_field_name,
             size,
             startingKeyDepth: starting_key_depth
         };

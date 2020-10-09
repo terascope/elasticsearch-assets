@@ -1,5 +1,5 @@
 import { ConvictSchema, AnyObject, ValidatedJobConfig } from '@terascope/job-components';
-import { spacesOpSchema } from '../__lib/schema';
+import { opSchema } from '../__lib/schema';
 import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import { DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
 
@@ -28,6 +28,6 @@ export default class Schema extends ConvictSchema<ApiConfig> {
     }
 
     build(): AnyObject {
-        return spacesOpSchema;
+        return opSchema;
     }
 }

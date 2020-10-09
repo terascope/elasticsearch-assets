@@ -5,7 +5,7 @@ import {
     getTypeOf,
     isNil
 } from '@terascope/job-components';
-import { elasticOpSchema } from '../__lib/schema';
+import { opSchema } from '../__lib/schema';
 import { ESReaderConfig } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
 
@@ -23,6 +23,12 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
         if (opConfig == null) throw new Error('Could not find elasticsearch_reader operation in jobConfig');
 
+        if (opConfig.field) {
+            this.context.logger.warn(`For api "${opConfig._name}", parameter "field" is deprecated and will be removed in later versions, please use "id_field_name" instead`);
+            opConfig.id_field_name = opConfig.field;
+            delete opConfig.field;
+        }
+
         const {
             api_name, field, ...newConfig
         } = opConfig;
@@ -31,11 +37,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
         // we set the new apiName back on the opConfig so it can reference the unique name
         opConfig.api_name = apiName;
-
-        if (field) {
-            this.context.logger.warn('For operation elasticsearch_reader, parameter "field" is deprecated and will be removed in later versions, please use "id_field_name" instead');
-            newConfig.id_field_name = field;
-        }
 
         this.ensureAPIFromConfig(apiName, job, newConfig);
 
@@ -60,6 +61,6 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
     }
 
     build(): AnyObject {
-        return elasticOpSchema;
+        return opSchema;
     }
 }
