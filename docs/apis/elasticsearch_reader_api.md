@@ -22,7 +22,7 @@ Example Job
         {
             "_name": "elasticsearch_reader_api",
             "index": "test_index",
-            "field": "uuid",
+            "id_field_name": "uuid",
             "size": 1000,
             "connection": "default"
         }
@@ -78,7 +78,7 @@ parameters:
 - name: String
 - configOverrides (optional) see [parameters](#Parameters) for config fields
 
-Creates an instance of a [reader api](#elasticsearch-reader-instance). Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if the api name has been previously used.  
+Creates an instance of a [reader api](#elasticsearch-reader-instance). Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if the api name has been previously used.
 
 ### remove (async)
 parameters:
@@ -104,7 +104,7 @@ Returns a Map of the cached api instances
 const apiConfig = {
   _name: "elasticsearch_reader_api",
   index: "test_index",
-  field: "uuid",
+  id_field_name: "uuid",
   size: 1000,
   connection: "default"
 };
@@ -113,7 +113,7 @@ const apiManager = this.getAPI(apiName);
 
 apiManager.size() === 0
 
-// this will return an api cached at "normalClient" 
+// this will return an api cached at "normalClient"
 const normalClient = await apiManager.create('normalClient', {})
 
 apiManager.size() === 1
@@ -129,7 +129,7 @@ apiManager.size() === 2
 apiManger.getConfig('overrideClient') === {
   _name: "elasticsearch_reader_api",
   index: "other_index",
-  field: "uuid",
+  id_field_name: "uuid",
   size: 1000,
   connection: "other"
 }
@@ -398,26 +398,28 @@ parameters:
   -  slicerID: the numerical id of the slicer.
   -  numOfSlicers: the number of total slicers that will be generated
   -  recoveryData?: the `SlicerRecoveryData` for the job
-  -  key_type: The type of id used in index or the chars contained in the field'
-  -  key_range?: if provided, slicer will only recurse on these given keys
-  -  starting_key_depth: the length of the key generated before attempting to count the records in the index
-
+  -  keyType: The type of id used in index or the chars contained in the field'
+  -  keyRange?: if provided, slicer will only recurse on these given keys
+  -  startingKeyDepth: the length of the key generated before attempting to count the records in the index
+  -  idFieldName: the field where the id resides
 
 ```js
 const lifecycle = 'once';
 const numOfSlicers = 3;
 const slicerID = 0;
 const recoveryData = [];
-const key_type = 'hexadecimal';
-const starting_key_depth = 2;
+const keyType = 'hexadecimal';
+const startingKeyDepth = 2;
+const idFieldName = 'uuid';
 
 const args = {
     lifecycle,
     numOfSlicers,
     slicerID,
     recoveryData,
-    key_type,
-    starting_key_depth,
+    keyType,
+    startingKeyDepth,
+    idFieldName
 };
 
 const slicer = await api.makeIDSlicer(args);
@@ -468,7 +470,8 @@ size === 100000
 | end | The end date to which it will read to| String/Number/ elasticsearch date math syntax | optional, exclusive, if not provided the index will be queried for latest date, this date will be reflected in the opConfig saved in the execution context |
 | interval | The time interval in which the reader will increment by. The unit of time may be months, weeks, days, hours, minutes, seconds, milliseconds or their appropriate abbreviations | String | optional, defaults to auto which tries to calculate the interval by dividing date_range / (numOfRecords / size) |
 | time_resolution | Not all dates have millisecond resolutions, specify 's' if you need second level date slicing | String | optional, defaults to milliseconds 'ms' |
-| date_field_name | document field name where the date used for searching resides | String | required |
+| date_field_name | document field name where the date used for searching resides | String | required for date based fetchers/slicers |
+| id_field_name | document field name where the id used for searching resides | String | required for id based fetchers/slicers |
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
 | fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
 | subslice_by_key | determine if slice should be further divided up by id if slice is to too big | Boolean | optional, defaults to false |
@@ -502,7 +505,7 @@ size === 100000
             "_name": "elasticsearch_reader_api:id",
             "connection": "connection-1",
             "index": "index-1",
-            "field": "_key",
+            "id_field_name": "_key",
             "query": "key:key-name",
             "size": 10000
         },
@@ -510,7 +513,7 @@ size === 100000
             "_name": "elasticsearch_reader_api:custom",
             "connection": "connection-2",
             "index": "index2",
-            "field": "name",
+            "date_field_name": "name",
             "size": 10000
         }
     ],

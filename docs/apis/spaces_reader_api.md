@@ -110,7 +110,7 @@ This will allow you to iterate over the values of the cache
 const apiConfig = {
   _name: "spaces_reader_api",
   index: "test_index",
-  field: "uuid",
+  date_field_name: "created",
   size: 1000,
   connection: "default",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
@@ -138,7 +138,7 @@ apiManager.size() === 2
 apiManger.getConfig('overrideClient') === {
   _name: "elasticsearch_reader_api",
   index: "other_index",
-  field: "uuid",
+  date_field_name: "created",
   size: 1000,
   connection: "other",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
@@ -180,9 +180,6 @@ parameters:
   -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
   -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
-### _searchRequest
-```(query: ElasticsearchSearchParams) => Promise<DataEntities[]>```
-This will allow you to pass in a whole elasticsearch query object to make custom queries. THIS IS AN UNSUPPORTED ESCAPE HATCH. Please do not overly rely on this as this is an internal api and will most likely change.
 
 parameters:
 - query: an elasticsearch query object
@@ -203,19 +200,6 @@ const dateRangeQuery = {
 };
 
 const results = await api.fetch(dateRangeQuery);
-
-const oldUIDQuery = {
-   key:  `events#ba*`
-};
-
-const results = await api.fetch(oldUIDQuery);
-
-const wildcardQuery = {
-    field: 'uuid,
-    value: 'afe1*',
-};
-
-const results = await api.fetch(wildcardQuery);
 
 
 const query: {
