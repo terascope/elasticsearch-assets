@@ -210,7 +210,12 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             dates
         );
 
-        const { type, field, size } = opConfig;
+        const {
+            type,
+            id_field_name,
+            size,
+            starting_key_depth
+        } = opConfig;
 
         const keyArray = getKeyArray(opConfig.key_type);
 
@@ -223,9 +228,9 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             countFn,
             version,
             type,
-            field,
+            idFieldName: id_field_name,
             size,
-            starting_key_depth: 0
+            startingKeyDepth: starting_key_depth
         };
 
         const idSlicers = idSlicer(idSlicerArs);

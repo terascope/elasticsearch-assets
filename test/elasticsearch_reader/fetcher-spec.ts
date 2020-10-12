@@ -65,7 +65,8 @@ describe('elasticsearch_reader fetcher', () => {
         _op: 'elasticsearch_reader',
         date_field_name: 'created',
         index: evenIndex,
-        time_resolution: 'ms'
+        time_resolution: 'ms',
+        type: docType
     };
 
     async function makeFetcherTest(config: AnyObject = {}) {

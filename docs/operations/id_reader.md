@@ -5,9 +5,9 @@ The behavior of this reader changes with the version of elasticsearch being sear
 
 For this reader to function correctly the [connection config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors) must have an appropriately set `apiVersion` for the elasticsearch connection. The behavior changes according to the apiVersion
 
-when searching against elasticsearch <= v5, it will query directly against the _uid (the elasticsearch _id of the record) so parameter `field` is NOT needed. However the `type` of the record must be set
+when searching against elasticsearch <= v5, it will query directly against the _uid (the elasticsearch _id of the record) so parameter `id_field_name` is NOT needed. However the `type` of the record must be set
 
-when searching against elasticsearch >= 6,  parameter `field` IS needed.
+when searching against elasticsearch >= 6,  parameter `id_field_name` IS needed.
 
 Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 
@@ -57,7 +57,7 @@ Example Job:
     {
       "_op": "id_reader",
       "index": "test_index",
-      "field": "uuid",
+      "id_field_name": "uuid",
       "fields": ["ip", "created", "bytes", "uuid"],
       "connection": "default"
     },
@@ -164,7 +164,7 @@ Example Job:
     {
       "_op": "id_reader",
       "index": "test_index",
-      "field": "uuid",
+      "id_field_name": "uuid",
       "key_range": ["a"],
       "query": "bytes:>= 1000",
       "connection": "default"
@@ -252,7 +252,7 @@ This will create 4 slicers that will divide up the the chars that it will search
     {
       "_op": "id_reader",
       "index": "test_index",
-      "field": "uuid",
+      "id_field_name": "uuid",
       "connection": "default"
     },
     {
@@ -339,7 +339,7 @@ const secondSliceResults = [
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
 | api_name | name of api to be used by id reader | String | optional, defaults to 'elasticsearch_reader_api' |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch|
-| field | The field on which we are searching against | String | required if running against elasticsearch >= v6, otherwise it is not needed on v5
+| id_field_name | The field on which we are searching against | String | required if running against elasticsearch >= v6, otherwise it is not needed on v5
 
 ## Advanced Configuration
 
@@ -382,7 +382,7 @@ If submitting the job in long form, here is a list of parameters that will throw
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "uuid",
+            "id_field_name": "uuid",
             "size": 1000,
             "key_type": "base64url",
             "connection": "default"
@@ -411,7 +411,7 @@ this configuration will be expanded out to the long form underneath the hood
         {
             "_name": "elasticsearch_reader_api",
             "index": "test_index",
-            "field": "uuid",
+            "id_field_name": "uuid",
             "size": 1000,
             "key_type": "base64url",
             "connection": "default"

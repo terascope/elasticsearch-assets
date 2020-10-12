@@ -12,12 +12,13 @@ export enum IDType {
 export interface ESIDReaderConfig extends OpConfig {
     index: string;
     size: number;
-    field: string;
+    id_field_name: string;
     key_range: null | string[];
     starting_key_depth: number;
     query?: string;
     fields: null | string[];
     connection: string;
+    api_name: string;
 }
 
 export interface ESIDSlicerArgs {
@@ -27,11 +28,11 @@ export interface ESIDSlicerArgs {
     keySet: string[];
     baseKeyArray: string[];
     events: EventEmitter;
-    starting_key_depth: number;
+    startingKeyDepth: number;
     version: number;
     countFn: (args: AnyObject) => Promise<number>;
     type: string | null;
-    field: string | null;
+    idFieldName: string | null;
     size: number;
 }
 

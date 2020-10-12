@@ -60,8 +60,10 @@ describe('spaces_reader fetcher', () => {
             connection: 'default',
             time_resolution: 's',
             api_name: 'someName',
-            type: 'someType'
+            type: 'someType',
+            starting_key_depth: 0
         };
+
         const client = new SpacesClient(opConfig, logger);
 
         expect(client.search).toBeDefined();

@@ -28,7 +28,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "connection": "es-1"
         },
         {
@@ -75,7 +75,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "query_index",
-            "field": "created",
+            "date_field_name": "created",
             "query": "bytes:>=100",
             "start": "2020-08-04T10:00:00.000Z",
             "end": "2020-08-04T20:00:00.000Z",
@@ -122,7 +122,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "connection": "es-1"
         },
         {
@@ -149,7 +149,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "delay": "1m",
             "interval": "1m",
             "connection": "es-1"
@@ -195,7 +195,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "time_resolution": "ms",
             "interval": "1m",
             "connection": "es-1"
@@ -286,7 +286,7 @@ If submitting the job in long form, here is a list of parameters that will throw
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "uuid",
+            "date_field_name": "created",
             "size": 1000,
             "connection": "default"
         },
@@ -314,7 +314,7 @@ this configuration will be expanded out to the long form underneath the hood
         {
             "_name": "elasticsearch_reader_api",
             "index": "test_index",
-            "field": "uuid",
+            "date_field_name": "uuid",
             "size": 1000,
             "connection": "default"
         }

@@ -1,10 +1,8 @@
 import {
     ConvictSchema,
     ValidatedJobConfig,
-    getOpConfig,
     get,
     AnyObject,
-    isNil,
     isString,
     getTypeOf,
     cloneDeep,
@@ -13,12 +11,6 @@ import {
 } from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
-
-function fetchConfig(job: ValidatedJobConfig) {
-    const opConfig = getOpConfig(job, 'elasticsearch_bulk');
-    if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
-    return opConfig as ElasticsearchBulkConfig;
-}
 
 export const schema: AnyObject = {
     size: {
@@ -106,24 +98,28 @@ export const schema: AnyObject = {
 
 export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
     validateJob(job: ValidatedJobConfig): void {
-        const opConfig = fetchConfig(job);
+        let opIndex = 0;
+
+        const opConfig = job.operations.find((op, ind) => {
+            if (op._op === 'elasticsearch_bulk') {
+                opIndex = ind;
+                return op;
+            }
+            return false;
+        });
+
+        if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
+
         const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
         if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
 
         const {
-            api_name, ...apiConfig
+            api_name, ...newConfig
         } = opConfig;
-        if (!Array.isArray(job.apis)) job.apis = [];
-        const ElasticSenderAPI = job.apis.find((jobApi) => jobApi._name === api_name);
 
-        if (isNil(ElasticSenderAPI)) {
-            if (isNil(opConfig.index)) throw new Error('Invalid elasticsearch_sender configuration, must provide parameter index');
+        const apiName = api_name || `${DEFAULT_API_NAME}:${opConfig._op}-${opIndex}`;
 
-            job.apis.push({
-                _name: DEFAULT_API_NAME,
-                ...apiConfig
-            });
-        }
+        this.ensureAPIFromConfig(apiName, job, newConfig);
     }
 
     build(): AnyObject {

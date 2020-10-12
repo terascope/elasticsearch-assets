@@ -15,11 +15,11 @@ import {
 import evenSpread from '../fixtures/data/even-spread';
 import { IDType } from '../../asset/src/id_reader/interfaces';
 
-describe('id_reader fetcher', () => {
+describe('id_reader job', () => {
     let harness: JobTestHarness;
     let clients: any;
     const esClient = makeClient();
-    const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
+    const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;
 
     const version = getESVersion(esClient);
 
@@ -72,18 +72,21 @@ describe('id_reader fetcher', () => {
         if (harness) await harness.shutdown();
     });
 
-    async function makeTest(opConfig?: any, numOfSlicers = 1) {
-        const idReader = Object.assign(
-            { _op: 'id_reader' },
-            opConfig,
-            { type: docType, id_field_name }
-        );
+    it('can fetch all even-data with job in long form with deprecated "id_field_name"', async () => {
+        const apiConfig = {
+            _name: 'elasticsearch_reader_api',
+            type: docType,
+            field: id_field_name,
+            index: evenIndex,
+            key_type: IDType.base64url
+        };
 
         const job = newTestJobConfig({
-            slicers: numOfSlicers,
+            slicers: 1,
             max_retries: 0,
+            apis: [apiConfig],
             operations: [
-                idReader,
+                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
@@ -92,16 +95,11 @@ describe('id_reader fetcher', () => {
 
         await harness.initialize();
 
-        return harness;
-    }
-
-    it('can fetch all even-data', async () => {
-        const opConfig = { index: evenIndex };
         const keyList = getKeyArray(IDType.base64url);
-        const test = await makeTest(opConfig);
+
         const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
-        const sliceResults = await test.runToCompletion();
+        const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
@@ -114,13 +112,34 @@ describe('id_reader fetcher', () => {
         });
     });
 
-    it('can fetch all even-data with multiple slicers', async () => {
-        const opConfig = { index: evenIndex };
+    it('can fetch all even-data with job in long form with non-deprecated', async () => {
+        const apiConfig = {
+            _name: 'elasticsearch_reader_api',
+            type: docType,
+            id_field_name,
+            index: evenIndex,
+            key_type: IDType.base64url
+        };
+
+        const job = newTestJobConfig({
+            slicers: 1,
+            max_retries: 0,
+            apis: [apiConfig],
+            operations: [
+                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'noop' }
+            ],
+        });
+
+        harness = new JobTestHarness(job, { clients });
+
+        await harness.initialize();
+
         const keyList = getKeyArray(IDType.base64url);
-        const test = await makeTest(opConfig, 2);
+
         const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
-        const sliceResults = await test.runToCompletion();
+        const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
@@ -133,18 +152,34 @@ describe('id_reader fetcher', () => {
         });
     });
 
-    it('can fetch all even-data for a given key', async () => {
-        const opConfig = {
-            index: evenIndex,
-            key_range: ['a']
-        };
+    it('can fetch all even-data with job in short form', async () => {
+        const job = newTestJobConfig({
+            slicers: 1,
+            max_retries: 0,
+            apis: [],
+            operations: [
+                {
+                    _op: 'id_reader',
+                    type: docType,
+                    id_field_name,
+                    index: evenIndex,
+                    key_type: IDType.base64url
+                },
+                { _op: 'noop' }
+            ],
+        });
+
+        harness = new JobTestHarness(job, { clients });
+
+        await harness.initialize();
+
         const keyList = getKeyArray(IDType.base64url);
-        const test = await makeTest(opConfig);
+
         const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
 
-        const sliceResults = await test.runToCompletion();
+        const sliceResults = await harness.runToCompletion();
 
-        expect(getTotalSliceCounts(sliceResults)).toEqual(evenSpreadIds.get('a'));
+        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
 
         sliceResults.forEach((results) => {
             const idChar = results.data[0][id_field_name].charAt(0);
@@ -155,27 +190,49 @@ describe('id_reader fetcher', () => {
         });
     });
 
-    it('will have all appropriate metadata on records', async () => {
-        const opConfig = {
-            index: evenIndex,
-            key_range: ['a']
+    it('can fetch all even-data with job in long form but it makes its own api', async () => {
+        const apiConfig = {
+            _name: 'elasticsearch_reader_api',
+            type: docType,
+            id_field_name,
+            index: 'something_else',
+            key_type: IDType.base64url
         };
+        // KEY DIFFERENCE IS LACK OF API_NAME, it will make 'elasticsearch_reader_api:id_reader-0'
+        const job = newTestJobConfig({
+            slicers: 1,
+            max_retries: 0,
+            apis: [apiConfig],
+            operations: [
+                {
+                    _op: 'id_reader',
+                    type: docType,
+                    id_field_name,
+                    index: evenIndex,
+                    key_type: IDType.base64url
+                },
+                { _op: 'noop' }
+            ],
+        });
 
-        const test = await makeTest(opConfig);
-        const results = await test.runToCompletion();
-        const record = results[0].data[0];
+        harness = new JobTestHarness(job, { clients });
 
-        expect(DataEntity.isDataEntity(record)).toBeTrue();
+        await harness.initialize();
 
-        const metadata = record.getMetadata();
+        const keyList = getKeyArray(IDType.base64url);
 
-        expect(metadata._createTime).toBeNumber();
-        expect(metadata._processTime).toBeNumber();
-        expect(metadata._ingestTime).toBeNumber();
-        expect(metadata._eventTime).toBeNumber();
-        expect(metadata._key).toBeString();
-        expect(metadata._index).toEqual(evenIndex);
-        expect(metadata._type).toEqual(docType);
-        expect(metadata._eventTime).toBeNumber();
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
+
+        const sliceResults = await harness.runToCompletion();
+
+        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
+
+        sliceResults.forEach((results) => {
+            const idChar = results.data[0][id_field_name].charAt(0);
+
+            expect(keyList).toContain(idChar);
+            expect(evenSpreadIds.has(idChar)).toEqual(true);
+            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
+        });
     });
 });

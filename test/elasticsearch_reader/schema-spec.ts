@@ -1,10 +1,11 @@
 import 'jest-extended';
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, newTestJobConfig } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
-import * as ESReaderSchema from '../../asset/src/elasticsearch_reader/schema';
+import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
 import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 
 describe('elasticsearch_reader schema', () => {
     const index = 'some_index';
@@ -39,7 +40,12 @@ describe('elasticsearch_reader schema', () => {
     const docType = version === 5 ? 'events' : '_doc';
 
     async function makeSchema(config: AnyObject = {}): Promise<ESReaderConfig> {
-        const opConfig = Object.assign({}, { _op: name, index, date_field_name: 'created' }, config);
+        const opConfig = Object.assign({}, {
+            _op: name,
+            index,
+            date_field_name: 'created',
+            type: docType
+        }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
         await harness.initialize();
@@ -53,21 +59,9 @@ describe('elasticsearch_reader schema', () => {
 
     it('has defaults', async () => {
         const schema = await makeSchema();
-        const {
-            connection,
-            size,
-            interval,
-            delay,
-            subslice_by_key,
-            time_resolution
-        } = schema;
+        const { api_name } = schema;
 
-        expect(connection).toEqual('default');
-        expect(size).toEqual(5000);
-        expect(interval).toEqual('auto');
-        expect(delay).toEqual('30s');
-        expect(subslice_by_key).toBeFalse();
-        expect(time_resolution).toEqual('s');
+        expect(api_name).toEqual('elasticsearch_reader_api:elasticsearch_reader-0');
     });
 
     it('can geo validate', async () => {
@@ -88,7 +82,7 @@ describe('elasticsearch_reader schema', () => {
 
         // @ts-expect-error
         expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
-        expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance paramter, is formatted incorrectly');
+        expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance parameter, is formatted incorrectly');
         expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
         expect(() => validGeoDistance('200km')).not.toThrowError();
 
@@ -98,9 +92,9 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true };
+        const badOP = { subslice_by_key: true, type: null };
         const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, other: 'events-', type: docType };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -159,11 +153,68 @@ describe('elasticsearch_reader schema', () => {
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
         if (version <= 5) {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
             await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
         } else {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
+            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
             await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
         }
+    });
+
+    it('should throw if api is created but opConfig has index set to another value', async () => {
+        const job = newTestJobConfig({
+            apis: [
+                {
+                    _name: DEFAULT_API_NAME,
+                    index,
+                    type: docType,
+                    date_field_name: 'created'
+                }
+            ],
+            operations: [
+                {
+                    _op: name,
+                    index: 'something_else',
+                    api_name: DEFAULT_API_NAME,
+                    date_field_name: 'created'
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+    });
+
+    it('should not throw if base api is created but opConfig has index set to another value', async () => {
+        const job = newTestJobConfig({
+            apis: [
+                {
+                    _name: DEFAULT_API_NAME,
+                    index,
+                    type: docType,
+                    date_field_name: 'created'
+                }
+            ],
+            operations: [
+                {
+                    _op: name,
+                    index,
+                    date_field_name: 'created',
+                    type: docType,
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const apiConfig = harness.executionContext.config.apis.find(
+            (api) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
+        );
+
+        expect(apiConfig).toBeDefined();
+        expect(apiConfig!.index).toEqual(index);
     });
 });

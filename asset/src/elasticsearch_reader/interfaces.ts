@@ -1,6 +1,9 @@
 import { EventEmitter } from 'events';
 import {
-    OpConfig, Logger, LifeCycle, AnyObject
+    OpConfig,
+    Logger,
+    LifeCycle,
+    AnyObject
 } from '@terascope/job-components';
 import moment from 'moment';
 import WindowState from '../elasticsearch_reader_api/window-state';
@@ -12,7 +15,7 @@ export interface ESReaderConfig extends ESReaderOptions, OpConfig {
 
 export interface ESReaderOptions {
     index: string;
-    field?: string;
+    id_field_name?: string;
     size: number;
     start: null | string;
     end: null | string;
@@ -36,6 +39,7 @@ export interface ESReaderOptions {
     geo_sort_order?: string;
     geo_sort_unit?: string;
     connection: string;
+    starting_key_depth: number;
 }
 
 export interface InputDateSegments {
