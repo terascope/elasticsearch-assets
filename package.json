@@ -34,7 +34,7 @@
     "dependencies": {},
     "devDependencies": {
         "@terascope/data-types": "^0.23.0",
-        "@terascope/elasticsearch-api": "^2.14.0",
+        "@terascope/elasticsearch-api": "^2.14.1",
         "@terascope/eslint-config": "^0.5.0",
         "@terascope/job-components": "^0.42.1",
         "@terascope/teraslice-state-storage": "^0.21.0",
