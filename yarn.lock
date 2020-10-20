@@ -4223,10 +4223,10 @@ mnemonist@^0.38.0:
   dependencies:
     obliterator "^1.6.1"
 
-mocker-data-generator@^2.9.0:
-  version "2.9.0"
-  resolved "https://registry.yarnpkg.com/mocker-data-generator/-/mocker-data-generator-2.9.0.tgz#28b9723cd2242d92f54cfc045fe6ef94d1111f30"
-  integrity sha512-mEx4twKcMepTUgzVvRNqj1umRu2hPpQPSaCqWmwHDcPgBhLpiNkEb4s1rry8Rg1FpBGbgtgy9X490D44OIU/hA==
+mocker-data-generator@^2.10.0:
+  version "2.10.0"
+  resolved "https://registry.yarnpkg.com/mocker-data-generator/-/mocker-data-generator-2.10.0.tgz#98746d284737870a2edac5536939963d6e41b3a2"
+  integrity sha512-gETkLW8Hfd+zgyZxnF1NO8IC/1YLGMDa646kvmhipkQiXIVCUNgJ5r3xYzSoAI0FFl3FH+RkfBqvDAw7h7kk4g==
   dependencies:
     casual-browserify "^1.5.19"
     chance "^1.1.7"
