@@ -630,7 +630,7 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^16.0.3"
 
-"@terascope/elasticsearch-api@^2.14.1", "@terascope/elasticsearch-api@^2.14.3":
+"@terascope/elasticsearch-api@^2.14.3":
   version "2.14.3"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.14.3.tgz#c85b4063bd1a72b47c82bb005ccf7fe215d1434a"
   integrity sha512-dhMgOJxnE0s4812ATdOM+i7lLkIlcEjVkk1CK/x2nx5v0Km92bb+Fu78szsyOLJERWCDrSLnd/0LfLb4ZGD7uA==
@@ -671,13 +671,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.21.1":
-  version "0.21.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.21.1.tgz#14f6890e1fecd421fef1f9d1cad0dd051d326614"
-  integrity sha512-VXc3c8NhSGR/nst/LlIRgTM8mCpbAjcMeRGbsiSoD9IhBAhRYll5GVF4WptJrDXAYDcQap7C+oklckhCFaEmcA==
+"@terascope/teraslice-state-storage@^0.21.3":
+  version "0.21.3"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.21.3.tgz#78927e974de098cd7294e2467cd60d1f23ff10d0"
+  integrity sha512-bBYw2S4nta4GZ492FP+xJscpBuwvBcXvKDZdd5YrwL+Tda/nig1oh5FxsqDCDBJfbnhxGwfkiDQ2cvybezSsFA==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.14.1"
-    "@terascope/utils" "^0.32.1"
+    "@terascope/elasticsearch-api" "^2.14.3"
+    "@terascope/utils" "^0.32.2"
     mnemonist "^0.38.0"
 
 "@terascope/types@^0.6.0":
@@ -685,7 +685,7 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.6.0.tgz#0d759ab7b26f6fc25af4b9727462b1d264761a1b"
   integrity sha512-I+E4m1wneMaiUslcl0Al0j2gjDcgUsFKhwurImYZh60+h10YMLfifbFSiJ18CUBnjy5A2rbaiKxt+OiOxQEkrA==
 
-"@terascope/utils@^0.32.0", "@terascope/utils@^0.32.1", "@terascope/utils@^0.32.2":
+"@terascope/utils@^0.32.0", "@terascope/utils@^0.32.2":
   version "0.32.2"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.32.2.tgz#17af9b779bfa418884c8cc5c5c58c90a194eae2c"
   integrity sha512-s5/XCRj4Y3ikWu4iT6UvLWs3uPPSfDSaDs6dQyU3Bdt5wL/Sh0MriP0YF3za7AV4HmTu7hZ7P6VwJO3yx7he2g==

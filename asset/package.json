@@ -16,7 +16,7 @@
     "dependencies": {
         "@terascope/elasticsearch-api": "^2.14.3",
         "@terascope/job-components": "^0.42.2",
-        "@terascope/teraslice-state-storage": "^0.21.1",
+        "@terascope/teraslice-state-storage": "^0.21.3",
         "@terascope/utils": "^0.32.0",
         "datemath-parser": "^1.0.6",
         "got": "^11.7.0",
