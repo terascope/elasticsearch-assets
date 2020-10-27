@@ -635,7 +635,7 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^16.1.0"
 
-"@terascope/elasticsearch-api@^2.14.3", "@terascope/elasticsearch-api@^2.14.4":
+"@terascope/elasticsearch-api@^2.14.4":
   version "2.14.4"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.14.4.tgz#f108f4a5c74d495ea849ac7bfaeeeaa6dfa55e71"
   integrity sha512-n4LmeSjOFKYi+6sfnJ1jFRMa9JMQDU+0AuVSAHlR8e+F7RGt/hvA9O4e/Q/pI8R71ssBn1K57JGPDkD1kS2nbw==
@@ -676,13 +676,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.21.3":
-  version "0.21.3"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.21.3.tgz#78927e974de098cd7294e2467cd60d1f23ff10d0"
-  integrity sha512-bBYw2S4nta4GZ492FP+xJscpBuwvBcXvKDZdd5YrwL+Tda/nig1oh5FxsqDCDBJfbnhxGwfkiDQ2cvybezSsFA==
+"@terascope/teraslice-state-storage@^0.21.4":
+  version "0.21.4"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.21.4.tgz#d916b98c8b9fd4d59278eebcc7ee22e6987d1af5"
+  integrity sha512-5TjVksyrJF2xl652npmfA8COWLDw7/XFuzzx6w6MhsOgoCp21iPTgP5MW9gx0BwqIDvXAfZOAXbYMC59LPqKMg==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.14.3"
-    "@terascope/utils" "^0.32.2"
+    "@terascope/elasticsearch-api" "^2.14.4"
+    "@terascope/utils" "^0.32.3"
     mnemonist "^0.38.0"
 
 "@terascope/types@^0.6.1":
@@ -690,7 +690,7 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.6.1.tgz#5cd3dc2c416b3633d09308c84642eaca3ca2798d"
   integrity sha512-hVhNVxLjc7FynwYLUUMQQcCN86O3lSfxtrf97B24X24sJqvq7FIFBH54SmAnOPDyfXRhgWs2pUYmx4BgU0tvog==
 
-"@terascope/utils@^0.32.0", "@terascope/utils@^0.32.2", "@terascope/utils@^0.32.3":
+"@terascope/utils@^0.32.0", "@terascope/utils@^0.32.3":
   version "0.32.3"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.32.3.tgz#7ac4c968375336da59323e0ba16b2322711b1886"
   integrity sha512-/UewWuJoKiCXzLeHN+b51FjNY1ZYz1bbftMcf5LnnfWJISZzO49hsTrEMH4bW2LEKbR723Xuole/nR4VrbH1pw==
