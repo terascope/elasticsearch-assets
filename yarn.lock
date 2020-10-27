@@ -680,10 +680,10 @@
     "@terascope/utils" "^0.32.2"
     mnemonist "^0.38.0"
 
-"@terascope/types@^0.6.0":
-  version "0.6.0"
-  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.6.0.tgz#0d759ab7b26f6fc25af4b9727462b1d264761a1b"
-  integrity sha512-I+E4m1wneMaiUslcl0Al0j2gjDcgUsFKhwurImYZh60+h10YMLfifbFSiJ18CUBnjy5A2rbaiKxt+OiOxQEkrA==
+"@terascope/types@^0.6.0", "@terascope/types@^0.6.1":
+  version "0.6.1"
+  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.6.1.tgz#5cd3dc2c416b3633d09308c84642eaca3ca2798d"
+  integrity sha512-hVhNVxLjc7FynwYLUUMQQcCN86O3lSfxtrf97B24X24sJqvq7FIFBH54SmAnOPDyfXRhgWs2pUYmx4BgU0tvog==
 
 "@terascope/utils@^0.32.0", "@terascope/utils@^0.32.2":
   version "0.32.2"
