@@ -39,7 +39,7 @@
         "@terascope/job-components": "^0.42.3",
         "@terascope/teraslice-state-storage": "^0.21.4",
         "@terascope/types": "^0.6.1",
-        "@types/bluebird": "^3.5.32",
+        "@types/bluebird": "^3.5.33",
         "@types/elasticsearch": "^5.0.35",
         "@types/got": "^9.6.11",
         "@types/jest": "^26.0.14",
