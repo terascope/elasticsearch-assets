@@ -169,6 +169,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
+                    connection: 'default',
                     index: 'test-index',
                 }
             ],
