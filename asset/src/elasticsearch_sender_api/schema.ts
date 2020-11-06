@@ -38,8 +38,7 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
 
         const { connectors } = this.context.sysconfig.terafoundation;
 
-        // hack to get around default connection check until schema updates for routed_sender
-        // replaces default connection with routed sender connection
+        // hack to get around default connection check until schema updates and further discussion
         if (connectors.elasticsearch.default == null && getOpConfig(job, 'routed_sender')) {
             this._applyRoutedSenderConnection(job, apiConfigs);
         }
@@ -53,6 +52,9 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
         });
     }
 
+    // replaces default connection with routed sender connection
+    // for ops that use the routed sender, should be removed once routed_sender schema or
+    // implementation is updated
     _applyRoutedSenderConnection(job: ValidatedJobConfig, apiConfigs: APIConfig[]): void {
         job.operations.forEach((op) => {
             if (op._op === 'routed_sender') {
