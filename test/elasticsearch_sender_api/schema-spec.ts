@@ -1,7 +1,7 @@
 import 'jest-extended';
 import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, TestContext, ValidatedJobConfig } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
 import { ElasticsearchSenderApi, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
@@ -94,47 +94,57 @@ describe('elasticsearch sender api schema', () => {
     });
 });
 
-describe('elasticsearch sender api schema', () => {
-    const esClient = makeClient();
+describe('elasticsearch sender api schema for routed sender jobs', () => {
+    let harness: WorkerTestHarness;
+    let job: ValidatedJobConfig;
+    let context: TestContext;
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
+    beforeAll(async () => {
+        const esClient = makeClient();
 
-    const testAsset = path.join(__dirname, '..', 'fixtures');
-
-    const job = newTestJobConfig({
-        max_retries: 3,
-        apis: [
+        const clients = [
             {
-                _name: 'elasticsearch_sender_api',
-                index: 'test-index',
+                type: 'elasticsearch',
+                endpoint: 'default',
+                create: () => ({
+                    client: esClient
+                }),
             }
-        ],
-        operations: [
-            {
-                _op: 'test-reader',
-                passthrough_slice: true
-            },
-            {
-                _op: 'routed_sender',
-                api_name: 'elasticsearch_sender_api'
-            }
-        ],
-    });
+        ];
 
-    const harness = new WorkerTestHarness(job, {
-        clients,
-        assetDir: [
-            testAsset,
-            process.cwd()
-        ]
+        const testAsset = path.join(__dirname, '..', 'fixtures');
+
+        job = newTestJobConfig({
+            max_retries: 3,
+            apis: [
+                {
+                    _name: 'elasticsearch_sender_api',
+                    index: 'test-index',
+                }
+            ],
+            operations: [
+                {
+                    _op: 'test-reader',
+                    passthrough_slice: true
+                },
+                {
+                    _op: 'routed_sender',
+                    api_name: 'elasticsearch_sender_api'
+                }
+            ],
+        });
+
+        harness = new WorkerTestHarness(job, {
+            clients,
+            assetDir: [
+                testAsset,
+                process.cwd()
+            ]
+        });
+
+        context = harness.context;
+
+        delete context.sysconfig.terafoundation.connectors.elasticsearch.default;
     });
 
     afterEach(async () => {
@@ -142,12 +152,35 @@ describe('elasticsearch sender api schema', () => {
     });
 
     it('should not throw if default is not an es endpoint and routed sender is an operation', async () => {
-        const { context } = harness;
+        const schema = new SenderSchema(context);
 
-        delete context.sysconfig.terafoundation.connectors.elasticsearch.default;
+        expect(() => schema.validateJob(job)).not.toThrow();
+    });
+
+    it('should throw if default is not an es endpoint and routed sender is not an operation', async () => {
+        const job2 = newTestJobConfig({
+            max_retries: 3,
+            apis: [
+                {
+                    _name: 'elasticsearch_sender_api',
+                    connection: 'default',
+                    index: 'test-index',
+                }
+            ],
+            operations: [
+                {
+                    _op: 'test-reader',
+                    passthrough_slice: true
+                },
+                {
+                    _op: 'noop',
+                    api_name: 'elasticsearch_sender_api'
+                }
+            ],
+        });
 
         const schema = new SenderSchema(context);
 
-        schema.validateJob(job);
+        expect(() => schema.validateJob(job2)).toThrow();
     });
 });
