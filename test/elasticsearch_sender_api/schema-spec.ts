@@ -96,16 +96,23 @@ describe('elasticsearch sender api schema', () => {
 
 describe('elasticsearch sender api schema for routed sender jobs', () => {
     let harness: WorkerTestHarness;
-    let job: ValidatedJobConfig;
     let context: TestContext;
 
     beforeAll(async () => {
+        // need this to create valid context to remove the default es connection
         const esClient = makeClient();
 
         const clients = [
             {
                 type: 'elasticsearch',
-                endpoint: 'default',
+                endpoint: 'test-es',
+                create: () => ({
+                    client: esClient
+                }),
+            },
+            {
+                type: 'elasticsearch',
+                endpoint: 'test-es1',
                 create: () => ({
                     client: esClient
                 }),
@@ -114,7 +121,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
 
         const testAsset = path.join(__dirname, '..', 'fixtures');
 
-        job = newTestJobConfig({
+        const initialJob = newTestJobConfig({
             max_retries: 3,
             apis: [
                 {
@@ -129,12 +136,15 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'routed_sender',
-                    api_name: 'elasticsearch_sender_api'
+                    api_name: 'elasticsearch_sender_api',
+                    routing: {
+                        '**': 'test-es'
+                    }
                 }
             ],
         });
 
-        harness = new WorkerTestHarness(job, {
+        harness = new WorkerTestHarness(initialJob, {
             clients,
             assetDir: [
                 testAsset,
@@ -153,6 +163,82 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
 
     it('should not throw if default is not an es endpoint and routed sender is an operation', async () => {
         const schema = new SenderSchema(context);
+
+        const job = newTestJobConfig({
+            max_retries: 3,
+            apis: [
+                {
+                    _name: 'elasticsearch_sender_api',
+                    index: 'test-index',
+                }
+            ],
+            operations: [
+                {
+                    _op: 'test-reader',
+                    passthrough_slice: true
+                },
+                {
+                    _op: 'routed_sender',
+                    api_name: 'elasticsearch_sender_api',
+                    routing: {
+                        '**': 'test-es'
+                    }
+                }
+            ],
+        });
+
+        expect(() => schema.validateJob(job)).not.toThrow();
+    });
+
+    it('should not throw if default is not an es endpoint and multiple routed sender operations', async () => {
+        const schema = new SenderSchema(context);
+
+        const job = newTestJobConfig({
+            max_retries: 3,
+            apis: [
+                {
+                    _name: 'elasticsearch_sender_api',
+                    connection: 'test-es1',
+                    index: 'test-index',
+                },
+                {
+                    _name: 'elasticsearch_sender_api:routed1',
+                    connection: 'default',
+                    index: 'test-index',
+                },
+                {
+                    _name: 'elasticsearch_sender_api:routed2',
+                    connection: 'default',
+                    index: 'test-index',
+                }
+            ],
+            operations: [
+                {
+                    _op: 'test-reader',
+                    passthrough_slice: true
+                },
+                {
+                    _op: 'routed_sender',
+                    api_name: 'elasticsearch_sender_api:routed1',
+                    routing: {
+                        a: 'test-es',
+                        b: 'test-es2',
+                        '*': 'test-es3',
+                    }
+                },
+                {
+                    _op: 'routed_sender',
+                    api_name: 'elasticsearch_sender_api:routed2',
+                    routing: {
+                        '**': 'test-es'
+                    }
+                },
+                {
+                    _op: 'noop',
+                    api_name: 'elasticsearch_sender_api'
+                }
+            ],
+        });
 
         expect(() => schema.validateJob(job)).not.toThrow();
     });

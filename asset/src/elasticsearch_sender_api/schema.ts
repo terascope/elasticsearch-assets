@@ -2,8 +2,9 @@ import {
     ConvictSchema,
     AnyObject,
     cloneDeep,
-    getOpConfig,
     ValidatedJobConfig,
+    APIConfig,
+    getOpConfig
 } from '@terascope/job-components';
 import { ElasticsearchSenderConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
@@ -32,27 +33,33 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const apiConfigs = job.apis.filter((config) => {
             const apiName = config._name;
-            return apiName === (DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`))
-                // routed_sender overrides default connection, no need to check it
-                && apiName !== this._getRoutedSenderApiName(job);
+            return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
         });
+
+        const { connectors } = this.context.sysconfig.terafoundation;
+
+        // hack to get around default connection check until schema updates for routed_sender
+        // check the first connection on the routed sender op
+        if (connectors.elasticsearch.default == null && getOpConfig(job, 'routed_sender')) {
+            this._applyRoutedSenderConnection(job, apiConfigs);
+        }
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
             const { connection } = apiConfig;
 
-            const { connectors } = this.context.sysconfig.terafoundation;
             const endpointConfig = connectors.elasticsearch[connection];
 
             if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
         });
     }
 
-    _getRoutedSenderApiName(job: ValidatedJobConfig): string | null {
-        const routedSender = getOpConfig(job, 'routed_sender');
-
-        if (routedSender) return routedSender.api_name;
-
-        return null;
+    _applyRoutedSenderConnection(job: ValidatedJobConfig, apiConfigs: APIConfig[]): void {
+        job.operations.forEach((op) => {
+            if (op._op === 'routed_sender') {
+                apiConfigs.filter((config) => config._name === op.api_name)
+                    .forEach((config) => { [config.connection] = Object.values(op.routing); });
+            }
+        });
     }
 
     build(): AnyObject {
