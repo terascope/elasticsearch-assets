@@ -2,7 +2,8 @@ import {
     ConvictSchema,
     AnyObject,
     cloneDeep,
-    ValidatedJobConfig
+    getOpConfig,
+    ValidatedJobConfig,
 } from '@terascope/job-components';
 import { ElasticsearchSenderConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
@@ -31,7 +32,9 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const apiConfigs = job.apis.filter((config) => {
             const apiName = config._name;
-            return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
+            return apiName === (DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`))
+                // routed_sender overrides default connection, no need to check it
+                && apiName !== this._getRoutedSenderApiName(job);
         });
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
@@ -42,6 +45,14 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
 
             if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
         });
+    }
+
+    _getRoutedSenderApiName(job: ValidatedJobConfig): string | null {
+        const routedSender = getOpConfig(job, 'routed_sender');
+
+        if (routedSender) return routedSender.api_name;
+
+        return null;
     }
 
     build(): AnyObject {
