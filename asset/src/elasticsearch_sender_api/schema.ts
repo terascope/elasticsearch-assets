@@ -2,7 +2,9 @@ import {
     ConvictSchema,
     AnyObject,
     cloneDeep,
-    ValidatedJobConfig
+    ValidatedJobConfig,
+    APIConfig,
+    getOpConfig
 } from '@terascope/job-components';
 import { ElasticsearchSenderConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
@@ -34,13 +36,31 @@ export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
             return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
         });
 
+        const { connectors } = this.context.sysconfig.terafoundation;
+
+        // hack to get around default connection check until schema updates and further discussion
+        if (connectors.elasticsearch.default == null && getOpConfig(job, 'routed_sender')) {
+            this._applyRoutedSenderConnection(job, apiConfigs);
+        }
+
         apiConfigs.forEach((apiConfig: AnyObject) => {
             const { connection } = apiConfig;
 
-            const { connectors } = this.context.sysconfig.terafoundation;
             const endpointConfig = connectors.elasticsearch[connection];
 
             if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+        });
+    }
+
+    // replaces default connection with routed sender connection
+    // for ops that use the routed sender, should be removed once routed_sender schema or
+    // implementation is updated
+    _applyRoutedSenderConnection(job: ValidatedJobConfig, apiConfigs: APIConfig[]): void {
+        job.operations.forEach((op) => {
+            if (op._op === 'routed_sender') {
+                apiConfigs.filter((config) => config._name === op.api_name && config.connection === 'default')
+                    .forEach((config) => { [config.connection] = Object.values(op.routing); });
+            }
         });
     }
 
