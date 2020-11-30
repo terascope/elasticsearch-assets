@@ -17,7 +17,7 @@
         "@terascope/elasticsearch-api": "^2.15.0",
         "@terascope/job-components": "^0.42.3",
         "@terascope/teraslice-state-storage": "^0.22.0",
-        "@terascope/utils": "^0.32.0",
+        "@terascope/utils": "^0.33.0",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.0",
         "mocker-data-generator": "^2.10.0",
