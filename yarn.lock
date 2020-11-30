@@ -626,12 +626,12 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^16.1.0"
 
-"@terascope/elasticsearch-api@^2.14.4":
-  version "2.14.4"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.14.4.tgz#f108f4a5c74d495ea849ac7bfaeeeaa6dfa55e71"
-  integrity sha512-n4LmeSjOFKYi+6sfnJ1jFRMa9JMQDU+0AuVSAHlR8e+F7RGt/hvA9O4e/Q/pI8R71ssBn1K57JGPDkD1kS2nbw==
+"@terascope/elasticsearch-api@^2.14.4", "@terascope/elasticsearch-api@^2.15.0":
+  version "2.15.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.15.0.tgz#88f44db3fb2a4ae4e7e07c2d365c179ec87139d0"
+  integrity sha512-BLdYwbLrzK0eNyRywVT9y+uWqK9o7x2PvEALQh+yeEGPg/Kiq3FVXH0YM/70koPmGUQKGfu8XSWktPXWfQz0Kw==
   dependencies:
-    "@terascope/utils" "^0.32.3"
+    "@terascope/utils" "^0.33.0"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -694,12 +694,35 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.6.1.tgz#5cd3dc2c416b3633d09308c84642eaca3ca2798d"
   integrity sha512-hVhNVxLjc7FynwYLUUMQQcCN86O3lSfxtrf97B24X24sJqvq7FIFBH54SmAnOPDyfXRhgWs2pUYmx4BgU0tvog==
 
+"@terascope/types@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.7.0.tgz#b9c04387dad3aaea468eac28e6be7d99f9451846"
+  integrity sha512-OYz5FU+66gELsSSJKYLFePQmQemweDtDhnhhXynFPXDVM3swQENR8Ai59DOgrDUaiszcz+ceczSEuMg/MnRtdQ==
+
 "@terascope/utils@^0.32.0", "@terascope/utils@^0.32.3":
   version "0.32.3"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.32.3.tgz#7ac4c968375336da59323e0ba16b2322711b1886"
   integrity sha512-/UewWuJoKiCXzLeHN+b51FjNY1ZYz1bbftMcf5LnnfWJISZzO49hsTrEMH4bW2LEKbR723Xuole/nR4VrbH1pw==
   dependencies:
     "@terascope/types" "^0.6.1"
+    debug "^4.1.1"
+    is-plain-object "^5.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash.get "^4.4.2"
+    lodash.has "^4.5.2"
+    lodash.set "^4.3.2"
+    lodash.unset "^4.5.2"
+    p-map "^4.0.0"
+    shallow-clone "^3.0.1"
+
+"@terascope/utils@^0.33.0":
+  version "0.33.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.33.0.tgz#4eba8b95d24349a92252b0c2d3e73d32e18dbac4"
+  integrity sha512-qLCjybZXykCCFcJGG5EgjzG4hKea3iML5csduL53Kr72bLeANam7R13UZxNclypKhDB7DKUroA3Wgu2sfnoemw==
+  dependencies:
+    "@terascope/types" "^0.7.0"
     debug "^4.1.1"
     is-plain-object "^5.0.0"
     js-string-escape "^1.0.1"
