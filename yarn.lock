@@ -637,7 +637,7 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^16.1.1"
 
-"@terascope/elasticsearch-api@^2.14.4", "@terascope/elasticsearch-api@^2.15.0":
+"@terascope/elasticsearch-api@^2.15.0":
   version "2.15.0"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.15.0.tgz#88f44db3fb2a4ae4e7e07c2d365c179ec87139d0"
   integrity sha512-BLdYwbLrzK0eNyRywVT9y+uWqK9o7x2PvEALQh+yeEGPg/Kiq3FVXH0YM/70koPmGUQKGfu8XSWktPXWfQz0Kw==
@@ -691,13 +691,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.21.4":
-  version "0.21.4"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.21.4.tgz#d916b98c8b9fd4d59278eebcc7ee22e6987d1af5"
-  integrity sha512-5TjVksyrJF2xl652npmfA8COWLDw7/XFuzzx6w6MhsOgoCp21iPTgP5MW9gx0BwqIDvXAfZOAXbYMC59LPqKMg==
+"@terascope/teraslice-state-storage@^0.22.0":
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.22.0.tgz#50711d85abc150cf91e16cae553ad55f7e78767a"
+  integrity sha512-NUmrX7TUKndpmCsuLUqQdUCvbb203nQbZ4QMS1CpLpNSXTkhIjcr0aS1E6GG3oKxv3qVWsT9x0wUR9FeGwLKow==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.14.4"
-    "@terascope/utils" "^0.32.3"
+    "@terascope/elasticsearch-api" "^2.15.0"
+    "@terascope/utils" "^0.33.0"
     mnemonist "^0.38.0"
 
 "@terascope/types@^0.6.1":
