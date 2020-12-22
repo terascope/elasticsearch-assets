@@ -20,7 +20,7 @@
         "@terascope/teraslice-state-storage": "^0.23.1",
         "@terascope/utils": "^0.32.0",
         "datemath-parser": "^1.0.6",
-        "got": "^11.8.0",
+        "got": "^11.8.1",
         "mocker-data-generator": "^2.10.0",
         "moment": "^2.29.1"
     },
