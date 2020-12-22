@@ -28,7 +28,8 @@ export default class SpacesClient {
                 searchParams: query,
                 responseType: 'json',
                 timeout: this.opConfig.timeout,
-                retry: 0
+                retry: 3,
+                headers: this.opConfig.headers || {},
             });
 
             return body;
@@ -54,7 +55,6 @@ export default class SpacesClient {
 
     async apiSearch(queryConfig: AnyObject): Promise<AnyObject> {
         const { opConfig } = this;
-        // console.log('queryConfig', JSON.stringify(queryConfig, null, 4))
         const fields = get(queryConfig, '_source', null);
         const dateFieldName = this.opConfig.date_field_name;
         // put in the dateFieldName into fields so date reader can work
@@ -195,7 +195,7 @@ export default class SpacesClient {
                 total: 1,
                 successful: 1,
                 failed: 0
-            }
+            },
         } as SearchResponse<any>;
     }
 
@@ -203,7 +203,7 @@ export default class SpacesClient {
         const query = {
             token: this.opConfig.token,
             q: '_exists_:_key',
-            size: 1,
+            size: 0,
             include_type_config: true
         };
 

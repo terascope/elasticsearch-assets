@@ -13,8 +13,10 @@ import {
     isNumber,
     isValidDate,
     isFunction,
-    isString
+    isString,
 } from '@terascope/job-components';
+import { DataFrame } from '@terascope/data-mate';
+import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { CountParams, SearchParams, Client } from 'elasticsearch';
 import dateSlicerFn from './elasticsearch_date_slicer';
@@ -51,6 +53,14 @@ import {
 type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
 
+function isValidDataTypeConfig(record: any): record is DataTypeConfig {
+    if (!record || !isSimpleObject(record)) return false;
+    if (!record.version || !isNumber(record.version)) return false;
+    if (!record.fields || !isSimpleObject(record.fields)) return false;
+
+    return true;
+}
+
 export default class ElasticsearchAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
@@ -70,6 +80,11 @@ export default class ElasticsearchAPI {
             connection,
             index
         };
+
+        if (config.use_data_frames) {
+            clientConfig.full_response = true;
+            if (!isValidDataTypeConfig(config.type_config)) throw new Error('Parameter "type_config" must be set if DataFrames are being returned');
+        }
 
         this.config = Object.freeze(config);
         this.emitter = emitter;
@@ -105,7 +120,7 @@ export default class ElasticsearchAPI {
         return this.client.count(query as CountParams);
     }
 
-    async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]> {
+    async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
         this.validate(queryParams);
         // attempt to get window if not set
         if (!this.windowSize) {
@@ -116,7 +131,36 @@ export default class ElasticsearchAPI {
         if (this.windowSize) {
             const query = buildQuery(this.config, queryParams);
             query.size = this.windowSize;
-            return this._searchRequest(query);
+            const start = Date.now();
+            // this could be a full  ES request, Spaces Request, or an array of data-entities
+            const searchResults = await this._searchRequest(query) as any;
+
+            const searchEnd = Date.now();
+
+            if (this.config.use_data_frames) {
+                const typeConfig = this.config.type_config as DataTypeConfig;
+                const records = searchResults.hits.hits.map((data: AnyObject) => data._source);
+                const metrics: AnyObject = {
+                    search_time: searchEnd - start,
+                    fetched: records.length,
+                    total: searchResults.hits.total
+                };
+
+                // we do not have access to complexity right now
+                return DataFrame.fromJSON(
+                    typeConfig,
+                    records,
+                    {
+                        name: '<unknown>',
+                        metadata: {
+                            search_end_time: searchEnd,
+                            metrics
+                        }
+                    }
+                );
+            }
+
+            return searchResults;
         }
 
         // index is not up, return empty, we log in getWindowSize

@@ -23,7 +23,20 @@ export default class SpacesReaderApi extends APIFactory<ElasticsearchAPI, ApiCon
         _name: string, overrideConfigs: Partial<ApiConfig>
     ): Promise<{ client: ElasticsearchAPI, config: ApiConfig }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
+
+        if (config.use_data_frames) {
+            config.full_response = true;
+        }
+
         const mockedClient = new SpacesClient(config, this.logger);
+
+        if (config.use_data_frames && !config.type_config) {
+            // For some reason the DataTypeConfig types are not the same version
+            // can remove once they are synched
+            // @ts-expect-error
+            config.type_config = await mockedClient.getDataType();
+        }
+
         const emitter = this.context.apis.foundation.getSystemEvents();
         const reader = new ElasticsearchAPI(config, mockedClient, emitter, this.logger);
 

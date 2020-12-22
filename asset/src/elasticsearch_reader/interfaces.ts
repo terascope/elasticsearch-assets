@@ -6,6 +6,7 @@ import {
     AnyObject
 } from '@terascope/job-components';
 import moment from 'moment';
+import { DataTypeConfig } from '@terascope/types';
 import WindowState from '../elasticsearch_reader_api/window-state';
 import { IDType, WildCardQuery } from '../id_reader/interfaces';
 
@@ -40,6 +41,8 @@ export interface ESReaderOptions {
     geo_sort_unit?: string;
     connection: string;
     starting_key_depth: number;
+    use_data_frames?: boolean;
+    type_config?: DataTypeConfig
 }
 
 export interface InputDateSegments {
@@ -101,6 +104,7 @@ export interface ApiConfig extends ESReaderConfig {
     endpoint: string;
     token: string;
     timeout: number;
+    full_response?: boolean;
 }
 
 export type ESDateConfig = ESReaderConfig | ApiConfig;
