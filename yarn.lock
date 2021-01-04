@@ -700,7 +700,7 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.7.0.tgz#b9c04387dad3aaea468eac28e6be7d99f9451846"
   integrity sha512-OYz5FU+66gELsSSJKYLFePQmQemweDtDhnhhXynFPXDVM3swQENR8Ai59DOgrDUaiszcz+ceczSEuMg/MnRtdQ==
 
-"@terascope/utils@^0.32.0", "@terascope/utils@^0.32.3":
+"@terascope/utils@^0.32.3":
   version "0.32.3"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.32.3.tgz#7ac4c968375336da59323e0ba16b2322711b1886"
   integrity sha512-/UewWuJoKiCXzLeHN+b51FjNY1ZYz1bbftMcf5LnnfWJISZzO49hsTrEMH4bW2LEKbR723Xuole/nR4VrbH1pw==
