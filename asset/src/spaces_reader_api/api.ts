@@ -31,9 +31,6 @@ export default class SpacesReaderApi extends APIFactory<ElasticsearchAPI, ApiCon
         const mockedClient = new SpacesClient(config, this.logger);
 
         if (config.use_data_frames && !config.type_config) {
-            // For some reason the DataTypeConfig types are not the same version
-            // can remove once they are synched
-            // @ts-expect-error
             config.type_config = await mockedClient.getDataType();
         }
 
