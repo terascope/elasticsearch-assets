@@ -55,7 +55,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
 
             if (count !== 0) {
                 // the closing of this path happens at keyGenerator
-                return { ...query, count };
+                return { ...esQuery, count };
             }
 
             // if count is zero then close path to prevent further iteration
