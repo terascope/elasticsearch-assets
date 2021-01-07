@@ -16,9 +16,9 @@
     "dependencies": {
         "@terascope/data-mate": "^0.19.3",
         "@terascope/elasticsearch-api": "^2.15.0",
-        "@terascope/job-components": "^0.42.3",
+        "@terascope/job-components": "^0.44.1",
         "@terascope/teraslice-state-storage": "^0.23.1",
-        "@terascope/utils": "^0.32.0",
+        "@terascope/utils": "^0.34.1",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.1",
         "mocker-data-generator": "^2.10.0",
