@@ -18,8 +18,9 @@ import {
     DateSegments,
     SlicerDateResults,
     dateFormatSeconds, dateFormat, divideRange
-} from '@terascope/elasticsearch-asset-apis';
-import MockClient from '../../helpers/mock_client';
+} from '../../src';
+import MockClient from '../helpers';
+import slicerFn from '../../src/elasticsearch_date_slicer';
 
 interface TestConfig {
     slicers?: number;

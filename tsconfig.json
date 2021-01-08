@@ -23,7 +23,7 @@
             "./node_modules/@types"
         ]
     },
-    "include": [],
+    "include": ["test"],
     "references": [
         {
             "path": "packages/terafoundation_elasticsearch_connector"

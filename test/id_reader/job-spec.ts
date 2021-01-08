@@ -2,7 +2,7 @@ import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
-import { getKeyArray } from '../../asset/src/elasticsearch_reader_api/elasticsearch_id_slicer/helpers';
+import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,
@@ -13,7 +13,6 @@ import {
     populateIndex
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
-import { IDType } from '../../asset/src/id_reader/interfaces';
 
 describe('id_reader job', () => {
     let harness: JobTestHarness;
