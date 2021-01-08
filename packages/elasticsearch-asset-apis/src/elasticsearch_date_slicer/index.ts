@@ -9,15 +9,15 @@ import {
     DateConfig,
     StartPointConfig,
     DateSegments,
-    DetermineSliceResults
-} from '../../elasticsearch_reader/interfaces';
+    DetermineSliceResults,
+    IDSlicerArgs
+} from '../interfaces';
 import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
     determineStartingPoint
 } from './helpers';
-import { ESIDSlicerArgs } from '../../id_reader/interfaces';
 import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
 
 interface DateParams {
@@ -219,7 +219,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
         const keyArray = getKeyArray(opConfig.key_type);
 
-        const idSlicerArs: ESIDSlicerArgs = {
+        const idSlicerArs: IDSlicerArgs = {
             events,
             logger,
             range,

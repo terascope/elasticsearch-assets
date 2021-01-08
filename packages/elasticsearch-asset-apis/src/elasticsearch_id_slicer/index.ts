@@ -1,8 +1,7 @@
 import { TSError, SlicerFn, AnyObject } from '@terascope/job-components';
-import { ESIDSlicerArgs } from '../../id_reader/interfaces';
-import { SlicerDateResults, IDReaderSlice } from '../../elasticsearch_reader/interfaces';
+import { IDSlicerArgs, SlicerDateResults, IDReaderSlice } from '../interfaces';
 
-export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
+export default function newSlicer(args: IDSlicerArgs): SlicerFn {
     const {
         events,
         retryData,

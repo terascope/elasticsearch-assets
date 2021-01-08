@@ -4,7 +4,7 @@ import {
 } from '@terascope/job-components';
 import { DataTypeConfig } from '@terascope/data-types';
 import got from 'got';
-import { ApiConfig } from '../elasticsearch_reader/interfaces';
+import { SpacesApiConfig } from '../interfaces';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -12,14 +12,14 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export default class SpacesClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
-    opConfig: ApiConfig;
+    config: SpacesApiConfig;
     logger: Logger;
     protected uri: string;
 
-    constructor(opConfig: ApiConfig, logger: Logger) {
-        this.opConfig = opConfig;
+    constructor(config: SpacesApiConfig, logger: Logger) {
+        this.config = config;
         this.logger = logger;
-        this.uri = `${opConfig.endpoint}/${opConfig.index}`;
+        this.uri = `${config.endpoint}/${config.index}`;
     }
 
     async makeRequest(query: AnyObject): Promise<SearchResult> {
@@ -27,9 +27,9 @@ export default class SpacesClient {
             const { body } = await got<SearchResult>(this.uri, {
                 searchParams: query,
                 responseType: 'json',
-                timeout: this.opConfig.timeout,
+                timeout: this.config.timeout,
                 retry: 3,
-                headers: this.opConfig.headers || {},
+                headers: this.config.headers || {},
             });
 
             return body;
@@ -54,9 +54,9 @@ export default class SpacesClient {
     }
 
     async apiSearch(queryConfig: AnyObject): Promise<AnyObject> {
-        const { opConfig } = this;
+        const { config } = this;
         const fields = get(queryConfig, '_source', null);
-        const dateFieldName = this.opConfig.date_field_name;
+        const dateFieldName = this.config.date_field_name;
         // put in the dateFieldName into fields so date reader can work
         if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
@@ -74,10 +74,10 @@ export default class SpacesClient {
 
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
-                    for (const [key, config] of Object.entries(queryAction)) {
+                    for (const [key, qConfig] of Object.entries(queryAction)) {
                         const queryFn = queryOptions[key];
                         if (queryFn) {
-                            let queryStr = queryFn(config);
+                            let queryStr = queryFn(qConfig);
                             if (key !== 'range') queryStr = `(${queryStr})`;
 
                             if (luceneQuery.length) {
@@ -105,11 +105,11 @@ export default class SpacesClient {
 
             let { size } = queryConfig;
             if (size == null) {
-                ({ size } = opConfig);
+                ({ size } = config);
             }
 
             return Object.assign({}, geoQuery, sortQuery, fieldsQuery, {
-                token: opConfig.token,
+                token: config.token,
                 q: luceneQuery,
                 size,
             });
@@ -124,7 +124,7 @@ export default class SpacesClient {
                 geo_sort_point: geoSortPoint,
                 geo_sort_order: geoSortOrder,
                 geo_sort_unit: geoSortUnit
-            } = opConfig;
+            } = config;
             const geoQuery: any = {};
             if (geoBoxTopLeft) geoQuery.geo_box_top_left = geoBoxTopLeft;
             if (geoBoxBottomRight) geoQuery.geo_box_bottom_right = geoBoxBottomRight;
@@ -201,7 +201,7 @@ export default class SpacesClient {
 
     async getDataType(): Promise<DataTypeConfig> {
         const query = {
-            token: this.opConfig.token,
+            token: this.config.token,
             q: '_exists_:_key',
             size: 0,
             include_type_config: true
@@ -226,7 +226,7 @@ export default class SpacesClient {
     async version(): Promise<void> {}
 
     get cluster(): Partial<Client['cluster']> {
-        const { index } = this.opConfig;
+        const { index } = this.config;
         return {
             async stats() {
                 return new Promise(((resolve) => {
@@ -256,7 +256,7 @@ export default class SpacesClient {
     }
 
     get indices(): Partial<Client['indices']> {
-        const { index, endpoint, token } = this.opConfig;
+        const { index, endpoint, token } = this.config;
         return {
             async getSettings() {
                 const uri = `${endpoint}/${index}/_info`;

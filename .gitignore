@@ -65,3 +65,9 @@ builds/
 build/
 
 asset/dist
+
+packages/elasticsearch-asset-apis/dist
+packages/elasticsearch-asset-apis/node_modules
+
+packages/terafoundation_elasticsearch_connector/dist
+packages/terafoundation_elasticsearch_connector/node_modules
