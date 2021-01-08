@@ -48,8 +48,8 @@ describe('spaces-reader schema', () => {
         };
 
         if (apiConfig) {
-            const newApiConfig = Object.assign({ _name: 'spaces_reader_api' }, apiConfig);
-            partialJob.apis.push(newApiConfig);
+            const newAPIConfig = Object.assign({ _name: 'spaces_reader_api' }, apiConfig);
+            partialJob.apis.push(newAPIConfig);
         }
 
         harness = new WorkerTestHarness(newTestJobConfig(partialJob), {});

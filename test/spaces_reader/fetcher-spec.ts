@@ -3,7 +3,7 @@ import nock from 'nock';
 import { newTestJobConfig, debugLogger } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import SpacesClient from '../../asset/src/spaces_reader_api/client';
-import { ApiConfig } from '../../asset/src/elasticsearch_reader/interfaces';
+import { APIConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import { IDType } from '../../asset/src/id_reader/interfaces';
 import MockClient from '../helpers/mock_client';
 
@@ -40,7 +40,7 @@ describe('spaces_reader fetcher', () => {
     });
 
     it('should look like an elasticsearch client', () => {
-        const opConfig: ApiConfig = {
+        const opConfig: APIConfig = {
             _op: 'spaces_reader',
             index: testIndex,
             endpoint: baseUri,

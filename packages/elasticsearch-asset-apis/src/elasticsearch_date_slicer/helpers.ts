@@ -3,7 +3,7 @@ import {
     AnyObject,
     toNumber,
     parseGeoPoint,
-} from '@terascope/job-components';
+} from '@terascope/utils';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-expect-error

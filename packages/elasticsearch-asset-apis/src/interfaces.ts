@@ -1,13 +1,8 @@
+import type { LifeCycle, SlicerRecoveryData } from '@terascope/job-components';
 import { EventEmitter } from 'events';
-import {
-    AnyObject,
-    Logger,
-    LifeCycle,
-    SlicerRecoveryData
-} from '@terascope/job-components';
+import { AnyObject, Logger } from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/types';
-
-import WindowState from './window-state';
+import { WindowState } from './window-state';
 
 export enum IDType {
     base64url = 'base64url',
@@ -44,7 +39,6 @@ export interface IDSlicerArgs {
     size: number;
 }
 export interface IDSlicerConfig {
-    lifecycle: LifeCycle,
     slicerID: number,
     numOfSlicers: number,
     recoveryData: SlicerRecoveryData[],
@@ -163,7 +157,7 @@ export interface ESReaderOptions {
     type_config?: DataTypeConfig
 }
 
-export interface SpacesApiConfig extends ESReaderOptions {
+export interface SpacesAPIConfig extends ESReaderOptions {
     endpoint: string;
     token: string;
     timeout: number;

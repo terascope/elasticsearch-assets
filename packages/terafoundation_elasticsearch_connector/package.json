@@ -6,10 +6,12 @@
         "access": "public"
     },
     "srcMain": "src/index.ts",
-    "main": "dist/index.js",
-    "typings": "dist/index.d.ts",
+    "main": "dist/src/index.js",
+    "typings": "dist/src/index.d.ts",
+    "files": [
+        "dist/src/**/*"
+    ],
     "scripts": {
-        "prepare": "yarn build",
         "build": "tsc --project tsconfig.json",
         "build:watch": "yarn build --watch",
         "test": "jest",
@@ -20,8 +22,13 @@
     "repository": "git@github.com:terascope/terafoundation_elasticsearch_connector.git",
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
-    "dependencies": {},
-    "devDependencies": {},
+    "dependencies": {
+        "@terascope/utils": "^0.34.1",
+        "elasticsearch": "^15.4.1"
+    },
+    "devDependencies": {
+        "@types/elasticsearch": "^5.0.36"
+    },
     "engines": {
         "node": ">=10.16.0"
     }

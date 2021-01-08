@@ -1,20 +1,20 @@
-import { debugLogger, Logger } from '@terascope/job-components';
+import { debugLogger, Logger } from '@terascope/utils';
 import { EventEmitter } from 'events';
 import SpacesClient from './spaces-client';
-import BaseReaderAPI from '../base-api';
-import { SpacesApiConfig } from '../interfaces';
+import { BaseReaderAPI } from '../base-api';
+import { SpacesAPIConfig } from '../interfaces';
 
-interface SpacesApiArgs {
-    config: SpacesApiConfig,
+interface SpacesAPIArgs {
+    config: SpacesAPIConfig,
     logger?: Logger;
     emitter?: EventEmitter;
 }
 
-export default async function createSpacesApi({
+export async function createSpacesAPI({
     config,
     logger = debugLogger('spaces-api'),
     emitter = new EventEmitter()
-}: SpacesApiArgs): Promise<BaseReaderAPI> {
+}: SpacesAPIArgs): Promise<BaseReaderAPI> {
     if (config.use_data_frames) {
         config.full_response = true;
     }

@@ -1,10 +1,10 @@
 import type { Client, SearchResponse } from 'elasticsearch';
 import {
     Logger, TSError, get, AnyObject
-} from '@terascope/job-components';
+} from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/data-types';
 import got from 'got';
-import { SpacesApiConfig } from '../interfaces';
+import { SpacesAPIConfig } from '../interfaces';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -12,11 +12,11 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export default class SpacesClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
-    config: SpacesApiConfig;
+    config: SpacesAPIConfig;
     logger: Logger;
     protected uri: string;
 
-    constructor(config: SpacesApiConfig, logger: Logger) {
+    constructor(config: SpacesAPIConfig, logger: Logger) {
         this.config = config;
         this.logger = logger;
         this.uri = `${config.endpoint}/${config.index}`;

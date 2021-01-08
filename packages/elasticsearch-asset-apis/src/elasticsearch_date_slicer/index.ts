@@ -1,4 +1,5 @@
-import { cloneDeep, TSError, SlicerFn } from '@terascope/job-components';
+import type { SlicerFn } from '@terascope/job-components';
+import { cloneDeep, TSError } from '@terascope/utils';
 import moment from 'moment';
 import idSlicer from '../elasticsearch_id_slicer';
 import {

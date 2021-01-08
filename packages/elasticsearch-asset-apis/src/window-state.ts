@@ -1,11 +1,11 @@
-import { times } from '@terascope/job-components';
+import { times } from '@terascope/utils';
 
 interface WindowMeta {
     hasCalled: boolean;
     canRestart: boolean;
 }
 
-export default class WindowState {
+export class WindowState {
     _windowState: Record<number, WindowMeta> = {};
 
     constructor(numOfSlicers: number) {

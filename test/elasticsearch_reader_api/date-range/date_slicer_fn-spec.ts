@@ -10,17 +10,16 @@ import {
     pDelay,
 } from '@terascope/job-components';
 import moment from 'moment';
-import WindowState from '../../../asset/src/elasticsearch_reader_api/window-state';
-import slicerFn from '../../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer';
 import {
+    WindowState,
     SlicerArgs,
     ParsedInterval,
     SlicerDateConfig,
     DateSegments,
-    SlicerDateResults
-} from '../../../asset/src/elasticsearch_reader/interfaces';
+    SlicerDateResults,
+    dateFormatSeconds, dateFormat, divideRange
+} from '@terascope/elasticsearch-asset-apis';
 import MockClient from '../../helpers/mock_client';
-import { dateFormatSeconds, dateFormat, divideRange } from '../../../asset/src/elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
 
 interface TestConfig {
     slicers?: number;

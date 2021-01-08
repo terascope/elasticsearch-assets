@@ -3,16 +3,12 @@ import {
     SlicerFn,
     SlicerRecoveryData
 } from '@terascope/job-components';
-import ElasticsearchAPI from '../elasticsearch_reader_api/elasticsearch-api';
+import { BaseReaderAPI, IDSlicerConfig } from '@terascope/elasticsearch-asset-apis';
 import { ESIDReaderConfig } from './interfaces';
-import {
-    ElasticReaderFactoryAPI,
-    IDSlicerArgs,
-    ElasticsearchReaderAPIConfig
-} from '../elasticsearch_reader_api/interfaces';
+import { ElasticReaderFactoryAPI, ElasticsearchReaderAPIConfig } from '../elasticsearch_reader_api/interfaces';
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
-    api!: ElasticsearchAPI;
+    api!: BaseReaderAPI;
     version!: number;
     config!: ElasticsearchReaderAPIConfig;
 
@@ -42,7 +38,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
-        const { lifecycle, slicers } = this.executionConfig;
+        const { slicers } = this.executionConfig;
 
         const {
             key_type,
@@ -53,8 +49,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
 
         const { recoveryData } = this;
 
-        const args: IDSlicerArgs = {
-            lifecycle,
+        const args: IDSlicerConfig = {
             numOfSlicers: slicers,
             slicerID: id,
             recoveryData,
@@ -64,6 +59,6 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             idFieldName: id_field_name || null
         };
 
-        return this.api.makeIDSlicer(args as IDSlicerArgs);
+        return this.api.makeIDSlicer(args);
     }
 }

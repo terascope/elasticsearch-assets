@@ -13,8 +13,7 @@ import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
-import { dateOptions } from '../elasticsearch_reader_api/elasticsearch_date_slicer/helpers';
-import { IDType } from '../id_reader/interfaces';
+import { dateOptions, IDType } from '@terascope/elasticsearch-asset-apis';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
 

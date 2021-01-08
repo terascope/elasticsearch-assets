@@ -1,3 +1,4 @@
+import type { SlicerFn } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { EventEmitter } from 'events';
 import {
@@ -8,13 +9,12 @@ import {
     Logger,
     toNumber,
     TSError,
-    SlicerFn,
     isSimpleObject,
     isNumber,
     isValidDate,
     isFunction,
     isString,
-} from '@terascope/job-components';
+} from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
@@ -47,7 +47,7 @@ import {
     IDSlicerConfig
 } from '../interfaces';
 import SpacesClient from '../spaces-api/spaces-client';
-import WindowState from '../window-state';
+import { WindowState } from '../window-state';
 
 type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
@@ -60,7 +60,7 @@ function isValidDataTypeConfig(record: any): record is DataTypeConfig {
     return true;
 }
 
-export default class BaseReaderAPI {
+export class BaseReaderAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
     private _baseClient: AnyObject;
@@ -199,7 +199,6 @@ export default class BaseReaderAPI {
 
     private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
         if (isObject(input)) {
-            if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
             if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
             if (this.version >= 6 && (!isString(input.idFieldName) || input.idFieldName.length === 0)) throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
@@ -227,7 +226,7 @@ export default class BaseReaderAPI {
         return input as unknown as IDSlicerConfig;
     }
 
-    async makeIDSlicer(args: IDSlicerArgs): Promise<SlicerFn> {
+    async makeIDSlicer(args: IDSlicerConfig): Promise<SlicerFn> {
         const config = this.validateIDSlicerConfig(args);
         const countFn = this.count.bind(this);
 
