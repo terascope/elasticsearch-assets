@@ -2,11 +2,10 @@ import { debugLogger, Logger } from '@terascope/utils';
 import { EventEmitter } from 'events';
 import { Client } from 'elasticsearch';
 import { BaseReaderAPI } from './base-api';
-import { SpacesAPIConfig } from './interfaces';
+import { ESReaderOptions } from './interfaces';
 
-// TODO: fix config type
 export interface ElasticsearchAPIArgs {
-    config: SpacesAPIConfig,
+    config: ESReaderOptions,
     client: Client,
     logger?: Logger;
     emitter?: EventEmitter;
@@ -15,7 +14,7 @@ export interface ElasticsearchAPIArgs {
 export async function createElasticsearchReaderAPI({
     config,
     client,
-    logger = debugLogger('spaces-api'),
+    logger = debugLogger('elasticsearch-api'),
     emitter = new EventEmitter()
 }: ElasticsearchAPIArgs): Promise<BaseReaderAPI> {
     return new BaseReaderAPI(config, client, emitter, logger);

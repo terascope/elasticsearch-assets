@@ -31,13 +31,14 @@ export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, An
             cached: true
         });
         const emitter = this.context.apis.foundation.getSystemEvents();
-        // TODO: fix type
+
         const clientConfig: ElasticsearchAPIArgs = {
-            config: config as any,
+            config,
             client: esClient,
             emitter,
             logger: this.logger
         };
+
         const client = await createElasticsearchReaderAPI(clientConfig);
 
         return { client, config };
