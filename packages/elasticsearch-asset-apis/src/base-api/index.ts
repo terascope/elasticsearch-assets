@@ -1,3 +1,4 @@
+import type { SlicerFn } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { EventEmitter } from 'events';
 import {
@@ -8,19 +9,20 @@ import {
     Logger,
     toNumber,
     TSError,
-    SlicerFn,
     isSimpleObject,
     isNumber,
     isValidDate,
     isFunction,
-    isString
-} from '@terascope/job-components';
+    isString,
+} from '@terascope/utils';
+import { DataFrame } from '@terascope/data-mate';
+import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { CountParams, SearchParams, Client } from 'elasticsearch';
-import dateSlicerFn from './elasticsearch_date_slicer';
-import idSlicerFn from './elasticsearch_id_slicer';
-import { getKeyArray } from './elasticsearch_id_slicer/helpers';
-import { IDType, ESIDSlicerArgs } from '../id_reader/interfaces';
+import dateSlicerFn from '../elasticsearch_date_slicer';
+import idSlicerFn from '../elasticsearch_id_slicer';
+import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
+
 import {
     buildQuery,
     dateOptions,
@@ -30,28 +32,35 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment
-} from './elasticsearch_date_slicer/helpers';
+} from '../elasticsearch_date_slicer/helpers';
 import {
     ESReaderOptions,
     SlicerDateResults,
     DateSegments,
     InputDateSegments,
     SlicerArgs,
-    StartPointConfig
-} from '../elasticsearch_reader/interfaces';
-import SpacesClient from '../spaces_reader_api/client';
-import WindowState from './window-state';
-import {
+    StartPointConfig,
+    IDType,
     DateSlicerArgs,
     DateSlicerConfig,
     IDSlicerArgs,
     IDSlicerConfig
-} from './interfaces';
+} from '../interfaces';
+import SpacesClient from '../spaces-api/spaces-client';
+import { WindowState } from '../window-state';
 
 type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
 
-export default class ElasticsearchAPI {
+function isValidDataTypeConfig(record: any): record is DataTypeConfig {
+    if (!record || !isSimpleObject(record)) return false;
+    if (!record.version || !isNumber(record.version)) return false;
+    if (!record.fields || !isSimpleObject(record.fields)) return false;
+
+    return true;
+}
+
+export class BaseReaderAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
     private _baseClient: AnyObject;
@@ -70,6 +79,11 @@ export default class ElasticsearchAPI {
             connection,
             index
         };
+
+        if (config.use_data_frames) {
+            clientConfig.full_response = true;
+            if (!isValidDataTypeConfig(config.type_config)) throw new Error('Parameter "type_config" must be set if DataFrames are being returned');
+        }
 
         this.config = Object.freeze(config);
         this.emitter = emitter;
@@ -105,7 +119,7 @@ export default class ElasticsearchAPI {
         return this.client.count(query as CountParams);
     }
 
-    async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]> {
+    async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
         this.validate(queryParams);
         // attempt to get window if not set
         if (!this.windowSize) {
@@ -116,7 +130,36 @@ export default class ElasticsearchAPI {
         if (this.windowSize) {
             const query = buildQuery(this.config, queryParams);
             query.size = this.windowSize;
-            return this._searchRequest(query);
+            const start = Date.now();
+            // this could be a full  ES request, Spaces Request, or an array of data-entities
+            const searchResults = await this._searchRequest(query) as any;
+
+            const searchEnd = Date.now();
+
+            if (this.config.use_data_frames) {
+                const typeConfig = this.config.type_config as DataTypeConfig;
+                const records = searchResults.hits.hits.map((data: AnyObject) => data._source);
+                const metrics: AnyObject = {
+                    search_time: searchEnd - start,
+                    fetched: records.length,
+                    total: searchResults.hits.total
+                };
+
+                // we do not have access to complexity right now
+                return DataFrame.fromJSON(
+                    typeConfig,
+                    records,
+                    {
+                        name: '<unknown>',
+                        metadata: {
+                            search_end_time: searchEnd,
+                            metrics
+                        }
+                    }
+                );
+            }
+
+            return searchResults;
         }
 
         // index is not up, return empty, we log in getWindowSize
@@ -156,7 +199,6 @@ export default class ElasticsearchAPI {
 
     private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
         if (isObject(input)) {
-            if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
             if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
             if (this.version >= 6 && (!isString(input.idFieldName) || input.idFieldName.length === 0)) throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
@@ -184,7 +226,7 @@ export default class ElasticsearchAPI {
         return input as unknown as IDSlicerConfig;
     }
 
-    async makeIDSlicer(args: IDSlicerArgs): Promise<SlicerFn> {
+    async makeIDSlicer(args: IDSlicerConfig): Promise<SlicerFn> {
         const config = this.validateIDSlicerConfig(args);
         const countFn = this.count.bind(this);
 
@@ -210,7 +252,7 @@ export default class ElasticsearchAPI {
         const keySet = divideKeyArray(keyArray, numOfSlicers);
         const { type, size } = this.config;
 
-        const slicerConfig: ESIDSlicerArgs = {
+        const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
             logger: this.logger,
             keySet: keySet[slicerID],
@@ -241,7 +283,7 @@ export default class ElasticsearchAPI {
             slicerConfig.retryData = parsedRetry;
         }
 
-        return idSlicerFn(slicerConfig as ESIDSlicerArgs);
+        return idSlicerFn(slicerConfig as IDSlicerArgs);
     }
 
     private validateDateSlicerConfig(input: unknown): DateSlicerConfig {

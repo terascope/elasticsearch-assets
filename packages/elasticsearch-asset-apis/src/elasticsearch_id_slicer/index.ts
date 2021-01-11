@@ -1,8 +1,8 @@
-import { TSError, SlicerFn, AnyObject } from '@terascope/job-components';
-import { ESIDSlicerArgs } from '../../id_reader/interfaces';
-import { SlicerDateResults, IDReaderSlice } from '../../elasticsearch_reader/interfaces';
+import type { SlicerFn } from '@terascope/job-components';
+import { TSError, AnyObject } from '@terascope/utils';
+import { IDSlicerArgs, SlicerDateResults, IDReaderSlice } from '../interfaces';
 
-export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
+export default function newSlicer(args: IDSlicerArgs): SlicerFn {
     const {
         events,
         retryData,
@@ -55,7 +55,7 @@ export default function newSlicer(args: ESIDSlicerArgs): SlicerFn {
 
             if (count !== 0) {
                 // the closing of this path happens at keyGenerator
-                return { ...query, count };
+                return { ...esQuery, count };
             }
 
             // if count is zero then close path to prevent further iteration

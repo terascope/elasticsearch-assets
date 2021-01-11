@@ -4,7 +4,7 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject, TestContext } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
-import { ElasticsearchSenderApi, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
+import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema';
 
 describe('elasticsearch sender api schema', () => {
@@ -27,7 +27,7 @@ describe('elasticsearch sender api schema', () => {
 
     const apiName = DEFAULT_API_NAME;
 
-    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchSenderApi> {
+    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchSenderAPI> {
         const defaults = {
             _name: apiName,
             type: docType,
@@ -56,7 +56,7 @@ describe('elasticsearch sender api schema', () => {
         await harness.initialize();
 
         const { apis } = harness.executionContext.config;
-        return apis.find((settings) => settings._name === apiName) as ElasticsearchSenderApi;
+        return apis.find((settings) => settings._name === apiName) as ElasticsearchSenderAPI;
     }
 
     afterEach(async () => {

@@ -1,0 +1,41 @@
+{
+    "name": "@terascope/elasticsearch-asset-apis",
+    "version": "0.1.0",
+    "description": "Elasticsearch reader and sender apis",
+    "publishConfig": {
+        "access": "public"
+    },
+    "srcMain": "src/index.ts",
+    "main": "dist/src/index.js",
+    "typings": "dist/src/index.d.ts",
+    "files": [
+        "dist/src/**/*"
+    ],
+    "scripts": {
+        "build": "tsc --project tsconfig.json",
+        "build:watch": "yarn build --watch",
+        "test": "jest",
+        "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
+        "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand"
+    },
+    "homepage": "https://github.com/terascope/elasticsearch-assets",
+    "repository": "git@github.com:terascope/elasticsearch-assets.git",
+    "author": "Terascope, LLC <info@terascope.io>",
+    "license": "MIT",
+    "dependencies": {
+        "@terascope/data-mate": "^0.19.4",
+        "@terascope/data-types": "^0.25.1",
+        "@terascope/elasticsearch-api": "^2.16.1",
+        "@terascope/utils": "^0.34.1",
+        "got": "^11.8.1",
+        "moment": "^2.29.1"
+    },
+    "devDependencies": {
+        "@terascope/job-components": "^0.44.1",
+        "@types/elasticsearch": "^5.0.36",
+        "elasticsearch": "^15.4.1"
+    },
+    "engines": {
+        "node": ">=10.16.0"
+    }
+}

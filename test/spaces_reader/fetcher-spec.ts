@@ -1,16 +1,13 @@
 import 'jest-extended';
 import nock from 'nock';
-import { newTestJobConfig, debugLogger } from '@terascope/job-components';
+import { newTestJobConfig } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import SpacesClient from '../../asset/src/spaces_reader_api/client';
-import { ApiConfig } from '../../asset/src/elasticsearch_reader/interfaces';
-import { IDType } from '../../asset/src/id_reader/interfaces';
 import MockClient from '../helpers/mock_client';
 
 describe('spaces_reader fetcher', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
-    const logger = debugLogger('spaces_reader');
+
     let clients: any;
     let defaultClient: MockClient;
 
@@ -37,40 +34,6 @@ describe('spaces_reader fetcher', () => {
 
     afterEach(() => {
         nock.cleanAll();
-    });
-
-    it('should look like an elasticsearch client', () => {
-        const opConfig: ApiConfig = {
-            _op: 'spaces_reader',
-            index: testIndex,
-            endpoint: baseUri,
-            token: 'test-token',
-            size: 100000,
-            interval: '30s',
-            delay: '30s',
-            date_field_name: 'date',
-            timeout: 50,
-            start: null,
-            end: null,
-            preserve_id: false,
-            subslice_by_key: false,
-            subslice_key_threshold: 50000,
-            fields: null,
-            key_type: IDType.base64,
-            connection: 'default',
-            time_resolution: 's',
-            api_name: 'someName',
-            type: 'someType',
-            starting_key_depth: 0
-        };
-
-        const client = new SpacesClient(opConfig, logger);
-
-        expect(client.search).toBeDefined();
-        expect(client.count).toBeDefined();
-        expect(client.cluster).toBeDefined();
-        expect(client.cluster.stats).toBeDefined();
-        expect(client.cluster.getSettings).toBeDefined();
     });
 
     describe('when querying against a spaces server', () => {
@@ -265,13 +228,14 @@ describe('spaces_reader fetcher', () => {
         });
 
         describe('when the request times out', () => {
+            const query = 'test:query';
             const harness = new WorkerTestHarness(newTestJobConfig({
                 name: 'simple-api-reader-job',
                 max_retries: 0,
                 operations: [
                     {
                         _op: 'spaces_reader',
-                        query: 'test:query',
+                        query,
                         index: testIndex,
                         endpoint: baseUri,
                         token: 'test-token',
@@ -289,7 +253,9 @@ describe('spaces_reader fetcher', () => {
 
             beforeEach(async () => {
                 scope.get(`/${testIndex}/_info`)
-                    .query({ token: 'test-token' })
+                    .query({
+                        token: 'test-token',
+                    })
                     .reply(200, {
                         params: {
                             size: {

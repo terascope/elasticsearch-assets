@@ -2,11 +2,13 @@ import {
     ConvictSchema,
     AnyObject,
     cloneDeep,
-    ValidatedJobConfig
+    ValidatedJobConfig,
+    isObjectEntity,
+    getTypeOf
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
+import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
 import { schema } from '../elasticsearch_reader_api/schema';
-import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import { DEFAULT_API_NAME } from './interfaces';
 
 const clone = cloneDeep(schema);
@@ -26,6 +28,20 @@ const apiSchema = {
         doc: 'Time in milliseconds to wait for a connection to timeout.',
         default: '30 seconds',
         format: 'duration'
+    },
+    headers: {
+        doc: 'Object containing headers for the requests',
+        default: {},
+        format: (val: unknown) => {
+            if (!isObjectEntity(val)) {
+                throw new Error(`Invalid parameter headers, must provide an object, was given ${getTypeOf(val)}`);
+            }
+        }
+    },
+    retry: {
+        doc: 'The number of times that the spaces client will try to retry a request',
+        default: 0,
+        format: Number
     }
 };
 
@@ -36,7 +52,7 @@ delete spacesSchema.api_name;
 
 spacesSchema.date_field_name.format = 'required_String';
 
-export default class Schema extends ConvictSchema<ApiConfig> {
+export default class Schema extends ConvictSchema<SpacesAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 

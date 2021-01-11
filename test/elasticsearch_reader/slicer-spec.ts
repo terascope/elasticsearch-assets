@@ -11,7 +11,7 @@ import {
 import moment from 'moment';
 import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { IDType } from '../../asset/src/id_reader/interfaces';
+import { IDType } from '@terascope/elasticsearch-asset-apis';
 import {
     TEST_INDEX_PREFIX,
     ELASTICSEARCH_VERSION,

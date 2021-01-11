@@ -35,7 +35,7 @@ export interface ElasticsearchSenderConfig {
     _key?: string
 }
 
-export interface ElasticsearchSenderApi extends ElasticsearchSenderConfig, APIConfig {}
+export interface ElasticsearchSenderAPI extends ElasticsearchSenderConfig, APIConfig {}
 
 export interface BulkMeta {
     _index: string;

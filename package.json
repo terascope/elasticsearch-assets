@@ -1,22 +1,25 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.2.1",
+    "version": "2.3.0",
     "private": true,
     "workspaces": [
+        "packages/*",
         "asset"
     ],
     "scripts": {
         "asset:build": "yarn && yarn run build",
-        "build": "rm -rf asset/dist; tsc --project tsconfig.json",
-        "build:watch": "yarn build --watch",
+        "build": "tsc --build",
+        "build:watch": "tsc --build --watch",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
         "lint:fix": "yarn lint --fix",
+        "test:all": "yarn workspaces run test",
         "test": "jest",
         "test:7": "ELASTICSEARCH_VERSION=7.x jest",
         "test:5": "ELASTICSEARCH_VERSION=5.6 jest",
         "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
-        "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand"
+        "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand",
+        "publish:changed": "./scripts/publish.sh"
     },
     "repository": {
         "type": "git",
@@ -29,7 +32,7 @@
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
     "engines": {
-        "node": ">=8.0.0"
+        "node": ">=10.16.0"
     },
     "dependencies": {},
     "devDependencies": {
@@ -42,8 +45,8 @@
         "@types/bluebird": "^3.5.33",
         "@types/elasticsearch": "^5.0.37",
         "@types/got": "^9.6.11",
-        "@types/jest": "^26.0.19",
-        "@types/node": "^14.14.19",
+        "@types/jest": "^26.0.20",
+        "@types/node": "^14.14.20",
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.40.4",
         "eslint": "^7.17.0",

@@ -6,10 +6,11 @@ import {
     getTypeOf,
     AnyObject
 } from '@terascope/utils';
-import ElasticsearchAPI from './elasticsearch-api';
-import { ESReaderOptions } from '../elasticsearch_reader/interfaces';
+import {
+    ESReaderOptions, createElasticsearchReaderAPI, BaseReaderAPI, ElasticsearchAPIArgs
+} from '@terascope/elasticsearch-asset-apis';
 
-export default class ElasticsearchReaderAPI extends APIFactory<ElasticsearchAPI, AnyObject > {
+export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, AnyObject > {
     // TODO: this needs more validation
     validateConfig(config: unknown): ESReaderOptions {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
@@ -21,18 +22,26 @@ export default class ElasticsearchReaderAPI extends APIFactory<ElasticsearchAPI,
 
     async create(
         _name: string, overrideConfigs: Partial<ESReaderOptions>
-    ): Promise<{ client: ElasticsearchAPI, config: AnyObject }> {
+    ): Promise<{ client: BaseReaderAPI, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         const { connection } = config;
-        const { client } = this.context.foundation.getConnection({
+        const { client: esClient } = this.context.foundation.getConnection({
             endpoint: connection,
             type: 'elasticsearch',
             cached: true
         });
         const emitter = this.context.apis.foundation.getSystemEvents();
-        const reader = new ElasticsearchAPI(config, client, emitter, this.logger);
 
-        return { client: reader, config };
+        const clientConfig: ElasticsearchAPIArgs = {
+            config,
+            client: esClient,
+            emitter,
+            logger: this.logger
+        };
+
+        const client = await createElasticsearchReaderAPI(clientConfig);
+
+        return { client, config };
     }
 
     async remove(_index: string): Promise<void> {}

@@ -1,4 +1,5 @@
 import 'jest-extended';
+import { DataEntity } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getESVersion } from 'elasticsearch-store';
 import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces';
@@ -99,7 +100,7 @@ describe('elasticsearch reader api', () => {
         // @ts-expect-error
         expect(api.windowSize).toBeUndefined();
 
-        const results = await api.fetch({});
+        const results = await api.fetch({}) as DataEntity[];
         expect(results.length).toEqual(2);
 
         // @ts-expect-error

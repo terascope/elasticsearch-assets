@@ -40,7 +40,7 @@ export default class Schema extends ConvictSchema<ESReaderConfig> {
 
         this.ensureAPIFromConfig(apiName, job, newConfig);
 
-        const elasticsearchReaderAPI = job.apis.find((jobApi) => jobApi._name === apiName);
+        const elasticsearchReaderAPI = job.apis.find((jobAPI) => jobAPI._name === apiName);
 
         if (isNil(elasticsearchReaderAPI)) throw new Error(`Could not find job api ${apiName}`);
 

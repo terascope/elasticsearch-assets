@@ -1,9 +1,9 @@
 import { ConvictSchema, AnyObject, ValidatedJobConfig } from '@terascope/job-components';
+import { AssetSpacesAPIConfig } from './interfaces';
 import { opSchema } from '../__lib/schema';
-import { ApiConfig } from '../elasticsearch_reader/interfaces';
 import { DEFAULT_API_NAME } from '../spaces_reader_api/interfaces';
 
-export default class Schema extends ConvictSchema<ApiConfig> {
+export default class Schema extends ConvictSchema<AssetSpacesAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         let opIndex = 0;
 

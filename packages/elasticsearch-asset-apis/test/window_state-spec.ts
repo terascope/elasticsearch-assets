@@ -1,5 +1,5 @@
 import 'jest-extended';
-import WindowState from '../../asset/src/elasticsearch_reader_api/window-state';
+import { WindowState } from '../src';
 
 describe('WindowState', () => {
     it('can instantiate', () => {

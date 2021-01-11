@@ -3,7 +3,7 @@ import {
     AnyObject,
     toNumber,
     parseGeoPoint,
-} from '@terascope/job-components';
+} from '@terascope/utils';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-expect-error
@@ -12,14 +12,14 @@ import { GeoPoint } from '@terascope/types';
 import { SearchParams } from 'elasticsearch';
 import {
     StartPointConfig,
-    SlicerDateConfig,
+    SlicerDates,
     InputDateSegments,
     DateSegments,
     SlicerDateResults,
     ParsedInterval,
     DateConfig,
     ESReaderOptions,
-} from '../../elasticsearch_reader/interfaces';
+} from '../interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {
@@ -275,7 +275,7 @@ export function delayedStreamSegment(
 }
 
 interface StartingConfig {
-    dates: SlicerDateConfig;
+    dates: SlicerDates;
     range: DateSegments;
 }
 
@@ -296,7 +296,7 @@ function holeAffectsRange(dates: DateRanges, hRange: DateConfig): boolean {
     return false;
 }
 
-function compareDatesToLimit(dates: SlicerDateConfig) {
+function compareDatesToLimit(dates: SlicerDates) {
     if (dates.end.isSameOrAfter(dates.limit)) dates.end = moment.utc(dates.limit);
     if (dates.start.isSameOrAfter(dates.limit)) dates.start = moment.utc(dates.limit);
     return dates;
@@ -308,10 +308,10 @@ function compareRangeToRecoveryData(
     interval: ParsedInterval,
     id: number,
     numOfSlicers: number
-): SlicerDateConfig {
+): SlicerDates {
     const [step, unit] = interval;
     const rData: RDate = recoveryData[id] as RDate;
-    const finalDates = Object.assign({}, newDates) as Partial<SlicerDateConfig> & DateRanges;
+    const finalDates = Object.assign({}, newDates) as Partial<SlicerDates> & DateRanges;
     const holes = [];
 
     // expansion of slicers already takes into account the end
@@ -381,7 +381,7 @@ function compareRangeToRecoveryData(
         finalDates.holes = holes;
     }
 
-    return compareDatesToLimit(finalDates as SlicerDateConfig);
+    return compareDatesToLimit(finalDates as SlicerDates);
 }
 
 interface DateRanges {
@@ -424,7 +424,7 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
         return { dates: correctDates, range: dates };
     }
 
-    const dateRange: Partial<SlicerDateConfig>[] = divideRange(
+    const dateRange: Partial<SlicerDates>[] = divideRange(
         dates.start,
         dates.limit,
         numOfSlicers
@@ -435,7 +435,7 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
     if (end.isSameOrAfter(newDates.limit)) end = moment.utc(newDates.limit);
     newDates.end = end;
 
-    return { dates: newDates as SlicerDateConfig, range: dates };
+    return { dates: newDates as SlicerDates, range: dates };
 }
 
 export function buildQuery(
