@@ -228,13 +228,14 @@ describe('spaces_reader fetcher', () => {
         });
 
         describe('when the request times out', () => {
+            const query = 'test:query';
             const harness = new WorkerTestHarness(newTestJobConfig({
                 name: 'simple-api-reader-job',
                 max_retries: 0,
                 operations: [
                     {
                         _op: 'spaces_reader',
-                        query: 'test:query',
+                        query,
                         index: testIndex,
                         endpoint: baseUri,
                         token: 'test-token',
@@ -252,7 +253,9 @@ describe('spaces_reader fetcher', () => {
 
             beforeEach(async () => {
                 scope.get(`/${testIndex}/_info`)
-                    .query({ token: 'test-token' })
+                    .query({
+                        token: 'test-token',
+                    })
                     .reply(200, {
                         params: {
                             size: {

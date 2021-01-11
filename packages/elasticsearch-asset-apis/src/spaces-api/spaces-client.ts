@@ -12,23 +12,27 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 export default class SpacesClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
-    config: SpacesAPIConfig;
+    readonly config: SpacesAPIConfig;
     logger: Logger;
     protected uri: string;
+    private retry: number;
 
     constructor(config: SpacesAPIConfig, logger: Logger) {
         this.config = config;
         this.logger = logger;
         this.uri = `${config.endpoint}/${config.index}`;
+        this.retry = config.retry ?? 0;
     }
 
     async makeRequest(query: AnyObject): Promise<SearchResult> {
+        const { retry } = this;
+
         try {
             const { body } = await got<SearchResult>(this.uri, {
                 searchParams: query,
                 responseType: 'json',
                 timeout: this.config.timeout,
-                retry: 3,
+                retry,
                 headers: this.config.headers || {},
             });
 
@@ -104,6 +108,7 @@ export default class SpacesClient {
             }
 
             let { size } = queryConfig;
+
             if (size == null) {
                 ({ size } = config);
             }

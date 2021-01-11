@@ -163,6 +163,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     timeout: number;
     full_response?: boolean;
     headers?: AnyObject
+    retry?: number;
 }
 
 export interface DetermineSliceResults {
