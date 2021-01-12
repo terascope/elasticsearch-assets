@@ -1,5 +1,5 @@
 {
-    "name": "@terascope/terafoundation_elasticsearch_connector",
+    "name": "terafoundation_elasticsearch_connector",
     "version": "0.1.0",
     "description": "Elasticsearch connector for terafoundation",
     "publishConfig": {
