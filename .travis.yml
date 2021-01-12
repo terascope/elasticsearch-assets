@@ -3,7 +3,7 @@ dist: bionic
 language: node_js
 node_js:
   - '10.19'
-  - '12.18'
+  - '12.20'
 os:
   - linux
   - osx
@@ -37,7 +37,7 @@ jobs:
   - node_js: '10.19'
     env: ELASTICSEARCH_VERSION=6.8.6
   # Don't build es 5 on node 12
-  - node_js: '12.18'
+  - node_js: '12.20'
     env: ELASTICSEARCH_VERSION=5.6
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
@@ -70,7 +70,7 @@ deploy:
     script: yarn publish:changed
     on:
       tags: true
-      condition: $TRAVIS_OS_NAME = linux
+      condition: $TRAVIS_OS_NAME = linux AND $ELASTICSEARCH_VERSION = 7.2.1
   - provider: releases
     api_key: $GITHUB_TOKEN
     prerelease: true
