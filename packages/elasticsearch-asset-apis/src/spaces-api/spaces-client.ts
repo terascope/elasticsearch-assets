@@ -1,6 +1,6 @@
 import type { Client, SearchResponse } from 'elasticsearch';
 import {
-    Logger, TSError, get, AnyObject
+    Logger, TSError, get, AnyObject, withoutNil
 } from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/data-types';
 import got from 'got';
@@ -25,12 +25,23 @@ export default class SpacesClient {
     }
 
     async makeRequest(query: AnyObject): Promise<SearchResult> {
-        const { retry } = this;
-
+        const { retry, config: { variables } } = this;
         try {
-            const { body } = await got<SearchResult>(this.uri, {
-                searchParams: query,
+            const {
+                token,
+                include_type_config,
+                ...queryParams
+            } = query;
+
+            const json = withoutNil({
+                ...queryParams,
+                variables
+            });
+
+            const { body } = await got.post<SearchResult>(this.uri, {
+                searchParams: withoutNil({ token, include_type_config }),
                 responseType: 'json',
+                json,
                 timeout: this.config.timeout,
                 retry,
                 headers: this.config.headers || {},
