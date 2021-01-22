@@ -1,6 +1,6 @@
 {
-    "name": "@terascope/terafoundation_elasticsearch_connector",
-    "version": "0.1.0",
+    "name": "terafoundation_elasticsearch_connector",
+    "version": "0.1.1",
     "description": "Elasticsearch connector for terafoundation",
     "publishConfig": {
         "access": "public"
