@@ -70,7 +70,7 @@ deploy:
     script: yarn publish:changed
     on:
       tags: true
-      condition: '$TRAVIS_OS_NAME = linux AND $ELASTICSEARCH_VERSION = "7.2.1"'
+      condition: $TRAVIS_OS_NAME = linux
   - provider: releases
     api_key: $GITHUB_TOKEN
     prerelease: true
