@@ -12,6 +12,7 @@ describe('spaces_reader fetcher', () => {
     let defaultClient: MockClient;
 
     const maxSize = 100000;
+    const token = 'test-token';
 
     beforeEach(() => {
         defaultClient = new MockClient();
@@ -40,12 +41,11 @@ describe('spaces_reader fetcher', () => {
         describe.each([
             ['range query', {
                 query: {
-                    token: 'test-token',
                     q: 'date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}',
                     size: 100
                 },
                 opConfig: {
-                    token: 'test-token',
+                    token,
                     size: 100000,
                     interval: '30s',
                     delay: '30s',
@@ -59,13 +59,12 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query', {
                 query: {
-                    token: 'test-token',
                     q: '(foo:bar)',
                     size: 5000,
                 },
                 opConfig: {
                     query: 'foo:bar',
-                    token: 'test-token',
+                    token,
                     size: 100000,
                     date_field_name: 'date',
                 },
@@ -75,13 +74,12 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query with url characters', {
                 query: {
-                    token: 'test-token',
                     q: '(foo:"bar+baz")',
                     size: 5000,
                 },
                 opConfig: {
                     query: 'foo:"bar+baz"',
-                    token: 'test-token',
+                    token,
                     size: 100000,
                     date_field_name: 'date',
                 },
@@ -91,14 +89,13 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query with fields', {
                 query: {
-                    token: 'test-token',
                     q: '(test:query OR other:thing AND bytes:>=2000)',
                     size: 100,
                     fields: 'foo,bar,date'
                 },
                 opConfig: {
                     query: 'test:query OR other:thing AND bytes:>=2000',
-                    token: 'test-token',
+                    token,
                     size: 100000,
                     date_field_name: 'date',
                     fields: ['foo', 'bar'],
@@ -109,13 +106,12 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query with date range', {
                 query: {
-                    token: 'test-token',
                     q: 'example_date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z} AND (foo:bar)',
                     size: 200,
                 },
                 opConfig: {
                     query: 'foo:bar',
-                    token: 'test-token',
+                    token,
                     size: 100000,
                     date_field_name: 'example_date',
                 },
@@ -127,7 +123,6 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query with geo point query', {
                 query: {
-                    token: 'other-token',
                     q: '(foo:bar)',
                     size: 100,
                     geo_point: '52.3456,79.6784',
@@ -135,7 +130,7 @@ describe('spaces_reader fetcher', () => {
                 },
                 opConfig: {
                     query: 'foo:bar',
-                    token: 'other-token',
+                    token,
                     size: 100000,
                     date_field_name: 'date',
                     geo_field: 'some_field',
@@ -148,7 +143,6 @@ describe('spaces_reader fetcher', () => {
             }],
             ['lucene query with geo bounding box query', {
                 query: {
-                    token: 'other-token',
                     q: '(foo:bar)',
                     size: 100000,
                     geo_box_top_left: '34.5234,79.42345',
@@ -157,7 +151,7 @@ describe('spaces_reader fetcher', () => {
                 },
                 opConfig: {
                     query: 'foo:bar',
-                    token: 'other-token',
+                    token,
                     size: 100000,
                     date_field_name: 'date',
                     geo_field: 'some_field',
@@ -192,8 +186,7 @@ describe('spaces_reader fetcher', () => {
             query.size = maxSize;
 
             beforeEach(async () => {
-                scope.get(`/${testIndex}/_info`)
-                    .query({ token: opConfig.token })
+                scope.get(`/${testIndex}/_info?token=${opConfig.token}`)
                     .reply(200, {
                         params: {
                             size: {
@@ -202,8 +195,7 @@ describe('spaces_reader fetcher', () => {
                         }
                     });
 
-                scope.get(`/${testIndex}`)
-                    .query(query)
+                scope.post(`/${testIndex}?token=${opConfig.token}`, query)
                     .reply(200, {
                         results: [{
                             _index: opConfig.index,
@@ -238,7 +230,7 @@ describe('spaces_reader fetcher', () => {
                         query,
                         index: testIndex,
                         endpoint: baseUri,
-                        token: 'test-token',
+                        token,
                         size: 100000,
                         interval: '30s',
                         delay: '30s',
@@ -252,10 +244,7 @@ describe('spaces_reader fetcher', () => {
             }), {});
 
             beforeEach(async () => {
-                scope.get(`/${testIndex}/_info`)
-                    .query({
-                        token: 'test-token',
-                    })
+                scope.get(`/${testIndex}/_info?token=${token}`)
                     .reply(200, {
                         params: {
                             size: {
@@ -264,12 +253,10 @@ describe('spaces_reader fetcher', () => {
                         }
                     });
 
-                scope.get(`/${testIndex}`)
-                    .query({
-                        token: 'test-token',
-                        q: '(test:query)',
-                        size: 100000,
-                    })
+                scope.post(`/${testIndex}?token=${token}`, {
+                    q: '(test:query)',
+                    size: 100000,
+                })
                     .delay(500)
                     .reply(200, {
                         results: [{

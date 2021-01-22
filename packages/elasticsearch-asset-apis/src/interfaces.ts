@@ -1,7 +1,7 @@
 import type { LifeCycle, SlicerRecoveryData } from '@terascope/job-components';
 import { EventEmitter } from 'events';
 import { AnyObject, Logger } from '@terascope/utils';
-import { DataTypeConfig } from '@terascope/types';
+import { DataTypeConfig, xLuceneVariables } from '@terascope/types';
 import { WindowState } from './window-state';
 
 export enum IDType {
@@ -164,6 +164,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     full_response?: boolean;
     headers?: AnyObject
     retry?: number;
+    variables?: xLuceneVariables
 }
 
 export interface DetermineSliceResults {

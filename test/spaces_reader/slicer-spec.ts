@@ -89,21 +89,19 @@ describe('spaces_reader slicer', () => {
         }
 
         beforeEach(async () => {
-            scope.get(new RegExp(testIndex))
+            scope.post(new RegExp(testIndex))
                 .reply(200, {
                     results: [{ created: start.toISOString() }],
                     total: 1
                 });
 
-            scope.get(new RegExp(testIndex))
-                .query(true)
+            scope.post(new RegExp(testIndex))
                 .reply(200, {
                     results: [{ created: end.toISOString() }],
                     total: 1
                 });
 
-            scope.get(new RegExp(testIndex))
-                .query(true)
+            scope.post(new RegExp(testIndex))
                 .reply(200, {
                     results: [{ created: end.toISOString() }],
                     total: 1
@@ -124,6 +122,12 @@ describe('spaces_reader slicer', () => {
     describe('when connected to a spaces server', () => {
         const start = moment('2012-12-12T00:00:00.000Z');
         const end = moment(start.toISOString()).add(1, 'minute');
+        const variables = {
+            '@foo': 'foo',
+            $bar: 'bar'
+        };
+        const token = 'test-token';
+
         const harness = new SlicerTestHarness(newTestJobConfig({
             name: 'simple-api-reader-job',
             lifecycle: 'once',
@@ -134,14 +138,15 @@ describe('spaces_reader slicer', () => {
                     query: 'slicer:query',
                     index: testIndex,
                     endpoint: baseUri,
-                    token: 'test-token',
+                    token,
                     size: 2,
                     interval: '1m',
                     start: start.toISOString(),
                     end: end.toISOString(),
                     delay: '0s',
                     date_field_name: 'created',
-                    timeout: 50
+                    timeout: 50,
+                    variables
                 },
                 {
                     _op: 'noop'
@@ -151,12 +156,12 @@ describe('spaces_reader slicer', () => {
 
         beforeEach(async () => {
             const query = {
-                token: 'test-token',
                 q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
+                size: 0,
+                variables
             };
 
-            scope.get(`/${testIndex}`)
-                .query(Object.assign({ size: 0 }, query))
+            scope.post(`/${testIndex}?token=${token}`, query)
                 .reply(200, {
                     results: [],
                     total: 2
