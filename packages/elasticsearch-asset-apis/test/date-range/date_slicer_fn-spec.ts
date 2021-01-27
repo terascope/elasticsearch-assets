@@ -19,7 +19,7 @@ import {
     SlicerDateResults,
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src';
-import MockClient from '../helpers';
+import { MockClient } from '../helpers';
 import slicerFn from '../../src/elasticsearch_date_slicer';
 
 interface TestConfig {
