@@ -60,7 +60,7 @@ function validateBulk(data: BulkData) {
     }
 }
 
-export default class MockClient {
+export class MockClient {
     sequence!: any[];
     indices: AnyObject;
     cluster: AnyObject;

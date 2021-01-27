@@ -14,6 +14,7 @@ import {
     isValidDate,
     isFunction,
     isString,
+    get
 } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -444,7 +445,7 @@ export class BaseReaderAPI {
 
         // using this query to catch potential errors even if a date is given already
         const results = await this.client.search(query);
-        const [data] = results;
+        const data = get(results, 'hits.hits[0]._source', results[0]);
 
         if (data == null) {
             this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.config.index}`);
