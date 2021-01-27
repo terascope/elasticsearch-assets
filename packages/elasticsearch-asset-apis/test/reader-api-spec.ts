@@ -22,7 +22,7 @@ import {
     SlicerDateResults
 } from '../src';
 
-describe('Reader Api', () => {
+describe('Reader API', () => {
     const client = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
     const logger = debugLogger('api-dataFrame-test');
