@@ -10,7 +10,8 @@ import {
     cleanupIndex,
     populateIndex,
     waitForData,
-    ELASTICSEARCH_VERSION
+    ELASTICSEARCH_VERSION,
+    formatWildcardQuery
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -21,11 +22,12 @@ import {
     SlicerDateResults
 } from '../src';
 
-describe('Api', () => {
+describe('Reader Api', () => {
     const client = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
     const logger = debugLogger('api-dataFrame-test');
     const emitter = new EventEmitter();
+    const idFieldName = 'uuid';
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -167,7 +169,7 @@ describe('Api', () => {
 
             const results = await api.fetch() as DataFrame;
 
-            expect(results).toBeDefined();
+            expect(results).toBeInstanceOf(DataFrame);
             expect(results.size).toEqual(1000);
             expect(results.metadata.metrics).toMatchObject({
                 fetched: 1000,
@@ -244,7 +246,7 @@ describe('Api', () => {
                 recoveryData: [],
                 keyType: IDType.base64url,
                 startingKeyDepth: 0,
-                idFieldName: 'uuid'
+                idFieldName,
             });
 
             expect(slicer).toBeDefined();
@@ -254,10 +256,18 @@ describe('Api', () => {
             expect(slice).toBeDefined();
             expect(slice).toMatchObject({
                 wildcard: {
-                    field: 'uuid',
+                    field: idFieldName,
                     value: 'a*'
                 },
                 count: 58
+            });
+
+            const expectedResults = formatWildcardQuery([
+                { key: 'a*', count: 58 },
+            ], version, docType, idFieldName);
+
+            [slice].forEach((result, index) => {
+                expect(result).toMatchObject(expectedResults[index]);
             });
         });
     });
@@ -464,20 +474,19 @@ describe('Api', () => {
                 recoveryData: [],
                 keyType: IDType.base64url,
                 startingKeyDepth: 0,
-                idFieldName: 'uuid'
+                idFieldName
             });
 
             expect(slicer).toBeDefined();
 
             const slice = await slicer() as SlicerDateResults;
 
-            expect(slice).toBeDefined();
-            expect(slice).toMatchObject({
-                wildcard: {
-                    field: 'uuid',
-                    value: 'a*'
-                },
-                count: 58
+            const expectedResults = formatWildcardQuery([
+                { key: 'a*', count: 58 },
+            ], version, docType, idFieldName);
+
+            [slice].forEach((result, index) => {
+                expect(result).toMatchObject(expectedResults[index]);
             });
         });
     });

@@ -1,5 +1,4 @@
 import { TypeConfigFields } from '@terascope/data-types';
-import { cloneDeep } from '@terascope/utils';
 
 const data = [
     {
@@ -10016,7 +10015,7 @@ const types: TypeConfigFields = {
 };
 
 export = {
-    data: cloneDeep(data),
+    data,
     types,
     index: 'even_spread'
 }
