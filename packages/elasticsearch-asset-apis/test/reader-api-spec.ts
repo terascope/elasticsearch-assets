@@ -250,13 +250,6 @@ describe('Reader API', () => {
             const slice = await slicer() as SlicerDateResults;
 
             expect(slice).toBeDefined();
-            expect(slice).toMatchObject({
-                wildcard: {
-                    field: idFieldName,
-                    value: 'a*'
-                },
-                count: 58
-            });
 
             const expectedResults = formatWildcardQuery([
                 { key: 'a*', count: 58 },
