@@ -694,15 +694,15 @@
     multi-progress "^4.0.0"
     progress "^2.0.3"
 
-"@terascope/job-components@^0.44.1":
-  version "0.44.1"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.44.1.tgz#b959b7e2064e59870866948a211b79ff13ec7cd3"
-  integrity sha512-0jebGRhXoXQWqCr/LT8I7E5eKNpUdN40IqNAnF6hxzULsawnnks6i+FKRrLKbHdVkkuQ4nH6viG+QFG8n0rEOg==
+"@terascope/job-components@^0.45.0":
+  version "0.45.0"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.45.0.tgz#cf2cca7af2ad8ab89b342eb5085f6ebb1c58bae2"
+  integrity sha512-KodaX/v2JLXJS44G3ou/NbsehxWzIMGMrR8GyDK4hv6jKtCKDMBsxpTHJwgwWjZ4wSWQaMFsyn4eVa9FHRPKTw==
   dependencies:
-    "@terascope/utils" "^0.34.1"
+    "@terascope/utils" "^0.35.0"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
-    uuid "^8.3.1"
+    uuid "^8.3.2"
 
 "@terascope/teraslice-op-test-harness@^1.23.0":
   version "1.23.0"
@@ -6238,7 +6238,7 @@ uuid@^3.3.2:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
   integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
 
-uuid@^8.3.0, uuid@^8.3.1, uuid@^8.3.2:
+uuid@^8.3.0, uuid@^8.3.2:
   version "8.3.2"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-8.3.2.tgz#80d5b5ced271bb9af6c445f21a1a04c606cefbe2"
   integrity sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==
