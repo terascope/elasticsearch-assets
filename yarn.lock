@@ -618,12 +618,12 @@
     lodash.defaultsdeep "^4.6.1"
     yargs "^16.1.1"
 
-"@terascope/elasticsearch-api@^2.15.0", "@terascope/elasticsearch-api@^2.16.1":
-  version "2.16.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.16.1.tgz#bb3268ed177f17b1e72ca08a81478fdb0c88d1db"
-  integrity sha512-7XAsu4i6uipkcRX9sNjSp8fu+wr7sGvJqyEEEJCk7yVqKsbincGz8uzMaUvpTowaZdI1/h3LmcbNDUz8yYzSzw==
+"@terascope/elasticsearch-api@^2.16.1", "@terascope/elasticsearch-api@^2.17.0":
+  version "2.17.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.17.0.tgz#945f4a52e31f823f7fa9968f45dbb7d75421bb64"
+  integrity sha512-J0BtruOfW8HgVuqRbUWxGpr6dZCQ9DlxfxYSGTCJmMqtoS/I4KSsvsdcRYyQ0j7PX+mG0bnMG6aMHZossimMlA==
   dependencies:
-    "@terascope/utils" "^0.34.1"
+    "@terascope/utils" "^0.35.0"
     bluebird "^3.7.2"
     lodash.isequal "^4.5.0"
 
@@ -690,6 +690,24 @@
   version "0.34.1"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.34.1.tgz#3e52d35f29a6bbb8bd93d99c708e99ada2c15d91"
   integrity sha512-GzRnQeoNrx41FohJy02ToPrjXHy3XxrMQwuJ0FHM3ncq6Iy6wPQoX5XR0ID/lcusLNghm6Ew4ioJv+jxcYs6hA==
+  dependencies:
+    "@terascope/types" "^0.7.0"
+    debug "^4.3.1"
+    is-plain-object "^5.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash.get "^4.4.2"
+    lodash.has "^4.5.2"
+    lodash.set "^4.3.2"
+    lodash.unset "^4.5.2"
+    p-map "^4.0.0"
+    shallow-clone "^3.0.1"
+
+"@terascope/utils@^0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.35.0.tgz#4b885e8af12197ddecb0c83d741475c5faf65680"
+  integrity sha512-Cb3/Mfg62gsHIdfoa3rtbvxgssws88gqR0T+s+qJVtxkqdyseTthp2TVaiGTBwWRZTmAD0rgbFxC8gToNI2HnQ==
   dependencies:
     "@terascope/types" "^0.7.0"
     debug "^4.3.1"
