@@ -33,7 +33,7 @@
         "@terascope/data-types": "^0.25.0"
     },
     "devDependencies": {
-        "@terascope/data-mate": "^0.20.0",
+        "@terascope/data-mate": "^0.21.0",
         "@terascope/job-components": "^0.44.1",
         "@types/elasticsearch": "^5.0.36",
         "elasticsearch": "^15.4.1"
