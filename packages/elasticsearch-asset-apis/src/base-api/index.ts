@@ -96,32 +96,16 @@ export class BaseReaderAPI {
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
     }
 
-    private validate(query: unknown) {
-        if (isObject(query)) {
-            if (
-                !(query.start || query.end)
-                && !(query.key || query.wildcard)
-                && !this.hasDefaultQueries
-            ) {
-                throw new Error(`No valid query parameters, it must have start/end, or key/wildcard or apiConfig query or geo_field set, obj ${JSON.stringify(query)}`);
-            }
-        } else {
-            throw new Error(`Invalid query parameters, must receive an object, got ${getTypeOf(query)}`);
-        }
-    }
-
     makeWindowState(numOfSlicers: number): WindowState {
         return new WindowState(numOfSlicers);
     }
 
     async count(queryParams: Partial<SlicerDateResults> = {}): Promise<number> {
-        this.validate(queryParams);
         const query = buildQuery(this.config, queryParams);
         return this.client.count(query as CountParams);
     }
 
     async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
-        this.validate(queryParams);
         // attempt to get window if not set
         if (!this.windowSize) {
             const size = await this.getWindowSize();
