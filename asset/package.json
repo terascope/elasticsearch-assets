@@ -24,7 +24,7 @@
         "@terascope/utils": "^0.36.2",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.1",
-        "mocker-data-generator": "^2.10.0",
+        "mocker-data-generator": "^2.12.0",
         "moment": "^2.29.1"
     },
     "devDependencies": {}
