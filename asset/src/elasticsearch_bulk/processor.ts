@@ -1,7 +1,7 @@
 import { BatchProcessor } from '@terascope/job-components';
 import { DataEntity } from '@terascope/utils';
+import { ElasticsearchSender } from '@terascope/elasticsearch-asset-apis';
 import { ElasticSenderAPI } from '../elasticsearch_sender_api/interfaces';
-import ElasticsearchSender from '../elasticsearch_sender_api/bulk_send';
 import { ElasticsearchBulkConfig } from './interfaces';
 
 export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkConfig> {

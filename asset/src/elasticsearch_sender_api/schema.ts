@@ -6,7 +6,7 @@ import {
     APIConfig,
     getOpConfig
 } from '@terascope/job-components';
-import { ElasticsearchSenderConfig, DEFAULT_API_NAME } from './interfaces';
+import { ElasticsearchAPISenderConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
 import { schema } from '../elasticsearch_bulk/schema';
 
@@ -29,7 +29,7 @@ newSchema.index.format = (val: unknown) => {
     isValidIndex(val);
 };
 
-export default class Schema extends ConvictSchema<ElasticsearchSenderConfig> {
+export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const apiConfigs = job.apis.filter((config) => {
             const apiName = config._name;

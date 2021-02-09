@@ -49,6 +49,8 @@ import {
 } from '../interfaces';
 import SpacesClient from '../spaces-api/spaces-client';
 import { WindowState } from '../window-state';
+import { createBulkSenderAPI, ElasticsearchSenderConfig } from '../elasticsearch-bulk-sender';
+import { ElasticsearchSender } from '../elasticsearch-bulk-sender/bulk-sender';
 
 type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
@@ -153,6 +155,19 @@ export class BaseReaderAPI {
 
     async _searchRequest(query: SearchParams): Promise<DataEntity[]> {
         return this.client.search(query);
+    }
+
+    makeBulkSender(bulkConfig: Partial<ElasticsearchSenderConfig> = {}): ElasticsearchSender {
+        const { client } = this;
+        const { index, connection, size } = this.config;
+        const config = {
+            index,
+            connection,
+            size,
+            ...bulkConfig
+        };
+
+        return createBulkSenderAPI({ client, config });
     }
 
     async determineSliceInterval(

@@ -2,10 +2,9 @@ import 'jest-extended';
 import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import elasticAPI from '@terascope/elasticsearch-api';
-import { makeClient, cleanupIndex, fetch } from '../helpers/elasticsearch';
-import { TEST_INDEX_PREFIX, waitForData } from '../helpers';
-import Sender from '../../asset/src/elasticsearch_sender_api/bulk_send';
-import Schema from '../../asset/src/elasticsearch_sender_api/schema';
+import { makeClient, cleanupIndex, fetch } from '../test/helpers/elasticsearch';
+import { TEST_INDEX_PREFIX, waitForData } from '../test/helpers';
+import { createBulkSenderAPI } from '../src/elasticsearch-bulk-sender';
 
 describe('elasticsearch bulk sender module', () => {
     const META_ROUTE = 'standard:route';
@@ -14,7 +13,6 @@ describe('elasticsearch bulk sender module', () => {
     const esClient = elasticAPI(client, logger);
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
     const type = esClient.getESVersion() === 7 ? '_doc' : 'events';
-    const senderSchema = new Schema({} as any, 'api');
 
     let harness: WorkerTestHarness;
 
@@ -42,9 +40,7 @@ describe('elasticsearch bulk sender module', () => {
             config
         ) as any;
 
-        const fullConfig = senderSchema.validate(senderConfig);
-
-        return new Sender(esClient, fullConfig);
+        return createBulkSenderAPI({ client: esClient, config: senderConfig });
     }
 
     it('can instantiate', async () => {

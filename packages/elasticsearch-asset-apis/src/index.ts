@@ -5,3 +5,5 @@ export * from './elasticsearch-api';
 export * from './base-api';
 export * from './elasticsearch-date-slicer/helpers';
 export * from './elasticsearch-id-slicer/helpers';
+export * from './elasticsearch-bulk-sender';
+export * from './elasticsearch-bulk-sender/bulk-sender';
