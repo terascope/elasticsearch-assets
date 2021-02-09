@@ -1,7 +1,7 @@
 import type { SlicerFn } from '@terascope/job-components';
 import { cloneDeep, TSError } from '@terascope/utils';
 import moment from 'moment';
-import idSlicer from '../elasticsearch_id_slicer';
+import idSlicer from '../elasticsearch-id-slicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -19,7 +19,7 @@ import {
     dateOptions,
     determineStartingPoint
 } from './helpers';
-import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
+import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
 
 interface DateParams {
     start: moment.Moment;

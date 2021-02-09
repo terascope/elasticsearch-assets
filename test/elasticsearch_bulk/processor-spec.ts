@@ -97,53 +97,53 @@ describe('elasticsearch_bulk', () => {
         return harness;
     }
 
-    it('if no docs, returns an empty array', async () => {
-        const test = await makeTest();
-        const results = await test.runSlice([]);
+    // it('if no docs, returns an empty array', async () => {
+    //     const test = await makeTest();
+    //     const results = await test.runSlice([]);
 
-        expect(results).toEqual([]);
-    });
+    //     expect(results).toEqual([]);
+    // });
 
-    it('returns the data passed in', async () => {
-        const testIndex = 'docs_returned';
-        const index = makeIndex(testIndex);
-        const data = [{ some: 'data' }, { other: 4 }];
+    // it('returns the data passed in', async () => {
+    //     const testIndex = 'docs_returned';
+    //     const index = makeIndex(testIndex);
+    //     const data = [{ some: 'data' }, { other: 4 }];
 
-        const test = await makeTest({ index });
+    //     const test = await makeTest({ index });
 
-        const results = await test.runSlice(data);
+    //     const results = await test.runSlice(data);
 
-        expect(results).toEqual(data);
-    });
+    //     expect(results).toEqual(data);
+    // });
 
-    it('can send data to index', async () => {
-        const testIndex = 'less_than_size';
-        const index = makeIndex(testIndex);
-        const opConfig = { size: 50, create: true, index };
+    // it('can send data to index', async () => {
+    //     const testIndex = 'less_than_size';
+    //     const index = makeIndex(testIndex);
+    //     const opConfig = { size: 50, create: true, index };
 
-        const query: SearchParams = {
-            index,
-            size: 200
-        };
-        const data = [];
+    //     const query: SearchParams = {
+    //         index,
+    //         size: 200
+    //     };
+    //     const data = [];
 
-        for (let i = 0; i < 50; i += 1) {
-            data.push(DataEntity.make({ some: 'data' }, { _key: i + 1 }));
-        }
+    //     for (let i = 0; i < 50; i += 1) {
+    //         data.push(DataEntity.make({ some: 'data' }, { _key: i + 1 }));
+    //     }
 
-        const test = await makeTest(opConfig);
-        const results = await test.runSlice(data);
+    //     const test = await makeTest(opConfig);
+    //     const results = await test.runSlice(data);
 
-        expect(Array.isArray(results)).toEqual(true);
-        expect(results).toEqual(data);
+    //     expect(Array.isArray(results)).toEqual(true);
+    //     expect(results).toEqual(data);
 
-        await waitForData(esClient, index, data.length);
+    //     await waitForData(esClient, index, data.length);
 
-        const fetchedData = await fetch(esClient, query);
+    //     const fetchedData = await fetch(esClient, query);
 
-        expect(Array.isArray(fetchedData)).toEqual(true);
-        expect(fetchedData).toEqual(data);
-    });
+    //     expect(Array.isArray(fetchedData)).toEqual(true);
+    //     expect(fetchedData).toEqual(data);
+    // });
 
     it('can send delete bulk calls that are over size', async () => {
         const testIndex = 'deleted_records';

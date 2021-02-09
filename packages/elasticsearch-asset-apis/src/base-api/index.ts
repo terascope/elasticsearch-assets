@@ -20,9 +20,9 @@ import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { CountParams, SearchParams, Client } from 'elasticsearch';
-import dateSlicerFn from '../elasticsearch_date_slicer';
-import idSlicerFn from '../elasticsearch_id_slicer';
-import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
+import dateSlicerFn from '../elasticsearch-date-slicer';
+import idSlicerFn from '../elasticsearch-id-slicer';
+import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
 
 import {
     buildQuery,
@@ -33,7 +33,7 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment
-} from '../elasticsearch_date_slicer/helpers';
+} from '../elasticsearch-date-slicer/helpers';
 import {
     ESReaderOptions,
     SlicerDateResults,
