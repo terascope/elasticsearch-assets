@@ -329,8 +329,18 @@ export class BaseReaderAPI {
         const isPersistent = lifecycle === 'persistent';
         const countFn = this.count.bind(this);
 
+        const {
+            time_resolution: timeResolution,
+            size,
+            subslice_by_key: subsliceByKey,
+            subslice_key_threshold: subsliceKeyThreshold,
+            key_type: keyType,
+            id_field_name: idFieldName,
+            starting_key_depth: startingKeyDepth,
+            type
+        } = this.config;
+
         const slicerFnArgs: Partial<SlicerArgs> = {
-            opConfig: this.config,
             lifecycle,
             numOfSlicers,
             logger: this.logger,
@@ -338,7 +348,15 @@ export class BaseReaderAPI {
             events: this.emitter,
             version: this.version,
             countFn,
-            windowState
+            windowState,
+            timeResolution,
+            size,
+            subsliceByKey,
+            subsliceKeyThreshold,
+            keyType,
+            idFieldName,
+            startingKeyDepth,
+            type
         };
 
         await this.verifyIndex();

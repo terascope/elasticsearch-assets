@@ -93,9 +93,27 @@ describe('date slicer function', () => {
         const opConfig = executionConfig.operations[0];
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
+        const {
+            time_resolution: timeResolutionParam,
+            size,
+            subslice_by_key: subsliceByKey,
+            subslice_key_threshold: subsliceKeyThreshold,
+            key_type: keyType,
+            id_field_name: idFieldName,
+            starting_key_depth: startingKeyDepth,
+            type
+        } = opConfig;
+
         const slicerArgs: SlicerArgs = {
             events,
-            opConfig,
+            timeResolution: timeResolutionParam,
+            size,
+            subsliceKeyThreshold,
+            subsliceByKey,
+            keyType,
+            idFieldName,
+            startingKeyDepth,
+            type,
             numOfSlicers: slicers,
             lifecycle,
             logger,

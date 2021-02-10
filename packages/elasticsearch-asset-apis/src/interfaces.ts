@@ -53,7 +53,14 @@ export interface DateConfig {
     end: string | moment.Moment;
 }
 export interface SlicerArgs {
-    opConfig: any;
+    timeResolution: moment.unitOfTime.Base;
+    size: number;
+    subsliceByKey?: boolean;
+    subsliceKeyThreshold?: number;
+    idFieldName?: string,
+    keyType?: IDType;
+    type: string | null;
+    startingKeyDepth?: number,
     interval: ParsedInterval;
     latencyInterval?: ParsedInterval;
     lifecycle: LifeCycle;
