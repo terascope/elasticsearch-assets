@@ -1,7 +1,7 @@
 import type { SlicerFn } from '@terascope/job-components';
 import { cloneDeep, TSError } from '@terascope/utils';
 import moment from 'moment';
-import idSlicer from '../elasticsearch-id-slicer';
+import { idSlicer } from '../elasticsearch-id-slicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -53,7 +53,7 @@ function splitTime(
     return secondDiff;
 }
 
-export default function newSlicer(args: SlicerArgs): SlicerFn {
+export function dateSlicer(args: SlicerArgs): SlicerFn {
     const {
         events,
         opConfig,
@@ -311,7 +311,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         }
     }
 
-    function dateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
+    function makeDateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
         const shouldDivideByID = opConfig.subslice_by_key;
         const threshold = opConfig.subslice_key_threshold;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
@@ -372,5 +372,5 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         };
     }
 
-    return dateSlicer(sliceDates, id);
+    return makeDateSlicer(sliceDates, id);
 }

@@ -20,7 +20,7 @@ import {
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src';
 import { MockClient } from '../helpers';
-import slicerFn from '../../src/elasticsearch-date-slicer';
+import { dateSlicer } from '../../src/elasticsearch-date-slicer';
 
 interface TestConfig {
     slicers?: number;
@@ -109,7 +109,7 @@ describe('date slicer function', () => {
             version: 6
         };
 
-        return slicerFn(slicerArgs);
+        return dateSlicer(slicerArgs);
     }
 
     function makeDate(format: string) {

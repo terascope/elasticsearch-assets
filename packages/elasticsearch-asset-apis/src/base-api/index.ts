@@ -20,8 +20,8 @@ import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { CountParams, SearchParams, Client } from 'elasticsearch';
-import dateSlicerFn from '../elasticsearch-date-slicer';
-import idSlicerFn from '../elasticsearch-id-slicer';
+import { dateSlicer } from '../elasticsearch-date-slicer';
+import { idSlicer } from '../elasticsearch-id-slicer';
 import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
 
 import {
@@ -45,11 +45,12 @@ import {
     DateSlicerArgs,
     DateSlicerConfig,
     IDSlicerArgs,
-    IDSlicerConfig
+    IDSlicerConfig,
+    ElasticsearchSenderConfig
 } from '../interfaces';
 import SpacesClient from '../spaces-api/spaces-client';
 import { WindowState } from '../window-state';
-import { createBulkSenderAPI, ElasticsearchSenderConfig } from '../elasticsearch-bulk-sender';
+import { createBulkSenderAPI } from '../elasticsearch-bulk-sender';
 import { ElasticsearchSender } from '../elasticsearch-bulk-sender/bulk-sender';
 
 type ReaderClient = Client | SpacesClient
@@ -283,7 +284,7 @@ export class BaseReaderAPI {
             slicerConfig.retryData = parsedRetry;
         }
 
-        return idSlicerFn(slicerConfig as IDSlicerArgs);
+        return idSlicer(slicerConfig as IDSlicerArgs);
     }
 
     private validateDateSlicerConfig(input: unknown): DateSlicerConfig {
@@ -410,7 +411,7 @@ export class BaseReaderAPI {
             slicerFnArgs.dates = dates;
         }
 
-        return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;
+        return dateSlicer(slicerFnArgs as SlicerArgs) as SlicerFn;
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {

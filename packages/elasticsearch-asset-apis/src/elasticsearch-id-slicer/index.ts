@@ -2,7 +2,7 @@ import type { SlicerFn } from '@terascope/job-components';
 import { TSError, AnyObject } from '@terascope/utils';
 import { IDSlicerArgs, SlicerDateResults, IDReaderSlice } from '../interfaces';
 
-export default function newSlicer(args: IDSlicerArgs): SlicerFn {
+export function idSlicer(args: IDSlicerArgs): SlicerFn {
     const {
         events,
         retryData,

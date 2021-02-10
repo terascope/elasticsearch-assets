@@ -3,8 +3,6 @@ import { isNil, isPlainObject, isString } from '@terascope/utils';
 import { ElasticsearchSender } from './bulk-sender';
 import { ElasticsearchSenderConfig } from './interfaces';
 
-export * from './interfaces';
-
 interface BulkAPIArgs {
     config: ElasticsearchSenderConfig,
     client: elasticAPI.Client;
