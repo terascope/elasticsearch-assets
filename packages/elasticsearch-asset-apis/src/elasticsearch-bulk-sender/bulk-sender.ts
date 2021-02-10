@@ -9,7 +9,7 @@ import {
 } from '@terascope/utils';
 import {
     ElasticsearchSenderConfig, IndexSpec, BulkMeta, UpdateConfig
-} from './interfaces';
+} from '../interfaces';
 
 export class ElasticsearchSender implements RouteSenderAPI {
     client: elasticAPI.Client;

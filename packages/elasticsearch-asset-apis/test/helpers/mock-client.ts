@@ -1,7 +1,6 @@
 import {
     AnyObject,
     isPlainObject,
-    cloneDeep,
     isObjectEntity
 } from '@terascope/utils';
 
@@ -42,7 +41,7 @@ function validateBulk(data: BulkData) {
     if (!areObjects) throw new Error('bulk data must be an array of objects');
     if (data.body.length === 0) throw new Error('bulk must contain an array of objects');
 
-    const clone = cloneDeep(data.body);
+    const clone = data.body.slice();
 
     while (clone.length > 0) {
         const doc = clone.shift();
