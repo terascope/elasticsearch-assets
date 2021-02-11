@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.3.6",
+    "version": "2.3.7",
     "private": true,
     "workspaces": [
         "packages/*",
@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "asset:build": "yarn && yarn run build",
+        "asset:post-build": "./scripts/copy-links.sh",
         "build": "tsc --build",
         "build:watch": "tsc --build --watch",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
