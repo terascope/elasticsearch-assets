@@ -9,6 +9,7 @@
     ],
     "scripts": {
         "asset:build": "yarn && yarn run build",
+        "asset:post-build": "./scripts/copy-links.sh",
         "build": "tsc --build",
         "build:watch": "tsc --build --watch",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
