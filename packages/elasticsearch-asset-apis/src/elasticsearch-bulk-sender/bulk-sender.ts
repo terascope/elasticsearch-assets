@@ -9,9 +9,9 @@ import {
 } from '@terascope/utils';
 import {
     ElasticsearchSenderConfig, IndexSpec, BulkMeta, UpdateConfig
-} from './interfaces';
+} from '../interfaces';
 
-export default class ElasticsearchSender implements RouteSenderAPI {
+export class ElasticsearchSender implements RouteSenderAPI {
     client: elasticAPI.Client;
     config: ElasticsearchSenderConfig;
     clientVersion: number;
@@ -59,7 +59,7 @@ export default class ElasticsearchSender implements RouteSenderAPI {
         if (this.config.update || this.config.upsert) {
             indexMeta.update = meta;
 
-            if (this.config.update_retry_on_conflict > 0) {
+            if (this.config.update_retry_on_conflict && this.config.update_retry_on_conflict > 0) {
                 meta.retry_on_conflict = this.config.update_retry_on_conflict;
             }
 
@@ -71,7 +71,7 @@ export default class ElasticsearchSender implements RouteSenderAPI {
             }
 
             // This will merge this record with the existing record.
-            if (this.config.update_fields.length > 0) {
+            if (this.config.update_fields && this.config.update_fields.length > 0) {
                 update.doc = {};
                 this.config.update_fields.forEach((field) => {
                     // @ts-expect-error
@@ -91,7 +91,7 @@ export default class ElasticsearchSender implements RouteSenderAPI {
                 }
 
                 set(update, 'script.params', {});
-                for (const [key, field] of Object.entries(this.config.script_params)) {
+                for (const [key, field] of Object.entries(this.config.script_params ?? {})) {
                     if (record[field]) {
                     // @ts-expect-error
                         update.script.params[key] = record[field];

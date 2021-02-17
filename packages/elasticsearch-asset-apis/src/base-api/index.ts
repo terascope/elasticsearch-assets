@@ -20,9 +20,9 @@ import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { CountParams, SearchParams, Client } from 'elasticsearch';
-import dateSlicerFn from '../elasticsearch_date_slicer';
-import idSlicerFn from '../elasticsearch_id_slicer';
-import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
+import { dateSlicer } from '../elasticsearch-date-slicer';
+import { idSlicer } from '../elasticsearch-id-slicer';
+import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
 
 import {
     buildQuery,
@@ -33,7 +33,7 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment
-} from '../elasticsearch_date_slicer/helpers';
+} from '../elasticsearch-date-slicer/helpers';
 import {
     ESReaderOptions,
     SlicerDateResults,
@@ -45,10 +45,13 @@ import {
     DateSlicerArgs,
     DateSlicerConfig,
     IDSlicerArgs,
-    IDSlicerConfig
+    IDSlicerConfig,
+    ElasticsearchSenderConfig
 } from '../interfaces';
 import SpacesClient from '../spaces-api/spaces-client';
 import { WindowState } from '../window-state';
+import { createBulkSenderAPI } from '../elasticsearch-bulk-sender';
+import { ElasticsearchSender } from '../elasticsearch-bulk-sender/bulk-sender';
 
 type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
@@ -153,6 +156,19 @@ export class BaseReaderAPI {
 
     async _searchRequest(query: SearchParams): Promise<DataEntity[]> {
         return this.client.search(query);
+    }
+
+    makeBulkSender(bulkConfig: Partial<ElasticsearchSenderConfig> = {}): ElasticsearchSender {
+        const { client } = this;
+        const { index, connection, size } = this.config;
+        const config = {
+            index,
+            connection,
+            size,
+            ...bulkConfig
+        };
+
+        return createBulkSenderAPI({ client, config });
     }
 
     async determineSliceInterval(
@@ -268,7 +284,7 @@ export class BaseReaderAPI {
             slicerConfig.retryData = parsedRetry;
         }
 
-        return idSlicerFn(slicerConfig as IDSlicerArgs);
+        return idSlicer(slicerConfig as IDSlicerArgs);
     }
 
     private validateDateSlicerConfig(input: unknown): DateSlicerConfig {
@@ -313,8 +329,18 @@ export class BaseReaderAPI {
         const isPersistent = lifecycle === 'persistent';
         const countFn = this.count.bind(this);
 
+        const {
+            time_resolution: timeResolution,
+            size,
+            subslice_by_key: subsliceByKey,
+            subslice_key_threshold: subsliceKeyThreshold,
+            key_type: keyType,
+            id_field_name: idFieldName,
+            starting_key_depth: startingKeyDepth,
+            type
+        } = this.config;
+
         const slicerFnArgs: Partial<SlicerArgs> = {
-            opConfig: this.config,
             lifecycle,
             numOfSlicers,
             logger: this.logger,
@@ -322,7 +348,15 @@ export class BaseReaderAPI {
             events: this.emitter,
             version: this.version,
             countFn,
-            windowState
+            windowState,
+            timeResolution,
+            size,
+            subsliceByKey,
+            subsliceKeyThreshold,
+            keyType,
+            idFieldName,
+            startingKeyDepth,
+            type
         };
 
         await this.verifyIndex();
@@ -395,7 +429,7 @@ export class BaseReaderAPI {
             slicerFnArgs.dates = dates;
         }
 
-        return dateSlicerFn(slicerFnArgs as SlicerArgs) as SlicerFn;
+        return dateSlicer(slicerFnArgs as SlicerArgs) as SlicerFn;
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {

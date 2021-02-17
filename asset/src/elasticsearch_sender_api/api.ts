@@ -3,24 +3,25 @@ import {
     isNil, isString, isPlainObject, AnyObject, isNumber, getTypeOf
 } from '@terascope/utils';
 import elasticAPI from '@terascope/elasticsearch-api';
-import ElasticsearchSender from './bulk_send';
-import { ElasticsearchSenderConfig } from './interfaces';
+import { createBulkSenderAPI, ElasticsearchSender } from '@terascope/elasticsearch-asset-apis';
+import { ElasticsearchAPISenderConfig } from './interfaces';
 
 export default class ElasticsearchSenderAPI extends APIFactory
-    <ElasticsearchSender, ElasticsearchSenderConfig> {
+    <ElasticsearchSender, ElasticsearchAPISenderConfig> {
     // TODO: there might need more checks here
-    validateConfig(config: unknown): ElasticsearchSenderConfig {
+    validateConfig(config: unknown): ElasticsearchAPISenderConfig {
         if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
         if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         if (!isNumber(config.size)) throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(config.size)}`);
         if (isNil(config.connection) || !isString(config.connection)) throw new Error('Invalid parameter "connection", must provide a valid connection');
-        return config as ElasticsearchSenderConfig;
+        return config as ElasticsearchAPISenderConfig;
     }
 
     async create(
-        _name: string, overrideConfig: Partial<ElasticsearchSenderConfig>
-    ): Promise<{ client: ElasticsearchSender, config: ElasticsearchSenderConfig }> {
-        const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
+        _name: string, overrideConfig: Partial<ElasticsearchAPISenderConfig>
+    ): Promise<{ client: ElasticsearchSender, config: ElasticsearchAPISenderConfig }> {
+        const apiConfig = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
+        const { api_name, ...config } = apiConfig;
 
         const { client } = this.context.foundation.getConnection({
             endpoint: config.connection,
@@ -29,9 +30,9 @@ export default class ElasticsearchSenderAPI extends APIFactory
         });
 
         const esClient = elasticAPI(client, this.context.logger, config);
-        const esSender = new ElasticsearchSender(esClient, config);
+        const sender = createBulkSenderAPI({ client: esClient, config });
 
-        return { client: esSender, config };
+        return { client: sender, config: apiConfig };
     }
 
     async remove(_index: string): Promise<void> {}

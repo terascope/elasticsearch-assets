@@ -1,7 +1,7 @@
 import { APIConfig, APIFactoryRegistry, AnyObject } from '@terascope/job-components';
-import BulkSenderAPI from './bulk_send';
+import { ElasticsearchSender, ElasticsearchSenderConfig } from '@terascope/elasticsearch-asset-apis';
 
-export type ElasticSenderAPI = APIFactoryRegistry<BulkSenderAPI, AnyObject>
+export type ElasticSenderAPI = APIFactoryRegistry<ElasticsearchSender, AnyObject>
 
 export const DEFAULT_API_NAME = 'elasticsearch_sender_api';
 
@@ -17,7 +17,7 @@ export interface ValidSenderConfig extends APIConfig {
     index?: string;
 }
 
-export interface ElasticsearchSenderConfig {
+export interface ElasticsearchAPISenderConfig {
     size: number;
     connection: string;
     api_name: string;
@@ -36,29 +36,3 @@ export interface ElasticsearchSenderConfig {
 }
 
 export interface ElasticsearchSenderAPI extends ElasticsearchSenderConfig, APIConfig {}
-
-export interface BulkMeta {
-    _index: string;
-    _type: string;
-    _id: string | number;
-    retry_on_conflict: number;
-}
-
-export interface IndexSpec {
-    index?: AnyObject;
-    create?: AnyObject;
-    update?: AnyObject;
-    delete?: AnyObject;
-}
-
-export interface ScriptConfig {
-    file?: string;
-    source?: string;
-    params?: AnyObject;
-}
-
-export interface UpdateConfig {
-    upsert?: AnyObject;
-    doc?: AnyObject;
-    script?: ScriptConfig;
-}

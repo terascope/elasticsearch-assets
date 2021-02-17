@@ -1,7 +1,9 @@
 import type { SlicerFn } from '@terascope/job-components';
-import { cloneDeep, TSError } from '@terascope/utils';
+import {
+    cloneDeep, isNumber, TSError, isString
+} from '@terascope/utils';
 import moment from 'moment';
-import idSlicer from '../elasticsearch_id_slicer';
+import { idSlicer } from '../elasticsearch-id-slicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -11,7 +13,8 @@ import {
     StartPointConfig,
     DateSegments,
     DetermineSliceResults,
-    IDSlicerArgs
+    IDSlicerArgs,
+    IDType
 } from '../interfaces';
 import {
     dateFormat as dFormat,
@@ -19,7 +22,7 @@ import {
     dateOptions,
     determineStartingPoint
 } from './helpers';
-import { getKeyArray } from '../elasticsearch_id_slicer/helpers';
+import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
 
 interface DateParams {
     start: moment.Moment;
@@ -53,10 +56,11 @@ function splitTime(
     return secondDiff;
 }
 
-export default function newSlicer(args: SlicerArgs): SlicerFn {
+export function dateSlicer(args: SlicerArgs): SlicerFn {
     const {
         events,
-        opConfig,
+        timeResolution: timeResolutionArg,
+        size: querySize,
         numOfSlicers,
         lifecycle,
         logger,
@@ -67,10 +71,27 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         primaryRange,
         windowState,
         countFn,
-        version
+        version,
+        subsliceByKey,
+        subsliceKeyThreshold,
+        idFieldName = null,
+        startingKeyDepth = 0,
+        type = null,
+        keyType = IDType.base64url
     } = args;
+
+    if (subsliceByKey) {
+        if (!isNumber(subsliceKeyThreshold)) {
+            throw new Error('Invalid parameter subsliceKeyThreshold, it must be set to a number if subsliceByKey is set to true');
+        }
+
+        if (!isString(idFieldName)) {
+            throw new Error('Invalid parameter idFieldName, it must be set to a string if subsliceByKey is set to true');
+        }
+    }
+
     const isPersistent = lifecycle === 'persistent';
-    const timeResolution = dateOptions(opConfig.time_resolution);
+    const timeResolution = dateOptions(timeResolutionArg);
     const dateFormat = timeResolution === 'ms' ? dFormat : dateFormatSeconds;
     const currentWindow = primaryRange || {} as DateSegments;
 
@@ -211,14 +232,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             dates
         );
 
-        const {
-            type,
-            id_field_name,
-            size,
-            starting_key_depth
-        } = opConfig;
-
-        const keyArray = getKeyArray(opConfig.key_type);
+        const keyArray = getKeyArray(keyType);
 
         const idSlicerArs: IDSlicerArgs = {
             events,
@@ -229,9 +243,9 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
             countFn,
             version,
             type,
-            idFieldName: id_field_name,
-            size,
-            startingKeyDepth: starting_key_depth
+            idFieldName,
+            size: querySize,
+            startingKeyDepth: startingKeyDepth as number
         };
 
         const idSlicers = idSlicer(idSlicerArs);
@@ -311,13 +325,12 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         }
     }
 
-    function dateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
-        const shouldDivideByID = opConfig.subslice_by_key;
-        const threshold = opConfig.subslice_key_threshold;
+    function makeDateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
+        const threshold = subsliceKeyThreshold as number;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
 
         const dateParams: DateParams = {
-            size: opConfig.size,
+            size: querySize,
             interval,
             start: moment.utc(dates.start),
             end: moment.utc(dates.end),
@@ -349,7 +362,7 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
 
             adjustDates(dateParams, holes);
 
-            if (shouldDivideByID && data.count >= threshold) {
+            if (subsliceByKey && data.count >= threshold) {
                 logger.debug('date slicer is recursing by key list');
                 try {
                     const list = await makeKeyList(data, dateParams.limit.format(dateFormat));
@@ -372,5 +385,5 @@ export default function newSlicer(args: SlicerArgs): SlicerFn {
         };
     }
 
-    return dateSlicer(sliceDates, id);
+    return makeDateSlicer(sliceDates, id);
 }

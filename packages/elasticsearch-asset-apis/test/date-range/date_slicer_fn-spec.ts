@@ -20,7 +20,7 @@ import {
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src';
 import { MockClient } from '../helpers';
-import slicerFn from '../../src/elasticsearch_date_slicer';
+import { dateSlicer } from '../../src/elasticsearch-date-slicer';
 
 interface TestConfig {
     slicers?: number;
@@ -93,9 +93,27 @@ describe('date slicer function', () => {
         const opConfig = executionConfig.operations[0];
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
+        const {
+            time_resolution: timeResolutionParam,
+            size,
+            subslice_by_key: subsliceByKey,
+            subslice_key_threshold: subsliceKeyThreshold,
+            key_type: keyType,
+            id_field_name: idFieldName,
+            starting_key_depth: startingKeyDepth,
+            type
+        } = opConfig;
+
         const slicerArgs: SlicerArgs = {
             events,
-            opConfig,
+            timeResolution: timeResolutionParam,
+            size,
+            subsliceKeyThreshold,
+            subsliceByKey,
+            keyType,
+            idFieldName,
+            startingKeyDepth,
+            type,
             numOfSlicers: slicers,
             lifecycle,
             logger,
@@ -109,7 +127,7 @@ describe('date slicer function', () => {
             version: 6
         };
 
-        return slicerFn(slicerArgs);
+        return dateSlicer(slicerArgs);
     }
 
     function makeDate(format: string) {
