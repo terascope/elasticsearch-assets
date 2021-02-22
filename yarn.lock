@@ -586,7 +586,7 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.23.0", "@terascope/data-mate@^0.23.3":
+"@terascope/data-mate@^0.23.3":
   version "0.23.3"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.23.3.tgz#8720b5a6d446543c217e1754e1589494c289f99d"
   integrity sha512-T01upE3jTskqre323Cjp60grtesTtngai2xgSfhjqxTL4taNG3btpvfPltd+OshP0+ljZttBlS6dAadUvZos9A==
@@ -601,6 +601,34 @@
     "@turf/clean-coords" "^6.2.0"
     "@turf/helpers" "^6.2.0"
     awesome-phonenumber "^2.43.0"
+    date-fns "^2.17.0"
+    ip-bigint "^3.0.0"
+    ip6addr "^0.2.3"
+    ipaddr.js "^2.0.0"
+    is-cidr "^4.0.2"
+    is-ip "^3.1.0"
+    jexl "^2.2.2"
+    mnemonist "^0.38.1"
+    uuid "^8.3.2"
+    valid-url "^1.0.9"
+    validator "^13.5.2"
+    xlucene-parser "^0.34.1"
+
+"@terascope/data-mate@^0.25.0":
+  version "0.25.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.25.0.tgz#cbde56436487470b4004a406ecc6dc3a1b39d10c"
+  integrity sha512-jrTeVYh4S2HUlYs0s+M4aMyd8B4El8GavSTX0oNBkdtTsQhIrKGzTyerSjOWqotVqcD1OCrR36v3bp6Gdw64Ag==
+  dependencies:
+    "@terascope/data-types" "^0.27.2"
+    "@terascope/types" "^0.7.1"
+    "@terascope/utils" "^0.36.2"
+    "@turf/bbox" "^6.2.0"
+    "@turf/bbox-polygon" "^6.3.0"
+    "@turf/boolean-point-in-polygon" "^6.2.0"
+    "@turf/circle" "^6.3.0"
+    "@turf/clean-coords" "^6.2.0"
+    "@turf/helpers" "^6.2.0"
+    awesome-phonenumber "^2.46.0"
     date-fns "^2.17.0"
     ip-bigint "^3.0.0"
     ip6addr "^0.2.3"
@@ -1444,7 +1472,7 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-awesome-phonenumber@^2.43.0:
+awesome-phonenumber@^2.43.0, awesome-phonenumber@^2.46.0:
   version "2.46.0"
   resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.46.0.tgz#46d0f3bb943dba396fc6857258d1bd33684185c3"
   integrity sha512-uwh3nqE9JHWoFmdG6rMa69EfoFR+YHs2E/Vom6WLJ93o/+WEr6RBk3USOu5Z3Wz2VkxOrW9rkWfLX+ENPDTOrQ==
