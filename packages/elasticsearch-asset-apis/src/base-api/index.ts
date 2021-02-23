@@ -112,7 +112,7 @@ export class BaseReaderAPI {
         // attempt to get window if not set
         if (!this.windowSize) {
             const size = await this.getWindowSize();
-            if (size) this.windowSize = size;
+            this.windowSize = size;
         }
         // if we did go ahead and complete query
         if (this.windowSize) {
@@ -150,8 +150,7 @@ export class BaseReaderAPI {
             return searchResults;
         }
 
-        // index is not up, return empty, we log in getWindowSize
-        return [];
+        throw new Error('Could net fetch as window size of index was not found');
     }
 
     async _searchRequest(query: SearchParams): Promise<DataEntity[]> {
@@ -196,6 +195,12 @@ export class BaseReaderAPI {
         }
 
         return [millisecondInterval, 'ms'];
+    }
+
+    private async validateSize(size: number) {
+        const windowSize = await this.getWindowSize();
+        if (size > windowSize) throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
+        this.windowSize = windowSize;
     }
 
     private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
@@ -252,6 +257,8 @@ export class BaseReaderAPI {
 
         const keySet = divideKeyArray(keyArray, numOfSlicers);
         const { type, size } = this.config;
+
+        await this.validateSize(size);
 
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
@@ -339,6 +346,8 @@ export class BaseReaderAPI {
             starting_key_depth: startingKeyDepth,
             type
         } = this.config;
+
+        await this.validateSize(size);
 
         const slicerFnArgs: Partial<SlicerArgs> = {
             lifecycle,
@@ -485,16 +494,11 @@ export class BaseReaderAPI {
         return parsedDate;
     }
 
-    private async getSettings(query: AnyObject): Promise<AnyObject | null> {
-        try {
-            return this._baseClient.indices.getSettings(query);
-        } catch (_err) {
-            this.logger.warn(`index: ${this.config.index} is not yet created`);
-            return null;
-        }
+    private async getSettings(query: AnyObject): Promise<AnyObject> {
+        return this._baseClient.indices.getSettings(query);
     }
 
-    async getWindowSize(): Promise<number | null> {
+    async getWindowSize(): Promise<number> {
         const window = 'index.max_result_window';
         const { index } = this.config;
 
@@ -507,19 +511,17 @@ export class BaseReaderAPI {
 
         const settings = await this.getSettings(query);
 
-        if (settings) {
-            for (const [key, configs] of Object.entries(settings)) {
-                if (key.match(index)) {
-                    const defaultPath = configs.defaults[window];
-                    const configPath = configs.settings[window];
-                    // config goes first as it overrides an defaults
-                    if (configPath) return toNumber(configPath);
-                    if (defaultPath) return toNumber(defaultPath);
-                }
+        for (const [key, configs] of Object.entries(settings)) {
+            if (key.match(index)) {
+                const defaultPath = configs.defaults[window];
+                const configPath = configs.settings[window];
+                // config goes first as it overrides an defaults
+                if (configPath) return toNumber(configPath);
+                if (defaultPath) return toNumber(defaultPath);
             }
         }
 
-        return null;
+        throw new Error(`Could not find settings for index ${index}`);
     }
 
     get version(): number {

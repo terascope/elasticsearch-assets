@@ -167,7 +167,7 @@ describe('date_reader job', () => {
                     date_field_name: 'created',
                     interval: 'auto',
                     time_resolution: 'ms',
-                    size: 100000
+                    size: 10000
                 }
             ],
             operations: [

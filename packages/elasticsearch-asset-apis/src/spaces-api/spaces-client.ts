@@ -9,6 +9,15 @@ import { SpacesAPIConfig } from '../interfaces';
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+interface SettingResults {
+    [key: string]: {
+        settings: {
+            'index.max_result_window': number
+        },
+        defaults: AnyObject
+    }
+}
+
 export default class SpacesClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
@@ -242,7 +251,8 @@ export default class SpacesClient {
     async version(): Promise<void> {}
 
     get cluster(): Partial<Client['cluster']> {
-        const { index } = this.config;
+        const getSettings = this.getSettings.bind(this);
+
         return {
             async stats() {
                 return new Promise(((resolve) => {
@@ -253,63 +263,52 @@ export default class SpacesClient {
                     });
                 }));
             },
-            async getSettings() {
-                return new Promise(((resolve) => {
-                    const result = {};
-
-                    result[index] = {
-                        settings: {
-                            index: {
-                                max_result_window: 100000
-                            }
-                        }
-                    };
-
-                    resolve(result);
-                }));
-            }
+            getSettings
         };
     }
 
-    get indices(): Partial<Client['indices']> {
+    async getSettings(): Promise<SettingResults> {
         const { index, endpoint, token } = this.config;
-        return {
-            async getSettings() {
-                const uri = `${endpoint}/${index}/_info`;
+        const uri = `${endpoint}/${index}/_info`;
 
-                try {
-                    const { body: { params: { size: { max } } } } = await got(uri, {
-                        searchParams: { token },
-                        responseType: 'json',
-                        timeout: 1000000,
-                        retry: 0
-                    });
+        try {
+            const { body: { params: { size: { max } } } } = await got(uri, {
+                searchParams: { token },
+                responseType: 'json',
+                timeout: 1000000,
+                retry: 0
+            });
 
-                    return {
-                        [index]: {
-                            settings: {
-                                'index.max_result_window': max
-                            },
-                            defaults: {}
-                        }
-                    };
-                } catch (err) {
-                    if (err instanceof got.TimeoutError) {
-                        throw new TSError('HTTP request timed out connecting to API endpoint.', {
-                            statusCode: 408,
-                            context: {
-                                endpoint: uri,
-                            }
-                        });
-                    }
-                    throw new TSError(err, {
-                        reason: 'Failure making search request',
-                        context: {
-                            endpoint: uri,
-                        }
-                    });
+            return {
+                [index]: {
+                    settings: {
+                        'index.max_result_window': max
+                    },
+                    defaults: {}
                 }
+            };
+        } catch (err) {
+            if (err instanceof got.TimeoutError) {
+                throw new TSError('HTTP request timed out connecting to API endpoint.', {
+                    statusCode: 408,
+                    context: {
+                        endpoint: uri,
+                    }
+                });
             }
+            throw new TSError(err, {
+                reason: 'Failure making search request',
+                context: {
+                    endpoint: uri,
+                }
+            });
+        }
+    }
+
+    get indices(): Partial<Client['indices']> {
+        const getSettings = this.getSettings.bind(this);
+        return {
+            getSettings
         };
     }
 }

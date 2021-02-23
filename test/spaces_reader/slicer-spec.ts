@@ -10,6 +10,9 @@ describe('spaces_reader slicer', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
     const assetDir = path.join(__dirname, '../..');
+    const maxSize = 100000;
+    const token = 'test-token';
+
     let clients: any;
     let defaultClient: MockClient;
 
@@ -77,7 +80,7 @@ describe('spaces_reader slicer', () => {
             start: start.toISOString(),
             end: end.toISOString(),
             endpoint: baseUri,
-            token: 'test-token',
+            token,
         };
 
         async function getMeta(test: SlicerTestHarness) {
@@ -89,6 +92,15 @@ describe('spaces_reader slicer', () => {
         }
 
         beforeEach(async () => {
+            scope.get(`/${testIndex}/_info?token=${token}`)
+                .reply(200, {
+                    params: {
+                        size: {
+                            max: maxSize
+                        }
+                    }
+                });
+
             scope.post(new RegExp(testIndex))
                 .reply(200, {
                     results: [{ created: start.toISOString() }],
@@ -126,7 +138,6 @@ describe('spaces_reader slicer', () => {
             '@foo': 'foo',
             $bar: 'bar'
         };
-        const token = 'test-token';
 
         const harness = new SlicerTestHarness(newTestJobConfig({
             name: 'simple-api-reader-job',
@@ -160,6 +171,15 @@ describe('spaces_reader slicer', () => {
                 size: 0,
                 variables
             };
+
+            scope.get(`/${testIndex}/_info?token=${token}`)
+                .reply(200, {
+                    params: {
+                        size: {
+                            max: maxSize
+                        }
+                    }
+                });
 
             scope.post(`/${testIndex}?token=${token}`, query)
                 .reply(200, {
