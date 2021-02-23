@@ -25,5 +25,9 @@ export async function createSpacesAPI({
         config.type_config = await client.getDataType();
     }
 
-    return new BaseReaderAPI(config, client, emitter, logger);
+    const api = new BaseReaderAPI(config, client, emitter, logger);
+
+    await api.validateSize();
+
+    return api;
 }

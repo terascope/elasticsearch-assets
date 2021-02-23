@@ -17,5 +17,7 @@ export async function createElasticsearchReaderAPI({
     logger = debugLogger('elasticsearch-api'),
     emitter = new EventEmitter()
 }: ElasticsearchAPIArgs): Promise<BaseReaderAPI> {
-    return new BaseReaderAPI(config, client, emitter, logger);
+    const api = new BaseReaderAPI(config, client, emitter, logger);
+    await api.validateSize();
+    return api;
 }

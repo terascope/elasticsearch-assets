@@ -478,5 +478,25 @@ describe('Reader API', () => {
                 expect(result).toMatchObject(expectedResults[index]);
             });
         });
+
+        it('will throw is size is beyond window_size of index', async () => {
+            const size = 1000000000;
+
+            const config: ESReaderOptions = {
+                ...defaultConfig,
+                size
+            };
+
+            const errMsg = `Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of 10000 for index ${config.index}`;
+
+            try {
+                await createElasticsearchReaderAPI({
+                    config, client, logger, emitter
+                });
+                throw new Error('should have error');
+            } catch (err) {
+                expect(err.message).toEqual(errMsg);
+            }
+        });
     });
 });

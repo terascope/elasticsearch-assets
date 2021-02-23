@@ -69,7 +69,6 @@ export class BaseReaderAPI {
     logger: Logger;
     private _baseClient: AnyObject;
     protected readonly client: elasticAPI.Client;
-    private hasDefaultQueries = false;
     private windowSize: undefined | number = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
@@ -94,7 +93,6 @@ export class BaseReaderAPI {
         this.logger = logger;
         this._baseClient = client;
         this.client = elasticAPI(client, logger, clientConfig);
-        if (config.query || config.geo_field) this.hasDefaultQueries = true;
         const timeResolution = time_resolution ? dateOptions(time_resolution) : '';
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
     }
@@ -111,8 +109,7 @@ export class BaseReaderAPI {
     async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
         // attempt to get window if not set
         if (!this.windowSize) {
-            const size = await this.getWindowSize();
-            this.windowSize = size;
+            await this.validateSize();
         }
         // if we did go ahead and complete query
         if (this.windowSize) {
@@ -197,7 +194,8 @@ export class BaseReaderAPI {
         return [millisecondInterval, 'ms'];
     }
 
-    private async validateSize(size: number) {
+    async validateSize(): Promise<void> {
+        const { size } = this.config;
         const windowSize = await this.getWindowSize();
         if (size > windowSize) throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
         this.windowSize = windowSize;
@@ -258,7 +256,7 @@ export class BaseReaderAPI {
         const keySet = divideKeyArray(keyArray, numOfSlicers);
         const { type, size } = this.config;
 
-        await this.validateSize(size);
+        if (!this.windowSize) await this.validateSize();
 
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
@@ -347,7 +345,7 @@ export class BaseReaderAPI {
             type
         } = this.config;
 
-        await this.validateSize(size);
+        if (!this.windowSize) await this.validateSize();
 
         const slicerFnArgs: Partial<SlicerArgs> = {
             lifecycle,
