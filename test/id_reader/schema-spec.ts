@@ -89,7 +89,7 @@ describe('id_reader Schema', () => {
             await expect(makeSchema({ index: 4 })).toReject();
             await expect(makeSchema({ index: '' })).toReject();
             await expect(makeSchema({ index: 'Hello' })).toReject();
-            await expect(makeSchema({ index: 'hello' })).toReject();
+            await expect(makeSchema({ index: 'hello' })).toResolve();
         });
 
         it('should values are incorrect', async () => {

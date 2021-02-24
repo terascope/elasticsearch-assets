@@ -490,9 +490,11 @@ describe('Reader API', () => {
             const errMsg = `Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of 10000 for index ${config.index}`;
 
             try {
-                await createElasticsearchReaderAPI({
+                const api = await createElasticsearchReaderAPI({
                     config, client, logger, emitter
                 });
+
+                await api.fetch({});
                 throw new Error('should have error');
             } catch (err) {
                 expect(err.message).toEqual(errMsg);
