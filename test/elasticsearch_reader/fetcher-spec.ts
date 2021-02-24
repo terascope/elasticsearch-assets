@@ -136,4 +136,16 @@ describe('elasticsearch_reader fetcher', () => {
 
         expect(recordCount).toEqual(evenSpread.data.length);
     });
+
+    it('should throw if size is greater than window_size', async () => {
+        const size = 1000000000;
+        const errMsg = `Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of 10000 for index ${evenIndex}`;
+
+        try {
+            const test = await makeJobTest({ size });
+            await test.runToCompletion();
+        } catch (err) {
+            expect(err.message).toEqual(errMsg);
+        }
+    });
 });

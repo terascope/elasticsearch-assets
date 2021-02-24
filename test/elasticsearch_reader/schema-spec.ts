@@ -1,17 +1,34 @@
 import 'jest-extended';
-import { AnyObject, newTestJobConfig } from '@terascope/job-components';
+import { AnyObject, newTestJobConfig, DataEntity } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
-import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import {
+    TEST_INDEX_PREFIX,
+    ELASTICSEARCH_VERSION,
+    makeClient,
+    cleanupIndex,
+    populateIndex
+} from '../helpers';
+import evenSpread from '../fixtures/data/even-spread';
 
 describe('elasticsearch_reader schema', () => {
-    const index = 'some_index';
     const name = 'elasticsearch_reader';
+    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_schema`;
+
+    function makeIndex(str: string) {
+        return `${readerIndex}_${str}`;
+    }
 
     const esClient = makeClient();
+    const version = getESVersion(esClient);
+    const docType = version === 5 ? 'events' : '_doc';
+
+    const index = makeIndex(evenSpread.index);
+
+    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const clients = [
         {
@@ -28,16 +45,21 @@ describe('elasticsearch_reader schema', () => {
 
     let harness: WorkerTestHarness;
 
+    beforeAll(async () => {
+        await cleanupIndex(esClient, makeIndex('*'));
+        await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
+    });
+
+    afterAll(async () => {
+        await cleanupIndex(esClient, makeIndex('*'));
+    });
+
     afterEach(async () => {
         if (harness) {
             harness.events.emit('worker:shutdown');
             await harness.shutdown();
         }
     });
-
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
 
     async function makeSchema(config: AnyObject = {}): Promise<ESReaderConfig> {
         const opConfig = Object.assign({}, {
@@ -99,7 +121,6 @@ describe('elasticsearch_reader schema', () => {
 
         const testOpConfig = {
             _op: 'elasticsearch_reader',
-            index: 'some-index',
             date_field_name: 'created'
         };
 

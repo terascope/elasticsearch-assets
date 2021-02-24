@@ -69,7 +69,6 @@ export class BaseReaderAPI {
     logger: Logger;
     private _baseClient: AnyObject;
     protected readonly client: elasticAPI.Client;
-    private hasDefaultQueries = false;
     private windowSize: undefined | number = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
@@ -94,7 +93,6 @@ export class BaseReaderAPI {
         this.logger = logger;
         this._baseClient = client;
         this.client = elasticAPI(client, logger, clientConfig);
-        if (config.query || config.geo_field) this.hasDefaultQueries = true;
         const timeResolution = time_resolution ? dateOptions(time_resolution) : '';
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
     }
@@ -110,48 +108,41 @@ export class BaseReaderAPI {
 
     async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
         // attempt to get window if not set
-        if (!this.windowSize) {
-            const size = await this.getWindowSize();
-            if (size) this.windowSize = size;
-        }
+        if (!this.windowSize) await this.setWindowSize();
+
         // if we did go ahead and complete query
-        if (this.windowSize) {
-            const query = buildQuery(this.config, queryParams);
-            query.size = this.windowSize;
-            const start = Date.now();
-            // this could be a full  ES request, Spaces Request, or an array of data-entities
-            const searchResults = await this._searchRequest(query) as any;
+        const query = buildQuery(this.config, queryParams);
+        query.size = this.windowSize;
+        const start = Date.now();
+        // this could be a full  ES request, Spaces Request, or an array of data-entities
+        const searchResults = await this._searchRequest(query) as any;
 
-            const searchEnd = Date.now();
+        const searchEnd = Date.now();
 
-            if (this.config.use_data_frames) {
-                const typeConfig = this.config.type_config as DataTypeConfig;
-                const records = searchResults.hits.hits.map((data: AnyObject) => data._source);
-                const metrics: AnyObject = {
-                    search_time: searchEnd - start,
-                    fetched: records.length,
-                    total: searchResults.hits.total
-                };
+        if (this.config.use_data_frames) {
+            const typeConfig = this.config.type_config as DataTypeConfig;
+            const records = searchResults.hits.hits.map((data: AnyObject) => data._source);
+            const metrics: AnyObject = {
+                search_time: searchEnd - start,
+                fetched: records.length,
+                total: searchResults.hits.total
+            };
 
-                // we do not have access to complexity right now
-                return DataFrame.fromJSON(
-                    typeConfig,
-                    records,
-                    {
-                        name: '<unknown>',
-                        metadata: {
-                            search_end_time: searchEnd,
-                            metrics
-                        }
+            // we do not have access to complexity right now
+            return DataFrame.fromJSON(
+                typeConfig,
+                records,
+                {
+                    name: '<unknown>',
+                    metadata: {
+                        search_end_time: searchEnd,
+                        metrics
                     }
-                );
-            }
-
-            return searchResults;
+                }
+            );
         }
 
-        // index is not up, return empty, we log in getWindowSize
-        return [];
+        return searchResults;
     }
 
     async _searchRequest(query: SearchParams): Promise<DataEntity[]> {
@@ -196,6 +187,13 @@ export class BaseReaderAPI {
         }
 
         return [millisecondInterval, 'ms'];
+    }
+
+    async setWindowSize(): Promise<void> {
+        const { size } = this.config;
+        const windowSize = await this.getWindowSize();
+        if (size > windowSize) throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
+        this.windowSize = windowSize;
     }
 
     private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
@@ -252,6 +250,8 @@ export class BaseReaderAPI {
 
         const keySet = divideKeyArray(keyArray, numOfSlicers);
         const { type, size } = this.config;
+
+        if (!this.windowSize) await this.setWindowSize();
 
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
@@ -339,6 +339,8 @@ export class BaseReaderAPI {
             starting_key_depth: startingKeyDepth,
             type
         } = this.config;
+
+        if (!this.windowSize) await this.setWindowSize();
 
         const slicerFnArgs: Partial<SlicerArgs> = {
             lifecycle,
@@ -485,16 +487,11 @@ export class BaseReaderAPI {
         return parsedDate;
     }
 
-    private async getSettings(query: AnyObject): Promise<AnyObject | null> {
-        try {
-            return this._baseClient.indices.getSettings(query);
-        } catch (_err) {
-            this.logger.warn(`index: ${this.config.index} is not yet created`);
-            return null;
-        }
+    private async getSettings(query: AnyObject): Promise<AnyObject> {
+        return this._baseClient.indices.getSettings(query);
     }
 
-    async getWindowSize(): Promise<number | null> {
+    async getWindowSize(): Promise<number> {
         const window = 'index.max_result_window';
         const { index } = this.config;
 
@@ -507,19 +504,17 @@ export class BaseReaderAPI {
 
         const settings = await this.getSettings(query);
 
-        if (settings) {
-            for (const [key, configs] of Object.entries(settings)) {
-                if (key.match(index)) {
-                    const defaultPath = configs.defaults[window];
-                    const configPath = configs.settings[window];
-                    // config goes first as it overrides an defaults
-                    if (configPath) return toNumber(configPath);
-                    if (defaultPath) return toNumber(defaultPath);
-                }
+        for (const [key, configs] of Object.entries(settings)) {
+            if (key.match(index)) {
+                const defaultPath = configs.defaults[window];
+                const configPath = configs.settings[window];
+                // config goes first as it overrides an defaults
+                if (configPath) return toNumber(configPath);
+                if (defaultPath) return toNumber(defaultPath);
             }
         }
 
-        return null;
+        throw new Error(`Could not find settings for index ${index}`);
     }
 
     get version(): number {

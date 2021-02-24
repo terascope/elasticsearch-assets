@@ -1,18 +1,35 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
+import { AnyObject, ValidatedJobConfig, DataEntity } from '@terascope/job-components';
 import { getESVersion } from 'elasticsearch-store';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
-import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
+import {
+    TEST_INDEX_PREFIX,
+    ELASTICSEARCH_VERSION,
+    makeClient,
+    cleanupIndex,
+    populateIndex
+} from '../helpers';
+import evenSpread from '../fixtures/data/even-spread';
 
 describe('id_reader Schema', () => {
-    const index = 'some_index';
     const name = 'id_reader';
     const id_field_name = 'someField';
 
-    const esClient = makeClient();
+    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_id_reader_schema`;
 
+    function makeIndex(str: string) {
+        return `${readerIndex}_${str}`;
+    }
+
+    const esClient = makeClient();
+    const version = getESVersion(esClient);
+    const docType = version === 5 ? 'events' : '_doc';
+
+    const index = makeIndex(evenSpread.index);
+
+    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
     const clients = [
         {
             type: 'elasticsearch',
@@ -25,10 +42,6 @@ describe('id_reader Schema', () => {
             }
         },
     ];
-
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
 
     let harness: WorkerTestHarness;
 
@@ -54,6 +67,15 @@ describe('id_reader Schema', () => {
 
     afterEach(async () => {
         if (harness) await harness.shutdown();
+    });
+
+    beforeAll(async () => {
+        await cleanupIndex(esClient, makeIndex('*'));
+        await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
+    });
+
+    afterAll(async () => {
+        await cleanupIndex(esClient, makeIndex('*'));
     });
 
     describe('when validating the schema', () => {
@@ -166,37 +188,37 @@ describe('id_reader Schema', () => {
             const job1 = newTestJobConfig({
                 slicers: 1,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_range: ['a', 'b']
+                    _op: 'id_reader', type: docType, index, key_range: ['a', 'b']
                 }, { _op: 'noop' }]
             });
             const job2 = newTestJobConfig({
                 slicers: 2,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_range: ['a']
+                    _op: 'id_reader', type: docType, index, key_range: ['a']
                 }, { _op: 'noop' }]
             });
             const job3 = newTestJobConfig({
                 slicers: 4,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_type: 'hexadecimal'
+                    _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
                 }, { _op: 'noop' }]
             });
             const job4 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_type: 'hexadecimal'
+                    _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
                 }, { _op: 'noop' }]
             });
             const job5 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_type: 'base64url'
+                    _op: 'id_reader', type: docType, index, key_type: 'base64url'
                 }, { _op: 'noop' }]
             });
             const job6 = newTestJobConfig({
                 slicers: 70,
                 operations: [{
-                    _op: 'id_reader', type: docType, index: 'some-index', key_type: 'base64url'
+                    _op: 'id_reader', type: docType, index, key_type: 'base64url'
                 }, { _op: 'noop' }]
             });
 
