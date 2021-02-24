@@ -133,7 +133,8 @@ describe('elasticsearch reader api', () => {
         const apiFactory = await setupAPITest({ size });
 
         try {
-            await apiFactory.create('test', { query: '*' });
+            const api = await apiFactory.create('test', { query: '*' });
+            await api.fetch({});
             throw new Error('expected error here');
         } catch (err) {
             expect(err.message).toEqual(errMsg);
