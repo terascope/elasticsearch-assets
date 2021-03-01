@@ -34,7 +34,7 @@
     },
     "devDependencies": {
         "@terascope/data-mate": "^0.25.0",
-        "@terascope/job-components": "^0.46.2",
+        "@terascope/job-components": "^0.47.0",
         "@types/elasticsearch": "^5.0.36",
         "elasticsearch": "^15.4.1"
     },
