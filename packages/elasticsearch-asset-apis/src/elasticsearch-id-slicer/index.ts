@@ -137,7 +137,11 @@ function* recurse(baseArray: string[], str: string): Generator<string> {
     }
 }
 
-function* recurseDepth(baseArray: string[], str: string, startingKeyDepth: number) {
+function* recurseDepth(
+    baseArray: string[],
+    str: string,
+    startingKeyDepth: number
+): Generator<string> {
     for (const key of baseArray) {
         const newStr = str + key;
 
@@ -153,7 +157,10 @@ function* recurseDepth(baseArray: string[], str: string, startingKeyDepth: numbe
     }
 }
 
-function* generateKeys(baseArray: string[], keysArray: string[]) {
+function* generateKeys(
+    baseArray: string[],
+    keysArray: string[]
+): Generator<string> {
     for (const startKey of keysArray) {
         const processKey = yield startKey;
 
@@ -165,7 +172,11 @@ function* generateKeys(baseArray: string[], keysArray: string[]) {
     return null;
 }
 
-function* generateKeyDepth(baseArray: string[], keysArray: string[], startingKeyDepth: number) {
+function* generateKeyDepth(
+    baseArray: string[],
+    keysArray: string[],
+    startingKeyDepth: number
+): Generator<string> {
     for (const startKey of keysArray) {
         yield* recurseDepth(baseArray, startKey, startingKeyDepth);
     }
