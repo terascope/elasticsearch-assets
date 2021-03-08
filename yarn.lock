@@ -613,15 +613,15 @@
     validator "^13.5.2"
     xlucene-parser "^0.34.1"
 
-"@terascope/data-types@^0.27.2":
-  version "0.27.2"
-  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.27.2.tgz#d4277f52f1a3e29e0482dc9b25c6669b436ea221"
-  integrity sha512-YFtpMzebD6HCIL9+88FUQ0eXaKaYYHr3UQiMmrB30MMyjggdCE1aKv5KQqeDbYRdAmO7uhChY8dXF7cXWhlELg==
+"@terascope/data-types@^0.27.2", "@terascope/data-types@^0.27.3":
+  version "0.27.3"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.27.3.tgz#2b36d58bfb422d148d4aacf944685d4a56ae3bd6"
+  integrity sha512-3r/lVBNMDE2RyEPuTCktfd8uH1QJjRkDxN7HTkxwT4Nmeh8N1Ya7N5LAQNU+Gt3+1R+92Jlugq2NkY9KBQjLUw==
   dependencies:
     "@terascope/types" "^0.7.1"
-    "@terascope/utils" "^0.36.2"
-    graphql "^15.4.0"
-    lodash "^4.17.20"
+    "@terascope/utils" "^0.36.3"
+    graphql "^15.5.0"
+    lodash "^4.17.21"
     yargs "^16.2.0"
 
 "@terascope/elasticsearch-api@^2.18.2":
@@ -693,10 +693,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.7.1.tgz#0712b34e148db0bd19bea219d386f49e833e703d"
   integrity sha512-cbayopONnDam37C6qn4ARl2K0UdXbxs9ObPUQ2IeV7gMia6dPZ+QByvw3qDYuUFLpS1VTxhxd4nKu2KiNxxDgw==
 
-"@terascope/utils@^0.36.2":
-  version "0.36.2"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.36.2.tgz#c0772b5e68109f24bb310fc83fc83d9ff5c15e6a"
-  integrity sha512-C1lcSXfiPviSzNHvdzWWXtVO9S7z4ll/b3TCPHDR8GhW8xxoT03fjlMlGXnPNfbzOaCD8o8K9ba/mgpvVjSO6Q==
+"@terascope/utils@^0.36.2", "@terascope/utils@^0.36.3":
+  version "0.36.3"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.36.3.tgz#974140269b6a309a68efd3750e29856f4b840e73"
+  integrity sha512-vezSxXQLr4diTQK/2wq1Os/U8hXOPZSzUFlkhW83W4X6WsXvazMZ3yfel4GD+qFgR4Bz/F8zPMFe07WwLEsVNA==
   dependencies:
     "@terascope/types" "^0.7.1"
     debug "^4.3.1"
@@ -704,7 +704,7 @@
     js-string-escape "^1.0.1"
     kind-of "^6.0.3"
     latlon-geohash "^1.1.0"
-    lodash "^4.17.20"
+    lodash "^4.17.21"
     p-map "^4.0.0"
     shallow-clone "^3.0.1"
 
@@ -3100,7 +3100,7 @@ graceful-fs@^4.1.10, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.6.tgz#ff040b2b0853b23c3d31027523706f1885d76bee"
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
 
-graphql@^15.4.0:
+graphql@^15.5.0:
   version "15.5.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.5.0.tgz#39d19494dbe69d1ea719915b578bf920344a69d5"
   integrity sha512-OmaM7y0kaK31NKG31q4YbD2beNYa6jBBKtMFT6gLYJljHLJr42IqJ8KX08u3Li/0ifzTU5HjmoOOrwa5BRLeDA==
@@ -4340,10 +4340,10 @@ lodash.sortby@^4.7.0:
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
   integrity sha1-7dFMgk4sycHgsKG0K7UhBRakJDg=
 
-lodash@4.x, lodash@^4.17.10, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20:
-  version "4.17.20"
-  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.20.tgz#b44a9b6297bcb698f1c51a3545a2b3b368d59c52"
-  integrity sha512-PlhdFcillOINfeV7Ni6oF1TAEayyZBoZ8bcshTHqOYJYlrqzRK5hagpagky5o4HfCzzd1TRkXPMFq6cKk9rGmA==
+lodash@4.x, lodash@^4.17.10, lodash@^4.17.15, lodash@^4.17.19, lodash@^4.17.20, lodash@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
+  integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
 
 loose-envify@^1.4.0:
   version "1.4.0"
