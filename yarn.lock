@@ -624,14 +624,14 @@
     lodash "^4.17.21"
     yargs "^16.2.0"
 
-"@terascope/elasticsearch-api@^2.18.2":
-  version "2.18.2"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.18.2.tgz#e7052661f1bd553e2a98bcabd464bde799971db1"
-  integrity sha512-9i0EN7VeLdxc/3hPyOxT8qhYh3MhiVAg91fzlWf7zE7dfS/hTdPN/BkERxagaOiFVB63OsApFSFenKtooeB05g==
+"@terascope/elasticsearch-api@^2.18.2", "@terascope/elasticsearch-api@^2.18.3":
+  version "2.18.3"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.18.3.tgz#fd49325b03d2ae962eaff35659a2fa93bb19b9ea"
+  integrity sha512-fZ0RxBAOpPDN2kiDjywxSh06TbUVKuAlemozF5yYUWj9xhssW3wW0Nv1NMgWgBBovleKqQpTsDiKimsvHoLmfQ==
   dependencies:
-    "@terascope/utils" "^0.36.2"
+    "@terascope/utils" "^0.36.3"
     bluebird "^3.7.2"
-    lodash "^4.17.20"
+    lodash "^4.17.21"
 
 "@terascope/eslint-config@^0.5.3":
   version "0.5.3"
@@ -679,14 +679,14 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.25.2":
-  version "0.25.2"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.25.2.tgz#55e9432ddcdfdf4611419707cdf20fc299102f33"
-  integrity sha512-gUb6g/g/qCwDPIEUVosWb/q2NvP8QBxbG8AotYPjt8VBVySQ6oi1yTFyj+fwBQJe2B74DGT4sdFxDg/gcs5FuQ==
+"@terascope/teraslice-state-storage@^0.25.3":
+  version "0.25.3"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.25.3.tgz#59408cac1f02a593f57ae9638383fa21d7cff15c"
+  integrity sha512-JsYtKHv+CrAt7u853GJlftRwe/rJHl+vAot+uryMB0DlSCQdGI01dIQR+/5iGmy0PXhrLLBNBBPv3FnR3oeaZQ==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.18.2"
-    "@terascope/utils" "^0.36.2"
-    mnemonist "^0.38.1"
+    "@terascope/elasticsearch-api" "^2.18.3"
+    "@terascope/utils" "^0.36.3"
+    mnemonist "^0.38.3"
 
 "@terascope/types@^0.7.1":
   version "0.7.1"
@@ -4495,13 +4495,6 @@ mkdirp@1.x:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
-
-mnemonist@^0.38.1:
-  version "0.38.1"
-  resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.38.1.tgz#4835f982c18713fc97ddf30756529f57cfa3b635"
-  integrity sha512-I674bCCj9p87Re+gv15ynDrP14XjcmLR7tBO22l3UoxQLniyIXdD9vid2sSxYkyOr0fZwJTA+dXRvrwANgdnyg==
-  dependencies:
-    obliterator "^1.6.1"
 
 mnemonist@^0.38.3:
   version "0.38.3"
