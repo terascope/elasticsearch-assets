@@ -1,4 +1,3 @@
-import type { SlicerFn } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { EventEmitter } from 'events';
 import {
@@ -46,7 +45,9 @@ import {
     DateSlicerConfig,
     IDSlicerArgs,
     IDSlicerConfig,
-    ElasticsearchSenderConfig
+    ElasticsearchSenderConfig,
+    DateSlicerResults,
+    IDSlicerResults
 } from '../interfaces';
 import SpacesClient from '../spaces-api/spaces-client';
 import { WindowState } from '../window-state';
@@ -186,7 +187,8 @@ export class BaseReaderAPI {
             return [seconds, 's'];
         }
 
-        return [millisecondInterval, 'ms'];
+        const millisecondIntervalResults = millisecondInterval < 1 ? 1 : millisecondInterval;
+        return [millisecondIntervalResults, 'ms'];
     }
 
     async setWindowSize(): Promise<void> {
@@ -225,7 +227,7 @@ export class BaseReaderAPI {
         return input as unknown as IDSlicerConfig;
     }
 
-    async makeIDSlicer(args: IDSlicerConfig): Promise<SlicerFn> {
+    async makeIDSlicer(args: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
         const config = this.validateIDSlicerConfig(args);
         const countFn = this.count.bind(this);
 
@@ -317,7 +319,7 @@ export class BaseReaderAPI {
         return input as unknown as DateSlicerConfig;
     }
 
-    async makeDateSlicer(args: DateSlicerArgs): Promise<SlicerFn> {
+    async makeDateSlicer(args: DateSlicerArgs): Promise<() => Promise<DateSlicerResults>> {
         const config = this.validateDateSlicerConfig(args);
         const {
             slicerID,
@@ -431,7 +433,7 @@ export class BaseReaderAPI {
             slicerFnArgs.dates = dates;
         }
 
-        return dateSlicer(slicerFnArgs as SlicerArgs) as SlicerFn;
+        return dateSlicer(slicerFnArgs as SlicerArgs);
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {

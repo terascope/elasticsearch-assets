@@ -1,8 +1,9 @@
-import type { SlicerFn } from '@terascope/job-components';
 import { TSError, AnyObject } from '@terascope/utils';
-import { IDSlicerArgs, SlicerDateResults, IDReaderSlice } from '../interfaces';
+import {
+    IDSlicerArgs, SlicerDateResults, IDReaderSlice, IDSlicerResults
+} from '../interfaces';
 
-export function idSlicer(args: IDSlicerArgs): SlicerFn {
+export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {
         events,
         retryData,
