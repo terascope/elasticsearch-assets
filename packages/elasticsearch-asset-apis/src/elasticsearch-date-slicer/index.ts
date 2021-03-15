@@ -1,4 +1,3 @@
-import type { SlicerFn } from '@terascope/job-components';
 import {
     cloneDeep, isNumber, TSError, isString
 } from '@terascope/utils';
@@ -14,7 +13,8 @@ import {
     DateSegments,
     DetermineSliceResults,
     IDSlicerArgs,
-    IDType
+    IDType,
+    DateSlicerResults
 } from '../interfaces';
 import {
     dateFormat as dFormat,
@@ -33,8 +33,6 @@ interface DateParams {
     interval: ParsedInterval;
     size: number;
 }
-
-type SliceResults = SlicerDateResults | SlicerDateResults[] | null;
 
 function splitTime(
     start: moment.Moment,
@@ -56,7 +54,7 @@ function splitTime(
     return secondDiff;
 }
 
-export function dateSlicer(args: SlicerArgs): SlicerFn {
+export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
     const {
         events,
         timeResolution: timeResolutionArg,
@@ -325,7 +323,10 @@ export function dateSlicer(args: SlicerArgs): SlicerFn {
         }
     }
 
-    function makeDateSlicer(dates: SlicerDateConfig, slicerId: number): SlicerFn {
+    function makeDateSlicer(
+        dates: SlicerDateConfig,
+        slicerId: number
+    ): () => Promise<DateSlicerResults> {
         const threshold = subsliceKeyThreshold as number;
         const holes: DateConfig[] = dates.holes ? dates.holes.slice() : [];
 
@@ -340,7 +341,7 @@ export function dateSlicer(args: SlicerArgs): SlicerFn {
 
         logger.debug('all date configurations for date slicer', dateParams);
 
-        return async function sliceDate(): Promise<SliceResults> {
+        return async function sliceDate(): Promise<DateSlicerResults> {
             if (dateParams.start.isSameOrAfter(dateParams.limit)) {
                 // we are done
                 // if steaming and there is more work, then continue

@@ -1,4 +1,4 @@
-import { TypeConfigFields } from '@terascope/data-types';
+import { DataTypeFields } from '@terascope/types';
 
 const data = [
     {
@@ -10003,7 +10003,7 @@ const data = [
     }
 ];
 
-const types: TypeConfigFields = {
+const types: DataTypeFields = {
     ip: { type: 'IP' },
     userAgent: { type: 'Keyword' },
     url: { type: 'Keyword' },

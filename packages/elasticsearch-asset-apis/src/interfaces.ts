@@ -98,6 +98,12 @@ export interface IDReaderSlice {
     key?: string;
 }
 
+/** What a date slicer fn will return */
+export type DateSlicerResults = SlicerDateResults | SlicerDateResults[] | null;
+
+/** What a id slicer fn will return */
+export type IDSlicerResults = IDReaderSlice | null;
+
 export type ParsedInterval = [number, moment.unitOfTime.Base];
 
 export interface DateSlicerArgs {
