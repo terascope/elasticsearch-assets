@@ -29,11 +29,11 @@
         "moment": "^2.29.1"
     },
     "peerDependencies": {
-        "@terascope/data-mate": "^0.25.0",
+        "@terascope/data-mate": "^0.25.2",
         "@terascope/data-types": "^0.27.2"
     },
     "devDependencies": {
-        "@terascope/data-mate": "^0.25.0",
+        "@terascope/data-mate": "^0.25.2",
         "@terascope/job-components": "^0.48.0",
         "@types/elasticsearch": "^5.0.36",
         "elasticsearch": "^15.4.1"
