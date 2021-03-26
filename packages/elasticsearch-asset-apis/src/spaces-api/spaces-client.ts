@@ -34,7 +34,7 @@ export default class SpacesClient {
     }
 
     async makeRequest(query: AnyObject): Promise<SearchResult> {
-        const { retry, config: { variables } } = this;
+        const { config: { variables } } = this;
         try {
             const {
                 token,
@@ -52,7 +52,10 @@ export default class SpacesClient {
                 responseType: 'json',
                 json,
                 timeout: this.config.timeout,
-                retry,
+                retry: {
+                    limit: this.retry,
+                    methods: ['POST', 'GET'],
+                },
                 headers: this.config.headers || {},
             });
 
@@ -276,7 +279,10 @@ export default class SpacesClient {
                 searchParams: { token },
                 responseType: 'json',
                 timeout: 1000000,
-                retry: 0
+                retry: {
+                    limit: this.retry,
+                    methods: ['POST', 'GET'],
+                }
             });
 
             return {
