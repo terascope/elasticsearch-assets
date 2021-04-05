@@ -23,7 +23,7 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/elasticsearch-api": "^2.18.5",
+        "@terascope/elasticsearch-api": "^2.18.7",
         "@terascope/utils": "^0.36.7",
         "got": "^11.8.2",
         "moment": "^2.29.1"
