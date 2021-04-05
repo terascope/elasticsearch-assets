@@ -19,7 +19,7 @@
         "@terascope/data-mate": "^0.26.1",
         "@terascope/elasticsearch-api": "^2.18.5",
         "@terascope/elasticsearch-asset-apis": "^0.3.3",
-        "@terascope/job-components": "^0.48.2",
+        "@terascope/job-components": "^0.48.4",
         "@terascope/teraslice-state-storage": "^0.25.7",
         "@terascope/utils": "^0.36.7",
         "datemath-parser": "^1.0.6",
