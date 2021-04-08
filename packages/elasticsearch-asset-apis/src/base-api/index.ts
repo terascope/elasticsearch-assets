@@ -1,4 +1,3 @@
-import elasticAPI from '@terascope/elasticsearch-api';
 import { EventEmitter } from 'events';
 import {
     AnyObject,
@@ -13,12 +12,11 @@ import {
     isValidDate,
     isFunction,
     isString,
-    get
 } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
-import { CountParams, SearchParams, Client } from 'elasticsearch';
+import type { CountParams, IndicesGetSettingsParams, SearchParams } from 'elasticsearch';
 import { dateSlicer } from '../elasticsearch-date-slicer';
 import { idSlicer } from '../elasticsearch-id-slicer';
 import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
@@ -45,19 +43,15 @@ import {
     DateSlicerConfig,
     IDSlicerArgs,
     IDSlicerConfig,
-    ElasticsearchSenderConfig,
     DateSlicerResults,
     IDSlicerResults
 } from '../interfaces';
-import SpacesClient from '../spaces-api/spaces-client';
 import { WindowState } from '../window-state';
-import { createBulkSenderAPI } from '../elasticsearch-bulk-sender';
-import { ElasticsearchSender } from '../elasticsearch-bulk-sender/bulk-sender';
+import { ReaderClient, SettingResults } from '../reader-client';
 
-type ReaderClient = Client | SpacesClient
 type FetchDate = moment.Moment | null;
 
-function isValidDataTypeConfig(record: any): record is DataTypeConfig {
+function isValidDataTypeConfig(record: unknown): record is DataTypeConfig {
     if (!record || !isSimpleObject(record)) return false;
     if (!record.version || !isNumber(record.version)) return false;
     if (!record.fields || !isSimpleObject(record.fields)) return false;
@@ -68,32 +62,26 @@ function isValidDataTypeConfig(record: any): record is DataTypeConfig {
 export class BaseReaderAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
-    private _baseClient: AnyObject;
-    protected readonly client: elasticAPI.Client;
-    private windowSize: undefined | number = undefined;
+    protected readonly client: ReaderClient;
+    private windowSize: number|undefined = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
 
     constructor(
         config: ESReaderOptions, client: ReaderClient, emitter: EventEmitter, logger: Logger
     ) {
-        const { connection, index, time_resolution } = config;
-        const clientConfig = {
-            full_response: false,
-            connection,
-            index
-        };
+        const { time_resolution } = config;
 
         if (config.use_data_frames) {
-            clientConfig.full_response = true;
-            if (!isValidDataTypeConfig(config.type_config)) throw new Error('Parameter "type_config" must be set if DataFrames are being returned');
+            if (!isValidDataTypeConfig(config.type_config)) {
+                throw new Error('Parameter "type_config" must be set if DataFrames are being returned');
+            }
         }
 
         this.config = Object.freeze(config);
         this.emitter = emitter;
         this.logger = logger;
-        this._baseClient = client;
-        this.client = elasticAPI(client, logger, clientConfig);
+        this.client = client;
         const timeResolution = time_resolution ? dateOptions(time_resolution) : '';
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
     }
@@ -114,53 +102,21 @@ export class BaseReaderAPI {
         // if we did go ahead and complete query
         const query = buildQuery(this.config, queryParams);
         query.size = this.windowSize;
-        const start = Date.now();
-        // this could be a full  ES request, Spaces Request, or an array of data-entities
-        const searchResults = await this._searchRequest(query) as any;
 
-        const searchEnd = Date.now();
-
-        if (this.config.use_data_frames) {
-            const typeConfig = this.config.type_config as DataTypeConfig;
-            const records = searchResults.hits.hits.map((data: AnyObject) => data._source);
-            const metrics: AnyObject = {
-                search_time: searchEnd - start,
-                fetched: records.length,
-                total: searchResults.hits.total
-            };
-
-            // we do not have access to complexity right now
-            return DataFrame.fromJSON(
-                typeConfig,
-                records,
-                {
-                    name: '<unknown>',
-                    metadata: {
-                        search_end_time: searchEnd,
-                        metrics
-                    }
-                }
-            );
-        }
-
-        return searchResults;
+        return this.client.search(
+            query, this.config.use_data_frames ?? false, this.config.type_config
+        );
     }
 
-    async _searchRequest(query: SearchParams): Promise<DataEntity[]> {
-        return this.client.search(query);
-    }
-
-    makeBulkSender(bulkConfig: Partial<ElasticsearchSenderConfig> = {}): ElasticsearchSender {
-        const { client } = this;
-        const { index, connection, size } = this.config;
-        const config = {
-            index,
-            connection,
-            size,
-            ...bulkConfig
-        };
-
-        return createBulkSenderAPI({ client, config });
+    _searchRequest(query: SearchParams, fullResponse?: false): Promise<DataEntity[]>;
+    _searchRequest(query: SearchParams, fullResponse: true): Promise<unknown>;
+    async _searchRequest(
+        query: SearchParams, fullResponse?: boolean
+    ): Promise<DataEntity[]|unknown> {
+        return this.client._searchRequest(
+            query,
+            fullResponse
+        );
     }
 
     async determineSliceInterval(
@@ -271,7 +227,7 @@ export class BaseReaderAPI {
         if (recoveryData && recoveryData.length > 0) {
             // TODO: verify what retryData is
             // real retry of executionContext here, need to reformat retry data
-            const parsedRetry = recoveryData.map((obj: any) => {
+            const parsedRetry = recoveryData.map((obj) => {
                 // regex to get str between # and *
                 if (obj.lastSlice) {
                     if (this.version <= 5) return obj.lastSlice.key.match(/#(.*)\*/)[1];
@@ -344,7 +300,7 @@ export class BaseReaderAPI {
 
         if (!this.windowSize) await this.setWindowSize();
 
-        const slicerFnArgs: Partial<SlicerArgs> = {
+        const slicerFnArgs: SlicerArgs = {
             lifecycle,
             numOfSlicers,
             logger: this.logger,
@@ -437,9 +393,11 @@ export class BaseReaderAPI {
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {
-        const [startDate, endDate] = await Promise.all([this.getIndexDate(this.config.start, 'start'), this.getIndexDate(this.config.end, 'end')]);
-        const finalDates = { start: startDate, limit: endDate };
-        return finalDates;
+        const [start, limit] = await Promise.all([
+            this.getIndexDate(this.config.start, 'start'),
+            this.getIndexDate(this.config.end, 'end')
+        ]);
+        return { start, limit };
     }
 
     private async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
@@ -466,8 +424,7 @@ export class BaseReaderAPI {
         }
 
         // using this query to catch potential errors even if a date is given already
-        const results = await this.client.search(query);
-        const data = get(results, 'hits.hits[0]._source', results[0]);
+        const [data] = await this._searchRequest(query, false);
 
         if (data == null) {
             this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.config.index}`);
@@ -484,13 +441,11 @@ export class BaseReaderAPI {
         // end date is non-inclusive, adding 1s so range will cover it
         const newDate = data[this.config.date_field_name];
         const time = moment(newDate).add(1, this.config.time_resolution);
-        const parsedDate = parseDate(time.format(this.dateFormat));
-
-        return parsedDate;
+        return parseDate(time.format(this.dateFormat));
     }
 
-    private async getSettings(query: AnyObject): Promise<AnyObject> {
-        return this._baseClient.indices.getSettings(query);
+    async getSettings(query: IndicesGetSettingsParams): Promise<SettingResults> {
+        return this.client.getSettings(query);
     }
 
     async getWindowSize(): Promise<number> {
@@ -523,9 +478,9 @@ export class BaseReaderAPI {
         return this.client.getESVersion();
     }
 
-    async verifyIndex(): Promise<boolean|undefined> {
+    async verifyIndex(): Promise<void> {
         // this is method in api is badly named
-        return this.client.version();
+        return this.client.verify();
     }
 }
 
@@ -533,7 +488,7 @@ function isObject(val: unknown): val is AnyObject {
     return isObjectEntity(val);
 }
 
-function difference(srcArray: string[] | null, valArray: string[]) {
+function difference(srcArray: string[] | null, valArray: string[]): string[] {
     const results: string[] = [];
     if (!srcArray) return results;
 
@@ -545,8 +500,8 @@ function difference(srcArray: string[] | null, valArray: string[]) {
     return results;
 }
 
-function divideKeyArray(keysArray: string[], num: number) {
-    const results = [];
+function divideKeyArray(keysArray: string[], num: number): string[][] {
+    const results: string[][] = [];
     const len = num;
 
     for (let i = 0; i < len; i += 1) {

@@ -64,7 +64,6 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         logger,
         dates: sliceDates,
         id,
-        interval,
         latencyInterval,
         primaryRange,
         windowState,
@@ -77,6 +76,11 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         type = null,
         keyType = IDType.base64url
     } = args;
+
+    if (!args.interval) {
+        throw new Error('Missing parameter interval');
+    }
+    const interval = args.interval!;
 
     if (subsliceByKey) {
         if (!isNumber(subsliceKeyThreshold)) {
@@ -267,7 +271,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
 
             if (!canProcessNextRange) return null;
 
-            const [step, unit] = interval as ParsedInterval;
+            const [step, unit] = interval;
             const [lStep, lUnit] = latencyInterval as ParsedInterval;
             const delayedBarrier = moment.utc().subtract(lStep, lUnit);
 
@@ -283,7 +287,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 interval
             };
 
-            const { dates } = await determineStartingPoint(config);
+            const { dates } = determineStartingPoint(config);
 
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window
@@ -386,5 +390,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         };
     }
 
+    if (!sliceDates) {
+        throw new Error('Missing parameter sliceDates');
+    }
     return makeDateSlicer(sliceDates, id);
 }

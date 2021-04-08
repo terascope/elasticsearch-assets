@@ -1,24 +1,20 @@
-import type { Client, SearchResponse } from 'elasticsearch';
+import type {
+    IndicesGetSettingsParams,
+    SearchParams
+} from 'elasticsearch';
 import {
-    Logger, TSError, get, AnyObject, withoutNil
+    Logger, TSError, get, AnyObject, withoutNil, DataEntity
 } from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/data-types';
 import got from 'got';
+import { DataFrame } from '@terascope/data-mate';
 import { SpacesAPIConfig } from '../interfaces';
+import { ReaderClient, SettingResults } from '../reader-client';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-interface SettingResults {
-    [key: string]: {
-        settings: {
-            'index.max_result_window': number
-        },
-        defaults: AnyObject
-    }
-}
-
-export default class SpacesClient {
+export default class SpacesClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     readonly config: SpacesAPIConfig;
@@ -80,9 +76,11 @@ export default class SpacesClient {
         }
     }
 
-    async apiSearch(queryConfig: AnyObject): Promise<AnyObject> {
+    async apiSearch(queryConfig: SearchParams): Promise<SearchResult> {
         const { config } = this;
+
         const fields = get(queryConfig, '_source', null);
+
         const dateFieldName = this.config.date_field_name;
         // put in the dateFieldName into fields so date reader can work
         if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
@@ -118,7 +116,7 @@ export default class SpacesClient {
             } else {
                 luceneQuery = _parseEsQ();
             }
-            // geo sort will be taken care of in the teraserver search api
+            // geo sort will be taken care of in the spaces search api
             if (queryConfig.body && queryConfig.body.sort && queryConfig.body.sort.length > 0) {
                 queryConfig.body.sort.forEach((sortType: any) => {
                     // We are checking for date sorts, geo sorts are handled by _parseGeoQuery
@@ -197,34 +195,7 @@ export default class SpacesClient {
 
         const query = parseQueryConfig(mustQuery);
 
-        try {
-            return this.makeRequest(query);
-        } catch (err) {
-            return Promise.reject(new TSError(err, { reason: `error while calling endpoint ${this.uri}` }));
-        }
-    }
-
-    private _makeESCompatible(response: AnyObject): SearchResponse<any> {
-        let esResults: any[] = [];
-
-        if (response.results) {
-            esResults = response.results.map((result: any) => ({
-                _source: result
-            }));
-        }
-
-        return {
-            hits: {
-                hits: esResults,
-                total: response.total
-            },
-            timed_out: false,
-            _shards: {
-                total: 1,
-                successful: 1,
-                failed: 0
-            },
-        } as SearchResponse<any>;
+        return this.makeRequest(query);
     }
 
     async getDataType(): Promise<DataTypeConfig> {
@@ -240,37 +211,83 @@ export default class SpacesClient {
         return spaceResults.type_config as DataTypeConfig;
     }
 
-    async search(queryConfig: AnyObject): Promise<SearchResponse<any>> {
-        const spaceResults = await this.apiSearch(queryConfig);
-        return this._makeESCompatible(spaceResults);
-    }
+    search(
+        query: SearchParams,
+        useDataFrames: false,
+        typeConfig?: DataTypeConfig
+    ): Promise<DataEntity[]>;
+    search(
+        query: SearchParams,
+        useDataFrames: true,
+        typeConfig: DataTypeConfig
+    ): Promise<DataFrame>;
+    async search(
+        query: SearchParams,
+        useDataFrames: boolean,
+        typeConfig?: DataTypeConfig
+    ): Promise<DataEntity[]|DataFrame> {
+        if (!useDataFrames) {
+            return this._searchRequest(query, false);
+        }
 
-    async count(queryConfig: AnyObject): Promise<SearchResponse<any>> {
-        queryConfig.size = 0;
-        const spaceResults = await this.apiSearch(queryConfig);
-        return this._makeESCompatible(spaceResults);
-    }
+        const start = Date.now();
+        const searchResults = await this._searchRequest(
+            query, true
+        );
 
-    async version(): Promise<void> {}
-
-    get cluster(): Partial<Client['cluster']> {
-        const getSettings = this.getSettings.bind(this);
-
-        return {
-            async stats() {
-                return new Promise(((resolve) => {
-                    resolve({
-                        nodes: {
-                            versions: ['0.5']
-                        }
-                    });
-                }));
-            },
-            getSettings
+        const searchEnd = Date.now();
+        const records = searchResults.results.map((data) => data._source);
+        const metrics: AnyObject = {
+            search_time: searchEnd - start,
+            fetched: searchResults.returning,
+            total: searchResults.total
         };
+
+        // we do not have access to complexity right now
+        return DataFrame.fromJSON(
+            typeConfig!,
+            records,
+            {
+                name: '<unknown>',
+                metadata: {
+                    search_end_time: searchEnd,
+                    metrics
+                }
+            }
+        );
     }
 
-    async getSettings(): Promise<SettingResults> {
+    _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
+    _searchRequest(query: SearchParams, fullResponse: true): Promise<SearchResult>;
+    async _searchRequest(
+        query: SearchParams,
+        fullResponse?: boolean
+    ): Promise<DataEntity[]|SearchResult> {
+        if (fullResponse) {
+            return this.apiSearch(query);
+        }
+        const result = await this.apiSearch(query);
+        return result.results.map((record) => DataEntity.make(record, {
+            // FIXME
+        }));
+    }
+
+    async count(queryConfig: SearchParams): Promise<number> {
+        queryConfig.size = 0;
+        const spaceResults = await this._searchRequest(queryConfig, true);
+        return spaceResults.total;
+    }
+
+    /**
+     * @todo this should verify the endpoint is valid
+    */
+    async verify(): Promise<void> {}
+
+    getESVersion(): number {
+        return 6;
+    }
+
+    async getSettings(_query: IndicesGetSettingsParams): Promise<SettingResults> {
         const { index, endpoint, token } = this.config;
         const uri = `${endpoint}/${index}/_info`;
 
@@ -309,13 +326,6 @@ export default class SpacesClient {
                 }
             });
         }
-    }
-
-    get indices(): Partial<Client['indices']> {
-        const getSettings = this.getSettings.bind(this);
-        return {
-            getSettings
-        };
     }
 }
 

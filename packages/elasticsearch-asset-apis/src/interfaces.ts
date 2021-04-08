@@ -61,16 +61,16 @@ export interface SlicerArgs {
     keyType?: IDType;
     type: string | null;
     startingKeyDepth?: number,
-    interval: ParsedInterval;
+    interval?: ParsedInterval;
     latencyInterval?: ParsedInterval;
     lifecycle: LifeCycle;
     numOfSlicers: number;
     logger: Logger;
-    dates: SlicerDates;
+    dates?: SlicerDates;
     primaryRange?: DateSegments;
     id: number;
     events: EventEmitter;
-    windowState: WindowState;
+    windowState?: WindowState;
     version: number;
     countFn: (args: AnyObject) => Promise<number>
 }

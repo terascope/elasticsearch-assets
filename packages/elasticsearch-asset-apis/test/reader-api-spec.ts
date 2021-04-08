@@ -16,6 +16,7 @@ import {
 import evenSpread from './fixtures/data/even-spread';
 import {
     createElasticsearchReaderAPI,
+    ElasticsearchReaderClient,
     ESReaderOptions,
     IDType,
     InputDateSegments,
@@ -29,11 +30,18 @@ describe('Reader API', () => {
     const emitter = new EventEmitter();
     const idFieldName = 'uuid';
 
-    function makeIndex(str: string) {
+    function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
     }
 
     const evenIndex = makeIndex(evenSpread.index);
+
+    const readerClient = new ElasticsearchReaderClient(
+        client,
+        { index: evenIndex },
+        logger,
+    );
+
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const version = getESVersion(client);
@@ -83,7 +91,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const results = await api.determineDateRanges();
@@ -102,7 +110,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const dates = await api.determineDateRanges() as InputDateSegments;
@@ -119,7 +127,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeDateSlicer({
@@ -150,7 +158,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
             // query is set to * above
             const count = await api.count();
@@ -164,7 +172,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const results = await api.fetch() as DataFrame;
@@ -180,7 +188,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const size = await api.getWindowSize();
@@ -194,7 +202,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
@@ -218,7 +226,14 @@ describe('Reader API', () => {
             } as any;
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger: testLogger, emitter
+                config,
+                client: new ElasticsearchReaderClient(
+                    client,
+                    { index: evenIndex },
+                    testLogger
+                ),
+                logger: testLogger,
+                emitter
             });
 
             await api.verifyIndex();
@@ -233,7 +248,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeIDSlicer({
@@ -290,7 +305,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const results = await api.determineDateRanges();
@@ -309,7 +324,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const dates = await api.determineDateRanges() as InputDateSegments;
@@ -326,7 +341,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeDateSlicer({
@@ -357,7 +372,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
             // query is set to * above
             const count = await api.count();
@@ -371,7 +386,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const results = await api.fetch() as DataEntity[];
@@ -401,7 +416,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const size = await api.getWindowSize();
@@ -415,7 +430,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
@@ -439,7 +454,14 @@ describe('Reader API', () => {
             } as any;
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger: testLogger, emitter
+                config,
+                client: new ElasticsearchReaderClient(
+                    client,
+                    { index: evenIndex },
+                    testLogger
+                ),
+                logger: testLogger,
+                emitter
             });
 
             await api.verifyIndex();
@@ -454,7 +476,7 @@ describe('Reader API', () => {
             };
 
             const api = await createElasticsearchReaderAPI({
-                config, client, logger, emitter
+                config, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeIDSlicer({
@@ -491,7 +513,7 @@ describe('Reader API', () => {
 
             try {
                 const api = await createElasticsearchReaderAPI({
-                    config, client, logger, emitter
+                    config, client: readerClient, logger, emitter
                 });
 
                 await api.fetch({});

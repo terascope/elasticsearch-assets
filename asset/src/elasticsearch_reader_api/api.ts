@@ -7,7 +7,8 @@ import {
     AnyObject
 } from '@terascope/utils';
 import {
-    ESReaderOptions, createElasticsearchReaderAPI, BaseReaderAPI, ElasticsearchAPIArgs
+    ESReaderOptions, createElasticsearchReaderAPI,
+    BaseReaderAPI, ElasticsearchAPIArgs, ElasticsearchReaderClient
 } from '@terascope/elasticsearch-asset-apis';
 
 export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, AnyObject > {
@@ -34,7 +35,10 @@ export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, An
 
         const clientConfig: ElasticsearchAPIArgs = {
             config,
-            client: esClient,
+            client: new ElasticsearchReaderClient(esClient, {
+                connection,
+                index: config.index,
+            }, this.logger),
             emitter,
             logger: this.logger
         };

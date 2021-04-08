@@ -34,8 +34,5 @@ describe('Spaces Mock Client', () => {
 
         expect(client.search).toBeDefined();
         expect(client.count).toBeDefined();
-        expect(client.cluster).toBeDefined();
-        expect(client.cluster.stats).toBeDefined();
-        expect(client.cluster.getSettings).toBeDefined();
     });
 });
