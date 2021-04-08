@@ -407,10 +407,6 @@ export class BaseReaderAPI {
         const sortObj = {};
         const sortOrder = order === 'start' ? 'asc' : 'desc';
 
-        if (!this.config.date_field_name) {
-            throw new Error('Missing required date_field_name parameter');
-        }
-
         sortObj[this.config.date_field_name] = { order: sortOrder };
 
         const query: AnyObject = {
