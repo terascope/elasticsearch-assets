@@ -83,11 +83,14 @@ export default class SpacesReaderClient implements ReaderClient {
 
         const dateFieldName = this.config.date_field_name;
         // put in the dateFieldName into fields so date reader can work
-        if (fields && !fields.includes(dateFieldName)) fields.push(dateFieldName);
+        if (fields && !fields.includes(dateFieldName)) {
+            fields.push(dateFieldName);
+        }
+
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray: null | any[]) {
+        function parseQueryConfig(mustArray: null | any[]): AnyObject {
             const queryOptions = {
                 query_string: _parseEsQ,
                 range: _parseDate,
@@ -141,7 +144,7 @@ export default class SpacesReaderClient implements ReaderClient {
             });
         }
 
-        function _parseGeoQuery() {
+        function _parseGeoQuery(): AnyObject {
             const {
                 geo_box_top_left: geoBoxTopLeft,
                 geo_box_bottom_right: geoBoxBottomRight,
@@ -162,13 +165,13 @@ export default class SpacesReaderClient implements ReaderClient {
             return geoQuery;
         }
 
-        function _parseEsQ(op?: any) {
+        function _parseEsQ(op?: any): string {
             const { q } = queryConfig;
             const results = q || get(op, 'query', '');
             return results;
         }
 
-        function _parseWildCard(op: Record<string, string>) {
+        function _parseWildCard(op: Record<string, string>): string {
             let str = '';
 
             for (const [key, value] of Object.entries(op)) {
@@ -178,7 +181,7 @@ export default class SpacesReaderClient implements ReaderClient {
             return str;
         }
 
-        function _parseDate(op: any) {
+        function _parseDate(op: any): string {
             let range;
             if (op) {
                 range = op;
