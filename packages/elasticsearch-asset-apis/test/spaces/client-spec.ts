@@ -1,38 +1,106 @@
-import { debugLogger } from '@terascope/job-components';
-import { SpacesAPIConfig, IDType } from '../../src';
-import RawSpacesClient from '../../src/spaces-api/spaces-client';
+import { DataFrame } from '@terascope/data-mate';
+import { DataTypeConfig, FieldType } from '@terascope/types';
+import { debugLogger } from '@terascope/utils';
+import { SearchParams } from 'elasticsearch';
+import 'jest-extended';
+import nock from 'nock';
+import {
+    buildQuery,
+    IDType,
+    SpacesAPIConfig,
+    SpacesReaderClient
+} from '../../src';
 
-describe('Spaces Mock Client', () => {
-    const logger = debugLogger('spaces_reader');
+describe('Spaces Reader Client', () => {
     const baseUri = 'http://test.dev';
-    const testIndex = 'details-subset';
+    const index = 'test-endpoint';
 
-    it('should look like an elasticsearch client', () => {
-        const opConfig: SpacesAPIConfig = {
-            index: testIndex,
+    const maxSize = 100_000;
+    const token = 'test-token';
+    const logger = debugLogger('spaces-reader-client');
+
+    const dataTypeConfig: DataTypeConfig = {
+        version: 1,
+        fields: {
+            foo: { type: FieldType.Keyword },
+            bar: { type: FieldType.Keyword },
+            byte: { type: FieldType.Byte },
+        }
+    };
+
+    let scope: nock.Scope;
+
+    function newClient(overrides?: Partial<SpacesAPIConfig>): SpacesReaderClient {
+        return new SpacesReaderClient({
             endpoint: baseUri,
-            token: 'test-token',
-            size: 100000,
-            interval: '30s',
-            delay: '30s',
-            date_field_name: 'date',
-            timeout: 50,
-            start: null,
-            end: null,
-            preserve_id: false,
+            token,
+            timeout: 2000,
+            retry: 0,
+            index,
             subslice_by_key: false,
-            subslice_key_threshold: 50000,
-            fields: null,
-            key_type: IDType.base64,
+            subslice_key_threshold: 5000,
+            starting_key_depth: 0,
+            key_type: IDType.base64url,
+            time_resolution: 'ms',
+            size: maxSize,
+            date_field_name: 'created',
             connection: 'default',
-            time_resolution: 's',
-            type: 'someType',
-            starting_key_depth: 0
-        };
+            interval: '1m',
+            delay: '30s',
+            ...overrides,
+        }, logger);
+    }
 
-        const client = new RawSpacesClient(opConfig, logger);
+    beforeEach(() => {
+        scope = nock(baseUri);
+    });
 
-        expect(client.search).toBeDefined();
-        expect(client.count).toBeDefined();
+    afterEach(() => {
+        nock.cleanAll();
+    });
+
+    describe('when given a simple request', () => {
+        const client = newClient({
+            query: 'foo:bar'
+        });
+        let query: SearchParams;
+
+        beforeEach(async () => {
+            query = buildQuery(client.config, {
+                count: 100,
+            });
+
+            scope.post(`/${index}?token=${token}`, {
+                q: '(foo:bar)',
+                size: 100
+            }).reply(200, {
+                results: [{ foo: 'foo', bar: 'bar', byte: 10 }],
+                returning: 1,
+                total: 1000
+            });
+        });
+
+        it('should be able to make a search request without use data frames', async () => {
+            const result = await client.search(query, false);
+            expect(result).toEqual([
+                { foo: 'foo', bar: 'bar', byte: 10 }
+            ]);
+        });
+
+        it('should be able to make a search request with use data frames', async () => {
+            const result = await client.search(query, true, dataTypeConfig);
+            expect(result).toBeInstanceOf(DataFrame);
+            expect(result.toJSON()).toEqual([
+                { foo: 'foo', bar: 'bar', byte: 10 }
+            ]);
+            expect(result.metadata).toEqual({
+                metrics: {
+                    search_time: expect.any(Number),
+                    fetched: 1,
+                    total: 1000
+                },
+                search_end_time: expect.any(Number),
+            });
+        });
     });
 });

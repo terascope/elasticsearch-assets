@@ -400,12 +400,16 @@ export class BaseReaderAPI {
         return { start, limit };
     }
 
-    private async getIndexDate(date: null | string, order: string): Promise<FetchDate> {
+    private async getIndexDate(date: string|null|undefined, order: string): Promise<FetchDate> {
         // we have a date, parse and return it
         if (date) return parseDate(date);
         // we are in auto, so we determine each part
         const sortObj = {};
         const sortOrder = order === 'start' ? 'asc' : 'desc';
+
+        if (!this.config.date_field_name) {
+            throw new Error('Missing required date_field_name parameter');
+        }
 
         sortObj[this.config.date_field_name] = { order: sortOrder };
 

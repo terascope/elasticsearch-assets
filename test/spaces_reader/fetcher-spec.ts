@@ -197,10 +197,7 @@ describe('spaces_reader fetcher', () => {
 
                 scope.post(`/${testIndex}?token=${opConfig.token}`, query)
                     .reply(200, {
-                        results: [{
-                            _index: opConfig.index,
-                            _source: { some: 'data' }
-                        }],
+                        results: [{ some: 'data' }],
                         total: 1
                     });
 

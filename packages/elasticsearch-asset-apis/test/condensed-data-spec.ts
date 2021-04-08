@@ -69,7 +69,6 @@ describe('ReaderAPI with condensed time data', () => {
         start: null,
         end: null,
         interval: 'auto',
-        preserve_id: false,
         subslice_by_key: false,
         fields: [],
         delay: '1000s',

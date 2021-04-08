@@ -14,7 +14,7 @@ import { ReaderClient, SettingResults } from '../reader-client';
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-export default class SpacesClient implements ReaderClient {
+export default class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     readonly config: SpacesAPIConfig;
@@ -29,7 +29,7 @@ export default class SpacesClient implements ReaderClient {
         this.retry = config.retry ?? 0;
     }
 
-    async makeRequest(query: AnyObject): Promise<SearchResult> {
+    protected async makeRequest(query: AnyObject): Promise<SearchResult> {
         const { config: { variables } } = this;
         try {
             const {
@@ -76,7 +76,7 @@ export default class SpacesClient implements ReaderClient {
         }
     }
 
-    async apiSearch(queryConfig: SearchParams): Promise<SearchResult> {
+    protected async apiSearch(queryConfig: SearchParams): Promise<SearchResult> {
         const { config } = this;
 
         const fields = get(queryConfig, '_source', null);
@@ -236,7 +236,6 @@ export default class SpacesClient implements ReaderClient {
         );
 
         const searchEnd = Date.now();
-        const records = searchResults.results.map((data) => data._source);
         const metrics: AnyObject = {
             search_time: searchEnd - start,
             fetched: searchResults.returning,
@@ -246,7 +245,7 @@ export default class SpacesClient implements ReaderClient {
         // we do not have access to complexity right now
         return DataFrame.fromJSON(
             typeConfig!,
-            records,
+            searchResults.results,
             {
                 name: '<unknown>',
                 metadata: {
