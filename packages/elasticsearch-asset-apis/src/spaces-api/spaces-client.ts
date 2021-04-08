@@ -29,7 +29,10 @@ export default class SpacesReaderClient implements ReaderClient {
         this.retry = config.retry ?? 0;
     }
 
-    protected async makeRequest(query: AnyObject): Promise<SearchResult> {
+    protected async makeRequest(
+        query: AnyObject,
+        format?: 'json'|'dfjson'
+    ): Promise<SearchResult> {
         const { config: { variables } } = this;
         try {
             const {
@@ -43,9 +46,14 @@ export default class SpacesReaderClient implements ReaderClient {
                 variables
             });
 
+            const isJSONResponse = (!format || format === 'json');
             const { body } = await got.post<SearchResult>(this.uri, {
-                searchParams: withoutNil({ token, include_type_config }),
-                responseType: 'json',
+                searchParams: withoutNil({
+                    token,
+                    include_type_config,
+                    format
+                }),
+                responseType: isJSONResponse ? 'json' : undefined,
                 json,
                 timeout: this.config.timeout,
                 retry: {
@@ -76,7 +84,7 @@ export default class SpacesReaderClient implements ReaderClient {
         }
     }
 
-    protected async apiSearch(queryConfig: SearchParams): Promise<SearchResult> {
+    protected translateSearchQuery(queryConfig: SearchParams): AnyObject {
         const { config } = this;
 
         const fields = get(queryConfig, '_source', null);
@@ -196,9 +204,7 @@ export default class SpacesReaderClient implements ReaderClient {
             return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
         }
 
-        const query = parseQueryConfig(mustQuery);
-
-        return this.makeRequest(query);
+        return parseQueryConfig(mustQuery);
     }
 
     async getDataType(): Promise<DataTypeConfig> {
@@ -209,9 +215,8 @@ export default class SpacesReaderClient implements ReaderClient {
             include_type_config: true
         };
 
-        const spaceResults = await this.makeRequest(query) as AnyObject;
-
-        return spaceResults.type_config as DataTypeConfig;
+        const spaceResults = await this.makeRequest(query);
+        return spaceResults.type_config!;
     }
 
     search(
@@ -227,48 +232,50 @@ export default class SpacesReaderClient implements ReaderClient {
     async search(
         query: SearchParams,
         useDataFrames: boolean,
-        typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]|DataFrame> {
         if (!useDataFrames) {
             return this._searchRequest(query, false);
         }
 
         const start = Date.now();
-        const searchResults = await this._searchRequest(
-            query, true
+        const data = await this._searchRequest(
+            query, true, 'dfjson'
         );
+
+        const dataFrame = await DataFrame.deserialize(data);
 
         const searchEnd = Date.now();
-        const metrics: AnyObject = {
-            search_time: searchEnd - start,
-            fetched: searchResults.returning,
-            total: searchResults.total
-        };
+        dataFrame.metadata.search_end_time = searchEnd;
+        dataFrame.metadata.metrics.search_time = searchEnd - start;
+        dataFrame.metadata.metrics.fetched = dataFrame.metadata.metrics.returning;
+        delete dataFrame.metadata.metrics.returning;
 
         // we do not have access to complexity right now
-        return DataFrame.fromJSON(
-            typeConfig!,
-            searchResults.results,
-            {
-                name: '<unknown>',
-                metadata: {
-                    search_end_time: searchEnd,
-                    metrics
-                }
-            }
-        );
+        return dataFrame;
     }
 
     _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
-    _searchRequest(query: SearchParams, fullResponse: true): Promise<SearchResult>;
+    _searchRequest(
+        query: SearchParams,
+        fullResponse: true,
+        format: 'dfjson'
+    ): Promise<string>;
+    _searchRequest(
+        query: SearchParams,
+        fullResponse: true,
+        format?: 'json'|'dfjson'
+    ): Promise<SearchResult>;
     async _searchRequest(
         query: SearchParams,
-        fullResponse?: boolean
-    ): Promise<DataEntity[]|SearchResult> {
+        fullResponse?: boolean,
+        format?: 'json'|'dfjson'
+    ): Promise<DataEntity[]|SearchResult|string> {
+        const searchQuery = this.translateSearchQuery(query);
         if (fullResponse) {
-            return this.apiSearch(query);
+            return this.makeRequest(searchQuery, format);
         }
-        const result = await this.apiSearch(query);
+
+        const result = await this.makeRequest(searchQuery);
         return result.results.map((record) => DataEntity.make(record, {
             // FIXME
         }));
@@ -332,8 +339,12 @@ export default class SpacesReaderClient implements ReaderClient {
 }
 
 type SearchResult = {
-    info: string;
     total: number;
     returning: number;
     results: any[];
+    /**
+     * If include_type_config is set,
+     * we should get this back
+    */
+    type_config?: DataTypeConfig;
 };

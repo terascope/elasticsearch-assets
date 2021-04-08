@@ -69,7 +69,9 @@ describe('Spaces Reader Client', () => {
             query = buildQuery(client.config, {
                 count: 100,
             });
+        });
 
+        it('should be able to make a search request without use data frames', async () => {
             scope.post(`/${index}?token=${token}`, {
                 q: '(foo:bar)',
                 size: 100
@@ -78,9 +80,7 @@ describe('Spaces Reader Client', () => {
                 returning: 1,
                 total: 1000
             });
-        });
 
-        it('should be able to make a search request without use data frames', async () => {
             const result = await client.search(query, false);
             expect(result).toEqual([
                 { foo: 'foo', bar: 'bar', byte: 10 }
@@ -88,7 +88,26 @@ describe('Spaces Reader Client', () => {
         });
 
         it('should be able to make a search request with use data frames', async () => {
+            const frame = DataFrame.fromJSON(
+                dataTypeConfig,
+                [{ foo: 'foo', bar: 'bar', byte: 10 }],
+                {
+                    metadata: {
+                        metrics: {
+                            total: BigInt(1000),
+                            returning: 1,
+                        }
+                    }
+                }
+            );
+
+            scope.post(`/${index}?token=${token}&format=dfjson`, {
+                q: '(foo:bar)',
+                size: 100,
+            }).reply(200, frame.serialize());
+
             const result = await client.search(query, true, dataTypeConfig);
+
             expect(result).toBeInstanceOf(DataFrame);
             expect(result.toJSON()).toEqual([
                 { foo: 'foo', bar: 'bar', byte: 10 }
@@ -97,7 +116,7 @@ describe('Spaces Reader Client', () => {
                 metrics: {
                     search_time: expect.any(Number),
                     fetched: 1,
-                    total: 1000
+                    total: BigInt(1000)
                 },
                 search_end_time: expect.any(Number),
             });
