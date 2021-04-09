@@ -17,16 +17,24 @@ import {
     IDType,
     InputDateSegments,
     DateSlicerArgs,
+    ElasticsearchReaderClient
 } from '../src';
 
 describe('ReaderAPI with condensed time data', () => {
     const client = makeClient();
+
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
     const logger = debugLogger('api-condensed-test');
     const emitter = new EventEmitter();
 
     const condensedIndex = makeIndex(condensedData.index);
     const evenBulkData = condensedData.data.map((obj) => DataEntity.make(obj, { _key: obj.bytes }));
+
+    const readerClient = new ElasticsearchReaderClient(
+        client,
+        { index: condensedIndex },
+        logger,
+    );
 
     const version = getESVersion(client);
     const docType = version === 5 ? 'events' : '_doc';
@@ -61,7 +69,6 @@ describe('ReaderAPI with condensed time data', () => {
         start: null,
         end: null,
         interval: 'auto',
-        preserve_id: false,
         subslice_by_key: false,
         fields: [],
         delay: '1000s',
@@ -80,7 +87,7 @@ describe('ReaderAPI with condensed time data', () => {
         };
 
         const api = await createElasticsearchReaderAPI({
-            config, client, logger, emitter
+            config, client: readerClient, logger, emitter
         });
 
         const dates = await api.determineDateRanges() as InputDateSegments;
@@ -102,7 +109,7 @@ describe('ReaderAPI with condensed time data', () => {
         };
 
         const api = await createElasticsearchReaderAPI({
-            config, client, logger, emitter
+            config, client: readerClient, logger, emitter
         });
 
         const slicer = await api.makeDateSlicer(slicerConfig);

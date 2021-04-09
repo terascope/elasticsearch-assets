@@ -34,8 +34,8 @@ export interface IDSlicerArgs {
     startingKeyDepth: number;
     version: number;
     countFn: (args: AnyObject) => Promise<number>;
-    type: string | null;
-    idFieldName: string | null;
+    type?: string | null;
+    idFieldName?: string | null;
     size: number;
 }
 export interface IDSlicerConfig {
@@ -59,18 +59,18 @@ export interface SlicerArgs {
     subsliceKeyThreshold?: number;
     idFieldName?: string,
     keyType?: IDType;
-    type: string | null;
+    type?: string | null;
     startingKeyDepth?: number,
-    interval: ParsedInterval;
+    interval?: ParsedInterval;
     latencyInterval?: ParsedInterval;
     lifecycle: LifeCycle;
     numOfSlicers: number;
     logger: Logger;
-    dates: SlicerDates;
+    dates?: SlicerDates;
     primaryRange?: DateSegments;
     id: number;
     events: EventEmitter;
-    windowState: WindowState;
+    windowState?: WindowState;
     version: number;
     countFn: (args: AnyObject) => Promise<number>
 }
@@ -143,18 +143,17 @@ export interface ESReaderOptions {
     index: string;
     id_field_name?: string;
     size: number;
-    start: null | string;
-    end: null | string;
+    start?: null | string;
+    end?: null | string;
     interval: string;
-    preserve_id: boolean;
     date_field_name: string;
     query?: string;
-    fields: null | string[];
+    fields?: null | string[];
     delay: string;
     subslice_by_key: boolean;
     subslice_key_threshold: number;
     key_type: IDType;
-    type: string | null;
+    type?: string | null;
     time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
     geo_box_top_left?: string;
@@ -174,8 +173,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     endpoint: string;
     token: string;
     timeout: number;
-    full_response?: boolean;
-    headers?: AnyObject
+    headers?: AnyObject;
     retry?: number;
     variables?: xLuceneVariables
 }

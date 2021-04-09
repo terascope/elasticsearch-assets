@@ -1,12 +1,12 @@
 import { debugLogger, Logger } from '@terascope/utils';
 import { EventEmitter } from 'events';
-import { Client } from 'elasticsearch';
 import { BaseReaderAPI } from './base-api';
 import { ESReaderOptions } from './interfaces';
+import { ReaderClient } from './reader-client';
 
 export interface ElasticsearchAPIArgs {
     config: ESReaderOptions,
-    client: Client,
+    client: ReaderClient,
     logger?: Logger;
     emitter?: EventEmitter;
 }
