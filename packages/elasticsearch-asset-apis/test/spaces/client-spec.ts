@@ -1,6 +1,6 @@
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig, FieldType } from '@terascope/types';
-import { debugLogger } from '@terascope/utils';
+import { bigIntToJSON, debugLogger } from '@terascope/utils';
 import { SearchParams } from 'elasticsearch';
 import 'jest-extended';
 import nock from 'nock';
@@ -112,11 +112,14 @@ describe('Spaces Reader Client', () => {
             expect(result.toJSON()).toEqual([
                 { foo: 'foo', bar: 'bar', byte: 10 }
             ]);
+
+            expect(typeof result.metadata.metrics.total).toBe('bigint');
+            result.metadata.metrics.total = bigIntToJSON(result.metadata.metrics.total);
             expect(result.metadata).toEqual({
                 metrics: {
                     search_time: expect.any(Number),
                     fetched: 1,
-                    total: BigInt(1000)
+                    total: 1000
                 },
                 search_end_time: expect.any(Number),
             });
