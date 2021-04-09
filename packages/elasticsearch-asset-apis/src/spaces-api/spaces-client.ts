@@ -6,7 +6,7 @@ import {
     Logger, TSError, get, AnyObject, withoutNil, DataEntity
 } from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/data-types';
-import got from 'got';
+import got, { OptionsOfJSONResponseBody } from 'got';
 import { DataFrame } from '@terascope/data-mate';
 import { SpacesAPIConfig } from '../interfaces';
 import { ReaderClient, SettingResults } from '../reader-client';
@@ -29,40 +29,55 @@ export default class SpacesReaderClient implements ReaderClient {
         this.retry = config.retry ?? 0;
     }
 
+    getRequestOptions(
+        query: AnyObject,
+        format?: 'json'|'dfjson'
+    ): OptionsOfJSONResponseBody {
+        const {
+            token,
+            include_type_config,
+            ...queryParams
+        } = query;
+
+        const json = withoutNil({
+            ...queryParams,
+            variables: this.config.variables
+        });
+        const isJSONResponse = (!format || format === 'json');
+
+        return {
+            searchParams: withoutNil({
+                token,
+                include_type_config,
+                format
+            }),
+            responseType: isJSONResponse ? 'json' : undefined,
+            json,
+            timeout: this.config.timeout,
+            retry: {
+                limit: this.retry,
+                methods: ['POST', 'GET'],
+            },
+            headers: this.config.headers || {},
+        };
+    }
+
+    protected async makeRequest(
+        query: AnyObject,
+        format?: 'json'
+    ): Promise<SearchResult>
+    protected async makeRequest(
+        query: AnyObject,
+        format: 'dfjson'
+    ): Promise<string>
     protected async makeRequest(
         query: AnyObject,
         format?: 'json'|'dfjson'
-    ): Promise<SearchResult> {
-        const { config: { variables } } = this;
+    ): Promise<SearchResult|string> {
         try {
-            const {
-                token,
-                include_type_config,
-                ...queryParams
-            } = query;
-
-            const json = withoutNil({
-                ...queryParams,
-                variables
-            });
-
-            const isJSONResponse = (!format || format === 'json');
-            const { body } = await got.post<SearchResult>(this.uri, {
-                searchParams: withoutNil({
-                    token,
-                    include_type_config,
-                    format
-                }),
-                responseType: isJSONResponse ? 'json' : undefined,
-                json,
-                timeout: this.config.timeout,
-                retry: {
-                    limit: this.retry,
-                    methods: ['POST', 'GET'],
-                },
-                headers: this.config.headers || {},
-            });
-
+            const { body } = await got.post<SearchResult>(
+                this.uri, this.getRequestOptions(query, format)
+            );
             return body;
         } catch (err) {
             if (err instanceof got.TimeoutError) {
@@ -87,7 +102,7 @@ export default class SpacesReaderClient implements ReaderClient {
     protected translateSearchQuery(queryConfig: SearchParams): AnyObject {
         const { config } = this;
 
-        const fields = get(queryConfig, '_source', null);
+        const fields = get(queryConfig, '_source', null) as string[]|null;
 
         const dateFieldName = this.config.date_field_name;
         // put in the dateFieldName into fields so date reader can work
@@ -272,7 +287,10 @@ export default class SpacesReaderClient implements ReaderClient {
     ): Promise<DataEntity[]|SearchResult|string> {
         const searchQuery = this.translateSearchQuery(query);
         if (fullResponse) {
-            return this.makeRequest(searchQuery, format);
+            if (format === 'dfjson') {
+                return this.makeRequest(searchQuery, format);
+            }
+            return this.makeRequest(searchQuery);
         }
 
         const result = await this.makeRequest(searchQuery);
