@@ -1,6 +1,6 @@
 import 'jest-extended';
 import nock from 'nock';
-import { newTestJobConfig } from '@terascope/job-components';
+import { DataEntity, newTestJobConfig } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import MockClient from '../helpers/mock_client';
 
@@ -185,6 +185,8 @@ describe('spaces_reader fetcher', () => {
             // query size are overridden for unbounded fetches
             query.size = maxSize;
 
+            let results: DataEntity[];
+
             beforeEach(async () => {
                 scope.get(`/${testIndex}/_info?token=${opConfig.token}`)
                     .reply(200, {
@@ -202,17 +204,18 @@ describe('spaces_reader fetcher', () => {
                     });
 
                 await harness.initialize();
+                results = await harness.runSlice(msg);
             });
 
             afterEach(async () => {
                 await harness.shutdown();
             });
 
-            it('should make the request', async () => {
-                const results = await harness.runSlice(msg);
-
-                expect(results).toBeArrayOfSize(1);
+            it('should make the request and return the correct results', () => {
                 expect(scope.isDone()).toBeTrue();
+                expect(results).toEqual([
+                    DataEntity.make({ some: 'data' })
+                ]);
             });
         });
 
