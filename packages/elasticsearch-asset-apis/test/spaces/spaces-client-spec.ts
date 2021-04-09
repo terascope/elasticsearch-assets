@@ -95,7 +95,6 @@ describe('Spaces Reader Client', () => {
                     metadata: {
                         metrics: {
                             total: 1000,
-                            returning: 1,
                         }
                     }
                 }
