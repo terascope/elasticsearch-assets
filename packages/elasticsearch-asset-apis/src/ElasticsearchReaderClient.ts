@@ -1,7 +1,7 @@
 import elasticAPI from '@terascope/elasticsearch-api';
 import { DataFrame } from '@terascope/data-mate';
 import {
-    AnyObject, DataEntity, Logger
+    AnyObject, DataEntity, get, Logger
 } from '@terascope/utils';
 import type {
     Client, SearchParams, IndicesGetSettingsParams, SearchResponse, CountParams
@@ -64,10 +64,10 @@ export class ElasticsearchReaderClient implements ReaderClient {
 
         const searchEnd = Date.now();
         const records = searchResults.hits.hits.map((data) => data._source);
-        const metrics: AnyObject = {
-            search_time: searchEnd - start,
+        const metrics = {
+            fetch_time: searchEnd - start,
             fetched: records.length,
-            total: searchResults.hits.total
+            total: get(searchResults, 'hits.total.value', get(searchResults, 'hits.total'))
         };
 
         // we do not have access to complexity right now

@@ -114,7 +114,7 @@ describe('Spaces Reader Client', () => {
 
             expect(result.metadata).toEqual({
                 metrics: {
-                    search_time: expect.any(Number),
+                    fetch_time: expect.any(Number),
                     fetched: 1,
                     total: 1000
                 },

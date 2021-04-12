@@ -261,7 +261,7 @@ export default class SpacesReaderClient implements ReaderClient {
 
         const searchEnd = Date.now();
         dataFrame.metadata.search_end_time = searchEnd;
-        dataFrame.metadata.metrics.search_time = searchEnd - start;
+        dataFrame.metadata.metrics.fetch_time = searchEnd - start;
         dataFrame.metadata.metrics.fetched = dataFrame.size;
 
         // we do not have access to complexity right now
