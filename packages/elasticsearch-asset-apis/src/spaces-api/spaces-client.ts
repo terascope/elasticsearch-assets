@@ -26,7 +26,7 @@ export default class SpacesReaderClient implements ReaderClient {
         this.config = config;
         this.logger = logger;
         this.uri = `${config.endpoint}/${config.index}`;
-        this.retry = config.retry ?? 0;
+        this.retry = config.retry ?? 3;
     }
 
     getRequestOptions(
