@@ -169,7 +169,8 @@ describe('spaces_reader fetcher', () => {
                 endpoint: baseUri,
                 interval: '30s',
                 delay: '30s',
-                timeout: 50
+                timeout: 50,
+                retry: 0,
             }, _opConfig, { size: maxSize });
 
             const harness = new WorkerTestHarness(newTestJobConfig({
@@ -235,7 +236,8 @@ describe('spaces_reader fetcher', () => {
                         interval: '30s',
                         delay: '30s',
                         date_field_name: 'date',
-                        timeout: 75
+                        timeout: 75,
+                        retry: 0
                     },
                     {
                         _op: 'noop'
