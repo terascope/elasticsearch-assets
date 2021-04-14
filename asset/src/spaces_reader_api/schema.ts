@@ -40,7 +40,7 @@ const apiSchema = {
     },
     retry: {
         doc: 'The number of times that the spaces client will try to retry a request',
-        default: 0,
+        default: 3,
         format: Number
     }
 };
