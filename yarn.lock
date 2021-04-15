@@ -603,10 +603,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.27.1":
-  version "0.27.1"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.27.1.tgz#6f92665d8c10fa8907c07133f3d6d91cc510f15f"
-  integrity sha512-vfCYPX3cwkmFNt2Ffj/dFuR72FcaHKomQAz56r1p/2BANeN6fIJV5mvlmw3eTqTxfuTLCIzCdV2chPQgdW96Zw==
+"@terascope/data-mate@^0.27.1", "@terascope/data-mate@^0.27.2":
+  version "0.27.2"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.27.2.tgz#df34581a6b66dab0fca65150109e3447aa921ee8"
+  integrity sha512-FN0OSLke7TviOb+MlNpBjMejEql227OPlASr5xYDHuj987ncny0px720Uj4ShzvsGPquTvcVk1oo9OkcLLvoKw==
   dependencies:
     "@terascope/data-types" "^0.28.0"
     "@terascope/types" "^0.8.0"
@@ -617,8 +617,8 @@
     "@turf/circle" "^6.3.0"
     "@turf/clean-coords" "^6.2.0"
     "@turf/helpers" "^6.2.0"
-    awesome-phonenumber "^2.48.0"
-    date-fns "^2.19.0"
+    awesome-phonenumber "^2.49.0"
+    date-fns "^2.20.3"
     ip-bigint "^3.0.3"
     ip6addr "^0.2.3"
     ipaddr.js "^2.0.0"
@@ -1466,7 +1466,7 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-awesome-phonenumber@^2.48.0:
+awesome-phonenumber@^2.49.0:
   version "2.49.0"
   resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.49.0.tgz#6924dffcfbda969a11b7986c3ee0ce39d745819d"
   integrity sha512-XI5AtK8aEIhp4tcSYbqAkyZ6kfudR0FN544MR3ewQ/kqnHOCU2ZwiYRMmTYApXGuTD1Ph33tvR9D/wmxxzeE0Q==
@@ -2064,10 +2064,10 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^2.19.0:
-  version "2.20.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.20.0.tgz#df00ba9177fbea22d88010b5844ecc91e9e03ceb"
-  integrity sha512-nmA7y6aDH5+fknfJ0G77HQzUSfTPpq4ifq+c9blP9d+X9zs3kNjxC+t3pcbBMGTp262a6PJB3RVjLlxIgoMI+Q==
+date-fns@^2.20.3:
+  version "2.21.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.21.0.tgz#4672b8e926d1b37d5353dc14da44b883481ac927"
+  integrity sha512-lbAFpaKz7QuVxm6m1rmioh4BB2gmLx1r1JMYXU2A/ufT5ly4zEG7HYH4fvS/QfbdyC5rkYyiS30mYz4Q7XCO+w==
 
 datemath-parser@^1.0.6:
   version "1.0.6"
