@@ -32,49 +32,47 @@ import IDSchema from '../src/id_reader/schema';
 import ESStateStorageAPI from '../src/elasticsearch_state_storage/api';
 import ESStateStorageSchema from '../src/elasticsearch_state_storage/schema';
 
-const assetRepo = {
-    ASSETS: {
-        elasticsearch_bulk: {
-            Processor: ESBulkSender,
-            Schema: ESBulkSenderSchema
-        },
-        elasticsearch_data_generator: {
-            Fetcher: ESDataGenFetcher,
-            Slicer: ESDataGenSlicer,
-            Schema: ESDataGenSchema
-        },
-        elasticsearch_reader: {
-            Fetcher: ESDateFetcher,
-            Slicer: ESDateSlicer,
-            Schema: ESDateSchema
-        },
-        spaces_reader: {
-            Fetcher: SpacesFetcher,
-            Slicer: SpacesSlicer,
-            Schema: SpacesSchema
-        },
-        id_reader: {
-            Fetcher: IDFetcher,
-            Slicer: IDSlicer,
-            Schema: IDSchema
-        },
-        elasticsearch_reader_api: {
-            API: ESReaderAPI,
-            Schema: ESReaderAPISchema
-        },
-        elasticsearch_sender_api: {
-            API: ESSenderAPI,
-            Schema: ESSenderAPISchema
-        },
-        spaces_reader_api: {
-            API: SpacesReaderAPI,
-            Schema: SpacesReaderAPISchema
-        },
-        elasticsearch_state_storage: {
-            API: ESStateStorageAPI,
-            Schema: ESStateStorageSchema
-        },
-    }
+// Teraslice Asset Registry
+// This was added to enable esbuild based bundled assets.
+export const ASSETS = {
+    elasticsearch_bulk: {
+        Processor: ESBulkSender,
+        Schema: ESBulkSenderSchema
+    },
+    elasticsearch_data_generator: {
+        Fetcher: ESDataGenFetcher,
+        Slicer: ESDataGenSlicer,
+        Schema: ESDataGenSchema
+    },
+    elasticsearch_reader: {
+        Fetcher: ESDateFetcher,
+        Slicer: ESDateSlicer,
+        Schema: ESDateSchema
+    },
+    spaces_reader: {
+        Fetcher: SpacesFetcher,
+        Slicer: SpacesSlicer,
+        Schema: SpacesSchema
+    },
+    id_reader: {
+        Fetcher: IDFetcher,
+        Slicer: IDSlicer,
+        Schema: IDSchema
+    },
+    elasticsearch_reader_api: {
+        API: ESReaderAPI,
+        Schema: ESReaderAPISchema
+    },
+    elasticsearch_sender_api: {
+        API: ESSenderAPI,
+        Schema: ESSenderAPISchema
+    },
+    spaces_reader_api: {
+        API: SpacesReaderAPI,
+        Schema: SpacesReaderAPISchema
+    },
+    elasticsearch_state_storage: {
+        API: ESStateStorageAPI,
+        Schema: ESStateStorageSchema
+    },
 };
-
-export default assetRepo;
