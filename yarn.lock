@@ -603,10 +603,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.27.2":
-  version "0.27.2"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.27.2.tgz#df34581a6b66dab0fca65150109e3447aa921ee8"
-  integrity sha512-FN0OSLke7TviOb+MlNpBjMejEql227OPlASr5xYDHuj987ncny0px720Uj4ShzvsGPquTvcVk1oo9OkcLLvoKw==
+"@terascope/data-mate@^0.27.2", "@terascope/data-mate@^0.27.3":
+  version "0.27.3"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.27.3.tgz#4bf2cca9c6fdc6256a9d3c63afcf07fd8198aade"
+  integrity sha512-faBDalCe+HFkX5R61bEkFWbZueJhKp8Zr5zuoxM7jYR4nWwAQ2eHu0spiz6I1XjBL/XChMMp9dpL/Uz+vwFK6A==
   dependencies:
     "@terascope/data-types" "^0.28.0"
     "@terascope/types" "^0.8.0"
@@ -618,7 +618,7 @@
     "@turf/clean-coords" "^6.2.0"
     "@turf/helpers" "^6.2.0"
     awesome-phonenumber "^2.49.0"
-    date-fns "^2.20.3"
+    date-fns "^2.21.1"
     ip-bigint "^3.0.3"
     ip6addr "^0.2.3"
     ipaddr.js "^2.0.0"
@@ -2064,10 +2064,10 @@ data-urls@^2.0.0:
     whatwg-mimetype "^2.3.0"
     whatwg-url "^8.0.0"
 
-date-fns@^2.20.3:
-  version "2.21.0"
-  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.21.0.tgz#4672b8e926d1b37d5353dc14da44b883481ac927"
-  integrity sha512-lbAFpaKz7QuVxm6m1rmioh4BB2gmLx1r1JMYXU2A/ufT5ly4zEG7HYH4fvS/QfbdyC5rkYyiS30mYz4Q7XCO+w==
+date-fns@^2.21.1:
+  version "2.21.1"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-2.21.1.tgz#679a4ccaa584c0706ea70b3fa92262ac3009d2b0"
+  integrity sha512-m1WR0xGiC6j6jNFAyW4Nvh4WxAi4JF4w9jRJwSI8nBmNcyZXPcP9VUQG+6gHQXAmqaGEKDKhOqAtENDC941UkA==
 
 datemath-parser@^1.0.6:
   version "1.0.6"
