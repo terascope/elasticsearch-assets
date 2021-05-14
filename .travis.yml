@@ -2,15 +2,15 @@
 dist: bionic
 language: node_js
 node_js:
-  - '10.19'
-  - '12.20'
+  - '12.22'
+  - '14.17'
 os:
   - linux
   - osx
 branches:
   only:
-  - master
-  - /^v\d+\.\d+\.\d+/
+    - master
+    - /^v\d+\.\d+\.\d+/
 addons:
   apt:
     packages:
@@ -27,15 +27,9 @@ env:
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:
   exclude:
-  # Don't build es 7 on osx because it is redunant
+  # Don't build es 7 on osx because it is redundant
   - os: osx
     env: ELASTICSEARCH_VERSION=7.2.1
-  # Don't build es 7 on node 10
-  - node_js: '10.19'
-    env: ELASTICSEARCH_VERSION=7.2.1
-  # Don't build es 6 on node 10
-  - node_js: '10.19'
-    env: ELASTICSEARCH_VERSION=6.8.6
   # Don't build es 5 on node 12
   - node_js: '12.20'
     env: ELASTICSEARCH_VERSION=5.6
@@ -58,7 +52,9 @@ script:
         echo "* skipping tests for macos...";
     fi
   - yarn lint
+  - teraslice-cli -v
   - teraslice-cli assets build
+  - teraslice-cli assets build --bundle
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_deploy:
