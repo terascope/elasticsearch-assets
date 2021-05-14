@@ -1,6 +1,6 @@
 {
     "name": "@terascope/elasticsearch-asset-apis",
-    "version": "0.4.2",
+    "version": "0.5.0",
     "description": "Elasticsearch reader and sender apis",
     "publishConfig": {
         "access": "public"
