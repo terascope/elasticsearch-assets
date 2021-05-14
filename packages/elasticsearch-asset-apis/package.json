@@ -23,18 +23,18 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/data-mate": "^0.27.2",
-        "@terascope/elasticsearch-api": "^2.19.0",
-        "@terascope/utils": "^0.38.0",
+        "@terascope/data-mate": "^0.27.4",
+        "@terascope/elasticsearch-api": "^2.19.1",
+        "@terascope/utils": "^0.38.1",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
         "moment": "^2.29.1"
     },
     "peerDependencies": {
-        "@terascope/data-types": "^0.28.0"
+        "@terascope/data-types": "^0.28.1"
     },
     "devDependencies": {
-        "@terascope/job-components": "^0.50.1",
+        "@terascope/job-components": "^0.50.2",
         "@types/elasticsearch": "^5.0.37",
         "elasticsearch": "^15.4.1"
     },
