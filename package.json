@@ -21,6 +21,7 @@
         "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
         "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand",
         "publish:changed": "./scripts/publish.sh"
+
     },
     "repository": {
         "type": "git",
@@ -37,19 +38,19 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@terascope/data-types": "^0.28.0",
-        "@terascope/elasticsearch-api": "^2.19.0",
+        "@terascope/data-types": "^0.28.1",
+        "@terascope/elasticsearch-api": "^2.19.1",
         "@terascope/eslint-config": "^0.5.5",
-        "@terascope/job-components": "^0.50.1",
-        "@terascope/teraslice-state-storage": "^0.26.0",
+        "@terascope/job-components": "^0.50.2",
+        "@terascope/teraslice-state-storage": "^0.27.1",
         "@terascope/types": "^0.8.0",
         "@types/bluebird": "^3.5.34",
         "@types/elasticsearch": "^5.0.37",
         "@types/got": "^9.6.11",
         "@types/jest": "^26.0.23",
-        "@types/node": "^14.14.20",
+        "@types/node": "^15.0.3",
         "elasticsearch": "^15.4.1",
-        "elasticsearch-store": "^0.49.3",
+        "elasticsearch-store": "^0.49.4",
         "eslint": "^7.26.0",
         "jest": "^26.6.3",
         "jest-extended": "^0.11.5",
@@ -58,6 +59,6 @@
         "teraslice-test-harness": "^0.27.1",
         "ts-jest": "^26.5.6",
         "ts-node": "^9.1.1",
-        "typescript": "^4.2.3"
+        "typescript": "^4.2.4"
     }
 }
