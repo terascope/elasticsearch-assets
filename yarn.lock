@@ -697,14 +697,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.26.0":
-  version "0.26.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.26.0.tgz#884d1ab33e7920b041ca1dc6684285ffa00175f3"
-  integrity sha512-mnxatkXATrtGWFRSFmH0R66zWmwKpRL396SYqmQTWVEXXPwdo7Rxt6J62MTppjW2ZkumtiRYRXBTLe8vm4YX9A==
+"@terascope/teraslice-state-storage@^0.27.0":
+  version "0.27.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.27.0.tgz#c82b827e20386f5ddc5f622c9a7caa0003c031db"
+  integrity sha512-se0nW1FbZJhKFoGv32TUz1ioQ3bFvMS7NBNkPuccXVq1i0Hqh0j8oTkWVznr4zPxWpEkCcT6bh1EJvF0nfDG4A==
   dependencies:
     "@terascope/elasticsearch-api" "^2.19.0"
-    "@terascope/utils" "^0.37.0"
-    mnemonist "^0.38.3"
+    "@terascope/utils" "^0.38.0"
 
 "@terascope/types@^0.8.0":
   version "0.8.0"
@@ -723,6 +722,22 @@
     kind-of "^6.0.3"
     latlon-geohash "^1.1.0"
     lodash "^4.17.21"
+    p-map "^4.0.0"
+    shallow-clone "^3.0.1"
+
+"@terascope/utils@^0.38.0":
+  version "0.38.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.38.0.tgz#e840bea165c9a27c96e9f7b7143f3d1e51a1a596"
+  integrity sha512-vPXTB8xjkLvQjKWlF5Vrf6uNILgcE8qNT7n/WbziVEjVyu7ai28xWgwas09OFwZRIJQcBBspt7CoOsxRSbpfUA==
+  dependencies:
+    "@terascope/types" "^0.8.0"
+    debug "^4.3.1"
+    is-plain-object "^5.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash "^4.17.21"
+    mnemonist "^0.38.3"
     p-map "^4.0.0"
     shallow-clone "^3.0.1"
 
