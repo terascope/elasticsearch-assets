@@ -40,7 +40,7 @@
         "@terascope/data-types": "^0.28.0",
         "@terascope/elasticsearch-api": "^2.19.0",
         "@terascope/eslint-config": "^0.5.5",
-        "@terascope/job-components": "^0.50.0",
+        "@terascope/job-components": "^0.50.1",
         "@terascope/teraslice-state-storage": "^0.26.0",
         "@terascope/types": "^0.8.0",
         "@types/bluebird": "^3.5.34",
