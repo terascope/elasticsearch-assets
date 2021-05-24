@@ -27,35 +27,35 @@ env:
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:
   exclude:
-  # Don't build es 7 on osx because it is redundant
-  - os: osx
-    env: ELASTICSEARCH_VERSION=7.2.1
-  # Don't build es 7 on node 12 to reduce the number of test jobs
-  - node_js: '12.20'
-    env: ELASTICSEARCH_VERSION=7.2.1
-  # Don't build es 6 on node 12 to reduce the number of test jobs
-  - node_js: '12.20'
-    env: ELASTICSEARCH_VERSION=6.8.6
-  # Don't build es 5 on node 14 to reduce the number of test jobs
-  - node_js: '14.17'
-    env: ELASTICSEARCH_VERSION=5.6
+    # Don't build es 7 on osx because it is redundant
+    - os: osx
+      env: ELASTICSEARCH_VERSION=7.2.1
+    # Don't build es 7 on node 12 to reduce the number of test jobs
+    - node_js: '12.22'
+      env: ELASTICSEARCH_VERSION=7.2.1
+    # Don't build es 6 on node 12 to reduce the number of test jobs
+    - node_js: '12.22'
+      env: ELASTICSEARCH_VERSION=6.8.6
+    # Don't build es 5 on node 14 to reduce the number of test jobs
+    - node_js: '14.17'
+      env: ELASTICSEARCH_VERSION=5.6
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        docker run -d --publish "9200:9200"
-            --env "ES_JAVA_OPTS=-Xms256m -Xmx256m"
-            --env "network.host=0.0.0.0"
-            --env "discovery.type=single-node"
-            "blacktop/elasticsearch:$ELASTICSEARCH_VERSION";
+    docker run -d --publish "9200:9200"
+    --env "ES_JAVA_OPTS=-Xms256m -Xmx256m"
+    --env "network.host=0.0.0.0"
+    --env "discovery.type=single-node"
+    "blacktop/elasticsearch:$ELASTICSEARCH_VERSION";
     else
-        echo "* skipping docker run for macos...";
+    echo "* skipping docker run for macos...";
     fi
   - yarn build
   - yarn global add teraslice-cli
 script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-        yarn test:all;
+    yarn test:all;
     else
-        echo "* skipping tests for macos...";
+    echo "* skipping tests for macos...";
     fi
   - yarn lint
   - teraslice-cli -v
