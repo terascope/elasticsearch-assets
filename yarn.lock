@@ -704,6 +704,11 @@
     "@terascope/elasticsearch-api" "^2.20.0"
     "@terascope/utils" "^0.39.0"
 
+"@terascope/types@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.10.0.tgz#ed0f2e5614dcb45bfebc38e029ad880f9b868874"
+  integrity sha512-vRX1wDbjGqw+IiUB5ldbGWd9S4PX2roXFC9Ne2lv0Bo7oilwxCLOnMNUA0Na/59kXJQum489v4r4PZLGRTeiRA==
+
 "@terascope/types@^0.9.0":
   version "0.9.0"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.9.0.tgz#567e7deb1a9b620deab7507ad5d8fb27182eb101"
