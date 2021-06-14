@@ -1,6 +1,6 @@
 {
     "name": "@terascope/elasticsearch-asset-apis",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Elasticsearch reader and sender apis",
     "publishConfig": {
         "access": "public"
@@ -23,10 +23,10 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/data-mate": "^0.28.0",
-        "@terascope/data-types": "^0.29.0",
-        "@terascope/elasticsearch-api": "^2.20.0",
-        "@terascope/utils": "^0.39.0",
+        "@terascope/data-mate": "^0.29.2",
+        "@terascope/data-types": "^0.30.2",
+        "@terascope/elasticsearch-api": "^2.21.2",
+        "@terascope/utils": "^0.40.2",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
         "moment": "^2.29.1"
