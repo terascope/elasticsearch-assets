@@ -642,12 +642,12 @@
     lodash "^4.17.21"
     yargs "^17.0.1"
 
-"@terascope/elasticsearch-api@^2.21.2":
-  version "2.21.2"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.21.2.tgz#8de87867adb4b4651e5338e92bfc86d5b6d72157"
-  integrity sha512-R57b8gw6Cyjk8HYcYrvvjwOLND5ayAe+KhZ9bhXT6+9v49cTcpHzx+mBEf8n4xIE1Jdhfh/Hg7jNsuK3anCQ3Q==
+"@terascope/elasticsearch-api@^2.21.2", "@terascope/elasticsearch-api@^2.21.3":
+  version "2.21.3"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.21.3.tgz#ff8ef7335b43f8d12360173e3421dacb3beee64a"
+  integrity sha512-Fk9h+kuDrG9ExdT39ELdVd00RhXF987BFherd5uQqvB9/LAGUA+kxITa3Vtu+bPzTVDNIbrOsPbWDo8LhtUKmw==
   dependencies:
-    "@terascope/utils" "^0.40.2"
+    "@terascope/utils" "^0.40.3"
     bluebird "^3.7.2"
 
 "@terascope/eslint-config@^0.6.0":
@@ -696,23 +696,23 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.29.2":
-  version "0.29.2"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.29.2.tgz#a8b828fba1eff15a733c02ab85720fa515f7ed6c"
-  integrity sha512-+qtgg0GhLpXWrh4exqoxf+blesBObNBdEefKWjMMox+hQ5hdb7jyOM6lBtp5/5GIqfQJPGEEVDRCDAQSCRQBsg==
+"@terascope/teraslice-state-storage@^0.29.3":
+  version "0.29.3"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.29.3.tgz#f0e11a3bd977913d5c27abfea92a8460dbeca2c9"
+  integrity sha512-VsWzt6vig8WY7GwBkru2JZqrUoaD98RaD8WAzLnD51VZZRWV7vTMv8ywWCG7wbuqpYHpEFVRSSxqTQYqyrp69g==
   dependencies:
-    "@terascope/elasticsearch-api" "^2.21.2"
-    "@terascope/utils" "^0.40.2"
+    "@terascope/elasticsearch-api" "^2.21.3"
+    "@terascope/utils" "^0.40.3"
 
 "@terascope/types@^0.10.0":
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.10.0.tgz#ed0f2e5614dcb45bfebc38e029ad880f9b868874"
   integrity sha512-vRX1wDbjGqw+IiUB5ldbGWd9S4PX2roXFC9Ne2lv0Bo7oilwxCLOnMNUA0Na/59kXJQum489v4r4PZLGRTeiRA==
 
-"@terascope/utils@^0.40.2":
-  version "0.40.2"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.40.2.tgz#d4c8cf05916a608790e4611ad57cc10c77c58658"
-  integrity sha512-5j+RHg7M3mEy39KrPXypw06x/lsXDjJPQooUoj7qX4oI2jWGj3hA5VLwwnQsROmhH9QoWK11VV4AGmMbkzP2+g==
+"@terascope/utils@^0.40.2", "@terascope/utils@^0.40.3":
+  version "0.40.3"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.40.3.tgz#0358e6dd6fb020554a3ed562127505fb917a8d9f"
+  integrity sha512-OljeEalsS8hi2r8jxheAi3QlG2QnwQ8SFpcBQu5WZm5xuqVHIBj0mBrnAhzIEvpMEOzsxA+eRulX63QiZVzb7g==
   dependencies:
     "@terascope/types" "^0.10.0"
     "@turf/bbox" "^6.2.0"
