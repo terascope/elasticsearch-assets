@@ -43,7 +43,7 @@
         "@terascope/elasticsearch-api": "^2.21.2",
         "@terascope/eslint-config": "^0.6.0",
         "@terascope/job-components": "^0.52.2",
-        "@terascope/teraslice-state-storage": "^0.29.2",
+        "@terascope/teraslice-state-storage": "^0.29.4",
         "@terascope/types": "^0.10.0",
         "@types/bluebird": "^3.5.34",
         "@types/elasticsearch": "^5.0.37",
