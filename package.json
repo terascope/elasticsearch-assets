@@ -22,7 +22,6 @@
         "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
         "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand",
         "publish:changed": "./scripts/publish.sh"
-
     },
     "repository": {
         "type": "git",
@@ -53,12 +52,12 @@
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.51.4",
         "eslint": "^7.28.0",
-        "jest": "^26.6.3",
+        "jest": "^27.0.4",
         "jest-extended": "^0.11.5",
         "moment": "^2.29.1",
         "nock": "^13.1.0",
         "teraslice-test-harness": "^0.28.0",
-        "ts-jest": "^26.5.6",
+        "ts-jest": "^27.0.3",
         "typescript": "^4.3.2"
     }
 }
