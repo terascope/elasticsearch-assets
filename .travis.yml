@@ -41,6 +41,9 @@ jobs:
       env: ELASTICSEARCH_VERSION=5.6
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     docker run -d --publish "9200:9200"
     --env "ES_JAVA_OPTS=-Xms256m -Xmx256m"
     --env "network.host=0.0.0.0"
