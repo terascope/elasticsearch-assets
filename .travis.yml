@@ -41,7 +41,9 @@ jobs:
       env: ELASTICSEARCH_VERSION=5.6
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
-    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
+    else
+    echo "* skipping docker login for macos..."
     fi
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     docker run -d --publish "9200:9200"
