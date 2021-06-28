@@ -1,6 +1,6 @@
 {
     "name": "@terascope/elasticsearch-asset-apis",
-    "version": "0.5.1",
+    "version": "0.5.2",
     "description": "Elasticsearch reader and sender apis",
     "publishConfig": {
         "access": "public"
@@ -16,23 +16,25 @@
         "build:watch": "yarn build --watch",
         "test": "jest",
         "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
-        "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand"
+        "test:debug": "env DEBUG='*teraslice*' jest --detectOpenHandles --coverage=false --runInBand",
+        "test:7": "ELASTICSEARCH_VERSION=7.x jest",
+        "test:5": "ELASTICSEARCH_VERSION=5.6 jest"
     },
     "homepage": "https://github.com/terascope/elasticsearch-assets",
     "repository": "git@github.com:terascope/elasticsearch-assets.git",
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/data-mate": "^0.29.2",
-        "@terascope/data-types": "^0.30.2",
-        "@terascope/elasticsearch-api": "^2.21.2",
-        "@terascope/utils": "^0.40.2",
+        "@terascope/data-mate": "^0.29.4",
+        "@terascope/data-types": "^0.30.4",
+        "@terascope/elasticsearch-api": "^2.21.4",
+        "@terascope/utils": "^0.40.4",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
         "moment": "^2.29.1"
     },
     "devDependencies": {
-        "@terascope/job-components": "^0.52.2",
+        "@terascope/job-components": "^0.52.4",
         "@types/elasticsearch": "^5.0.37",
         "elasticsearch": "^15.4.1"
     },
