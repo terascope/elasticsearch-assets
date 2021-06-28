@@ -27,8 +27,8 @@ describe('Reader API', () => {
     const logger = debugLogger('api-dataFrame-test');
     const emitter = new EventEmitter();
     const idFieldName = 'uuid';
-    const baseIndex = 'es_d1:foo-v1-bar';
-    const queryIndex = 'es_d*:foo-v1-*';
+    const baseIndex = 'es_d1-foo-v1-bar';
+    const queryIndex = 'es_d*-foo-v1-*';
 
     function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
