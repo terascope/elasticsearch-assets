@@ -525,5 +525,5 @@ function indexMatcher(index: string): (input: string) => boolean {
         return (indexVal) => matchWildcard(index, indexVal);
     }
 
-    return (indexVal) => indexVal.match(index) != null;
+    return (indexVal) => indexVal.includes(index);
 }
