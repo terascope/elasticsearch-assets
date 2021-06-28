@@ -12,6 +12,8 @@ import {
     isValidDate,
     isFunction,
     isString,
+    isWildCardString,
+    matchWildcard
 } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -460,9 +462,10 @@ export class BaseReaderAPI {
         };
 
         const settings = await this.getSettings(query);
+        const matcher = indexMatcher(index);
 
         for (const [key, configs] of Object.entries(settings)) {
-            if (key.match(index)) {
+            if (matcher(key)) {
                 const defaultPath = configs.defaults[window];
                 const configPath = configs.settings[window];
                 // config goes first as it overrides an defaults
@@ -515,4 +518,12 @@ function divideKeyArray(keysArray: string[], num: number): string[][] {
     }
 
     return results;
+}
+
+function indexMatcher(index: string): (input: string) => boolean {
+    if (isWildCardString(index)) {
+        return (indexVal) => matchWildcard(index, indexVal);
+    }
+
+    return (indexVal) => indexVal.match(index) != null;
 }
