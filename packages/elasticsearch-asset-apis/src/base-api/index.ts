@@ -474,7 +474,7 @@ export class BaseReaderAPI {
             }
         }
 
-        throw new Error(`Could not find settings for index ${index}`);
+        return this.config.size;
     }
 
     get version(): number {
