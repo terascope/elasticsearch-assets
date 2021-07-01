@@ -650,6 +650,27 @@
     validator "^13.6.0"
     xlucene-parser "^0.37.4"
 
+"@terascope/data-mate@^0.30.0":
+  version "0.30.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.30.0.tgz#eb6a034442b13c2bdb09c22df0485bf9881e45d3"
+  integrity sha512-qsMIWS4/1X9xC2hiK/i538oVd5MOGiKXLpU2d8a1sEONuu+oj8V2lMwkl2Jf7U37IAIfKGBxVQC+uIoncahFIQ==
+  dependencies:
+    "@terascope/data-types" "^0.30.4"
+    "@terascope/types" "^0.10.0"
+    "@terascope/utils" "^0.40.4"
+    date-fns "^2.22.1"
+    ip-bigint "^3.0.3"
+    ip6addr "^0.2.3"
+    ipaddr.js "^2.0.1"
+    is-cidr "^4.0.2"
+    is-ip "^3.1.0"
+    jexl "^2.2.2"
+    mnemonist "^0.38.3"
+    uuid "^8.3.2"
+    valid-url "^1.0.9"
+    validator "^13.6.0"
+    xlucene-parser "^0.38.0"
+
 "@terascope/data-types@^0.30.4":
   version "0.30.4"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.30.4.tgz#d1b306a73227f2aa5be7f088afc854b9b5b39b71"
@@ -6147,6 +6168,15 @@ xlucene-parser@^0.37.4:
   version "0.37.4"
   resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.37.4.tgz#4d374989c807aa2ef70ee53a2a1a8deb4edd1bb0"
   integrity sha512-uS26buQFMHkhzHi3XpdGg5+bIIQTkM87KNR6EiEz/VsvlE1f3YuPxwEdw9nI1gC9X/RB+UbDvs5pJ9J3Y14OBQ==
+  dependencies:
+    "@terascope/types" "^0.10.0"
+    "@terascope/utils" "^0.40.4"
+    netmask "^2.0.2"
+
+xlucene-parser@^0.38.0:
+  version "0.38.0"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.38.0.tgz#dca9e2b85f59ce0fed1ba552b9d80bac9a7c35ad"
+  integrity sha512-Wzw93+hPHGKqldsqpW16qq+AbNdLoNXo9ENVkRmCIfLRaOHMGLArnxLrm9pjkMcA6+zQD2Oc/N5dVo4OMD5kUw==
   dependencies:
     "@terascope/types" "^0.10.0"
     "@terascope/utils" "^0.40.4"
