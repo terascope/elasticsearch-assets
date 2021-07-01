@@ -25,7 +25,7 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/data-mate": "^0.29.4",
+        "@terascope/data-mate": "^0.30.0",
         "@terascope/data-types": "^0.30.4",
         "@terascope/elasticsearch-api": "^2.21.4",
         "@terascope/utils": "^0.40.4",
