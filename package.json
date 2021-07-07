@@ -46,7 +46,7 @@
         "@terascope/types": "^0.10.0",
         "@types/bluebird": "^3.5.34",
         "@types/elasticsearch": "^5.0.38",
-        "@types/got": "^9.6.11",
+        "@types/got": "^9.6.12",
         "@types/jest": "^26.0.23",
         "@types/node": "^15.12.2",
         "elasticsearch": "^15.4.1",
