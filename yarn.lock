@@ -2264,10 +2264,10 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.52.0:
-  version "0.52.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.52.0.tgz#4f80f996d2135c44cbe2f166ef2e53fb105544e1"
-  integrity sha512-mA1GdXBG37eTbrQsH87DmCZA0Oaym3WCx29TeVx1OPdmolooFM+m4C0Ogy0RrYGFqidrNf8AZXwWkGWtAj6JMw==
+elasticsearch-store@^0.52.1:
+  version "0.52.1"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.52.1.tgz#5e8321396b7729887f7b087fdeea71ddaca45047"
+  integrity sha512-xR7uHlh35YTfgF6UltsqU1w6qEI2OutGZqThoYEUI+BqztGGB0Y+IufOYkG6c1lVV1Lek6eq9+xsjNmre7jzjA==
   dependencies:
     "@terascope/data-mate" "^0.30.0"
     "@terascope/data-types" "^0.30.4"
