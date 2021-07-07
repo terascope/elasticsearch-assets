@@ -35,7 +35,7 @@
     },
     "devDependencies": {
         "@terascope/job-components": "^0.52.4",
-        "@types/elasticsearch": "^5.0.37",
+        "@types/elasticsearch": "^5.0.38",
         "elasticsearch": "^15.4.1"
     },
     "engines": {
