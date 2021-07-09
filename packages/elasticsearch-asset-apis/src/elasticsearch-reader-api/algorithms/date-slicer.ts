@@ -2,7 +2,7 @@ import {
     cloneDeep, isNumber, TSError, isString
 } from '@terascope/utils';
 import moment from 'moment';
-import { idSlicer } from '../elasticsearch-id-slicer';
+import { idSlicer } from './id-slicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -21,8 +21,8 @@ import {
     dateFormatSeconds,
     dateOptions,
     determineStartingPoint
-} from './helpers';
-import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
+} from './date-helpers';
+import { getKeyArray } from './id-helpers';
 
 interface DateParams {
     start: moment.Moment;

@@ -7,7 +7,7 @@ import type {
     Client, SearchParams, SearchResponse, CountParams
 } from 'elasticsearch';
 import { DataTypeConfig } from '@terascope/types';
-import { ReaderClient, SettingResults } from './reader-client';
+import { ReaderClient, SettingResults } from './interfaces';
 
 export class ElasticsearchReaderClient implements ReaderClient {
     private readonly _baseClient: Client;

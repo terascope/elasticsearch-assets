@@ -18,11 +18,10 @@ import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import type { CountParams, SearchParams } from 'elasticsearch';
-import { dateSlicer } from '../elasticsearch-date-slicer';
-import { idSlicer } from '../elasticsearch-id-slicer';
-import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
-
 import {
+    dateSlicer,
+    idSlicer,
+    getKeyArray,
     buildQuery,
     dateOptions,
     processInterval,
@@ -31,7 +30,7 @@ import {
     parseDate,
     determineStartingPoint,
     delayedStreamSegment
-} from '../elasticsearch-date-slicer/helpers';
+} from './algorithms';
 import {
     ESReaderOptions,
     SlicerDateResults,
@@ -45,10 +44,11 @@ import {
     IDSlicerArgs,
     IDSlicerConfig,
     DateSlicerResults,
-    IDSlicerResults
-} from '../interfaces';
-import { WindowState } from '../window-state';
-import { ReaderClient, SettingResults } from '../reader-client';
+    IDSlicerResults,
+    ReaderClient,
+    SettingResults
+} from './interfaces';
+import { WindowState } from './WindowState';
 
 type FetchDate = moment.Moment | null;
 

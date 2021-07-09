@@ -7,13 +7,13 @@ import {
 import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody } from 'got';
 import { DataFrame } from '@terascope/data-mate';
-import { SpacesAPIConfig } from '../interfaces';
-import { ReaderClient, SettingResults } from '../reader-client';
+import { SpacesAPIConfig } from './interfaces';
+import { ReaderClient, SettingResults } from '../elasticsearch-reader-api/interfaces';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
-export default class SpacesReaderClient implements ReaderClient {
+export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
     readonly config: SpacesAPIConfig;

@@ -2,7 +2,7 @@ import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject, getTypeOf, AnyObject, isNumber
 } from '@terascope/utils';
-import { createSpacesAPI, SpacesAPIConfig, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
+import { createSpacesReaderAPI, SpacesAPIConfig, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
 
 export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, SpacesAPIConfig > {
     // TODO: this needs more validation
@@ -24,7 +24,7 @@ export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, 
         const emitter = this.context.apis.foundation.getSystemEvents();
         const spacesArgs = { config, logger: this.logger, emitter };
 
-        const client = await createSpacesAPI(spacesArgs);
+        const client = await createSpacesReaderAPI(spacesArgs);
 
         return { client, config };
     }
