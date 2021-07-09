@@ -6,12 +6,12 @@ import {
     SlicerRecoveryData,
 } from '@terascope/job-components';
 import moment from 'moment';
-import { DateSlicerArgs, BaseReaderAPI } from '@terascope/elasticsearch-asset-apis';
+import { DateSlicerArgs, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
 import { ESDateConfig } from '../elasticsearch_reader/interfaces';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
 export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
-    protected api!: BaseReaderAPI;
+    protected api!: ElasticsearchReaderAPI;
     protected hasUpdated = false;
     protected startTime = moment().toISOString();
 

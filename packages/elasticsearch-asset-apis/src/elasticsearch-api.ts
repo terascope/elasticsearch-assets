@@ -1,6 +1,6 @@
 import { debugLogger, Logger } from '@terascope/utils';
 import { EventEmitter } from 'events';
-import { BaseReaderAPI } from './base-api';
+import { ElasticsearchReaderAPI } from './elasticsearch-reader-api';
 import { ESReaderOptions } from './interfaces';
 import { ReaderClient } from './reader-client';
 
@@ -11,11 +11,11 @@ export interface ElasticsearchAPIArgs {
     emitter?: EventEmitter;
 }
 
-export async function createElasticsearchReaderAPI({
+export function createElasticsearchReaderAPI({
     config,
     client,
     logger = debugLogger('elasticsearch-api'),
     emitter = new EventEmitter()
-}: ElasticsearchAPIArgs): Promise<BaseReaderAPI> {
-    return new BaseReaderAPI(config, client, emitter, logger);
+}: ElasticsearchAPIArgs): ElasticsearchReaderAPI {
+    return new ElasticsearchReaderAPI(config, client, emitter, logger);
 }

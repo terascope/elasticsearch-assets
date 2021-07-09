@@ -1,4 +1,4 @@
-export * from './base-api';
+export * from './elasticsearch-reader-api';
 export * from './elasticsearch-api';
 export * from './elasticsearch-bulk-sender';
 export * from './elasticsearch-date-slicer/helpers';

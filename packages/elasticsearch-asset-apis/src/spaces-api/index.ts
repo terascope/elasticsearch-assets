@@ -1,7 +1,7 @@
 import { debugLogger, Logger } from '@terascope/utils';
 import { EventEmitter } from 'events';
 import SpacesReaderClient from './spaces-client';
-import { BaseReaderAPI } from '../base-api';
+import { ElasticsearchReaderAPI } from '../elasticsearch-reader-api';
 import { SpacesAPIConfig } from '../interfaces';
 
 interface SpacesAPIArgs {
@@ -16,12 +16,12 @@ export async function createSpacesAPI({
     config,
     logger = debugLogger('spaces-api'),
     emitter = new EventEmitter()
-}: SpacesAPIArgs): Promise<BaseReaderAPI> {
+}: SpacesAPIArgs): Promise<ElasticsearchReaderAPI> {
     const client = new SpacesReaderClient(config, logger);
 
     if (config.use_data_frames && !config.type_config) {
         config.type_config = await client.getDataType();
     }
 
-    return new BaseReaderAPI(config, client, emitter, logger);
+    return new ElasticsearchReaderAPI(config, client, emitter, logger);
 }

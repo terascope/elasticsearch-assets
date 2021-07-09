@@ -3,12 +3,12 @@ import {
     SlicerFn,
     SlicerRecoveryData
 } from '@terascope/job-components';
-import { BaseReaderAPI, IDSlicerConfig } from '@terascope/elasticsearch-asset-apis';
+import { ElasticsearchReaderAPI, IDSlicerConfig } from '@terascope/elasticsearch-asset-apis';
 import { ESIDReaderConfig } from './interfaces';
 import { ElasticReaderFactoryAPI, ElasticsearchReaderAPIConfig } from '../elasticsearch_reader_api/interfaces';
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
-    api!: BaseReaderAPI;
+    api!: ElasticsearchReaderAPI;
     version!: number;
     config!: ElasticsearchReaderAPIConfig;
 

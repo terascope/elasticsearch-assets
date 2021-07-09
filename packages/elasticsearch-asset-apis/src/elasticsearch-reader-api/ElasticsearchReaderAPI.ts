@@ -60,7 +60,7 @@ function isValidDataTypeConfig(record: unknown): record is DataTypeConfig {
     return true;
 }
 
-export class BaseReaderAPI {
+export class ElasticsearchReaderAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
     protected readonly client: ReaderClient;
@@ -397,6 +397,7 @@ export class BaseReaderAPI {
             // slicer will run and complete when a null is returned
             return async () => null;
         }
+
         // TODO: we might want to consider making an interval for each slicer range
         const interval = await this.determineSliceInterval(
             this.config.interval,

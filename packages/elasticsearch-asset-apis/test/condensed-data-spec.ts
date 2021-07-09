@@ -86,7 +86,7 @@ describe('ReaderAPI with condensed time data', () => {
             size: 100
         };
 
-        const api = await createElasticsearchReaderAPI({
+        const api = createElasticsearchReaderAPI({
             config, client: readerClient, logger, emitter
         });
 
@@ -108,7 +108,7 @@ describe('ReaderAPI with condensed time data', () => {
             numOfSlicers: 1,
         };
 
-        const api = await createElasticsearchReaderAPI({
+        const api = createElasticsearchReaderAPI({
             config, client: readerClient, logger, emitter
         });
 

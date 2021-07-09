@@ -89,7 +89,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -108,7 +108,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -125,7 +125,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -156,7 +156,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
             // query is set to * above
@@ -170,7 +170,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -186,7 +186,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -200,7 +200,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -224,7 +224,7 @@ describe('Reader API', () => {
                 }
             } as any;
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config,
                 client: new ElasticsearchReaderClient(
                     client,
@@ -246,7 +246,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -302,7 +302,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -321,7 +321,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -338,7 +338,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -369,7 +369,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
             // query is set to * above
@@ -383,7 +383,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -413,7 +413,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -427,7 +427,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -451,7 +451,7 @@ describe('Reader API', () => {
                 }
             } as any;
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config,
                 client: new ElasticsearchReaderClient(
                     client,
@@ -473,7 +473,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -510,7 +510,7 @@ describe('Reader API', () => {
             const errMsg = `Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of 10000 for index ${config.index}`;
 
             try {
-                const api = await createElasticsearchReaderAPI({
+                const api = createElasticsearchReaderAPI({
                     config, client: readerClient, logger, emitter
                 });
 

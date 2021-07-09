@@ -8,22 +8,32 @@ import {
 } from '@terascope/utils';
 import {
     ESReaderOptions, createElasticsearchReaderAPI,
-    BaseReaderAPI, ElasticsearchAPIArgs, ElasticsearchReaderClient
+    ElasticsearchReaderAPI, ElasticsearchAPIArgs, ElasticsearchReaderClient
 } from '@terascope/elasticsearch-asset-apis';
 
-export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, AnyObject > {
+export default class ElasticsearchReaderAPIFactory extends APIFactory<
+ElasticsearchReaderAPI, Partial<ESReaderOptions>
+> {
     // TODO: this needs more validation
     validateConfig(config: unknown): ESReaderOptions {
-        if (isNil(config)) throw new Error('No configuration was found or provided for elasticsearch_reader_api');
-        if (!isObject(config)) throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
-        if (isNil(config.connection) || !isString(config.connection)) throw new Error('Invalid parameter "connection", must provide a valid connection');
-        if (isNil(config.index) || !isString(config.index)) throw new Error('Invalid parameter "index", must provide a valid index');
+        if (isNil(config)) {
+            throw new Error('No configuration was found or provided for elasticsearch_reader_api');
+        }
+        if (!isObject(config)) {
+            throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
+        }
+        if (isNil(config.connection) || !isString(config.connection)) {
+            throw new Error('Invalid parameter "connection", must provide a valid connection');
+        }
+        if (isNil(config.index) || !isString(config.index)) {
+            throw new Error('Invalid parameter "index", must provide a valid index');
+        }
         return config as ESReaderOptions;
     }
 
     async create(
         _name: string, overrideConfigs: Partial<ESReaderOptions>
-    ): Promise<{ client: BaseReaderAPI, config: AnyObject }> {
+    ): Promise<{ client: ElasticsearchReaderAPI, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         const { connection } = config;
         const { client: esClient } = this.context.foundation.getConnection({
@@ -43,7 +53,7 @@ export default class ElasticsearchReaderAPI extends APIFactory<BaseReaderAPI, An
             logger: this.logger
         };
 
-        const client = await createElasticsearchReaderAPI(clientConfig);
+        const client = createElasticsearchReaderAPI(clientConfig);
 
         return { client, config };
     }

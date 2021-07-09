@@ -89,7 +89,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -120,7 +120,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
@@ -151,7 +151,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            const api = await createElasticsearchReaderAPI({
+            const api = createElasticsearchReaderAPI({
                 config, client: readerClient, logger, emitter
             });
 
