@@ -75,12 +75,19 @@ export interface SettingResults {
     }
 }
 
+/**
+ * This used a list of all of the ID slicer ranges, the
+ * index of the range will correlate with the slicer instance
+*/
+export type IDSlicerRanges = readonly (readonly string[])[];
+
 export enum IDType {
     base64url = 'base64url',
     base64 = 'base64',
     hexadecimal = 'hexadecimal',
     HEXADECIMAL = 'HEXADECIMAL'
 }
+
 export interface WildCardQuery {
     field: string;
     value: string;
@@ -99,8 +106,8 @@ export interface IDSlicerArgs {
     retryData?: any;
     logger: Logger;
     range?: SlicerDateResults;
-    keySet: string[];
-    baseKeyArray: string[];
+    keySet: readonly string[];
+    baseKeyArray: readonly string[];
     events: EventEmitter;
     startingKeyDepth: number;
     version: number;
@@ -109,6 +116,7 @@ export interface IDSlicerArgs {
     idFieldName?: string | null;
     size: number;
 }
+
 export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,

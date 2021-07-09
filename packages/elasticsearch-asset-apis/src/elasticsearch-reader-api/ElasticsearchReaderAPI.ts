@@ -29,7 +29,8 @@ import {
     dateFormatSeconds,
     parseDate,
     determineStartingPoint,
-    delayedStreamSegment
+    delayedStreamSegment,
+    determineIDSlicerRanges
 } from './algorithms';
 import {
     ESReaderOptions,
@@ -46,7 +47,8 @@ import {
     DateSlicerResults,
     IDSlicerResults,
     ReaderClient,
-    SettingResults
+    SettingResults,
+    IDSlicerRanges
 } from './interfaces';
 import { WindowState } from './WindowState';
 
@@ -159,81 +161,95 @@ export class ElasticsearchReaderAPI {
         this.windowSize = windowSize;
     }
 
-    private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
-        if (isObject(input)) {
-            if (!isNumber(input.slicerID)) {
-                throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
-            }
-            if (!isNumber(input.numOfSlicers)) {
-                throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
-            }
-            if (this.version >= 6 && (
-                !isString(input.idFieldName) || input.idFieldName.length === 0
-            )) {
-                throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
-            }
+    /**
+     * Use this determine all of the slice ranges for all of the slicers
+    */
+    makeIDSlicerRanges(config: Pick<IDSlicerConfig, 'keyRange'|'keyType'|'numOfSlicers'>): IDSlicerRanges {
+        const {
+            numOfSlicers,
+            keyRange,
+            keyType,
+        } = config;
 
-            if (input.recoveryData) {
-                if (Array.isArray(input.recoveryData)) {
-                    const areAllObjects = input.recoveryData.every((val) => isSimpleObject(val));
-                    if (!areAllObjects) throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
-                } else {
-                    throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(input.recoveryData)}`);
-                }
-            } else {
-                input.recoveryData = [];
-            }
-
-            if (!input.keyType || !Object.values(IDType).includes(input.keyType)) {
-                throw new Error(`Invalid parameter key_type, got ${input.keyType}`);
-            }
-            if (input.keyRange) {
-                if (input.keyRange.length === 0) {
-                    throw new Error('Invalid key_range parameter, must be an array with length > 0');
-                }
-                if (!input.keyRange.every(isString)) {
-                    throw new Error('Invalid key_range parameter, must be an array of strings');
-                }
-            }
-        } else {
-            throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
+        if (!keyType || !(keyType in IDType)) {
+            throw new Error(`Invalid parameter key_type, got ${keyType}`);
         }
 
-        return input as unknown as IDSlicerConfig;
+        if (keyRange) {
+            if (keyRange.length === 0) {
+                throw new Error('Invalid key_range parameter, must be an array with length > 0');
+            }
+            if (!keyRange.every(isString)) {
+                throw new Error('Invalid key_range parameter, must be an array of strings');
+            }
+        }
+
+        if (!isNumber(numOfSlicers)) {
+            throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(numOfSlicers)}`);
+        }
+
+        const baseKeyArray = getKeyArray(keyType);
+        // we slice as not to mutate for when this is called again
+        const keyArray: readonly string[] = keyRange ? keyRange.slice() : baseKeyArray;
+
+        if (difference(keyArray, baseKeyArray).length > 0) {
+            throw new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
+        }
+
+        return determineIDSlicerRanges(keyArray, numOfSlicers);
     }
 
-    async makeIDSlicer(args: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
-        const config = this.validateIDSlicerConfig(args);
+    /**
+     * Return an instance of the slicer using the id algorithm
+    */
+    async makeIDSlicer(config: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
+        if (!isNumber(config.slicerID)) {
+            throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
+        }
+
+        if (this.version >= 6 && (
+            !isString(config.idFieldName) || config.idFieldName.length === 0
+        )) {
+            throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(config.idFieldName)}`);
+        }
+
+        if (config.recoveryData) {
+            if (Array.isArray(config.recoveryData)) {
+                const areAllObjects = config.recoveryData.every(isSimpleObject);
+                if (!areAllObjects) throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+            } else {
+                throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(config.recoveryData)}`);
+            }
+        }
+
+        const ranges = this.makeIDSlicerRanges(config);
+
         const countFn = this.count.bind(this);
 
         const {
-            numOfSlicers,
             slicerID,
             keyRange,
             keyType,
             recoveryData,
             startingKeyDepth,
-            idFieldName
+            idFieldName,
         } = config;
+        const { type, size } = this.config;
 
         const baseKeyArray = getKeyArray(keyType);
         // we slice as not to mutate for when this is called again
-        const keyArray = keyRange ? keyRange.slice() : baseKeyArray.slice();
+        const keyArray: readonly string[] = keyRange ? keyRange.slice() : baseKeyArray;
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            const error = new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
-            return Promise.reject(error);
+            throw new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
         }
-
-        const keySet = divideKeyArray(keyArray, numOfSlicers);
-        const { type, size } = this.config;
 
         if (!this.windowSize) await this.setWindowSize();
 
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
             logger: this.logger,
-            keySet: keySet[slicerID],
+            keySet: ranges[slicerID],
             version: this.version,
             baseKeyArray,
             startingKeyDepth,
@@ -309,6 +325,9 @@ export class ElasticsearchReaderAPI {
         return input as unknown as DateSlicerConfig;
     }
 
+    /**
+     * Return an instance of the slicer using the date algorithm
+    */
     async makeDateSlicer(args: DateSlicerArgs): Promise<() => Promise<DateSlicerResults>> {
         const config = this.validateDateSlicerConfig(args);
         const {
@@ -525,7 +544,10 @@ function isObject(val: unknown): val is AnyObject {
     return isObjectEntity(val);
 }
 
-function difference(srcArray: string[] | null, valArray: string[]): string[] {
+function difference(
+    srcArray: readonly string[] | null,
+    valArray: readonly string[]
+): readonly string[] {
     const results: string[] = [];
     if (!srcArray) return results;
 
@@ -534,23 +556,6 @@ function difference(srcArray: string[] | null, valArray: string[]): string[] {
             results.push(val);
         }
     }
-    return results;
-}
-
-function divideKeyArray(keysArray: string[], num: number): string[][] {
-    const results: string[][] = [];
-    const len = num;
-
-    for (let i = 0; i < len; i += 1) {
-        let divideNum = Math.ceil(keysArray.length / len);
-
-        if (i === num - 1) {
-            divideNum = keysArray.length;
-        }
-
-        results.push(keysArray.splice(0, divideNum));
-    }
-
     return results;
 }
 
