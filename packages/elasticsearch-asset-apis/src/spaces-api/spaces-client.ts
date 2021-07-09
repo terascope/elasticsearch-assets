@@ -1,5 +1,4 @@
 import type {
-    IndicesGetSettingsParams,
     SearchParams
 } from 'elasticsearch';
 import {
@@ -313,7 +312,7 @@ export default class SpacesReaderClient implements ReaderClient {
         return 6;
     }
 
-    async getSettings(_query: IndicesGetSettingsParams): Promise<SettingResults> {
+    async getSettings(_index: string): Promise<SettingResults> {
         const { index, endpoint, token } = this.config;
         const uri = `${endpoint}/${index}/_info`;
 

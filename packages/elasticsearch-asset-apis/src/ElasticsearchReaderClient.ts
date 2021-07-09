@@ -4,7 +4,7 @@ import {
     AnyObject, DataEntity, get, Logger
 } from '@terascope/utils';
 import type {
-    Client, SearchParams, IndicesGetSettingsParams, SearchResponse, CountParams
+    Client, SearchParams, SearchResponse, CountParams
 } from 'elasticsearch';
 import { DataTypeConfig } from '@terascope/types';
 import { ReaderClient, SettingResults } from './reader-client';
@@ -105,7 +105,12 @@ export class ElasticsearchReaderClient implements ReaderClient {
         await this.client.version();
     }
 
-    getSettings(params: IndicesGetSettingsParams): Promise<SettingResults> {
-        return this._baseClient.indices.getSettings(params);
+    getSettings(index: string): Promise<SettingResults> {
+        return this._baseClient.indices.getSettings({
+            index,
+            flatSettings: true,
+            includeDefaults: true,
+            allowNoIndices: true
+        });
     }
 }

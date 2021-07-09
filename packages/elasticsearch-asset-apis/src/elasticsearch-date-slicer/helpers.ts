@@ -255,7 +255,7 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
-    startTime: moment.Moment | Date | string,
+    startTime: moment.Moment | Date | string|undefined,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
 ): { start: moment.Moment, limit: moment.Moment } {

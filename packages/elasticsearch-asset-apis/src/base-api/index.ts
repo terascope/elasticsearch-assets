@@ -6,7 +6,6 @@ import {
     getTypeOf,
     Logger,
     toNumber,
-    TSError,
     isSimpleObject,
     isNumber,
     isValidDate,
@@ -18,7 +17,7 @@ import {
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
-import type { CountParams, IndicesGetSettingsParams, SearchParams } from 'elasticsearch';
+import type { CountParams, SearchParams } from 'elasticsearch';
 import { dateSlicer } from '../elasticsearch-date-slicer';
 import { idSlicer } from '../elasticsearch-id-slicer';
 import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
@@ -128,7 +127,9 @@ export class BaseReaderAPI {
             return processInterval(interval, this.config.time_resolution, esDates);
         }
 
-        if (esDates == null) throw new Error('must provide dates to create interval');
+        if (esDates == null) {
+            throw new Error('Missing required dates to create interval');
+        }
 
         const count = await this.count({
             start: moment(esDates.start).format(this.dateFormat),
@@ -152,15 +153,25 @@ export class BaseReaderAPI {
     async setWindowSize(): Promise<void> {
         const { size } = this.config;
         const windowSize = await this.getWindowSize();
-        if (size > windowSize) throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
+        if (size > windowSize) {
+            throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
+        }
         this.windowSize = windowSize;
     }
 
     private validateIDSlicerConfig(input: unknown): IDSlicerConfig {
         if (isObject(input)) {
-            if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
-            if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
-            if (this.version >= 6 && (!isString(input.idFieldName) || input.idFieldName.length === 0)) throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
+            if (!isNumber(input.slicerID)) {
+                throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
+            }
+            if (!isNumber(input.numOfSlicers)) {
+                throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
+            }
+            if (this.version >= 6 && (
+                !isString(input.idFieldName) || input.idFieldName.length === 0
+            )) {
+                throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(input.idFieldName)}`);
+            }
 
             if (input.recoveryData) {
                 if (Array.isArray(input.recoveryData)) {
@@ -173,10 +184,16 @@ export class BaseReaderAPI {
                 input.recoveryData = [];
             }
 
-            if (!input.keyType || !Object.values(IDType).includes(input.keyType)) throw new Error(`Invalid parameter key_type, got ${input.keyType}`);
+            if (!input.keyType || !Object.values(IDType).includes(input.keyType)) {
+                throw new Error(`Invalid parameter key_type, got ${input.keyType}`);
+            }
             if (input.keyRange) {
-                if (input.keyRange.length === 0) throw new Error('Invalid key_range parameter, must be an array with length > 0');
-                if (!input.keyRange.every(isString)) throw new Error('Invalid key_range parameter, must be an array of strings');
+                if (input.keyRange.length === 0) {
+                    throw new Error('Invalid key_range parameter, must be an array with length > 0');
+                }
+                if (!input.keyRange.every(isString)) {
+                    throw new Error('Invalid key_range parameter, must be an array of strings');
+                }
             }
         } else {
             throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
@@ -204,7 +221,7 @@ export class BaseReaderAPI {
         const keyArray = keyRange ? keyRange.slice() : baseKeyArray.slice();
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            const error = new TSError(`key_range specified for id_reader contains keys not found in: ${keyType}`);
+            const error = new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
             return Promise.reject(error);
         }
 
@@ -244,19 +261,27 @@ export class BaseReaderAPI {
             slicerConfig.retryData = parsedRetry;
         }
 
-        return idSlicer(slicerConfig as IDSlicerArgs);
+        return idSlicer(slicerConfig);
     }
 
     private validateDateSlicerConfig(input: unknown): DateSlicerConfig {
         if (isObject(input)) {
-            if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
-            if (!isNumber(input.slicerID)) throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
-            if (!isNumber(input.numOfSlicers)) throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
+            if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) {
+                throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
+            }
+            if (!isNumber(input.slicerID)) {
+                throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
+            }
+            if (!isNumber(input.numOfSlicers)) {
+                throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
+            }
 
             if (input.recoveryData) {
                 if (Array.isArray(input.recoveryData)) {
-                    const areAllObjects = input.recoveryData.every((val) => isSimpleObject(val));
-                    if (!areAllObjects) throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+                    const areAllObjects = input.recoveryData.every(isSimpleObject);
+                    if (!areAllObjects) {
+                        throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+                    }
                 } else {
                     throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(input.recoveryData)}`);
                 }
@@ -265,11 +290,18 @@ export class BaseReaderAPI {
             }
 
             if (input.lifecycle === 'persistent') {
-                if (!input.windowState || !input.windowState.checkin) throw new Error(`Invalid parameter windowState, must provide a valid windowState in "persistent" mode, got ${getTypeOf(input.windowState)}`);
-                if (!input.startTime || !isValidDate(input.startTime)) throw new Error(`Invalid parameter startTime, must provide a valid date in "persistent" mode, got ${getTypeOf(input.startTime)}`);
+                const windowState = input.windowState as WindowState|undefined;
+                if (!windowState || !windowState.checkin) {
+                    throw new Error(`Invalid parameter windowState, must provide a valid windowState in "persistent" mode, got ${getTypeOf(input.windowState)}`);
+                }
+                if (!input.startTime || !isValidDate(input.startTime)) {
+                    throw new Error(`Invalid parameter startTime, must provide a valid date in "persistent" mode, got ${getTypeOf(input.startTime)}`);
+                }
             }
 
-            if (input.hook && !isFunction(input.hook)) throw new Error('Input hook must be a function if provided');
+            if (input.hook && !isFunction(input.hook)) {
+                throw new Error('Input hook must be a function if provided');
+            }
         } else {
             throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
         }
@@ -339,7 +371,7 @@ export class BaseReaderAPI {
             slicerFnArgs.windowState = config.windowState as WindowState;
 
             const { start, limit } = delayedStreamSegment(
-                config.startTime as string,
+                config.startTime,
                 interval,
                 latencyInterval
             );
@@ -351,47 +383,47 @@ export class BaseReaderAPI {
                 recoveryData,
                 interval
             };
-            const { dates, range } = await determineStartingPoint(startConfig);
+            const { dates, range } = determineStartingPoint(startConfig);
 
             slicerFnArgs.dates = dates;
             slicerFnArgs.primaryRange = range;
-        } else {
-            const esDates = await this.determineDateRanges();
-            // query with no results
-            if (esDates.start == null || esDates.limit == null) {
-                this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
-                // slicer will run and complete when a null is returned
-                return async () => null;
-            }
-            // TODO: we might want to consider making an interval for each slicer range
-            const interval = await this.determineSliceInterval(
-                this.config.interval,
-                esDates as DateSegments
-            );
-            slicerFnArgs.interval = interval;
-
-            const startConfig: StartPointConfig = {
-                dates: esDates as DateSegments,
-                id: slicerID,
-                numOfSlicers,
-                recoveryData,
-                interval
-            };
-
-            if (config.hook) {
-                const params = {
-                    interval,
-                    start: moment(esDates.start.format(this.dateFormat)).toISOString(),
-                    end: moment(esDates.limit.format(this.dateFormat)).toISOString(),
-                };
-                await config.hook(params);
-            }
-            // we do not care for range for once jobs
-            const { dates } = await determineStartingPoint(startConfig);
-            slicerFnArgs.dates = dates;
+            return dateSlicer(slicerFnArgs);
         }
 
-        return dateSlicer(slicerFnArgs as SlicerArgs);
+        const esDates = await this.determineDateRanges();
+        // query with no results
+        if (esDates.start == null || esDates.limit == null) {
+            this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
+            // slicer will run and complete when a null is returned
+            return async () => null;
+        }
+        // TODO: we might want to consider making an interval for each slicer range
+        const interval = await this.determineSliceInterval(
+            this.config.interval,
+            esDates as DateSegments
+        );
+        slicerFnArgs.interval = interval;
+
+        const startConfig: StartPointConfig = {
+            dates: esDates as DateSegments,
+            id: slicerID,
+            numOfSlicers,
+            recoveryData,
+            interval
+        };
+
+        if (config.hook) {
+            const params = {
+                interval,
+                start: moment(esDates.start.format(this.dateFormat)).toISOString(),
+                end: moment(esDates.limit.format(this.dateFormat)).toISOString(),
+            };
+            await config.hook(params);
+        }
+        // we do not care for range for once jobs
+        const { dates } = determineStartingPoint(startConfig);
+        slicerFnArgs.dates = dates;
+        return dateSlicer(slicerFnArgs);
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {
@@ -434,7 +466,7 @@ export class BaseReaderAPI {
         }
 
         if (data[this.config.date_field_name] == null) {
-            throw new TSError(`Invalid date_field_name: "${this.config.date_field_name}" for index: ${this.config.index}, field does not exist on record`);
+            throw new Error(`Invalid date_field_name: "${this.config.date_field_name}" for index: ${this.config.index}, field does not exist on record`);
         }
 
         if (order === 'start') {
@@ -446,22 +478,23 @@ export class BaseReaderAPI {
         return parseDate(time.format(this.dateFormat));
     }
 
-    async getSettings(query: IndicesGetSettingsParams): Promise<SettingResults> {
-        return this.client.getSettings(query);
+    /**
+     * Get the index settings, used to determine the max_result_window size
+    */
+    async getSettings(index: string): Promise<SettingResults> {
+        return this.client.getSettings(index);
     }
 
+    /**
+     * This used verify the index.max_result_window size
+     * will be big enough to fix the within the requested
+     * slice size
+    */
     async getWindowSize(): Promise<number> {
         const window = 'index.max_result_window';
         const { index } = this.config;
 
-        const query = {
-            index,
-            flat_settings: true,
-            include_defaults: true,
-            allow_no_indices: true
-        };
-
-        const settings = await this.getSettings(query);
+        const settings = await this.getSettings(index);
         const matcher = indexMatcher(index);
 
         for (const [key, configs] of Object.entries(settings)) {

@@ -1,7 +1,7 @@
 import type { DataFrame } from '@terascope/data-mate';
 import type { AnyObject, DataEntity } from '@terascope/utils';
 import type {
-    SearchParams, IndicesGetSettingsParams
+    SearchParams
 } from 'elasticsearch';
 import { DataTypeConfig } from '@terascope/types';
 
@@ -60,7 +60,7 @@ export interface ReaderClient {
     /**
      * Used to determine the max window size
     */
-    getSettings(params: IndicesGetSettingsParams): Promise<SettingResults>;
+    getSettings(index: string): Promise<SettingResults>;
 }
 
 export interface SettingResults {
