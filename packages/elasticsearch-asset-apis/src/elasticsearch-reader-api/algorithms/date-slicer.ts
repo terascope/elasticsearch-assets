@@ -20,7 +20,7 @@ import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
-    determineStartingPoint
+    determineDateSlicerRange
 } from './date-helpers';
 import { getKeyArray } from './id-helpers';
 
@@ -287,7 +287,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 interval
             };
 
-            const { dates } = determineStartingPoint(config);
+            const { dates } = determineDateSlicerRange(config);
 
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window

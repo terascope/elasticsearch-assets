@@ -97,6 +97,23 @@ export interface IDSlicerResult {
     count: number;
     wildcard: WildCardQuery;
 }
+
+/**
+ * This is used for an individual starting point
+ * for a single range
+*/
+export interface DateSlicerRange {
+    readonly dates: SlicerDates;
+    readonly range: DateSegments;
+    readonly interval: ParsedInterval;
+}
+
+/**
+ * This used a list of all of the Date slicer ranges, the
+ * index of the range will correlate with the slicer instance
+*/
+export type DateSlicerRanges = readonly DateSlicerRange[];
+
 export interface DateSegments {
     start: moment.Moment;
     limit: moment.Moment;
@@ -207,9 +224,8 @@ export interface DateSlicerConfig {
 
 export interface StartPointConfig {
     dates: DateSegments;
-    id: number;
     numOfSlicers: number;
-    interval: ParsedInterval;
+    getInterval: () => ParsedInterval|Promise<ParsedInterval>;
     recoveryData?: SlicerDateResults[];
 }
 

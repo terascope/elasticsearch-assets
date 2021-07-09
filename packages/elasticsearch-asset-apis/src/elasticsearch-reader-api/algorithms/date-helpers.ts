@@ -19,6 +19,7 @@ import {
     ParsedInterval,
     DateConfig,
     ESReaderOptions,
+    DateSlicerRanges,
 } from '../interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
@@ -274,11 +275,6 @@ export function delayedStreamSegment(
     return { start: delayedStart, limit: delayedLimit };
 }
 
-interface StartingConfig {
-    dates: SlicerDates;
-    range: DateSegments;
-}
-
 function convertToHole(rRecord: SlicerDateResults): DateConfig {
     return { start: moment.utc(rRecord.start), end: moment.utc(rRecord.end) };
 }
@@ -392,50 +388,52 @@ interface DateRanges {
 
 type RDate = SlicerDateResults|undefined;
 
-export function determineStartingPoint(config: StartPointConfig): StartingConfig {
-    const {
-        dates,
-        id,
-        numOfSlicers,
-        interval,
-        recoveryData
-    } = config;
-    // we need to split up times
-    const [step, unit] = interval;
-    // we are running in recovery
-    if (recoveryData && recoveryData.length > 0) {
-        let newDates: DateRanges;
+export async function determineDateSlicerRanges({
+    dates,
+    numOfSlicers,
+    recoveryData,
+    getInterval
+}: Omit<StartPointConfig, 'id'>): Promise<DateSlicerRanges> {
+    return Promise.all(times(numOfSlicers, async (id) => {
+        const interval = await getInterval();
 
-        // our number of slicers have changed
-        if (numOfSlicers !== recoveryData.length) {
-            newDates = redistributeDates(recoveryData, numOfSlicers, id);
-        } else {
+        // we need to split up times
+        const [step, unit] = interval;
+        // we are running in recovery
+        if (recoveryData && recoveryData.length > 0) {
+            let newDates: DateRanges;
+
+            // our number of slicers have changed
+            if (numOfSlicers !== recoveryData.length) {
+                newDates = redistributeDates(recoveryData, numOfSlicers, id);
+            } else {
             // numOfSlicers are the same so we can distribute normally
-            newDates = divideRange(
-                dates.start,
-                dates.limit,
-                numOfSlicers
-            )[id];
+                newDates = divideRange(
+                    dates.start,
+                    dates.limit,
+                    numOfSlicers
+                )[id];
+            }
+            const correctDates = compareRangeToRecoveryData(
+                newDates, recoveryData, interval, id, numOfSlicers
+            );
+
+            return { dates: correctDates, range: dates, interval };
         }
-        const correctDates = compareRangeToRecoveryData(
-            newDates, recoveryData, interval, id, numOfSlicers
+
+        const dateRange: Partial<SlicerDates>[] = divideRange(
+            dates.start,
+            dates.limit,
+            numOfSlicers
         );
 
-        return { dates: correctDates, range: dates };
-    }
+        const newDates = dateRange[id];
+        let end = moment.utc(newDates.start).add(step, unit);
+        if (end.isSameOrAfter(newDates.limit)) end = moment.utc(newDates.limit);
+        newDates.end = end;
 
-    const dateRange: Partial<SlicerDates>[] = divideRange(
-        dates.start,
-        dates.limit,
-        numOfSlicers
-    );
-
-    const newDates = dateRange[id];
-    let end = moment.utc(newDates.start).add(step, unit);
-    if (end.isSameOrAfter(newDates.limit)) end = moment.utc(newDates.limit);
-    newDates.end = end;
-
-    return { dates: newDates as SlicerDates, range: dates };
+        return { dates: newDates as SlicerDates, range: dates, interval };
+    }));
 }
 
 export function buildQuery(

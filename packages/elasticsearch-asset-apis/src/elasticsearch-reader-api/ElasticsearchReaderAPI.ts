@@ -28,9 +28,9 @@ import {
     dateFormat,
     dateFormatSeconds,
     parseDate,
-    determineStartingPoint,
     delayedStreamSegment,
-    determineIDSlicerRanges
+    determineIDSlicerRanges,
+    determineDateSlicerRanges
 } from './algorithms';
 import {
     ESReaderOptions,
@@ -41,14 +41,14 @@ import {
     StartPointConfig,
     IDType,
     DateSlicerArgs,
-    DateSlicerConfig,
     IDSlicerArgs,
     IDSlicerConfig,
     DateSlicerResults,
     IDSlicerResults,
     ReaderClient,
     SettingResults,
-    IDSlicerRanges
+    IDSlicerRanges,
+    DateSlicerRanges
 } from './interfaces';
 import { WindowState } from './WindowState';
 
@@ -216,7 +216,9 @@ export class ElasticsearchReaderAPI {
         if (config.recoveryData) {
             if (Array.isArray(config.recoveryData)) {
                 const areAllObjects = config.recoveryData.every(isSimpleObject);
-                if (!areAllObjects) throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+                if (!areAllObjects) {
+                    throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+                }
             } else {
                 throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(config.recoveryData)}`);
             }
@@ -280,14 +282,12 @@ export class ElasticsearchReaderAPI {
         return idSlicer(slicerConfig);
     }
 
-    private validateDateSlicerConfig(input: unknown): DateSlicerConfig {
+    private validateDateSlicerConfig(input: unknown): void {
         if (isObject(input)) {
             if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) {
                 throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             }
-            if (!isNumber(input.slicerID)) {
-                throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(input.slicerID)}`);
-            }
+
             if (!isNumber(input.numOfSlicers)) {
                 throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
             }
@@ -301,8 +301,6 @@ export class ElasticsearchReaderAPI {
                 } else {
                     throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(input.recoveryData)}`);
                 }
-            } else {
-                input.recoveryData = [];
             }
 
             if (input.lifecycle === 'persistent') {
@@ -321,15 +319,86 @@ export class ElasticsearchReaderAPI {
         } else {
             throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
         }
+    }
 
-        return input as unknown as DateSlicerConfig;
+    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'>): Promise<DateSlicerRanges> {
+        this.validateDateSlicerConfig(config);
+        const {
+            lifecycle,
+            numOfSlicers,
+        } = config;
+
+        const isPersistent = lifecycle === 'persistent';
+
+        await this.verifyIndex();
+
+        const recoveryData = config.recoveryData?.map(
+            (slice) => slice.lastSlice
+        ).filter(Boolean) as SlicerDateResults[]|undefined || [];
+
+        if (isPersistent) {
+            // we need to interval to get starting dates
+            const [interval, latencyInterval] = await Promise.all([
+                this.determineSliceInterval(this.config.interval),
+                this.determineSliceInterval(this.config.delay)
+            ]);
+
+            const { start, limit } = delayedStreamSegment(
+                config.startTime,
+                interval,
+                latencyInterval
+            );
+
+            return determineDateSlicerRanges({
+                dates: { start, limit },
+                numOfSlicers,
+                recoveryData,
+                getInterval() {
+                    return interval;
+                }
+            });
+        }
+
+        const _esDates = await this.determineDateRanges();
+        // query with no results
+        if (_esDates.start == null || _esDates.limit == null) {
+            this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
+            // slicer will run and complete when a null is returned
+            return [];
+        }
+        const dates = _esDates as DateSegments;
+
+        return determineDateSlicerRanges({
+            dates,
+            numOfSlicers,
+            recoveryData,
+            getInterval: async () => {
+                const interval = this.determineSliceInterval(
+                    this.config.interval,
+                    dates
+                );
+                if (config.hook) {
+                    const params = {
+                        interval,
+                        start: moment(dates.start.format(this.dateFormat)).toISOString(),
+                        end: moment(dates.limit.format(this.dateFormat)).toISOString(),
+                    };
+                    await config.hook(params);
+                }
+                return interval;
+            }
+        });
     }
 
     /**
      * Return an instance of the slicer using the date algorithm
     */
-    async makeDateSlicer(args: DateSlicerArgs): Promise<() => Promise<DateSlicerResults>> {
-        const config = this.validateDateSlicerConfig(args);
+    async makeDateSlicer(config: DateSlicerArgs): Promise<() => Promise<DateSlicerResults>> {
+        if (!isNumber(config.slicerID)) {
+            throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
+        }
+        this.validateDateSlicerConfig(config);
+
         const {
             slicerID,
             lifecycle,
@@ -374,9 +443,9 @@ export class ElasticsearchReaderAPI {
 
         await this.verifyIndex();
 
-        const recoveryData = config.recoveryData.map(
+        const recoveryData = config.recoveryData?.map(
             (slice) => slice.lastSlice
-        ).filter(Boolean) as SlicerDateResults[];
+        ).filter(Boolean) as SlicerDateResults[]|undefined ?? [];
 
         if (isPersistent) {
             // we need to interval to get starting dates
@@ -397,12 +466,13 @@ export class ElasticsearchReaderAPI {
 
             const startConfig: StartPointConfig = {
                 dates: { start, limit },
-                id: slicerID,
                 numOfSlicers,
                 recoveryData,
-                interval
+                getInterval() {
+                    return interval;
+                }
             };
-            const { dates, range } = determineStartingPoint(startConfig);
+            const { dates, range } = (await determineDateSlicerRanges(startConfig))[slicerID];
 
             slicerFnArgs.dates = dates;
             slicerFnArgs.primaryRange = range;
@@ -426,10 +496,11 @@ export class ElasticsearchReaderAPI {
 
         const startConfig: StartPointConfig = {
             dates: esDates as DateSegments,
-            id: slicerID,
             numOfSlicers,
             recoveryData,
-            interval
+            getInterval() {
+                return interval;
+            }
         };
 
         if (config.hook) {
@@ -441,7 +512,7 @@ export class ElasticsearchReaderAPI {
             await config.hook(params);
         }
         // we do not care for range for once jobs
-        const { dates } = determineStartingPoint(startConfig);
+        const [{ dates }] = await determineDateSlicerRanges(startConfig);
         slicerFnArgs.dates = dates;
         return dateSlicer(slicerFnArgs);
     }
