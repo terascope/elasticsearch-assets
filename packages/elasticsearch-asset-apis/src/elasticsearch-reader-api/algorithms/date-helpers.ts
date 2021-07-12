@@ -20,6 +20,7 @@ import {
     DateConfig,
     ESReaderOptions,
     DateSlicerRanges,
+    DateSlicerRange,
 } from '../interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
@@ -388,55 +389,64 @@ interface DateRanges {
 
 type RDate = SlicerDateResults|undefined;
 
-export async function determineDateSlicerRanges({
-    dates,
-    numOfSlicers,
-    recoveryData,
-    getInterval
-}: StartPointConfig): Promise<DateSlicerRanges> {
+export async function determineDateSlicerRange(
+    {
+        dates,
+        numOfSlicers,
+        recoveryData,
+        getInterval
+    }: StartPointConfig,
+    id: number
+): Promise<DateSlicerRange> {
+    let newDates: DateRanges;
+    // we are running in recovery
+    if (recoveryData && recoveryData.length > 0) {
+        // our number of slicers have changed
+        if (numOfSlicers !== recoveryData.length) {
+            newDates = redistributeDates(recoveryData, numOfSlicers, id);
+        } else {
+            // numOfSlicers are the same so we can distribute normally
+            newDates = divideRange(
+                dates.start,
+                dates.limit,
+                numOfSlicers
+            )[id];
+        }
+        const interval = await getInterval(newDates);
+
+        const correctDates = compareRangeToRecoveryData(
+            newDates, recoveryData, interval, id, numOfSlicers
+        );
+
+        return { dates: correctDates, range: dates, interval };
+    }
+
     const dateRange = divideRange(
         dates.start,
         dates.limit,
         numOfSlicers
     );
 
-    return Promise.all(times(numOfSlicers, async (id) => {
-        let newDates: DateRanges;
-        // we are running in recovery
-        if (recoveryData && recoveryData.length > 0) {
-            // our number of slicers have changed
-            if (numOfSlicers !== recoveryData.length) {
-                newDates = redistributeDates(recoveryData, numOfSlicers, id);
-            } else {
-                // numOfSlicers are the same so we can distribute normally
-                newDates = divideRange(
-                    dates.start,
-                    dates.limit,
-                    numOfSlicers
-                )[id];
-            }
-            const interval = await getInterval(newDates);
+    newDates = dateRange[id];
 
-            const correctDates = compareRangeToRecoveryData(
-                newDates, recoveryData, interval, id, numOfSlicers
-            );
+    const interval = await getInterval(newDates);
+    // we need to split up times
+    const [step, unit] = interval;
 
-            return { dates: correctDates, range: dates, interval };
-        }
+    let end = moment.utc(newDates.start).add(step, unit);
+    if (end.isSameOrAfter(newDates.limit)) {
+        end = moment.utc(newDates.limit);
+    }
 
-        newDates = dateRange[id];
+    return { dates: { ...newDates, end }, range: dates, interval };
+}
 
-        const interval = await getInterval(newDates);
-        // we need to split up times
-        const [step, unit] = interval;
-
-        let end = moment.utc(newDates.start).add(step, unit);
-        if (end.isSameOrAfter(newDates.limit)) {
-            end = moment.utc(newDates.limit);
-        }
-
-        return { dates: { ...newDates, end }, range: dates, interval };
-    }));
+export async function determineDateSlicerRanges(
+    config: StartPointConfig
+): Promise<DateSlicerRanges> {
+    return Promise.all(times(config.numOfSlicers, async (id) => (
+        determineDateSlicerRange(config, id)
+    )));
 }
 
 export function buildQuery(

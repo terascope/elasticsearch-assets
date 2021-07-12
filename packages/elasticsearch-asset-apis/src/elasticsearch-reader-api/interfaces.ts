@@ -163,10 +163,26 @@ export interface SlicerArgs {
     numOfSlicers: number;
     logger: Logger;
     dates?: SlicerDates;
+    /**
+     * This only matters for persistent jobs
+    */
     primaryRange?: DateSegments;
+    /**
+     * The slicer id, I think this is used to further subdivide
+     * the dates
+    */
     id: number;
+    /**
+     * This used to emit a slice recursion event
+    */
     events: EventEmitter;
+    /**
+     * This is only used for persistent jobs
+    */
     windowState?: WindowState;
+    /**
+     * The elasticsearch server version (only the major version)
+    */
     version: number;
     countFn: (args: AnyObject) => Promise<number>
 }

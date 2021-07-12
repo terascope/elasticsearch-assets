@@ -30,7 +30,8 @@ import {
     parseDate,
     delayedStreamSegment,
     determineIDSlicerRanges,
-    determineDateSlicerRanges
+    determineDateSlicerRanges,
+    determineDateSlicerRange
 } from './algorithms';
 import {
     ESReaderOptions,
@@ -322,7 +323,7 @@ export class ElasticsearchReaderAPI {
         }
     }
 
-    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'>): Promise<DateSlicerRanges> {
+    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'>): Promise<DateSlicerRanges|undefined> {
         this.validateDateSlicerConfig(config);
         const {
             lifecycle,
@@ -366,7 +367,7 @@ export class ElasticsearchReaderAPI {
         if (_esDates.start == null || _esDates.limit == null) {
             this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
             // slicer will run and complete when a null is returned
-            return [];
+            return;
         }
         const dates = _esDates as DateSegments;
 
@@ -459,10 +460,6 @@ export class ElasticsearchReaderAPI {
                 this.determineSliceInterval(this.config.delay)
             ]);
 
-            slicerFnArgs.interval = interval;
-            slicerFnArgs.latencyInterval = latencyInterval;
-            slicerFnArgs.windowState = config.windowState as WindowState;
-
             const { start, limit } = delayedStreamSegment(
                 config.startTime,
                 interval,
@@ -477,11 +474,16 @@ export class ElasticsearchReaderAPI {
                     return interval;
                 }
             };
-            const { dates, range } = (await determineDateSlicerRanges(startConfig))[slicerID];
+            const { dates, range } = await determineDateSlicerRange(startConfig, slicerID);
 
-            slicerFnArgs.dates = dates;
-            slicerFnArgs.primaryRange = range;
-            return dateSlicer(slicerFnArgs);
+            return dateSlicer({
+                ...slicerFnArgs,
+                interval,
+                latencyInterval,
+                windowState: config.windowState,
+                dates,
+                primaryRange: range,
+            });
         }
 
         const esDates = await this.determineDateRanges();
@@ -492,34 +494,37 @@ export class ElasticsearchReaderAPI {
             return async () => null;
         }
 
-        // TODO: we might want to consider making an interval for each slicer range
-        const interval = await this.determineSliceInterval(
-            this.config.interval,
-            esDates as DateSegments
-        );
-        slicerFnArgs.interval = interval;
-
         const startConfig: StartPointConfig = {
             dates: esDates as DateSegments,
             numOfSlicers,
             recoveryData,
-            getInterval() {
+            getInterval: async (dates) => {
+                const interval = await this.determineSliceInterval(
+                    this.config.interval,
+                    dates
+                );
+                // This was originally created to update the job configuration
+                // with the correct interval so that retries and recovery operates
+                // with more accuracy. Also it exposes the discovered interval to
+                // to the user
+                if (config.hook) {
+                    await config.hook({
+                        interval,
+                        start: moment(dates.start.format(this.dateFormat)).toISOString(),
+                        end: moment(dates.limit.format(this.dateFormat)).toISOString(),
+                    });
+                }
                 return interval;
             }
         };
 
-        if (config.hook) {
-            const params = {
-                interval,
-                start: moment(esDates.start.format(this.dateFormat)).toISOString(),
-                end: moment(esDates.limit.format(this.dateFormat)).toISOString(),
-            };
-            await config.hook(params);
-        }
         // we do not care for range for once jobs
-        const [{ dates }] = await determineDateSlicerRanges(startConfig);
-        slicerFnArgs.dates = dates;
-        return dateSlicer(slicerFnArgs);
+        const { dates, interval } = await determineDateSlicerRange(startConfig, slicerID);
+        return dateSlicer({
+            ...slicerFnArgs,
+            interval,
+            dates,
+        });
     }
 
     async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {

@@ -20,7 +20,7 @@ import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
-    determineDateSlicerRanges
+    determineDateSlicerRange,
 } from './date-helpers';
 import { getKeyArray } from './id-helpers';
 
@@ -288,8 +288,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 }
             };
 
-            const ranges = await determineDateSlicerRanges(config);
-            const { dates } = ranges[id];
+            const { dates } = await determineDateSlicerRange(config, id);
 
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window
