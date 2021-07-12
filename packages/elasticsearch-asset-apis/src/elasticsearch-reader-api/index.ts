@@ -10,6 +10,7 @@ export * from './ElasticsearchReaderClient';
 export * from './interfaces';
 export * from './WindowState';
 export * from './algorithms';
+export * from './utils';
 
 export interface ElasticsearchAPIArgs {
     config: ESReaderOptions,

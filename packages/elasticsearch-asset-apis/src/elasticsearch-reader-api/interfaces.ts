@@ -141,7 +141,7 @@ export interface IDSlicerArgs {
 export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,
-    recoveryData: SlicerRecoveryData[],
+    recoveryData?: SlicerRecoveryData[],
     keyType: IDType;
     keyRange?: string[];
     startingKeyDepth: number,
@@ -240,7 +240,7 @@ export interface DateSlicerConfig {
     lifecycle: LifeCycle,
     slicerID: number,
     numOfSlicers: number,
-    recoveryData: SlicerRecoveryData[],
+    recoveryData?: SlicerRecoveryData[],
     windowState?: WindowState,
     startTime?: Date | string,
     hook?: (args: {
