@@ -48,7 +48,8 @@ import {
     ReaderClient,
     SettingResults,
     IDSlicerRanges,
-    DateSlicerRanges
+    DateSlicerRanges,
+    ParsedInterval
 } from './interfaces';
 import { WindowState } from './WindowState';
 
@@ -124,7 +125,7 @@ export class ElasticsearchReaderAPI {
 
     async determineSliceInterval(
         interval: string, esDates?: InputDateSegments
-    ): Promise<[number, moment.unitOfTime.Base]> {
+    ): Promise<ParsedInterval> {
         if (this.config.interval !== 'auto') {
             return processInterval(interval, this.config.time_resolution, esDates);
         }
@@ -353,9 +354,10 @@ export class ElasticsearchReaderAPI {
                 dates: { start, limit },
                 numOfSlicers,
                 recoveryData,
-                getInterval() {
-                    return interval;
-                }
+                getInterval: async (dates) => this.determineSliceInterval(
+                    this.config.interval,
+                    dates,
+                )
             });
         }
 
@@ -373,17 +375,20 @@ export class ElasticsearchReaderAPI {
             numOfSlicers,
             recoveryData,
             getInterval: async () => {
-                const interval = this.determineSliceInterval(
+                const interval = await this.determineSliceInterval(
                     this.config.interval,
                     dates
                 );
+                // This was originally created to update the job configuration
+                // with the correct interval so that retries and recovery operates
+                // with more accuracy. Also it exposes the discovered interval to
+                // to the user
                 if (config.hook) {
-                    const params = {
+                    await config.hook({
                         interval,
                         start: moment(dates.start.format(this.dateFormat)).toISOString(),
                         end: moment(dates.limit.format(this.dateFormat)).toISOString(),
-                    };
-                    await config.hook(params);
+                    });
                 }
                 return interval;
             }

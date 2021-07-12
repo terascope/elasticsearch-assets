@@ -23,6 +23,8 @@ import {
     SlicerDateResults
 } from '../src';
 
+jest.setTimeout(15_000);
+
 describe('Reader API', () => {
     const client = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;

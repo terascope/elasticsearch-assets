@@ -50,22 +50,26 @@ describe('determineDateSlicerRanges', () => {
                 recoveryData: []
             };
 
-            const ranges = await determineDateSlicerRanges(config);
+            const [
+                { dates: dates1, range: range1 },
+                { dates: dates2, range: range2 }
+            ] = await determineDateSlicerRanges(config);
 
-            expect(ranges).toEqual([{
+            expect(dates1).toEqual({
                 start: startOfRange,
                 end: firstSegmentLimit,
                 limit: firstSegmentLimit
-            }, {
+            });
+            expect(dates2).toEqual({
                 start: firstSegmentLimit,
                 end: endLimit,
                 limit: endLimit
-            }]);
+            });
 
-            expect(ranges[0].range.start.isSame(config.dates.start)).toBeTrue();
-            expect(ranges[0].range.limit.isSame(config.dates.limit)).toBeTrue();
-            expect(ranges[1].range.start.isSame(config.dates.start)).toBeTrue();
-            expect(ranges[1].range.limit.isSame(config.dates.limit)).toBeTrue();
+            expect(range1.start.isSame(config.dates.start)).toBeTrue();
+            expect(range1.limit.isSame(config.dates.limit)).toBeTrue();
+            expect(range2.start.isSame(config.dates.start)).toBeTrue();
+            expect(range2.limit.isSame(config.dates.limit)).toBeTrue();
         });
 
         it('can return point and range when recovery (1 point, no holes) is given for single slicer', async () => {

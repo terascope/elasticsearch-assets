@@ -67,8 +67,8 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     }
 
     function keyGenerator(
-        baseArray: string[],
-        keysArray: string[],
+        baseArray: readonly string[],
+        keysArray: readonly string[],
         retryKey?: string,
         dateRange?: SlicerDateResults
     ) {
@@ -127,7 +127,7 @@ function compareKeys(key: string, retryKey: string) {
     return false;
 }
 
-function* recurse(baseArray: string[], str: string): Generator<string> {
+function* recurse(baseArray: readonly string[], str: string): Generator<string> {
     for (const key of baseArray) {
         const newStr = str + key;
         const resp = yield newStr;
@@ -139,7 +139,7 @@ function* recurse(baseArray: string[], str: string): Generator<string> {
 }
 
 function* recurseDepth(
-    baseArray: string[],
+    baseArray: readonly string[],
     str: string,
     startingKeyDepth: number
 ): Generator<string> {
@@ -159,8 +159,8 @@ function* recurseDepth(
 }
 
 function* generateKeys(
-    baseArray: string[],
-    keysArray: string[]
+    baseArray: readonly string[],
+    keysArray: readonly string[]
 ): Generator<string> {
     for (const startKey of keysArray) {
         const processKey = yield startKey;
@@ -174,8 +174,8 @@ function* generateKeys(
 }
 
 function* generateKeyDepth(
-    baseArray: string[],
-    keysArray: string[],
+    baseArray: readonly string[],
+    keysArray: readonly string[],
     startingKeyDepth: number
 ): Generator<string> {
     for (const startKey of keysArray) {

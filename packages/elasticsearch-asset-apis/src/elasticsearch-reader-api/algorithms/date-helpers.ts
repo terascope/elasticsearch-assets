@@ -393,27 +393,30 @@ export async function determineDateSlicerRanges({
     numOfSlicers,
     recoveryData,
     getInterval
-}: Omit<StartPointConfig, 'id'>): Promise<DateSlicerRanges> {
-    return Promise.all(times(numOfSlicers, async (id) => {
-        const interval = await getInterval();
+}: StartPointConfig): Promise<DateSlicerRanges> {
+    const dateRange = divideRange(
+        dates.start,
+        dates.limit,
+        numOfSlicers
+    );
 
-        // we need to split up times
-        const [step, unit] = interval;
+    return Promise.all(times(numOfSlicers, async (id) => {
+        let newDates: DateRanges;
         // we are running in recovery
         if (recoveryData && recoveryData.length > 0) {
-            let newDates: DateRanges;
-
             // our number of slicers have changed
             if (numOfSlicers !== recoveryData.length) {
                 newDates = redistributeDates(recoveryData, numOfSlicers, id);
             } else {
-            // numOfSlicers are the same so we can distribute normally
+                // numOfSlicers are the same so we can distribute normally
                 newDates = divideRange(
                     dates.start,
                     dates.limit,
                     numOfSlicers
                 )[id];
             }
+            const interval = await getInterval(newDates);
+
             const correctDates = compareRangeToRecoveryData(
                 newDates, recoveryData, interval, id, numOfSlicers
             );
@@ -421,18 +424,18 @@ export async function determineDateSlicerRanges({
             return { dates: correctDates, range: dates, interval };
         }
 
-        const dateRange: Partial<SlicerDates>[] = divideRange(
-            dates.start,
-            dates.limit,
-            numOfSlicers
-        );
+        newDates = dateRange[id];
 
-        const newDates = dateRange[id];
+        const interval = await getInterval(newDates);
+        // we need to split up times
+        const [step, unit] = interval;
+
         let end = moment.utc(newDates.start).add(step, unit);
-        if (end.isSameOrAfter(newDates.limit)) end = moment.utc(newDates.limit);
-        newDates.end = end;
+        if (end.isSameOrAfter(newDates.limit)) {
+            end = moment.utc(newDates.limit);
+        }
 
-        return { dates: newDates as SlicerDates, range: dates, interval };
+        return { dates: { ...newDates, end }, range: dates, interval };
     }));
 }
 

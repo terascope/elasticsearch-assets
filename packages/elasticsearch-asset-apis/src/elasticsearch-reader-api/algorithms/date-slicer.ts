@@ -20,7 +20,7 @@ import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
-    determineDateSlicerRange
+    determineDateSlicerRanges
 } from './date-helpers';
 import { getKeyArray } from './id-helpers';
 
@@ -282,12 +282,14 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
 
             const config: StartPointConfig = {
                 dates: { start: moment.utc(newStart), limit: moment.utc(newLimit) },
-                id,
                 numOfSlicers,
-                interval
+                getInterval() {
+                    return interval;
+                }
             };
 
-            const { dates } = determineDateSlicerRange(config);
+            const ranges = await determineDateSlicerRanges(config);
+            const { dates } = ranges[id];
 
             if (dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window

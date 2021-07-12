@@ -200,7 +200,7 @@ export type DateSlicerResults = SlicerDateResults | SlicerDateResults[] | null;
 /** What a id slicer fn will return */
 export type IDSlicerResults = IDReaderSlice | null;
 
-export type ParsedInterval = [number, moment.unitOfTime.Base];
+export type ParsedInterval = readonly [step: number, unit: moment.unitOfTime.Base];
 
 export interface DateSlicerArgs {
     lifecycle: LifeCycle,
@@ -209,7 +209,11 @@ export interface DateSlicerArgs {
     recoveryData?: SlicerRecoveryData[];
     windowState?: WindowState,
     startTime?: Date | string
-    hook?: (args: AnyObject) => Promise<void>
+    hook?: (args: {
+        interval: ParsedInterval,
+        start: string;
+        end: string;
+    }) => Promise<void>
 }
 
 export interface DateSlicerConfig {
@@ -219,13 +223,17 @@ export interface DateSlicerConfig {
     recoveryData: SlicerRecoveryData[],
     windowState?: WindowState,
     startTime?: Date | string,
-    hook?: (args: AnyObject) => Promise<void>
+    hook?: (args: {
+        interval: ParsedInterval,
+        start: string;
+        end: string;
+    }) => Promise<void>
 }
 
 export interface StartPointConfig {
     dates: DateSegments;
     numOfSlicers: number;
-    getInterval: () => ParsedInterval|Promise<ParsedInterval>;
+    getInterval: (dates: DateSegments) => ParsedInterval|Promise<ParsedInterval>;
     recoveryData?: SlicerDateResults[];
 }
 

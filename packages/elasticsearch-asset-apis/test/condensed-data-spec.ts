@@ -20,10 +20,12 @@ import {
     ElasticsearchReaderClient
 } from '../src';
 
+jest.setTimeout(15_000);
+
 describe('ReaderAPI with condensed time data', () => {
     const client = makeClient();
 
-    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
+    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_condensed_`;
     const logger = debugLogger('api-condensed-test');
     const emitter = new EventEmitter();
 
