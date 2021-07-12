@@ -387,13 +387,13 @@ export class ElasticsearchReaderAPI {
             // slicer will run and complete when a null is returned
             return;
         }
-        const dates = _esDates as DateSegments;
 
+        const allSlicerDates = _esDates as DateSegments;
         return determineDateSlicerRanges({
-            dates,
+            dates: allSlicerDates,
             numOfSlicers,
             recoveryData,
-            getInterval: async () => {
+            getInterval: async (dates) => {
                 const interval = await this.determineSliceInterval(
                     this.config.interval,
                     dates
@@ -401,12 +401,12 @@ export class ElasticsearchReaderAPI {
                 // This was originally created to update the job configuration
                 // with the correct interval so that retries and recovery operates
                 // with more accuracy. Also it exposes the discovered interval to
-                // to the user
+                // to the user, we may not need to do this anymore
                 if (config.hook) {
                     await config.hook({
                         interval,
-                        start: moment(dates.start.format(this.dateFormat)).toISOString(),
-                        end: moment(dates.limit.format(this.dateFormat)).toISOString(),
+                        start: moment(allSlicerDates.start.format(this.dateFormat)).toISOString(),
+                        end: moment(allSlicerDates.limit.format(this.dateFormat)).toISOString(),
                     });
                 }
                 return interval;

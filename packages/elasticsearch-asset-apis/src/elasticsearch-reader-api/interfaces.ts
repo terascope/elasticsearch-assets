@@ -132,7 +132,10 @@ export interface IDSlicerArgs {
     events: EventEmitter;
     startingKeyDepth: number;
     version: number;
-    countFn: (args: AnyObject) => Promise<number>;
+    countFn: (args: {
+        start?: string;
+        end?: string;
+    }) => Promise<number>;
     type?: string | null;
     idFieldName?: string | null;
     size: number;
@@ -188,7 +191,10 @@ export interface SlicerArgs {
      * The elasticsearch server version (only the major version)
     */
     version: number;
-    countFn: (args: AnyObject) => Promise<number>
+    countFn: (args: {
+        start?: string;
+        end?: string;
+    }) => Promise<number>
 }
 export interface SlicerDateResults {
     start: string;

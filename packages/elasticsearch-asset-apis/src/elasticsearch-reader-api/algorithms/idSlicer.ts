@@ -1,4 +1,4 @@
-import { TSError, AnyObject } from '@terascope/utils';
+import { TSError } from '@terascope/utils';
 import {
     IDSlicerArgs, SlicerDateResults, IDReaderSlice, IDSlicerResults
 } from '../interfaces';
@@ -46,7 +46,10 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
             query.key = `${type}#${data.value}*`;
         }
 
-        async function getKeySlice(esQuery: AnyObject): Promise<IDReaderSlice | null> {
+        async function getKeySlice(esQuery: {
+            start?: string;
+            end?: string;
+        }): Promise<IDReaderSlice | null> {
             const count = await countFn(esQuery);
 
             if (count > size) {

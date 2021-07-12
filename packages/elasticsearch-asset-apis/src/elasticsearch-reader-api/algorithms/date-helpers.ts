@@ -1,11 +1,12 @@
 import {
     times,
-    toNumber,
+    toIntegerOrThrow,
 } from '@terascope/utils';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
+import { inspect } from 'util';
 import {
     StartPointConfig,
     SlicerDates,
@@ -70,14 +71,16 @@ export function processInterval(
     const regex = /(\d+)(\w+)/i;
     const intervalMatch = regex.exec(interval);
 
-    if (intervalMatch === null) {
+    if (intervalMatch == null) {
         throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
     }
 
     // don't need first parameter, its the full string
     intervalMatch.shift();
 
-    const newInterval: ParsedInterval = [toNumber(intervalMatch[0]), dateOptions(intervalMatch[1])];
+    const newInterval: ParsedInterval = [
+        toIntegerOrThrow(intervalMatch[0]), dateOptions(intervalMatch[1])
+    ];
     return compareInterval(newInterval, timeResolution, esDates);
 }
 
@@ -86,11 +89,23 @@ function compareInterval(
 ): ParsedInterval {
     if (esDates) {
         const datesDiff = moment(esDates.limit).diff(esDates.start);
-        const intervalDiff = moment.duration(Number(interval[0]), interval[1] as moment.unitOfTime.Base).as('milliseconds');
+        const intervalDiff = moment.duration(
+            toIntegerOrThrow(interval[0]),
+            interval[1] as moment.unitOfTime.Base
+        ).as('milliseconds');
 
         if (intervalDiff > datesDiff) {
             if (timeResolution === 's') {
-                return [Math.ceil(datesDiff / 1000), 's'];
+                const secondsDiff = Math.ceil(datesDiff / 1000);
+                if (!Number.isSafeInteger(secondsDiff)) {
+                    throw new Error(`Invalid interval diff found "${inspect(secondsDiff)}" ${inspect({
+                        esDates,
+                        interval,
+                        datesDiff,
+                        intervalDiff,
+                    })}`);
+                }
+                return [secondsDiff, 's'];
             }
             return [datesDiff, 'ms'];
         }
@@ -232,8 +247,8 @@ export function divideRange(
 ): DateSegments[] {
     const results: DateSegments[] = [];
     // 'x' is Unix Millisecond Timestamp format
-    const startNum = Number(moment.utc(startTime).format('x'));
-    const limitNum = Number(moment.utc(endTime).format('x'));
+    const startNum = toIntegerOrThrow(moment.utc(startTime).format('x'));
+    const limitNum = toIntegerOrThrow(moment.utc(endTime).format('x'));
     const range = (limitNum - startNum) / numOfSlicers;
 
     const step = moment.utc(startTime);

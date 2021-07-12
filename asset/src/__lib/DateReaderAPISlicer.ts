@@ -34,7 +34,7 @@ export class DateReaderAPISlicer extends ParallelSlicer<ESDateConfig> {
             numOfSlicers: slicers,
             recoveryData,
             startTime,
-            hook: async (params: AnyObject) => {
+            hook: async (params) => {
                 if (!this.hasUpdated) {
                     await this.updateJob(params);
                     this.hasUpdated = true;

@@ -46,6 +46,7 @@ function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateRe
         body.query.bool.must.push({ wildcard: { _uid: slice.key } });
     }
 
+    // this is used in the _id reader and the elasticsearch >= 6
     if (slice.wildcard) {
         const { field, value } = slice.wildcard;
         body.query.bool.must.push({ wildcard: { [field]: value } });
