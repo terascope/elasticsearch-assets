@@ -27,6 +27,7 @@ export function determineIDSlicerRanges(keysArray: readonly string[], num: numbe
     const results: string[][] = [];
     const len = num;
 
+    let lastDivideNum = 0;
     for (let i = 0; i < len; i += 1) {
         let divideNum = Math.ceil(keysArray.length / len);
 
@@ -34,7 +35,8 @@ export function determineIDSlicerRanges(keysArray: readonly string[], num: numbe
             divideNum = keysArray.length;
         }
 
-        results.push(keysArray.slice(0, divideNum));
+        results.push(keysArray.slice(lastDivideNum, divideNum));
+        lastDivideNum = divideNum;
     }
 
     return results;
