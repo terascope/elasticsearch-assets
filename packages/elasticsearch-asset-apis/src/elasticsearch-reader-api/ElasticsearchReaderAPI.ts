@@ -22,7 +22,6 @@ import {
     dateSlicer,
     idSlicer,
     getKeyArray,
-    buildQuery,
     dateOptions,
     processInterval,
     dateFormat,
@@ -53,6 +52,7 @@ import {
     IDSlicerRange
 } from './interfaces';
 import { WindowState } from './WindowState';
+import { buildQuery } from './utils';
 
 type FetchDate = moment.Moment | null;
 
