@@ -31,7 +31,6 @@ import {
     delayedStreamSegment,
     determineIDSlicerRanges,
     determineDateSlicerRanges,
-    determineDateSlicerRange
 } from './algorithms';
 import {
     ESReaderOptions,
@@ -39,7 +38,6 @@ import {
     DateSegments,
     InputDateSegments,
     SlicerArgs,
-    StartPointConfig,
     IDType,
     DateSlicerArgs,
     IDSlicerArgs,
@@ -50,7 +48,9 @@ import {
     SettingResults,
     IDSlicerRanges,
     DateSlicerRanges,
-    ParsedInterval
+    ParsedInterval,
+    DateSlicerRange,
+    IDSlicerRange
 } from './interfaces';
 import { WindowState } from './WindowState';
 
@@ -163,8 +163,37 @@ export class ElasticsearchReaderAPI {
         this.windowSize = windowSize;
     }
 
+    private validateIDSlicerConfig(config: unknown): void {
+        if (isObject(config)) {
+            if (!isNumber(config.slicerID)) {
+                throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
+            }
+
+            if (this.version >= 6 && (
+                !isString(config.idFieldName) || config.idFieldName.length === 0
+            )) {
+                throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(config.idFieldName)}`);
+            }
+
+            if (config.recoveryData) {
+                if (Array.isArray(config.recoveryData)) {
+                    const areAllObjects = config.recoveryData.every(isSimpleObject);
+                    if (!areAllObjects) {
+                        throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
+                    }
+                } else {
+                    throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(config.recoveryData)}`);
+                }
+            }
+        } else {
+            throw new Error(`Input must be an object, received ${getTypeOf(config)}`);
+        }
+    }
+
     /**
-     * Use this determine all of the slice ranges for all of the slicers
+     * This used to subdivide all the of the key ranges for each
+     * slicer instance, then each "range" should be passed into
+     * {@link ElasticsearchReaderAPI.makeIDSlicerFromRange}
     */
     makeIDSlicerRanges(config: Pick<IDSlicerConfig, 'keyRange'|'keyType'|'numOfSlicers'>): IDSlicerRanges {
         const {
@@ -202,31 +231,25 @@ export class ElasticsearchReaderAPI {
     }
 
     /**
-     * Return an instance of the slicer using the id algorithm
+     * Returns an instance of the slicer using the id algorithm,
+     * this is a higher level API and is not recommended when using many
+     * slicers since making all of the slicer ranges at once is more efficient
     */
     async makeIDSlicer(config: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
-        if (!isNumber(config.slicerID)) {
-            throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
-        }
-
-        if (this.version >= 6 && (
-            !isString(config.idFieldName) || config.idFieldName.length === 0
-        )) {
-            throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(config.idFieldName)}`);
-        }
-
-        if (config.recoveryData) {
-            if (Array.isArray(config.recoveryData)) {
-                const areAllObjects = config.recoveryData.every(isSimpleObject);
-                if (!areAllObjects) {
-                    throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
-                }
-            } else {
-                throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(config.recoveryData)}`);
-            }
-        }
-
         const ranges = this.makeIDSlicerRanges(config);
+        return this.makeIDSlicerFromRange(config, ranges[config.slicerID]);
+    }
+
+    /**
+     * Returns an instance of the slicer using the id algorithm,
+     * from a given slicer range, this should be used in conjunction
+     * with {@link ElasticsearchReaderAPI.makeIDSlicerRanges}
+    */
+    async makeIDSlicerFromRange(
+        config: IDSlicerConfig,
+        range: IDSlicerRange
+    ): Promise<() => Promise<IDSlicerResults>> {
+        this.validateIDSlicerConfig(config);
 
         const countFn = this.count.bind(this);
 
@@ -253,7 +276,7 @@ export class ElasticsearchReaderAPI {
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
             logger: this.logger,
-            keySet: ranges[slicerID],
+            keySet: range,
             version: this.version,
             baseKeyArray,
             startingKeyDepth,
@@ -284,46 +307,41 @@ export class ElasticsearchReaderAPI {
         return idSlicer(slicerConfig);
     }
 
-    private validateDateSlicerConfig(input: unknown): void {
-        if (isObject(input)) {
-            if (!(input.lifecycle === 'once' || input.lifecycle === 'persistent')) {
+    private validateDateSlicerConfig(config: unknown): void {
+        if (isObject(config)) {
+            if (!(config.lifecycle === 'once' || config.lifecycle === 'persistent')) {
                 throw new Error('Parameter lifecycle must be set to "once" or "persistent"');
             }
 
-            if (!isNumber(input.numOfSlicers)) {
-                throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(input.numOfSlicers)}`);
+            if (!isNumber(config.numOfSlicers)) {
+                throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(config.numOfSlicers)}`);
             }
 
-            if (input.recoveryData) {
-                if (Array.isArray(input.recoveryData)) {
-                    const areAllObjects = input.recoveryData.every(isSimpleObject);
+            if (config.recoveryData) {
+                if (Array.isArray(config.recoveryData)) {
+                    const areAllObjects = config.recoveryData.every(isSimpleObject);
                     if (!areAllObjects) {
                         throw new Error('Input recoveryData must be an array of recovered slices, cannot have mixed values');
                     }
                 } else {
-                    throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(input.recoveryData)}`);
+                    throw new Error(`Input recoveryData must be an array of recovered slices, got ${getTypeOf(config.recoveryData)}`);
                 }
             }
 
-            if (input.lifecycle === 'persistent') {
-                const windowState = input.windowState as WindowState|undefined;
-                if (!windowState || !windowState.checkin) {
-                    throw new Error(`Invalid parameter windowState, must provide a valid windowState in "persistent" mode, got ${getTypeOf(input.windowState)}`);
-                }
-                if (!input.startTime || !isValidDate(input.startTime)) {
-                    throw new Error(`Invalid parameter startTime, must provide a valid date in "persistent" mode, got ${getTypeOf(input.startTime)}`);
-                }
-            }
-
-            if (input.hook && !isFunction(input.hook)) {
+            if (config.hook && !isFunction(config.hook)) {
                 throw new Error('Input hook must be a function if provided');
             }
         } else {
-            throw new Error(`Input must be an object, received ${getTypeOf(input)}`);
+            throw new Error(`Input must be an object, received ${getTypeOf(config)}`);
         }
     }
 
-    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'>): Promise<DateSlicerRanges|undefined> {
+    /**
+     * This used to subdivide all the of the date ranges for each
+     * slicer instance, then each "range" should be passed into
+     * {@link ElasticsearchReaderAPI.makeDateSlicerFromRange}
+    */
+    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'|'windowState'>): Promise<DateSlicerRanges|undefined> {
         this.validateDateSlicerConfig(config);
         const {
             lifecycle,
@@ -397,9 +415,27 @@ export class ElasticsearchReaderAPI {
     }
 
     /**
-     * Return an instance of the slicer using the date algorithm
+     * Returns an instance of the slicer using the date algorithm,
+     * this is a higher level API and is not recommended when using many
+     * slicers since making all of the slicer ranges at once is more efficient
     */
     async makeDateSlicer(config: DateSlicerArgs): Promise<() => Promise<DateSlicerResults>> {
+        const ranges = await this.makeDateSlicerRanges(config);
+        if (ranges == null || ranges[config.slicerID] == null) {
+            // if it gets here there is probably no data for the query
+            return async () => null;
+        }
+        return this.makeDateSlicerFromRange(config, ranges[config.slicerID]);
+    }
+
+    /**
+     * Returns an instance of the slicer using the date algorithm,
+     * from a given slicer range, this should be used in conjunction
+     * with {@link ElasticsearchReaderAPI.makeDateSlicerRanges}
+    */
+    async makeDateSlicerFromRange(
+        config: Omit<DateSlicerArgs, 'recoveryData'>, range: DateSlicerRange
+    ): Promise<() => Promise<DateSlicerResults>> {
         if (!isNumber(config.slicerID)) {
             throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
         }
@@ -409,7 +445,6 @@ export class ElasticsearchReaderAPI {
             slicerID,
             lifecycle,
             numOfSlicers,
-            windowState,
         } = config;
 
         const isPersistent = lifecycle === 'persistent';
@@ -436,7 +471,6 @@ export class ElasticsearchReaderAPI {
             events: this.emitter,
             version: this.version,
             countFn,
-            windowState,
             timeResolution,
             size,
             subsliceByKey,
@@ -449,40 +483,28 @@ export class ElasticsearchReaderAPI {
 
         await this.verifyIndex();
 
-        const recoveryData = config.recoveryData?.map(
-            (slice) => slice.lastSlice
-        ).filter(Boolean) as SlicerDateResults[]|undefined ?? [];
-
         if (isPersistent) {
+            const windowState = config.windowState as WindowState|undefined;
+            if (!windowState || !windowState.checkin) {
+                throw new Error(`Invalid parameter windowState, must provide a valid windowState in "persistent" mode, got ${getTypeOf(windowState)}`);
+            }
+            if (!config.startTime || !isValidDate(config.startTime)) {
+                throw new Error(`Invalid parameter startTime, must provide a valid date in "persistent" mode, got ${getTypeOf(config.startTime)}`);
+            }
+
             // we need to interval to get starting dates
             const [interval, latencyInterval] = await Promise.all([
                 this.determineSliceInterval(this.config.interval),
                 this.determineSliceInterval(this.config.delay)
             ]);
 
-            const { start, limit } = delayedStreamSegment(
-                config.startTime,
-                interval,
-                latencyInterval
-            );
-
-            const startConfig: StartPointConfig = {
-                dates: { start, limit },
-                numOfSlicers,
-                recoveryData,
-                getInterval() {
-                    return interval;
-                }
-            };
-            const { dates, range } = await determineDateSlicerRange(startConfig, slicerID);
-
             return dateSlicer({
                 ...slicerFnArgs,
                 interval,
                 latencyInterval,
-                windowState: config.windowState,
-                dates,
-                primaryRange: range,
+                windowState,
+                dates: range.dates,
+                primaryRange: range.range,
             });
         }
 
@@ -494,36 +516,11 @@ export class ElasticsearchReaderAPI {
             return async () => null;
         }
 
-        const startConfig: StartPointConfig = {
-            dates: esDates as DateSegments,
-            numOfSlicers,
-            recoveryData,
-            getInterval: async (dates) => {
-                const interval = await this.determineSliceInterval(
-                    this.config.interval,
-                    dates
-                );
-                // This was originally created to update the job configuration
-                // with the correct interval so that retries and recovery operates
-                // with more accuracy. Also it exposes the discovered interval to
-                // to the user
-                if (config.hook) {
-                    await config.hook({
-                        interval,
-                        start: moment(dates.start.format(this.dateFormat)).toISOString(),
-                        end: moment(dates.limit.format(this.dateFormat)).toISOString(),
-                    });
-                }
-                return interval;
-            }
-        };
-
         // we do not care for range for once jobs
-        const { dates, interval } = await determineDateSlicerRange(startConfig, slicerID);
         return dateSlicer({
             ...slicerFnArgs,
-            interval,
-            dates,
+            interval: range.interval,
+            dates: range.dates,
         });
     }
 

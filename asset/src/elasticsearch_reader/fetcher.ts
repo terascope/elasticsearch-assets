@@ -1,3 +1,5 @@
-import ElasticsearchDateFetcher from '../__lib/reader';
+import { ReaderAPIFetcher } from '../__lib/ReaderAPIFetcher';
 
-export default ElasticsearchDateFetcher;
+export default class ElasticsearchDateFetcher extends ReaderAPIFetcher {
+
+}

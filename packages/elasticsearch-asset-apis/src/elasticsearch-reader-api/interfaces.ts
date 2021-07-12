@@ -76,10 +76,14 @@ export interface SettingResults {
 }
 
 /**
+ * An array of key spaces
+*/
+export type IDSlicerRange = readonly string[];
+/**
  * This used a list of all of the ID slicer ranges, the
  * index of the range will correlate with the slicer instance
 */
-export type IDSlicerRanges = readonly (readonly string[])[];
+export type IDSlicerRanges = readonly IDSlicerRange[];
 
 export enum IDType {
     base64url = 'base64url',

@@ -4,14 +4,14 @@ import { ElasticsearchReaderAPI, SlicerDateResults } from '@terascope/elasticsea
 import { ESDateConfig } from '../elasticsearch_reader/interfaces';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
-export default class DateReader extends Fetcher<ESDateConfig> {
+export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
     api!: ElasticsearchReaderAPI;
 
     async initialize(): Promise<void> {
-        await super.initialize();
         const apiName = this.opConfig.api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
+        await super.initialize();
     }
 
     async fetch(slice: SlicerDateResults): Promise<DataEntity[] | DataFrame> {
