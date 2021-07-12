@@ -2,7 +2,7 @@ import {
     cloneDeep, isNumber, TSError, isString
 } from '@terascope/utils';
 import moment from 'moment';
-import { idSlicer } from './id-slicer';
+import { idSlicer } from './idSlicer';
 import {
     SlicerArgs,
     SlicerDateResults,
