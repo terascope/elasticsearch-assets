@@ -15,10 +15,10 @@ export const hexadecimal = Object.freeze(['0', '1', '2', '3', '4', '5', '6', '7'
 export const HEXADECIMAL = Object.freeze(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F']);
 
 export function getKeyArray(keyType: IDType): readonly string[] {
-    if (keyType === 'base64url') return base64url;
-    if (keyType === 'base64') return base64;
-    if (keyType === 'hexadecimal') return hexadecimal;
-    if (keyType === 'HEXADECIMAL') return HEXADECIMAL;
+    if (keyType === IDType.base64url) return base64url;
+    if (keyType === IDType.base64) return base64;
+    if (keyType === IDType.hexadecimal) return hexadecimal;
+    if (keyType === IDType.HEXADECIMAL) return HEXADECIMAL;
 
     throw new Error('Could not find correct key type');
 }
