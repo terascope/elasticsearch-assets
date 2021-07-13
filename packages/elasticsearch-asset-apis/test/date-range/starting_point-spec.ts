@@ -29,7 +29,12 @@ describe('determineDateSlicerRanges', () => {
                 recoveryData: []
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates).toEqual({ start, end, limit });
             expect(range).toEqual(config.dates);
@@ -50,10 +55,14 @@ describe('determineDateSlicerRanges', () => {
                 recoveryData: []
             };
 
-            const [
-                { dates: dates1, range: range1 },
-                { dates: dates2, range: range2 }
-            ] = await determineDateSlicerRanges(config);
+            const [slicerRange1, slicerRange2] = await determineDateSlicerRanges(config);
+            if (slicerRange1 == null || slicerRange2 == null) {
+                expect(slicerRange1).not.toBeNil();
+                expect(slicerRange2).not.toBeNil();
+                return;
+            }
+            const { dates: dates1, range: range1 } = slicerRange1;
+            const { dates: dates2, range: range2 } = slicerRange2;
 
             expect(dates1).toEqual({
                 start: startOfRange,
@@ -95,7 +104,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(limit))).toBeTrue();
@@ -132,7 +146,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
@@ -170,7 +189,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(holeEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(limit))).toBeTrue();
@@ -209,7 +233,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
@@ -249,7 +278,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
@@ -288,7 +322,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
             expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
@@ -329,7 +368,12 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [{ dates, range }] = await determineDateSlicerRanges(config);
+            const [slicerRange] = await determineDateSlicerRanges(config);
+            if (slicerRange == null) {
+                expect(slicerRange).not.toBeNil();
+                return;
+            }
+            const { dates, range } = slicerRange;
 
             expect(dates.start.isSame(moment.utc(holeStart))).toBeTrue();
             expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
@@ -373,10 +417,14 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [
-                { dates: dates1, range: range1 },
-                { dates: dates2, range: range2 }
-            ] = await determineDateSlicerRanges(config);
+            const [slicerRange1, slicerRange2] = await determineDateSlicerRanges(config);
+            if (slicerRange1 == null || slicerRange2 == null) {
+                expect(slicerRange1).not.toBeNil();
+                expect(slicerRange2).not.toBeNil();
+                return;
+            }
+            const { dates: dates1, range: range1 } = slicerRange1;
+            const { dates: dates2, range: range2 } = slicerRange2;
 
             expect(dates1.start.isSame(moment.utc(recoveryEndSlicerOne))).toBeTrue();
             expect(dates1.end.isSame(moment.utc(firstSegmentLimit))).toBeTrue();
@@ -421,17 +469,21 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [
-                { dates, range },
-                { dates: dates2, range: range2 }
-            ] = await determineDateSlicerRanges(config);
+            const [slicerRange1, slicerRange2] = await determineDateSlicerRanges(config);
+            if (slicerRange1 == null || slicerRange2 == null) {
+                expect(slicerRange1).not.toBeNil();
+                expect(slicerRange2).not.toBeNil();
+                return;
+            }
+            const { dates: dates1, range: range1 } = slicerRange1;
+            const { dates: dates2, range: range2 } = slicerRange2;
 
-            expect(dates.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
-            expect(dates.end.isSame(moment.utc(expectedRange[0].limit))).toBeTrue();
-            expect(dates.limit.isSame(moment.utc(expectedRange[0].limit))).toBeTrue();
+            expect(dates1.start.isSame(moment.utc(recoveryEnd))).toBeTrue();
+            expect(dates1.end.isSame(moment.utc(expectedRange[0].limit))).toBeTrue();
+            expect(dates1.limit.isSame(moment.utc(expectedRange[0].limit))).toBeTrue();
 
-            expect(range.start.isSame(config.dates.start)).toBeTrue();
-            expect(range.limit.isSame(config.dates.limit)).toBeTrue();
+            expect(range1.start.isSame(config.dates.start)).toBeTrue();
+            expect(range1.limit.isSame(config.dates.limit)).toBeTrue();
 
             expect(dates2.start.isSame(moment.utc(expectedRange[1].start))).toBeTrue();
             expect(dates2.end.isSame(moment.utc(expectedRange[1].limit))).toBeTrue();
@@ -469,17 +521,21 @@ describe('determineDateSlicerRanges', () => {
                 }]
             };
 
-            const [
-                { dates, range },
-                { dates: dates2, range: range2 }
-            ] = await determineDateSlicerRanges(config);
+            const [slicerRange1, slicerRange2] = await determineDateSlicerRanges(config);
+            if (slicerRange1 == null || slicerRange2 == null) {
+                expect(slicerRange1).not.toBeNil();
+                expect(slicerRange2).not.toBeNil();
+                return;
+            }
+            const { dates: dates1, range: range1 } = slicerRange1;
+            const { dates: dates2, range: range2 } = slicerRange2;
 
-            expect(dates.start.isSame(moment.utc(holeStart))).toBeTrue();
-            expect(dates.end.isSame(moment.utc(holeStart))).toBeTrue();
-            expect(dates.limit.isSame(moment.utc(holeStart))).toBeTrue();
+            expect(dates1.start.isSame(moment.utc(holeStart))).toBeTrue();
+            expect(dates1.end.isSame(moment.utc(holeStart))).toBeTrue();
+            expect(dates1.limit.isSame(moment.utc(holeStart))).toBeTrue();
 
-            expect(range.start.isSame(config.dates.start)).toBeTrue();
-            expect(range.limit.isSame(config.dates.limit)).toBeTrue();
+            expect(range1.start.isSame(config.dates.start)).toBeTrue();
+            expect(range1.limit.isSame(config.dates.limit)).toBeTrue();
 
             // if we cannot process anything we go straight to limit
             expect(dates2.start.isSame(moment.utc(holeStart))).toBeTrue();

@@ -116,7 +116,7 @@ export interface DateSlicerRange {
  * This used a list of all of the Date slicer ranges, the
  * index of the range will correlate with the slicer instance
 */
-export type DateSlicerRanges = readonly DateSlicerRange[];
+export type DateSlicerRanges = readonly (DateSlicerRange|null)[];
 
 export interface DateSegments {
     start: moment.Moment;
@@ -256,10 +256,17 @@ export interface DateSlicerConfig {
     }) => Promise<void>
 }
 
+/**
+ * This function is used to determine the interval for each slicer,
+*/
+export interface GetIntervalFn {
+    (dates: DateSegments): ParsedInterval|null|Promise<ParsedInterval|null>;
+}
+
 export interface StartPointConfig {
     dates: DateSegments;
     numOfSlicers: number;
-    getInterval: (dates: DateSegments) => ParsedInterval|Promise<ParsedInterval>;
+    getInterval: GetIntervalFn;
     recoveryData?: SlicerDateResults[];
 }
 

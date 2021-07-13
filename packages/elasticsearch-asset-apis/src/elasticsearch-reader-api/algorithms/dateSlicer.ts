@@ -201,6 +201,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 throw new Error(`Calculated an invalid end date. ${inspect({ dateParams, holes })}`);
             }
 
+            dateParams.end = newEnd;
+
             events.emit('slicer:slice:range_expansion');
             return determineSlice(dateParams, slicerId, true, makeLimitQuery);
         }
@@ -303,13 +305,16 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 }
             };
 
-            const { dates } = await determineDateSlicerRange(config, id);
+            const result = await determineDateSlicerRange(config, id);
+            if (result == null) {
+                throw new Error('Got back null when it should have returned a date since the interval is fixed');
+            }
 
-            if (dates.limit.isSameOrBefore(delayedBarrier)) {
+            if (result.dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window
                 currentWindow.start = newStart;
                 currentWindow.limit = newLimit;
-                return dates;
+                return result.dates;
             }
             return null;
         }
@@ -372,6 +377,10 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 if (!next) return next;
 
                 const { start, end, limit } = next;
+                if (!end.isValid()) {
+                    throw new Error(`Calculated an invalid end date. ${inspect({ next })}`);
+                }
+
                 // TODO: check if we jumped a hole here at start, remove hole
                 dateParams.start = moment.utc(start);
                 dateParams.end = moment.utc(end);
@@ -394,7 +403,9 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                         return obj;
                     }) as SlicerDateResults[];
                 } catch (err) {
-                    return Promise.reject(new TSError(err, { reason: 'error while sub-slicing by key' }));
+                    throw new TSError(err, {
+                        reason: 'error while sub-slicing by key'
+                    });
                 }
             }
 

@@ -18,6 +18,7 @@ import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import type { CountParams, SearchParams } from 'elasticsearch';
+import { inspect } from 'util';
 import {
     dateSlicer,
     idSlicer,
@@ -126,7 +127,7 @@ export class ElasticsearchReaderAPI {
 
     async determineSliceInterval(
         interval: string, esDates?: InputDateSegments
-    ): Promise<ParsedInterval> {
+    ): Promise<ParsedInterval|null> {
         if (this.config.interval !== 'auto') {
             return processInterval(interval, this.config.time_resolution, esDates);
         }
@@ -140,6 +141,10 @@ export class ElasticsearchReaderAPI {
             end: moment(esDates.limit).format(this.dateFormat),
         });
 
+        // we need to return early so the millisecondInterval doesn't
+        // end up being Infinity because 1/0 === Infinity
+        if (count === 0) return null;
+
         const numOfSlices = Math.ceil(count / this.config.size);
         const timeRangeMilliseconds = moment(esDates.limit).diff(esDates.start);
         const millisecondInterval = Math.floor(timeRangeMilliseconds / numOfSlices);
@@ -147,10 +152,27 @@ export class ElasticsearchReaderAPI {
         if (this.config.time_resolution === 's') {
             let seconds = Math.floor(millisecondInterval / 1000);
             if (seconds < 1) seconds = 1;
+            if (!Number.isSafeInteger(seconds)) {
+                throw new Error(`Invalid interval diff found "${inspect(seconds)}" ${inspect({
+                    esDates,
+                    numOfSlices,
+                    count,
+                    millisecondInterval,
+                    seconds,
+                    config: this.config
+                })}`);
+            }
             return [seconds, 's'];
         }
 
         const millisecondIntervalResults = millisecondInterval < 1 ? 1 : millisecondInterval;
+        if (!Number.isSafeInteger(millisecondIntervalResults)) {
+            throw new Error(`Invalid interval diff found "${inspect(millisecondIntervalResults)}" ${inspect({
+                esDates,
+                millisecondInterval,
+                config: this.config
+            })}`);
+        }
         return [millisecondIntervalResults, 'ms'];
     }
 
@@ -363,6 +385,12 @@ export class ElasticsearchReaderAPI {
                 this.determineSliceInterval(this.config.delay)
             ]);
 
+            if (interval == null || latencyInterval == null) {
+                this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
+                // slicer will run and complete when a null is returned
+                return;
+            }
+
             const { start, limit } = delayedStreamSegment(
                 config.startTime,
                 interval,
@@ -398,6 +426,9 @@ export class ElasticsearchReaderAPI {
                     this.config.interval,
                     dates
                 );
+
+                if (interval == null) return null;
+
                 // This was originally created to update the job configuration
                 // with the correct interval so that retries and recovery operates
                 // with more accuracy. Also it exposes the discovered interval to
@@ -425,7 +456,7 @@ export class ElasticsearchReaderAPI {
             // if it gets here there is probably no data for the query
             return async () => null;
         }
-        return this.makeDateSlicerFromRange(config, ranges[config.slicerID]);
+        return this.makeDateSlicerFromRange(config, ranges[config.slicerID]!);
     }
 
     /**
@@ -497,6 +528,12 @@ export class ElasticsearchReaderAPI {
                 this.determineSliceInterval(this.config.interval),
                 this.determineSliceInterval(this.config.delay)
             ]);
+
+            if (interval == null || latencyInterval == null) {
+                this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
+                // slicer will run and complete when a null is returned
+                return async () => null;
+            }
 
             return dateSlicer({
                 ...slicerFnArgs,

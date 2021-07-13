@@ -406,8 +406,8 @@ export async function determineDateSlicerRange(
         recoveryData,
         getInterval
     }: StartPointConfig,
-    id: number
-): Promise<DateSlicerRange> {
+    id: number,
+): Promise<DateSlicerRange|null> {
     let newDates: SlicerDates|DateRanges;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
@@ -423,6 +423,7 @@ export async function determineDateSlicerRange(
             )[id];
         }
         const interval = await getInterval(newDates);
+        if (interval == null) return null;
 
         const correctDates = compareRangeToRecoveryData(
             newDates, recoveryData, interval, id, numOfSlicers
@@ -440,6 +441,8 @@ export async function determineDateSlicerRange(
     newDates = dateRange[id];
 
     const interval = await getInterval(newDates);
+    if (interval == null) return null;
+
     // we need to split up times
     const [step, unit] = interval;
 

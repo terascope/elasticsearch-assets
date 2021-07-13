@@ -153,6 +153,30 @@ describe('Reader API', () => {
             expect(nullSlice).toBeNull();
         });
 
+        it('can handle the case where no data is returned from the query', async () => {
+            const config: ESReaderOptions = {
+                ...defaultConfig,
+                // there should be nothing with this range
+                start: '2001-01-31T17:23:25.000Z',
+                end: '2001-01-31T17:23:26.000Z'
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeDateSlicer({
+                lifecycle: 'once',
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            expect(slicer).toBeDefined();
+
+            await expect(slicer()).resolves.toBeNull();
+        });
+
         it('can count a slice', async () => {
             const config: ESReaderOptions = {
                 ...defaultConfig
