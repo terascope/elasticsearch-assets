@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.6.3",
+    "version": "2.7.0",
     "private": true,
     "workspaces": [
         "packages/*",
@@ -48,7 +48,7 @@
         "@types/elasticsearch": "^5.0.38",
         "@types/got": "^9.6.12",
         "@types/jest": "^26.0.24",
-        "@types/node": "^15.12.2",
+        "@types/node": "^16.3.1",
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.52.1",
         "eslint": "^7.30.0",
@@ -56,6 +56,7 @@
         "jest-extended": "^0.11.5",
         "moment": "^2.29.1",
         "nock": "^13.1.1",
+        "node-notifier": "^10.0.0",
         "teraslice-test-harness": "^0.28.0",
         "ts-jest": "^27.0.3",
         "typescript": "^4.3.5"

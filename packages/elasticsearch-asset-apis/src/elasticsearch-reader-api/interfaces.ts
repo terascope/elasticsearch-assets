@@ -1,8 +1,89 @@
+import type { DataFrame } from '@terascope/data-mate';
+import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
+import type {
+    SearchParams
+} from 'elasticsearch';
 import type { LifeCycle, SlicerRecoveryData } from '@terascope/job-components';
-import { EventEmitter } from 'events';
-import { AnyObject, Logger } from '@terascope/utils';
-import { DataTypeConfig, xLuceneVariables } from '@terascope/types';
-import { WindowState } from './window-state';
+import type { EventEmitter } from 'events';
+import type { DataTypeConfig, xLuceneVariables } from '@terascope/types';
+import type { WindowState } from './WindowState';
+
+/**
+ * This is used for as the internal elasticsearch
+ * client in reader, this is designed as an abstraction
+ * so that spaces client will work with it is own specific
+ * optimizations
+*/
+export interface ReaderClient {
+    /**
+     * Counts the number of documents for a given query
+    */
+    count(query: SearchParams): Promise<number>;
+
+    /**
+     * Searches for documents for a given query
+    */
+    search(
+        query: SearchParams,
+        useDataFrames: false,
+        typeConfig?: DataTypeConfig
+    ): Promise<DataEntity[]>;
+    search(
+        query: SearchParams,
+        useDataFrames: true,
+        typeConfig: DataTypeConfig
+    ): Promise<DataFrame>;
+    search(
+        query: SearchParams,
+        useDataFrames: boolean,
+        typeConfig?: DataTypeConfig
+    ): Promise<DataEntity[]|DataFrame>;
+
+    /**
+     * Used to make a custom search request
+     *
+     * @note this API is subject to change
+    */
+    _searchRequest(query: SearchParams, fullResponse?: false): Promise<DataEntity[]>;
+    _searchRequest(query: SearchParams, fullResponse: true): Promise<unknown>;
+    _searchRequest(query: SearchParams, fullResponse?: boolean): Promise<DataEntity[]|unknown>;
+
+    /**
+     * Gets the elasticsearch major server version,
+     * this will be used to format the search parameters
+    */
+    getESVersion(): number;
+
+    /**
+     * Verify that the cluster is up,
+     * internally this will use esClient.version() probably
+    */
+    verify(): Promise<void>;
+
+    /**
+     * Used to determine the max window size
+    */
+    getSettings(index: string): Promise<SettingResults>;
+}
+
+export interface SettingResults {
+    [key: string]: {
+        settings: {
+            'index.max_result_window': number
+        },
+        defaults: AnyObject
+    }
+}
+
+/**
+ * An array of key spaces
+*/
+export type IDSlicerRange = readonly string[];
+/**
+ * This used a list of all of the ID slicer ranges, the
+ * index of the range will correlate with the slicer instance
+*/
+export type IDSlicerRanges = readonly IDSlicerRange[];
 
 export enum IDType {
     base64url = 'base64url',
@@ -10,6 +91,7 @@ export enum IDType {
     hexadecimal = 'hexadecimal',
     HEXADECIMAL = 'HEXADECIMAL'
 }
+
 export interface WildCardQuery {
     field: string;
     value: string;
@@ -19,6 +101,23 @@ export interface IDSlicerResult {
     count: number;
     wildcard: WildCardQuery;
 }
+
+/**
+ * This is used for an individual starting point
+ * for a single range
+*/
+export interface DateSlicerRange {
+    readonly dates: SlicerDates;
+    readonly range: DateSegments;
+    readonly interval: ParsedInterval;
+}
+
+/**
+ * This used a list of all of the Date slicer ranges, the
+ * index of the range will correlate with the slicer instance
+*/
+export type DateSlicerRanges = readonly (DateSlicerRange|null)[];
+
 export interface DateSegments {
     start: moment.Moment;
     limit: moment.Moment;
@@ -28,20 +127,24 @@ export interface IDSlicerArgs {
     retryData?: any;
     logger: Logger;
     range?: SlicerDateResults;
-    keySet: string[];
-    baseKeyArray: string[];
+    keySet: readonly string[];
+    baseKeyArray: readonly string[];
     events: EventEmitter;
     startingKeyDepth: number;
     version: number;
-    countFn: (args: AnyObject) => Promise<number>;
+    countFn: (args: {
+        start?: string;
+        end?: string;
+    }) => Promise<number>;
     type?: string | null;
     idFieldName?: string | null;
     size: number;
 }
+
 export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,
-    recoveryData: SlicerRecoveryData[],
+    recoveryData?: SlicerRecoveryData[],
     keyType: IDType;
     keyRange?: string[];
     startingKeyDepth: number,
@@ -67,12 +170,31 @@ export interface SlicerArgs {
     numOfSlicers: number;
     logger: Logger;
     dates?: SlicerDates;
+    /**
+     * This only matters for persistent jobs
+    */
     primaryRange?: DateSegments;
+    /**
+     * The slicer id, I think this is used to further subdivide
+     * the dates
+    */
     id: number;
+    /**
+     * This used to emit a slice recursion event
+    */
     events: EventEmitter;
+    /**
+     * This is only used for persistent jobs
+    */
     windowState?: WindowState;
+    /**
+     * The elasticsearch server version (only the major version)
+    */
     version: number;
-    countFn: (args: AnyObject) => Promise<number>
+    countFn: (args: {
+        start?: string;
+        end?: string;
+    }) => Promise<number>
 }
 export interface SlicerDateResults {
     start: string;
@@ -104,7 +226,7 @@ export type DateSlicerResults = SlicerDateResults | SlicerDateResults[] | null;
 /** What a id slicer fn will return */
 export type IDSlicerResults = IDReaderSlice | null;
 
-export type ParsedInterval = [number, moment.unitOfTime.Base];
+export type ParsedInterval = readonly [step: number, unit: moment.unitOfTime.Base];
 
 export interface DateSlicerArgs {
     lifecycle: LifeCycle,
@@ -113,24 +235,38 @@ export interface DateSlicerArgs {
     recoveryData?: SlicerRecoveryData[];
     windowState?: WindowState,
     startTime?: Date | string
-    hook?: (args: AnyObject) => Promise<void>
+    hook?: (args: {
+        interval: ParsedInterval,
+        start: string;
+        end: string;
+    }) => Promise<void>
 }
 
 export interface DateSlicerConfig {
     lifecycle: LifeCycle,
     slicerID: number,
     numOfSlicers: number,
-    recoveryData: SlicerRecoveryData[],
+    recoveryData?: SlicerRecoveryData[],
     windowState?: WindowState,
     startTime?: Date | string,
-    hook?: (args: AnyObject) => Promise<void>
+    hook?: (args: {
+        interval: ParsedInterval,
+        start: string;
+        end: string;
+    }) => Promise<void>
+}
+
+/**
+ * This function is used to determine the interval for each slicer,
+*/
+export interface GetIntervalFn {
+    (dates: DateSegments): ParsedInterval|null|Promise<ParsedInterval|null>;
 }
 
 export interface StartPointConfig {
     dates: DateSegments;
-    id: number;
     numOfSlicers: number;
-    interval: ParsedInterval;
+    getInterval: GetIntervalFn;
     recoveryData?: SlicerDateResults[];
 }
 
@@ -188,47 +324,4 @@ export interface DetermineSliceResults {
 export interface SlicerDateConfig extends DateSegments {
     end: moment.Moment;
     holes?: DateConfig[];
-}
-
-export interface ElasticsearchSenderConfig {
-    size: number;
-    connection: string;
-    index: string;
-    type?: string;
-    delete?: boolean;
-    update?: boolean;
-    update_retry_on_conflict?: number;
-    update_fields?: string[];
-    upsert?: boolean;
-    create?: boolean;
-    script_file?: string;
-    script?: string;
-    script_params?: AnyObject;
-    _key?: string
-}
-
-export interface BulkMeta {
-    _index: string;
-    _type: string;
-    _id: string | number;
-    retry_on_conflict: number;
-}
-
-export interface IndexSpec {
-    index?: AnyObject;
-    create?: AnyObject;
-    update?: AnyObject;
-    delete?: AnyObject;
-}
-
-export interface ScriptConfig {
-    file?: string;
-    source?: string;
-    params?: AnyObject;
-}
-
-export interface UpdateConfig {
-    upsert?: AnyObject;
-    doc?: AnyObject;
-    script?: ScriptConfig;
 }

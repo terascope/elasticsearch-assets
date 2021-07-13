@@ -11,16 +11,12 @@ import {
 } from '@terascope/job-components';
 import moment from 'moment';
 import {
-    WindowState,
-    SlicerArgs,
-    ParsedInterval,
-    SlicerDateConfig,
-    DateSegments,
-    SlicerDateResults,
+    WindowState, SlicerArgs, ParsedInterval,
+    SlicerDateConfig, DateSegments,
+    SlicerDateResults, dateSlicer,
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src';
 import { MockClient } from '../helpers';
-import { dateSlicer } from '../../src/elasticsearch-date-slicer';
 
 interface TestConfig {
     slicers?: number;

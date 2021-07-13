@@ -5,13 +5,15 @@ interface WindowMeta {
     canRestart: boolean;
 }
 
+/**
+ * This is used track the slicer state when running persistent mode
+*/
 export class WindowState {
     _windowState: Record<number, WindowMeta> = {};
 
     constructor(numOfSlicers: number) {
-        const keys = times(numOfSlicers);
-        keys.forEach((key) => {
-            this._windowState[key] = { hasCalled: false, canRestart: false };
+        times(numOfSlicers, (id) => {
+            this._windowState[id] = { hasCalled: false, canRestart: false };
         });
     }
 
@@ -19,6 +21,12 @@ export class WindowState {
         return Object.values(this._windowState).every((meta) => meta.hasCalled === value);
     }
 
+    /**
+     * Call this with the slicer id to ensure that
+     * the slicer is correctly processing. Returns true
+     * if all of the slicers are complete and need to restart
+     * processing
+    */
     checkin(id: number): boolean {
         const meta = this._windowState[id];
         let bool = false;

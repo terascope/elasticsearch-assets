@@ -1,7 +1,7 @@
 import { APIConfig, APIFactoryRegistry, AnyObject } from '@terascope/job-components';
-import { ElasticsearchSender, ElasticsearchSenderConfig } from '@terascope/elasticsearch-asset-apis';
+import { ElasticsearchBulkSender, ElasticsearchSenderConfig } from '@terascope/elasticsearch-asset-apis';
 
-export type ElasticSenderAPI = APIFactoryRegistry<ElasticsearchSender, AnyObject>
+export type ElasticSenderAPI = APIFactoryRegistry<ElasticsearchBulkSender, AnyObject>
 
 export const DEFAULT_API_NAME = 'elasticsearch_sender_api';
 

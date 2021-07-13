@@ -1,4 +1,4 @@
-import { TSError, AnyObject } from '@terascope/utils';
+import { TSError } from '@terascope/utils';
 import {
     IDSlicerArgs, SlicerDateResults, IDReaderSlice, IDSlicerResults
 } from '../interfaces';
@@ -46,7 +46,10 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
             query.key = `${type}#${data.value}*`;
         }
 
-        async function getKeySlice(esQuery: AnyObject): Promise<IDReaderSlice | null> {
+        async function getKeySlice(esQuery: {
+            start?: string;
+            end?: string;
+        }): Promise<IDReaderSlice | null> {
             const count = await countFn(esQuery);
 
             if (count > size) {
@@ -67,8 +70,8 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     }
 
     function keyGenerator(
-        baseArray: string[],
-        keysArray: string[],
+        baseArray: readonly string[],
+        keysArray: readonly string[],
         retryKey?: string,
         dateRange?: SlicerDateResults
     ) {
@@ -127,7 +130,7 @@ function compareKeys(key: string, retryKey: string) {
     return false;
 }
 
-function* recurse(baseArray: string[], str: string): Generator<string> {
+function* recurse(baseArray: readonly string[], str: string): Generator<string> {
     for (const key of baseArray) {
         const newStr = str + key;
         const resp = yield newStr;
@@ -139,7 +142,7 @@ function* recurse(baseArray: string[], str: string): Generator<string> {
 }
 
 function* recurseDepth(
-    baseArray: string[],
+    baseArray: readonly string[],
     str: string,
     startingKeyDepth: number
 ): Generator<string> {
@@ -159,8 +162,8 @@ function* recurseDepth(
 }
 
 function* generateKeys(
-    baseArray: string[],
-    keysArray: string[]
+    baseArray: readonly string[],
+    keysArray: readonly string[]
 ): Generator<string> {
     for (const startKey of keysArray) {
         const processKey = yield startKey;
@@ -174,8 +177,8 @@ function* generateKeys(
 }
 
 function* generateKeyDepth(
-    baseArray: string[],
-    keysArray: string[],
+    baseArray: readonly string[],
+    keysArray: readonly string[],
     startingKeyDepth: number
 ): Generator<string> {
     for (const startKey of keysArray) {

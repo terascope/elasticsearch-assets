@@ -1,6 +1,6 @@
 {
     "name": "asset",
-    "version": "2.6.4",
+    "version": "2.7.0",
     "private": true,
     "workspaces": {
         "nohoist": [
@@ -18,7 +18,7 @@
     "dependencies": {
         "@terascope/data-mate": "^0.30.0",
         "@terascope/elasticsearch-api": "^2.21.4",
-        "@terascope/elasticsearch-asset-apis": "^0.5.4",
+        "@terascope/elasticsearch-asset-apis": "^0.6.0",
         "@terascope/job-components": "^0.52.4",
         "@terascope/teraslice-state-storage": "^0.29.4",
         "@terascope/utils": "^0.40.4",

@@ -2,7 +2,8 @@ import {
     cloneDeep, isNumber, TSError, isString
 } from '@terascope/utils';
 import moment from 'moment';
-import { idSlicer } from '../elasticsearch-id-slicer';
+import { inspect } from 'util';
+import { idSlicer } from './idSlicer';
 import {
     SlicerArgs,
     SlicerDateResults,
@@ -20,9 +21,9 @@ import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
-    determineStartingPoint
-} from './helpers';
-import { getKeyArray } from '../elasticsearch-id-slicer/helpers';
+    determineDateSlicerRange,
+} from './date-helpers';
+import { getKeyArray } from './id-helpers';
 
 interface DateParams {
     start: moment.Moment;
@@ -108,12 +109,17 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             start, end, limit, size, holes, interval: [step, unit]
         } = dateParams;
 
+        if (!end.isValid()) {
+            throw new Error(`Received an invalid end date. ${inspect({ dateParams })}`);
+        }
+
         let count: number;
         try {
             count = await getCount(dateParams);
         } catch (err) {
-            const error = new TSError(err, { reason: `Unable to count slice ${JSON.stringify(dateParams)}` });
-            return Promise.reject(error);
+            throw new TSError(err, {
+                reason: `Unable to count slice ${inspect(dateParams)}`
+            });
         }
 
         if (count > size) {
@@ -124,6 +130,10 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 // get diff from new start
                 const diff = splitTime(newStart, end, limit, timeResolution);
                 const newEnd = moment.utc(newStart).add(diff, timeResolution);
+
+                if (!newEnd.isValid()) {
+                    throw new Error(`Calculated an invalid end date. ${inspect({ dateParams })}`);
+                }
 
                 const cloneDates: DateParams = {
                     interval: dateParams.interval,
@@ -156,6 +166,9 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 return { start, end, count };
             }
 
+            if (!newEnd.isValid()) {
+                throw new Error(`Calculated an invalid end date. ${inspect({ dateParams })}`);
+            }
             // recurse to find smaller chunk
             dateParams.end = newEnd;
             events.emit('slicer:slice:recursion');
@@ -174,17 +187,21 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             // we make a mark of the last end spot before expansion
             dateParams.prevEnd = moment.utc(end);
 
-            const newEnd = moment.utc(dateParams.end).add(step, unit);
+            let newEnd = moment.utc(dateParams.end).add(step, unit);
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;
-                dateParams.end = moment.utc(dateParams.limit);
+                newEnd = moment.utc(dateParams.limit);
             } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
                 makeLimitQuery = true;
-                dateParams.end = moment.utc(holes[0].start);
-            } else {
-                dateParams.end = newEnd;
+                newEnd = moment.utc(holes[0].start);
             }
+
+            if (!newEnd.isValid()) {
+                throw new Error(`Calculated an invalid end date. ${inspect({ dateParams, holes })}`);
+            }
+
+            dateParams.end = newEnd;
 
             events.emit('slicer:slice:range_expansion');
             return determineSlice(dateParams, slicerId, true, makeLimitQuery);
@@ -255,7 +272,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         return getIdData(idSlicers);
     }
 
-    async function getCount(dates: DateParams) {
+    async function getCount(dates: DateParams): Promise<number> {
         const end = dates.end ? dates.end : dates.limit;
         const query = {
             start: dates.start.format(dateFormat),
@@ -282,18 +299,22 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
 
             const config: StartPointConfig = {
                 dates: { start: moment.utc(newStart), limit: moment.utc(newLimit) },
-                id,
                 numOfSlicers,
-                interval
+                getInterval() {
+                    return interval;
+                }
             };
 
-            const { dates } = determineStartingPoint(config);
+            const result = await determineDateSlicerRange(config, id);
+            if (result == null) {
+                throw new Error('Got back null when it should have returned a date since the interval is fixed');
+            }
 
-            if (dates.limit.isSameOrBefore(delayedBarrier)) {
+            if (result.dates.limit.isSameOrBefore(delayedBarrier)) {
                 // we have successfully jumped, move window
                 currentWindow.start = newStart;
                 currentWindow.limit = newLimit;
-                return dates;
+                return result.dates;
             }
             return null;
         }
@@ -316,15 +337,17 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             dateParams.start = newStart;
         }
 
-        const newEnd = moment.utc(dateParams.start).add(step, unit);
+        let newEnd = moment.utc(dateParams.start).add(step, unit);
 
         if (newEnd.isSameOrAfter(dateParams.limit)) {
-            dateParams.end = moment.utc(dateParams.limit);
+            newEnd = moment.utc(dateParams.limit);
         } else if (holes.length > 0 && newEnd.isSameOrAfter(holes[0].start)) {
-            dateParams.end = moment.utc(holes[0].start);
-        } else {
-            dateParams.end = newEnd;
+            newEnd = moment.utc(holes[0].start);
         }
+        if (!newEnd.isValid()) {
+            throw new Error(`Calculated an invalid end date. ${inspect({ dateParams, holes })}`);
+        }
+        dateParams.end = newEnd;
     }
 
     function makeDateSlicer(
@@ -354,6 +377,10 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 if (!next) return next;
 
                 const { start, end, limit } = next;
+                if (!end.isValid()) {
+                    throw new Error(`Calculated an invalid end date. ${inspect({ next })}`);
+                }
+
                 // TODO: check if we jumped a hole here at start, remove hole
                 dateParams.start = moment.utc(start);
                 dateParams.end = moment.utc(end);
@@ -376,7 +403,9 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                         return obj;
                     }) as SlicerDateResults[];
                 } catch (err) {
-                    return Promise.reject(new TSError(err, { reason: 'error while sub-slicing by key' }));
+                    throw new TSError(err, {
+                        reason: 'error while sub-slicing by key'
+                    });
                 }
             }
 

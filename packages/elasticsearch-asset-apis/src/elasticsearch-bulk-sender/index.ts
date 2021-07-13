@@ -1,7 +1,10 @@
 import elasticAPI from '@terascope/elasticsearch-api';
 import { isNil, isPlainObject, isString } from '@terascope/utils';
-import { ElasticsearchSender } from './bulk-sender';
-import { ElasticsearchSenderConfig } from '../interfaces';
+import { ElasticsearchBulkSender } from './ElasticsearchBulkSender';
+import { ElasticsearchSenderConfig } from './interfaces';
+
+export * from './ElasticsearchBulkSender';
+export * from './interfaces';
 
 interface BulkAPIArgs {
     config: ElasticsearchSenderConfig,
@@ -9,7 +12,10 @@ interface BulkAPIArgs {
 }
 
 function validateConfig(input: unknown): ElasticsearchSenderConfig {
-    if (!isPlainObject(input)) throw new Error('Bulk Sender API config must be an object');
+    if (!isPlainObject(input)) {
+        throw new Error('Bulk Sender API config must be an object');
+    }
+
     const config = {
         ...input as Record<string, any>
     } as Partial<ElasticsearchSenderConfig>;
@@ -35,12 +41,12 @@ function validateConfig(input: unknown): ElasticsearchSenderConfig {
         }
     });
 
-    return input as ElasticsearchSenderConfig;
+    return config as ElasticsearchSenderConfig;
 }
 
-export function createBulkSenderAPI(
+export function createElasticsearchBulkSender(
     { client, config: inputConfig }: BulkAPIArgs
-): ElasticsearchSender {
+): ElasticsearchBulkSender {
     const config = validateConfig(inputConfig);
-    return new ElasticsearchSender(client, config);
+    return new ElasticsearchBulkSender(client, config);
 }

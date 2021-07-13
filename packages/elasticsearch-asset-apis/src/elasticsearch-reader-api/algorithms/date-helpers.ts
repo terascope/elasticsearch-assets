@@ -1,15 +1,12 @@
 import {
     times,
-    AnyObject,
-    toNumber,
-    parseGeoPoint,
+    toIntegerOrThrow,
 } from '@terascope/utils';
 import moment from 'moment';
 import fs from 'fs';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
-import { GeoPoint } from '@terascope/types';
-import { SearchParams } from 'elasticsearch';
+import { inspect } from 'util';
 import {
     StartPointConfig,
     SlicerDates,
@@ -18,7 +15,8 @@ import {
     SlicerDateResults,
     ParsedInterval,
     DateConfig,
-    ESReaderOptions,
+    DateSlicerRanges,
+    DateSlicerRange,
 } from '../interfaces';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
@@ -73,14 +71,16 @@ export function processInterval(
     const regex = /(\d+)(\w+)/i;
     const intervalMatch = regex.exec(interval);
 
-    if (intervalMatch === null) {
+    if (intervalMatch == null) {
         throw new Error('elasticsearch_reader interval and/or delay are incorrectly formatted. Needs to follow [number][letter\'s] format, e.g. "12s"');
     }
 
     // don't need first parameter, its the full string
     intervalMatch.shift();
 
-    const newInterval: ParsedInterval = [toNumber(intervalMatch[0]), dateOptions(intervalMatch[1])];
+    const newInterval: ParsedInterval = [
+        toIntegerOrThrow(intervalMatch[0]), dateOptions(intervalMatch[1])
+    ];
     return compareInterval(newInterval, timeResolution, esDates);
 }
 
@@ -89,11 +89,23 @@ function compareInterval(
 ): ParsedInterval {
     if (esDates) {
         const datesDiff = moment(esDates.limit).diff(esDates.start);
-        const intervalDiff = moment.duration(Number(interval[0]), interval[1] as moment.unitOfTime.Base).as('milliseconds');
+        const intervalDiff = moment.duration(
+            toIntegerOrThrow(interval[0]),
+            interval[1] as moment.unitOfTime.Base
+        ).as('milliseconds');
 
         if (intervalDiff > datesDiff) {
             if (timeResolution === 's') {
-                return [Math.ceil(datesDiff / 1000), 's'];
+                const secondsDiff = Math.ceil(datesDiff / 1000);
+                if (!Number.isSafeInteger(secondsDiff)) {
+                    throw new Error(`Invalid interval diff found "${inspect(secondsDiff)}" ${inspect({
+                        esDates,
+                        interval,
+                        datesDiff,
+                        intervalDiff,
+                    })}`);
+                }
+                return [secondsDiff, 's'];
             }
             return [datesDiff, 'ms'];
         }
@@ -235,8 +247,8 @@ export function divideRange(
 ): DateSegments[] {
     const results: DateSegments[] = [];
     // 'x' is Unix Millisecond Timestamp format
-    const startNum = Number(moment.utc(startTime).format('x'));
-    const limitNum = Number(moment.utc(endTime).format('x'));
+    const startNum = toIntegerOrThrow(moment.utc(startTime).format('x'));
+    const limitNum = toIntegerOrThrow(moment.utc(endTime).format('x'));
     const range = (limitNum - startNum) / numOfSlicers;
 
     const step = moment.utc(startTime);
@@ -255,7 +267,7 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
-    startTime: moment.Moment | Date | string,
+    startTime: moment.Moment | Date | string|undefined,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
 ): { start: moment.Moment, limit: moment.Moment } {
@@ -272,11 +284,6 @@ export function delayedStreamSegment(
     );
 
     return { start: delayedStart, limit: delayedLimit };
-}
-
-interface StartingConfig {
-    dates: SlicerDates;
-    range: DateSegments;
 }
 
 function convertToHole(rRecord: SlicerDateResults): DateConfig {
@@ -392,20 +399,18 @@ interface DateRanges {
 
 type RDate = SlicerDateResults|undefined;
 
-export function determineStartingPoint(config: StartPointConfig): StartingConfig {
-    const {
+export async function determineDateSlicerRange(
+    {
         dates,
-        id,
         numOfSlicers,
-        interval,
-        recoveryData
-    } = config;
-    // we need to split up times
-    const [step, unit] = interval;
+        recoveryData,
+        getInterval
+    }: StartPointConfig,
+    id: number,
+): Promise<DateSlicerRange|null> {
+    let newDates: DateRanges;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
-        let newDates: DateRanges;
-
         // our number of slicers have changed
         if (numOfSlicers !== recoveryData.length) {
             newDates = redistributeDates(recoveryData, numOfSlicers, id);
@@ -417,225 +422,42 @@ export function determineStartingPoint(config: StartPointConfig): StartingConfig
                 numOfSlicers
             )[id];
         }
+        const interval = await getInterval(newDates);
+        if (interval == null) return null;
+
         const correctDates = compareRangeToRecoveryData(
             newDates, recoveryData, interval, id, numOfSlicers
         );
 
-        return { dates: correctDates, range: dates };
+        return { dates: correctDates, range: dates, interval };
     }
 
-    const dateRange: Partial<SlicerDates>[] = divideRange(
+    const dateRange = divideRange(
         dates.start,
         dates.limit,
         numOfSlicers
     );
 
-    const newDates = dateRange[id];
+    newDates = dateRange[id];
+
+    const interval = await getInterval(newDates);
+    if (interval == null) return null;
+
+    // we need to split up times
+    const [step, unit] = interval;
+
     let end = moment.utc(newDates.start).add(step, unit);
-    if (end.isSameOrAfter(newDates.limit)) end = moment.utc(newDates.limit);
-    newDates.end = end;
+    if (end.isSameOrAfter(newDates.limit)) {
+        end = moment.utc(newDates.limit);
+    }
 
-    return { dates: newDates as SlicerDates, range: dates };
+    return { dates: { ...newDates, end }, range: dates, interval };
 }
 
-export function buildQuery(
-    opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>
-): SearchParams {
-    const query: SearchParams = {
-        index: opConfig.index,
-        size: slice.count,
-        body: _buildRangeQuery(opConfig, slice),
-    };
-
-    if (opConfig.fields) query._source = opConfig.fields;
-
-    return query;
-}
-
-function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>) {
-    const body: AnyObject = {
-        query: {
-            bool: {
-                must: [],
-            },
-        },
-    };
-    // is a range type query
-    if (slice.start && slice.end) {
-        const dateObj = {};
-        const { date_field_name: dateFieldName } = opConfig;
-        dateObj[dateFieldName] = {
-            gte: slice.start,
-            lt: slice.end,
-        };
-
-        body.query.bool.must.push({ range: dateObj });
-    }
-    // elasticsearch _id based query, we keep for v5 and lower
-    if (slice.key) {
-        body.query.bool.must.push({ wildcard: { _uid: slice.key } });
-    }
-
-    if (slice.wildcard) {
-        const { field, value } = slice.wildcard;
-        body.query.bool.must.push({ wildcard: { [field]: value } });
-    }
-
-    // elasticsearch lucene based query
-    if (opConfig.query) {
-        body.query.bool.must.push({
-            query_string: {
-                query: opConfig.query,
-            },
-        });
-    }
-
-    if (opConfig.geo_field) {
-        validateGeoParameters(opConfig);
-        const geoQuery = geoSearch(opConfig);
-        body.query.bool.must.push(geoQuery.query);
-        if (geoQuery.sort) body.sort = [geoQuery.sort];
-    }
-
-    return body;
-}
-
-export function validateGeoParameters(opConfig: ESReaderOptions): void {
-    const {
-        geo_field: geoField,
-        geo_box_top_left: geoBoxTopLeft,
-        geo_box_bottom_right: geoBoxBottomRight,
-        geo_point: geoPoint,
-        geo_distance: geoDistance,
-        geo_sort_point: geoSortPoint,
-        geo_sort_order: geoSortOrder,
-        geo_sort_unit: geoSortUnit,
-    } = opConfig;
-
-    function isBoundingBoxQuery() {
-        return geoBoxTopLeft && geoBoxBottomRight;
-    }
-
-    function isGeoDistanceQuery() {
-        return geoPoint && geoDistance;
-    }
-
-    if (geoBoxTopLeft && geoPoint) {
-        throw new Error('geo_box and geo_distance queries can not be combined.');
-    }
-
-    if ((geoPoint && !geoDistance) || (!geoPoint && geoDistance)) {
-        throw new Error(
-            'Both geo_point and geo_distance must be provided for a geo_point query.'
-        );
-    }
-
-    if ((geoBoxTopLeft && !geoBoxBottomRight) || (!geoBoxTopLeft && geoBoxBottomRight)) {
-        throw new Error(
-            'Both geo_box_top_left and geo_box_bottom_right must be provided for a geo bounding box query.'
-        );
-    }
-
-    if (geoBoxTopLeft && (geoSortOrder || geoSortUnit) && !geoSortPoint) {
-        throw new Error(
-            'bounding box search requires geo_sort_point to be set if any other geo_sort_* parameter is provided'
-        );
-    }
-
-    if ((geoBoxTopLeft || geoPoint || geoDistance || geoSortPoint) && !geoField) {
-        throw new Error(
-            'geo box search requires geo_field to be set if any other geo query parameters are provided'
-        );
-    }
-
-    if (geoField && !(isBoundingBoxQuery() || isGeoDistanceQuery())) {
-        throw new Error(
-            'if geo_field is specified then the appropriate geo_box or geo_distance query parameters need to be provided as well'
-        );
-    }
-}
-
-export function geoSearch(opConfig: ESReaderOptions): AnyObject {
-    let isGeoSort = false;
-    const queryResults: AnyObject = {};
-    // check for key existence to see if they are user defined
-    if (opConfig.geo_sort_order || opConfig.geo_sort_unit || opConfig.geo_sort_point) {
-        isGeoSort = true;
-    }
-
-    const {
-        geo_box_top_left: geoBoxTopLeft,
-        geo_box_bottom_right: geoBoxBottomRight,
-        geo_point: geoPoint,
-        geo_distance: geoDistance,
-        geo_sort_point: geoSortPoint,
-        geo_sort_order: geoSortOrder = 'asc',
-        geo_sort_unit: geoSortUnit = 'm',
-    } = opConfig;
-
-    function createGeoSortQuery(location: GeoPoint) {
-        const sortedSearch: AnyObject = { _geo_distance: {} };
-        sortedSearch._geo_distance[opConfig.geo_field as string] = {
-            lat: location[0],
-            lon: location[1],
-        };
-        sortedSearch._geo_distance.order = geoSortOrder;
-        sortedSearch._geo_distance.unit = geoSortUnit;
-        return sortedSearch;
-    }
-
-    let parsedGeoSortPoint;
-
-    if (geoSortPoint) {
-        parsedGeoSortPoint = parseGeoPoint(geoSortPoint);
-    }
-
-    // Handle an Geo Bounding Box query
-    if (geoBoxTopLeft) {
-        const topLeft = parseGeoPoint(geoBoxTopLeft);
-        const bottomRight = parseGeoPoint(geoBoxBottomRight as string);
-
-        const searchQuery = {
-            geo_bounding_box: {},
-        };
-
-        searchQuery.geo_bounding_box[opConfig.geo_field as string] = {
-            top_left: {
-                lat: topLeft[0],
-                lon: topLeft[1],
-            },
-            bottom_right: {
-                lat: bottomRight[0],
-                lon: bottomRight[1],
-            },
-        };
-
-        queryResults.query = searchQuery;
-
-        if (isGeoSort) {
-            queryResults.sort = createGeoSortQuery(parsedGeoSortPoint as GeoPoint);
-        }
-
-        return queryResults;
-    }
-
-    if (geoDistance) {
-        const location = parseGeoPoint(geoPoint as string);
-        const searchQuery = {
-            geo_distance: {
-                distance: geoDistance,
-            },
-        };
-
-        searchQuery.geo_distance[opConfig.geo_field as string] = {
-            lat: location[0],
-            lon: location[1],
-        };
-
-        queryResults.query = searchQuery;
-        const locationPoints = parsedGeoSortPoint || location;
-        queryResults.sort = createGeoSortQuery(locationPoints);
-    }
-
-    return queryResults;
+export async function determineDateSlicerRanges(
+    config: StartPointConfig
+): Promise<DateSlicerRanges> {
+    return Promise.all(times(config.numOfSlicers, async (id) => (
+        determineDateSlicerRange(config, id)
+    )));
 }

@@ -1,3 +1,5 @@
-import ElasticsearchIDFetcher from '../__lib/reader';
+import { ReaderAPIFetcher } from '../__lib/ReaderAPIFetcher';
 
-export default ElasticsearchIDFetcher;
+export default class ElasticsearchIDFetcher extends ReaderAPIFetcher {
+
+}

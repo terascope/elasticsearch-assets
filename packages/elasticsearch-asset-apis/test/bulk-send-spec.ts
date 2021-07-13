@@ -4,7 +4,7 @@ import { WorkerTestHarness } from 'teraslice-test-harness';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { makeClient, cleanupIndex, fetch } from '../test/helpers/elasticsearch';
 import { TEST_INDEX_PREFIX, waitForData } from '../test/helpers';
-import { createBulkSenderAPI } from '../src/elasticsearch-bulk-sender';
+import { createElasticsearchBulkSender } from '../src/elasticsearch-bulk-sender';
 
 describe('elasticsearch bulk sender module', () => {
     const META_ROUTE = 'standard:route';
@@ -40,7 +40,7 @@ describe('elasticsearch bulk sender module', () => {
             config
         ) as any;
 
-        return createBulkSenderAPI({ client: esClient, config: senderConfig });
+        return createElasticsearchBulkSender({ client: esClient, config: senderConfig });
     }
 
     it('can instantiate', async () => {

@@ -1,3 +1,5 @@
-import SpacesFetcher from '../__lib/reader';
+import { ReaderAPIFetcher } from '../__lib/ReaderAPIFetcher';
 
-export default SpacesFetcher;
+export default class SpacesDateFetcher extends ReaderAPIFetcher {
+
+}

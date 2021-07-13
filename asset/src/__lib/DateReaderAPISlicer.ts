@@ -6,22 +6,41 @@ import {
     SlicerRecoveryData,
 } from '@terascope/job-components';
 import moment from 'moment';
-import { DateSlicerArgs, BaseReaderAPI } from '@terascope/elasticsearch-asset-apis';
+import {
+    ElasticsearchReaderAPI, DateSlicerRanges
+} from '@terascope/elasticsearch-asset-apis';
 import { ESDateConfig } from '../elasticsearch_reader/interfaces';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
-export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
-    protected api!: BaseReaderAPI;
+export class DateReaderAPISlicer extends ParallelSlicer<ESDateConfig> {
+    protected api!: ElasticsearchReaderAPI;
     protected hasUpdated = false;
     protected startTime = moment().toISOString();
+    slicerRanges!: DateSlicerRanges|undefined;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
-        const apiName = this.opConfig.api_name;
-        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
-        this.api = await apiManager.create(apiName, {});
         // NOTE ORDER MATTERS
         // a parallel slicer initialize calls newSlicer multiple times
         // need to make api before newSlicer is called
+        const apiName = this.opConfig.api_name;
+        const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+        this.api = await apiManager.create(apiName, {});
+
+        const { lifecycle, slicers } = this.executionConfig;
+        const { startTime } = this;
+
+        this.slicerRanges = await this.api.makeDateSlicerRanges({
+            lifecycle,
+            numOfSlicers: slicers,
+            recoveryData,
+            startTime,
+            hook: async (params) => {
+                if (!this.hasUpdated) {
+                    await this.updateJob(params);
+                    this.hasUpdated = true;
+                }
+            },
+        });
 
         await super.initialize(recoveryData);
     }
@@ -35,31 +54,23 @@ export default class DateSlicer extends ParallelSlicer<ESDateConfig> {
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
-        const { lifecycle, slicers } = this.executionConfig;
-        const { recoveryData, startTime } = this;
+        // if it get here there is likely no data for the query
+        if (this.slicerRanges == null || this.slicerRanges[id] == null) {
+            return async () => null;
+        }
 
-        const hook = async (params: AnyObject) => {
-            if (!this.hasUpdated) {
-                await this.updateJob(params);
-                this.hasUpdated = true;
-            }
-        };
+        const { lifecycle, slicers } = this.executionConfig;
+        const { startTime } = this;
 
         const windowState = this.api.makeWindowState(slicers);
 
-        const slicerConfig: DateSlicerArgs = {
+        return this.api.makeDateSlicerFromRange({
             lifecycle,
             numOfSlicers: slicers,
             slicerID: id,
-            recoveryData,
             startTime,
-            hook,
-            windowState
-        };
-
-        const slicer = await this.api.makeDateSlicer(slicerConfig);
-
-        return slicer;
+            windowState,
+        }, this.slicerRanges[id]!);
     }
 
     isRecoverable(): boolean {

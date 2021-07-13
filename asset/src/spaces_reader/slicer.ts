@@ -1,3 +1,5 @@
-import DateSlicer from '../__lib/slicer';
+import { DateReaderAPISlicer } from '../__lib/DateReaderAPISlicer';
 
-export default DateSlicer;
+export default class SpacesDateSlicer extends DateReaderAPISlicer {
+
+}
