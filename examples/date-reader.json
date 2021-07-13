@@ -1,0 +1,20 @@
+{
+    "name" : "Date_Reader",
+    "workers" : 2,
+    "slicers" : 2,
+    "lifecycle" : "once",
+    "assets" : ["elasticsearch"],
+    "operations" : [
+        {
+            "_op": "elasticsearch_reader",
+            "index": "query_index",
+            "date_field_name": "created",
+            "query": "bytes:>=100",
+            "start": "2010-08-04T10:00:00.000Z",
+            "end": "2020-08-04T20:00:00.000Z"
+        },
+        {
+            "_op": "noop"
+        }
+    ]
+}

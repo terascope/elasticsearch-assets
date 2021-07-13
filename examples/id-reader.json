@@ -1,0 +1,18 @@
+{
+    "name": "ID_Reader",
+    "lifecycle": "once",
+    "slicers": 2,
+    "workers": 2,
+    "assets": ["elasticsearch"],
+    "operations": [
+      {
+        "_op": "id_reader",
+        "index": "test_index",
+        "id_field_name": "uuid",
+        "fields": ["ip", "created", "bytes", "uuid"]
+      },
+      {
+        "_op": "noop"
+      }
+    ]
+}
