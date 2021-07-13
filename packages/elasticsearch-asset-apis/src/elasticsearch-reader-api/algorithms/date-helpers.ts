@@ -408,7 +408,7 @@ export async function determineDateSlicerRange(
     }: StartPointConfig,
     id: number,
 ): Promise<DateSlicerRange|null> {
-    let newDates: SlicerDates|DateRanges;
+    let newDates: DateRanges;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {
         // our number of slicers have changed
@@ -450,11 +450,8 @@ export async function determineDateSlicerRange(
     if (end.isSameOrAfter(newDates.limit)) {
         end = moment.utc(newDates.limit);
     }
-    // apparently we need to mutate this?
-    // I am not sure why but seems like a bad idea
-    (newDates as SlicerDates).end = end;
 
-    return { dates: newDates as SlicerDates, range: dates, interval };
+    return { dates: { ...newDates, end }, range: dates, interval };
 }
 
 export async function determineDateSlicerRanges(
