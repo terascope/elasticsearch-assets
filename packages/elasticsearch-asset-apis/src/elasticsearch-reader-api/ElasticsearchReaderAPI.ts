@@ -428,7 +428,7 @@ export class ElasticsearchReaderAPI {
                 );
 
                 if (interval == null) {
-                    this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
+                    this.logger.warn(dates, `No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
                     return null;
                 }
 
