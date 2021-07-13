@@ -70,7 +70,7 @@ export class DateReaderAPISlicer extends ParallelSlicer<ESDateConfig> {
             slicerID: id,
             startTime,
             windowState,
-        }, this.slicerRanges[id]);
+        }, this.slicerRanges[id]!);
     }
 
     isRecoverable(): boolean {

@@ -5,14 +5,14 @@ import {
     isObjectEntity,
     getTypeOf,
     Logger,
-    toNumber,
     isSimpleObject,
     isNumber,
     isValidDate,
     isFunction,
     isString,
     isWildCardString,
-    matchWildcard
+    matchWildcard,
+    toIntegerOrThrow
 } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -427,7 +427,10 @@ export class ElasticsearchReaderAPI {
                     dates
                 );
 
-                if (interval == null) return null;
+                if (interval == null) {
+                    this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
+                    return null;
+                }
 
                 // This was originally created to update the job configuration
                 // with the correct interval so that retries and recovery operates
@@ -454,6 +457,7 @@ export class ElasticsearchReaderAPI {
         const ranges = await this.makeDateSlicerRanges(config);
         if (ranges == null || ranges[config.slicerID] == null) {
             // if it gets here there is probably no data for the query
+            // the logging is done elsewhere
             return async () => null;
         }
         return this.makeDateSlicerFromRange(config, ranges[config.slicerID]!);
@@ -596,7 +600,7 @@ export class ElasticsearchReaderAPI {
         const [data] = await this._searchRequest(query, false);
 
         if (data == null) {
-            this.logger.warn(`no data was found using query ${JSON.stringify(query)} for index: ${this.config.index}`);
+            this.logger.warn(`No data was found using query ${JSON.stringify(query)} for index: ${this.config.index}`);
             return null;
         }
 
@@ -637,8 +641,8 @@ export class ElasticsearchReaderAPI {
                 const defaultPath = configs.defaults[window];
                 const configPath = configs.settings[window];
                 // config goes first as it overrides an defaults
-                if (configPath) return toNumber(configPath);
-                if (defaultPath) return toNumber(defaultPath);
+                if (configPath) return toIntegerOrThrow(configPath);
+                if (defaultPath) return toIntegerOrThrow(defaultPath);
             }
         }
 
