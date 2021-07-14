@@ -422,7 +422,7 @@ export async function determineDateSlicerRange(
                 numOfSlicers
             )[id];
         }
-        const interval = await getInterval(newDates);
+        const interval = await getInterval(newDates, id);
         if (interval == null) return null;
 
         const correctDates = compareRangeToRecoveryData(
@@ -440,7 +440,7 @@ export async function determineDateSlicerRange(
 
     newDates = dateRange[id];
 
-    const interval = await getInterval(newDates);
+    const interval = await getInterval(newDates, id);
     if (interval == null) return null;
 
     // we need to split up times

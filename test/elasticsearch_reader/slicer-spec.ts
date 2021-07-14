@@ -182,9 +182,13 @@ describe('elasticsearch_reader slicer', () => {
             const test = await makeSlicerTest({ opConfig: {} });
             const update = await getMeta(test);
 
-            expect(update.start).toEqual(evenOriginalStart);
-            expect(update.end).toEqual(evenOriginalEnd);
-            expect(update.interval).toEqual([9, 'ms']);
+            expect(update).toEqual({
+                0: {
+                    start: evenOriginalStart,
+                    end: evenOriginalEnd,
+                    interval: [9, 'ms']
+                }
+            });
 
             const [slice] = await test.createSlices();
 
@@ -197,9 +201,13 @@ describe('elasticsearch_reader slicer', () => {
             const test = await makeSlicerTest({ opConfig: { start } });
             const update = await getMeta(test);
 
-            expect(update.start).toEqual(start);
-            expect(update.end).toEqual(evenOriginalEnd);
-            expect(update.interval).toEqual([8, 'ms']);
+            expect(update).toEqual({
+                0: {
+                    start,
+                    end: evenOriginalEnd,
+                    interval: [8, 'ms']
+                }
+            });
 
             const [slice] = await test.createSlices();
 
@@ -212,9 +220,13 @@ describe('elasticsearch_reader slicer', () => {
             const test = await makeSlicerTest({ opConfig: { end } });
             const update = await getMeta(test);
 
-            expect(update.start).toEqual(evenOriginalStart);
-            expect(update.end).toEqual(end);
-            expect(update.interval).toEqual([13, 'ms']);
+            expect(update).toEqual({
+                0: {
+                    start: evenOriginalStart,
+                    end,
+                    interval: [13, 'ms']
+                }
+            });
 
             const [slice] = await test.createSlices();
 

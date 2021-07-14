@@ -50,7 +50,8 @@ import {
     DateSlicerRanges,
     ParsedInterval,
     DateSlicerRange,
-    IDSlicerRange
+    IDSlicerRange,
+    DateSlicerMetadata
 } from './interfaces';
 import { WindowState } from './WindowState';
 import { buildQuery } from './utils';
@@ -417,35 +418,40 @@ export class ElasticsearchReaderAPI {
         }
 
         const allSlicerDates = _esDates as DateSegments;
-        return determineDateSlicerRanges({
+        const slicerMetadata: DateSlicerMetadata = {};
+
+        const slicerRanges = await determineDateSlicerRanges({
             dates: allSlicerDates,
             numOfSlicers,
             recoveryData,
-            getInterval: async (dates) => {
+            getInterval: async (dates, slicerId) => {
                 const interval = await this.determineSliceInterval(
                     this.config.interval,
                     dates
                 );
+
+                slicerMetadata[slicerId] = {
+                    interval,
+                    start: moment(dates.start.format(this.dateFormat)).toISOString(),
+                    end: moment(dates.limit.format(this.dateFormat)).toISOString(),
+                };
 
                 if (interval == null) {
                     this.logger.warn(dates, `No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
                     return null;
                 }
 
-                // This was originally created to update the job configuration
-                // with the correct interval so that retries and recovery operates
-                // with more accuracy. Also it exposes the discovered interval to
-                // to the user, we may not need to do this anymore
-                if (config.hook) {
-                    await config.hook({
-                        interval,
-                        start: moment(allSlicerDates.start.format(this.dateFormat)).toISOString(),
-                        end: moment(allSlicerDates.limit.format(this.dateFormat)).toISOString(),
-                    });
-                }
                 return interval;
             }
         });
+
+        // This was originally created to update the job configuration
+        // with the correct interval so it exposes the discovered intervals
+        // and date ranges for each slicer to the user
+        if (config.hook) {
+            await config.hook(slicerMetadata);
+        }
+        return slicerRanges;
     }
 
     /**
