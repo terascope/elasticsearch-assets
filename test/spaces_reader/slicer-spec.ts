@@ -127,7 +127,11 @@ describe('spaces_reader slicer', () => {
         it('will convert auto to proper interval and update the opConfig', async () => {
             harness = await waitForUpdate(opConfig);
             const updatedConfig = await getMeta(harness);
-            expect(updatedConfig.interval).toEqual([60, 's']);
+            expect(updatedConfig).toMatchObject({
+                0: {
+                    interval: [60, 's']
+                }
+            });
         });
     });
 

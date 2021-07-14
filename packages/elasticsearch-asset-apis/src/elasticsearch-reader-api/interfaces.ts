@@ -228,6 +228,17 @@ export type IDSlicerResults = IDReaderSlice | null;
 
 export type ParsedInterval = readonly [step: number, unit: moment.unitOfTime.Base];
 
+export type DateSlicerMetadata = Record<number, {
+    /**
+     * This is interval for the slicer, it will be null if
+     * there is no data for this time period
+    */
+    interval: ParsedInterval|null,
+    start: string;
+    end: string;
+}>;
+export type DateSlicerMetadataHook = (metadata: DateSlicerMetadata) => Promise<void>;
+
 export interface DateSlicerArgs {
     lifecycle: LifeCycle,
     slicerID: number,
@@ -235,11 +246,7 @@ export interface DateSlicerArgs {
     recoveryData?: SlicerRecoveryData[];
     windowState?: WindowState,
     startTime?: Date | string
-    hook?: (args: {
-        interval: ParsedInterval,
-        start: string;
-        end: string;
-    }) => Promise<void>
+    hook?: DateSlicerMetadataHook;
 }
 
 export interface DateSlicerConfig {
@@ -249,18 +256,14 @@ export interface DateSlicerConfig {
     recoveryData?: SlicerRecoveryData[],
     windowState?: WindowState,
     startTime?: Date | string,
-    hook?: (args: {
-        interval: ParsedInterval,
-        start: string;
-        end: string;
-    }) => Promise<void>
+    hook?: DateSlicerMetadataHook;
 }
 
 /**
  * This function is used to determine the interval for each slicer,
 */
 export interface GetIntervalFn {
-    (dates: DateSegments): ParsedInterval|null|Promise<ParsedInterval|null>;
+    (dates: DateSegments, slicerId: number): ParsedInterval|null|Promise<ParsedInterval|null>;
 }
 
 export interface StartPointConfig {
