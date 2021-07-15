@@ -5,10 +5,11 @@ import {
     Logger, TSError, get, AnyObject, withoutNil, DataEntity
 } from '@terascope/utils';
 import { DataTypeConfig } from '@terascope/data-types';
-import got, { OptionsOfJSONResponseBody } from 'got';
+import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
 import { SpacesAPIConfig } from './interfaces';
 import { ReaderClient, SettingResults } from '../elasticsearch-reader-api/interfaces';
+import { throwRequestError } from './throwRequestError';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -52,6 +53,7 @@ export class SpacesReaderClient implements ReaderClient {
             }),
             responseType: isJSONResponse ? 'json' : undefined,
             json,
+            throwHttpErrors: false,
             timeout: this.config.timeout,
             retry: {
                 limit: this.retry,
@@ -73,11 +75,12 @@ export class SpacesReaderClient implements ReaderClient {
         query: AnyObject,
         format?: 'json'|'dfjson'
     ): Promise<SearchResult|string> {
+        let response: Response<SearchResult|string>;
+
         try {
-            const { body } = await got.post<SearchResult>(
+            response = await got.post<SearchResult>(
                 this.uri, this.getRequestOptions(query, format)
             );
-            return body;
         } catch (err) {
             if (err instanceof got.TimeoutError) {
                 throw new TSError('HTTP request timed out connecting to API endpoint.', {
@@ -88,6 +91,13 @@ export class SpacesReaderClient implements ReaderClient {
                     }
                 });
             }
+            if (err instanceof got.RequestError && err.response) {
+                throwRequestError(
+                    this.uri,
+                    err.response?.statusCode ?? 500,
+                    err.response?.body
+                );
+            }
             throw new TSError(err, {
                 reason: 'Failure making search request',
                 context: {
@@ -96,6 +106,10 @@ export class SpacesReaderClient implements ReaderClient {
                 }
             });
         }
+        if (response.statusCode >= 400) {
+            throwRequestError(this.uri, response.statusCode, response.body);
+        }
+        return response.body;
     }
 
     protected translateSearchQuery(queryConfig: SearchParams): AnyObject {
