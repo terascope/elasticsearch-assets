@@ -34,7 +34,7 @@
         "moment": "^2.29.1"
     },
     "devDependencies": {
-        "@terascope/job-components": "^0.52.4",
+        "@terascope/job-components": "^0.52.5",
         "@types/elasticsearch": "^5.0.38",
         "elasticsearch": "^15.4.1"
     },
