@@ -27,7 +27,7 @@
     "dependencies": {
         "@terascope/data-mate": "^0.30.0",
         "@terascope/data-types": "^0.30.4",
-        "@terascope/elasticsearch-api": "^2.21.4",
+        "@terascope/elasticsearch-api": "^2.21.5",
         "@terascope/utils": "^0.40.4",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
