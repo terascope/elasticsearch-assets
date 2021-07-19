@@ -264,7 +264,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             type,
             idFieldName,
             size: querySize,
-            startingKeyDepth: startingKeyDepth as number
+            startingKeyDepth
         };
 
         const idSlicers = idSlicer(idSlicerArs);
