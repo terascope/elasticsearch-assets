@@ -526,8 +526,6 @@ export class ElasticsearchReaderAPI {
             type
         };
 
-        await this.verifyIndex();
-
         if (isPersistent) {
             const windowState = config.windowState as WindowState|undefined;
             if (!windowState || !windowState.checkin) {
