@@ -108,7 +108,6 @@ describe('elasticsearch reader api', () => {
         const results = await api.fetch({}) as DataEntity[];
         expect(results.length).toEqual(2);
 
-        // @ts-expect-error
         expect(api.windowSize).toEqual(10000);
     });
 

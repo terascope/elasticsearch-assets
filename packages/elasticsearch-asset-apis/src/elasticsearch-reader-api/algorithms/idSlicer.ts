@@ -1,4 +1,4 @@
-import { TSError } from '@terascope/utils';
+import { isString, TSError } from '@terascope/utils';
 import {
     IDSlicerArgs, SlicerDateResults, IDReaderSlice, IDSlicerResults
 } from '../interfaces';
@@ -19,17 +19,11 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     } = args;
 
     async function determineKeySlice(
-        generator: any,
+        generator: KeyGenerator,
         closePath: boolean,
         rangeObj?: SlicerDateResults
     ): Promise<IDReaderSlice| null> {
-        let data;
-        if (closePath) {
-            data = generator.next(closePath);
-        } else {
-            data = generator.next();
-        }
-
+        const data = generator.next(closePath ?? undefined);
         if (data.done) return null;
 
         const query: Partial<IDReaderSlice> = {};
@@ -40,7 +34,10 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
         }
 
         if (version >= 6) {
-            const fieldValue = idFieldName as string;
+            if (!isString(idFieldName)) {
+                throw new Error('Missing id_field_name for id slicer');
+            }
+            const fieldValue = idFieldName;
             query.wildcard = { field: fieldValue, value: `${data.value}*` };
         } else {
             query.key = `${type}#${data.value}*`;
@@ -109,10 +106,9 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
                 closePath = true;
                 return results;
             } catch (err) {
-                const error = new TSError(err, {
+                throw new TSError(err, {
                     reason: 'Failure to make slice for id_slicer'
                 });
-                return Promise.reject(error);
             }
         };
     }
@@ -121,7 +117,7 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
 }
 
 // return true if the keys do not match
-function compareKeys(key: string, retryKey: string) {
+function compareKeys(key: string, retryKey: string): boolean {
     for (let i = 0; i < key.length; i += 1) {
         if (key[i] !== retryKey[i]) {
             return true;
@@ -130,7 +126,9 @@ function compareKeys(key: string, retryKey: string) {
     return false;
 }
 
-function* recurse(baseArray: readonly string[], str: string): Generator<string> {
+type KeyGenerator = Generator<string, null, boolean|undefined>;
+
+function* recurse(baseArray: readonly string[], str: string): KeyGenerator {
     for (const key of baseArray) {
         const newStr = str + key;
         const resp = yield newStr;
@@ -139,13 +137,14 @@ function* recurse(baseArray: readonly string[], str: string): Generator<string> 
             yield* recurse(baseArray, newStr);
         }
     }
+    return null;
 }
 
 function* recurseDepth(
     baseArray: readonly string[],
     str: string,
     startingKeyDepth: number
-): Generator<string> {
+): KeyGenerator {
     for (const key of baseArray) {
         const newStr = str + key;
 
@@ -159,12 +158,13 @@ function* recurseDepth(
             yield* recurse(baseArray, newStr);
         }
     }
+    return null;
 }
 
 function* generateKeys(
     baseArray: readonly string[],
     keysArray: readonly string[]
-): Generator<string> {
+): KeyGenerator {
     for (const startKey of keysArray) {
         const processKey = yield startKey;
 
@@ -180,7 +180,7 @@ function* generateKeyDepth(
     baseArray: readonly string[],
     keysArray: readonly string[],
     startingKeyDepth: number
-): Generator<string> {
+): KeyGenerator {
     for (const startKey of keysArray) {
         yield* recurseDepth(baseArray, startKey, startingKeyDepth);
     }

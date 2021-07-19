@@ -70,7 +70,11 @@ export class ElasticsearchReaderAPI {
     readonly config: ESReaderOptions;
     logger: Logger;
     protected readonly client: ReaderClient;
-    private windowSize: number|undefined = undefined;
+    /**
+     * we should expose this because in some cases
+     * it might be an optimization to set this externally
+    */
+    windowSize: number|undefined = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
 
@@ -553,14 +557,6 @@ export class ElasticsearchReaderAPI {
                 dates: range.dates,
                 primaryRange: range.range,
             });
-        }
-
-        const esDates = await this.determineDateRanges();
-        // query with no results
-        if (esDates.start == null || esDates.limit == null) {
-            this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
-            // slicer will run and complete when a null is returned
-            return async () => null;
         }
 
         // we do not care for range for once jobs
