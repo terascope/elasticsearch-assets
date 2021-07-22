@@ -55,9 +55,9 @@ function _buildRangeQuery(
             }
             body.query.bool.must.push({
                 bool: {
-                    should: params.keys.map((key) => ([
-                        { wildcard: { [fieldValue]: `${key}*` } }
-                    ]))
+                    should: params.keys.map((key) => ({
+                        wildcard: { [fieldValue]: `${key}*` }
+                    }))
                 }
             });
         } else {
@@ -66,9 +66,9 @@ function _buildRangeQuery(
             }
             body.query.bool.must.push({
                 bool: {
-                    should: params.keys.map((key) => ([
-                        { _uid: `${opConfig.type}#${key}*` }
-                    ]))
+                    should: params.keys.map((key) => ({
+                        _uid: `${opConfig.type}#${key}*`
+                    }))
                 }
             });
         }

@@ -103,6 +103,10 @@ export interface DateSlicerRange {
     readonly dates: SlicerDates;
     readonly range: DateSegments;
     readonly interval: ParsedInterval;
+    /**
+     * This may be null sometimes
+    */
+    readonly count: number|null;
 }
 
 /**

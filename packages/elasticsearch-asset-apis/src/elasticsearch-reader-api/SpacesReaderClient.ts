@@ -7,6 +7,7 @@ import {
 import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
+import { inspect } from 'util';
 import { SpacesAPIConfig } from './interfaces';
 import { ReaderClient, SettingResults } from '../elasticsearch-reader-api/interfaces';
 import { throwRequestError } from './throwRequestError';
@@ -234,7 +235,10 @@ export class SpacesReaderClient implements ReaderClient {
         }
 
         function _parseBoolQuery(op: any): string {
-            const terms = op.bool.should.map(({ wildcard }: any) => _parseWildCard(wildcard));
+            if (!Array.isArray(op.should)) {
+                throw new Error(`Invalid input to _parseBoolQuery ${inspect(op)}`);
+            }
+            const terms = op.should.map(({ wildcard }: any) => _parseWildCard(wildcard));
             return `(${terms.join(' OR ')})`;
         }
 

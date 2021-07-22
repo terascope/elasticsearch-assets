@@ -429,14 +429,16 @@ export async function determineDateSlicerRange(
                 numOfSlicers
             )[id];
         }
-        const { interval } = await getInterval(newDates, id);
+        const { interval, count } = await getInterval(newDates, id);
         if (interval == null) return null;
 
         const correctDates = compareRangeToRecoveryData(
             newDates, recoveryData, interval, id, numOfSlicers
         );
 
-        return { dates: correctDates, range: dates, interval };
+        return {
+            dates: correctDates, range: dates, interval, count
+        };
     }
 
     const dateRange = divideRange(
@@ -450,7 +452,7 @@ export async function determineDateSlicerRange(
     // we can ignore the count here since it is not really need
     // even though it was already asked for to potentially get
     // the number of records
-    const { interval } = await getInterval(newDates, id);
+    const { interval, count } = await getInterval(newDates, id);
     if (interval == null) return null;
 
     // we need to split up times
@@ -461,7 +463,9 @@ export async function determineDateSlicerRange(
         end = moment.utc(newDates.limit);
     }
 
-    return { dates: { ...newDates, end }, range: dates, interval };
+    return {
+        dates: { ...newDates, end }, range: dates, interval, count
+    };
 }
 
 export async function determineDateSlicerRanges(
