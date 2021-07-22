@@ -130,7 +130,8 @@ export class SpacesReaderClient implements ReaderClient {
             const queryOptions = {
                 query_string: _parseEsQ,
                 range: _parseDate,
-                wildcard: _parseWildCard
+                wildcard: _parseWildCard,
+                bool: _parseBoolQuery
             };
             const sortQuery: any = {};
             const geoQuery = _parseGeoQuery();
@@ -230,6 +231,11 @@ export class SpacesReaderClient implements ReaderClient {
 
             // Teraslice date ranges are >= start and < end.
             return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
+        }
+
+        function _parseBoolQuery(op: any): string {
+            const terms = op.bool.should.map(({ wildcard }: any) => _parseWildCard(wildcard));
+            return `(${terms.join(' OR ')})`;
         }
 
         return parseQueryConfig(mustQuery);
