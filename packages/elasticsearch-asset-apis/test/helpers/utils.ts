@@ -1,4 +1,4 @@
-import { DataEntity, AnyObject } from '@terascope/utils';
+import { DataEntity } from '@terascope/utils';
 import { SliceResults } from 'teraslice-test-harness';
 
 export function getListOfIds(data: any[], key: string, depth = 1): Map<string, number> {
@@ -29,13 +29,4 @@ export function getTotalSliceCounts(sliceResults: SliceResults[]): number {
 export interface ESData {
     count: number;
     key: string;
-}
-
-export function formatWildcardQuery(
-    data: ESData[], version: number, docType: string, field: string
-): AnyObject[] {
-    return data.map((obj) => {
-        if (version <= 5) return { key: `${docType}#${obj.key}`, count: obj.count };
-        return { wildcard: { field, value: obj.key }, count: obj.count };
-    });
 }

@@ -91,10 +91,10 @@ describe('elasticsearch reader api schema', () => {
         await expect(makeSchema(Object.assign({}, testOpConfig, badOP))).toReject();
 
         const goodOp = await makeSchema(Object.assign({}, testOpConfig, goodOP));
-        expect(goodOp).toBeDefined();
+        expect(goodOp).toBeObject();
 
         const goodOp2 = await makeSchema(Object.assign({}, testOpConfig, otherGoodOP));
-        expect(goodOp2).toBeDefined();
+        expect(goodOp2).toBeObject();
     });
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {

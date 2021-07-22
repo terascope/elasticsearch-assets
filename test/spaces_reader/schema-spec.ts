@@ -142,7 +142,6 @@ describe('spaces-reader schema', () => {
             (api) => api._name === 'spaces_reader_api:spaces_reader-0'
         );
 
-        expect(apiConfig).toBeDefined();
-        expect(apiConfig!.index).toEqual(index);
+        expect(apiConfig).toMatchObject({ index });
     });
 });

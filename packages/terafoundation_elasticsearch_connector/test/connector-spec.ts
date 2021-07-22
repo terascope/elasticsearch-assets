@@ -1,4 +1,4 @@
-import { isObjectEntity, debugLogger } from '@terascope/utils';
+import { debugLogger } from '@terascope/utils';
 import 'jest-extended';
 import connector from '../src';
 
@@ -13,8 +13,7 @@ describe('terafoundation_elasticsearch_connector', () => {
     it('config_schema returns a schema', () => {
         const schema = connector.config_schema();
 
-        expect(schema).toBeDefined();
-        expect(isObjectEntity(schema)).toBeTrue();
+        expect(schema).toBeObject();
     });
 
     it('create returns a client and a logger', () => {

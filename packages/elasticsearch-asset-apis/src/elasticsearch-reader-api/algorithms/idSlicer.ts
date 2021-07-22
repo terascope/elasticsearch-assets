@@ -1,7 +1,8 @@
-import { isString, TSError } from '@terascope/utils';
+import { TSError } from '@terascope/utils';
 import {
-    IDSlicerArgs, SlicerDateResults, IDReaderSlice, IDSlicerResults
+    IDSlicerArgs, ReaderSlice, IDSlicerResults
 } from '../interfaces';
+import { generateCountQueryForKeys } from './id-helpers';
 
 export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {
@@ -10,43 +11,20 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
         range,
         baseKeyArray,
         keySet,
-        version,
         countFn,
         startingKeyDepth,
-        type,
-        idFieldName,
         size
     } = args;
 
     async function determineKeySlice(
         generator: KeyGenerator,
         closePath: boolean,
-        rangeObj?: SlicerDateResults
-    ): Promise<IDReaderSlice| null> {
+        rangeObj?: ReaderSlice
+    ): Promise<IDSlicerResults> {
         const data = generator.next(closePath ?? undefined);
         if (data.done) return null;
 
-        const query: Partial<IDReaderSlice> = {};
-
-        if (rangeObj) {
-            query.start = rangeObj.start;
-            query.end = rangeObj.end;
-        }
-
-        if (version >= 6) {
-            if (!isString(idFieldName)) {
-                throw new Error('Missing id_field_name for id slicer');
-            }
-            const fieldValue = idFieldName;
-            query.wildcard = { field: fieldValue, value: `${data.value}*` };
-        } else {
-            query.key = `${type}#${data.value}*`;
-        }
-
-        async function getKeySlice(esQuery: {
-            start?: string;
-            end?: string;
-        }): Promise<IDReaderSlice | null> {
+        async function getKeySlice(esQuery: ReaderSlice): Promise<IDSlicerResults> {
             const count = await countFn(esQuery);
 
             if (count > size) {
@@ -56,21 +34,29 @@ export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
 
             if (count !== 0) {
                 // the closing of this path happens at keyGenerator
-                return { ...esQuery, count };
+                return {
+                    ...esQuery,
+                    count
+                };
             }
 
             // if count is zero then close path to prevent further iteration
             return determineKeySlice(generator, true, rangeObj);
         }
 
-        return getKeySlice(query);
+        return getKeySlice(
+            generateCountQueryForKeys(
+                [data.value],
+                rangeObj
+            )
+        );
     }
 
     function keyGenerator(
         baseArray: readonly string[],
         keysArray: readonly string[],
         retryKey?: string,
-        dateRange?: SlicerDateResults
+        dateRange?: ReaderSlice
     ) {
         // if there is a starting depth, use the key depth generator, if not use default generator
         const gen = startingKeyDepth > 0

@@ -141,8 +141,7 @@ describe('id_reader Schema', () => {
                 (api) => api._name === 'elasticsearch_reader_api:id_reader-0'
             );
 
-            expect(apiConfig).toBeDefined();
-            expect(apiConfig!.index).toEqual(index);
+            expect(apiConfig).toMatchObject({ index });
         });
 
         it('should throw if number of slicers are greater than key_range length', async () => {

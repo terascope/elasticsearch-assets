@@ -1,7 +1,7 @@
 import { AnyObject, GeoPoint } from '@terascope/types';
-import { parseGeoPoint } from '@terascope/utils';
+import { isString, parseGeoPoint } from '@terascope/utils';
 import { SearchParams } from 'elasticsearch';
-import { ESReaderOptions, SlicerDateResults } from './interfaces';
+import { ESReaderOptions, ReaderSlice } from './interfaces';
 
 /**
  * Build the elasticsearch DSL query
@@ -9,12 +9,15 @@ import { ESReaderOptions, SlicerDateResults } from './interfaces';
  * @todo this should be switch to return an xLucene query
 */
 export function buildQuery(
-    opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>
+    opConfig: ESReaderOptions, params: ReaderSlice, version: number
 ): SearchParams {
+    if (params.count == null) {
+        throw new Error('Expected count to buildQuery');
+    }
     const query: SearchParams = {
         index: opConfig.index,
-        size: slice.count,
-        body: _buildRangeQuery(opConfig, slice),
+        size: params.count,
+        body: _buildRangeQuery(opConfig, params, version),
     };
 
     if (opConfig.fields) query._source = opConfig.fields;
@@ -22,7 +25,9 @@ export function buildQuery(
     return query;
 }
 
-function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateResults>) {
+function _buildRangeQuery(
+    opConfig: ESReaderOptions, params: ReaderSlice, version: number
+) {
     const body: AnyObject = {
         query: {
             bool: {
@@ -31,25 +36,42 @@ function _buildRangeQuery(opConfig: ESReaderOptions, slice: Partial<SlicerDateRe
         },
     };
     // is a range type query
-    if (slice.start && slice.end) {
+    if (params.start && params.end) {
         const dateObj = {};
         const { date_field_name: dateFieldName } = opConfig;
         dateObj[dateFieldName] = {
-            gte: slice.start,
-            lt: slice.end,
+            gte: params.start,
+            lt: params.end,
         };
 
         body.query.bool.must.push({ range: dateObj });
     }
     // elasticsearch _id based query, we keep for v5 and lower
-    if (slice.key) {
-        body.query.bool.must.push({ wildcard: { _uid: slice.key } });
-    }
-
-    // this is used in the _id reader and the elasticsearch >= 6
-    if (slice.wildcard) {
-        const { field, value } = slice.wildcard;
-        body.query.bool.must.push({ wildcard: { [field]: value } });
+    if (params.keys?.length) {
+        if (version >= 6) {
+            const fieldValue = opConfig.id_field_name;
+            if (!isString(fieldValue)) {
+                throw new Error(`Missing id_field_name for elasticsearch ${version} id slicer`);
+            }
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ([
+                        { wildcard: { [fieldValue]: `${key}*` } }
+                    ]))
+                }
+            });
+        } else {
+            if (!isString(opConfig.type)) {
+                throw new Error(`Missing type for elasticsearch ${version} id slicer`);
+            }
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ([
+                        { _uid: `${opConfig.type}#${key}*` }
+                    ]))
+                }
+            });
+        }
     }
 
     // elasticsearch lucene based query

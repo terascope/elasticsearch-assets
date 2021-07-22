@@ -31,15 +31,8 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
             throw new Error('Paramter id_field_name must be set if querying against elasticsearch version >= 6.x');
         }
 
-        const {
-            key_type,
-            key_range,
-        } = this.config;
-
-        this.slicerRanges = this.api.makeIDSlicerRanges({
+        this.slicerRanges = await this.api.makeIDSlicerRanges({
             numOfSlicers: this.executionConfig.slicers,
-            keyType: key_type,
-            keyRange: key_range || undefined,
         });
         await super.initialize(recoveryData);
     }
@@ -50,25 +43,10 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     }
 
     async newSlicer(id: number): Promise<SlicerFn> {
-        const { slicers } = this.executionConfig;
-
-        const {
-            key_type,
-            key_range,
-            starting_key_depth,
-            id_field_name
-        } = this.config;
-
-        const { recoveryData } = this;
-
         return this.api.makeIDSlicerFromRange({
-            numOfSlicers: slicers,
+            numOfSlicers: this.executionConfig.slicers,
             slicerID: id,
-            recoveryData,
-            keyType: key_type,
-            keyRange: key_range || undefined,
-            startingKeyDepth: starting_key_depth,
-            idFieldName: id_field_name || null
+            recoveryData: this.recoveryData,
         }, this.slicerRanges[id]);
     }
 }

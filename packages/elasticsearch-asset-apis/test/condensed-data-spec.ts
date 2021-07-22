@@ -17,7 +17,8 @@ import {
     IDType,
     InputDateSegments,
     DateSlicerArgs,
-    ElasticsearchReaderClient
+    ElasticsearchReaderClient,
+    ReaderSlice
 } from '../src';
 
 jest.setTimeout(15_000);
@@ -93,9 +94,12 @@ describe('ReaderAPI with condensed time data', () => {
         });
 
         const dates = await api.determineDateRanges() as InputDateSegments;
-        const interval = await api.determineSliceInterval(config.interval, dates);
+        const result = await api.determineSliceInterval(config.interval, dates);
 
-        expect(interval).toEqual([1, 'ms']);
+        expect(result).toEqual({
+            interval: [1, 'ms'],
+            count: 2000
+        });
     });
 
     it('can slice and read data this small', async () => {
@@ -120,7 +124,7 @@ describe('ReaderAPI with condensed time data', () => {
         if (!slice) throw new Error('slice should not be undefined');
         if (Array.isArray(slice)) throw new Error('slice should not be an array of slices');
 
-        const firstResults = await api.fetch(slice);
+        const firstResults = await api.fetch(slice as ReaderSlice);
 
         expect(firstResults).toBeArrayOfSize(1_000);
 
@@ -128,7 +132,7 @@ describe('ReaderAPI with condensed time data', () => {
         if (!slice2) throw new Error('slice should not be undefined');
         if (Array.isArray(slice2)) throw new Error('slice should not be an array of slices');
 
-        const secondResults = await api.fetch(slice2);
+        const secondResults = await api.fetch(slice2 as ReaderSlice);
 
         expect(secondResults).toBeArrayOfSize(1_000);
 

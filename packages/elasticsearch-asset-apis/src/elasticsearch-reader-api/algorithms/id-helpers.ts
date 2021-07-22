@@ -1,6 +1,8 @@
 /* eslint-disable no-useless-escape */
 
-import { IDSlicerRanges, IDType } from '../interfaces';
+import {
+    CountFn, IDSlicerRange, IDSlicerRanges, IDType, ReaderSlice
+} from '../interfaces';
 
 export const base64url = Object.freeze(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
     'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
@@ -23,8 +25,28 @@ export function getKeyArray(keyType: IDType): readonly string[] {
     throw new Error('Could not find correct key type');
 }
 
-export function determineIDSlicerRanges(keysArray: readonly string[], num: number): IDSlicerRanges {
-    const results: string[][] = [];
+export function generateCountQueryForKeys(
+    keys: readonly string[],
+    rangeObj?: ReaderSlice,
+): ReaderSlice {
+    const query: ReaderSlice = {
+        keys,
+    };
+
+    if (rangeObj) {
+        query.start = rangeObj.start;
+        query.end = rangeObj.end;
+    }
+
+    return query;
+}
+
+export async function determineIDSlicerRanges(
+    keysArray: readonly string[],
+    num: number,
+    getCount: CountFn
+): Promise<IDSlicerRanges> {
+    const results: IDSlicerRange[] = [];
     const len = num;
 
     let lastDivideNum = 0;
@@ -35,7 +57,13 @@ export function determineIDSlicerRanges(keysArray: readonly string[], num: numbe
             divideNum = keysArray.length;
         }
 
-        results.push(keysArray.slice(lastDivideNum, divideNum));
+        const keys = keysArray.slice(lastDivideNum, divideNum);
+        results.push({
+            keys,
+            count: await getCount(
+                generateCountQueryForKeys(keys)
+            )
+        });
         lastDivideNum = divideNum;
     }
 

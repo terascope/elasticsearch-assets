@@ -7,7 +7,7 @@ describe('WindowState', () => {
         const state = new WindowState(numOfSlicers);
 
         expect(Object.keys(state._windowState)).toBeArrayOfSize(numOfSlicers);
-        expect(state.checkin).toBeDefined();
+        expect(state.checkin).toBeFunction();
     });
 
     it('can checkin for one slicer', () => {

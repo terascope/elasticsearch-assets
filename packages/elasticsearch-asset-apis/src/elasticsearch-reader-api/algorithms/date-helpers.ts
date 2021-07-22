@@ -12,7 +12,7 @@ import {
     SlicerDates,
     InputDateSegments,
     DateSegments,
-    SlicerDateResults,
+    ReaderSlice,
     ParsedInterval,
     DateConfig,
     DateSlicerRanges,
@@ -171,17 +171,17 @@ function determineDivisions(numOfDivisions: number, endingNum: number) {
 }
 
 function compactDivisions(
-    _recoveryData: SlicerDateResults[],
+    _recoveryData: ReaderSlice[],
     buckets: number[],
     id: number
 ): DateRanges {
     const recoveryData = _recoveryData.slice();
     const holes: DateConfig[] = [];
     // we condense recoveryDate to the appropriate buckets
-    const compactedDivision = buckets.reduce<SlicerDateResults[][]>((list, num) => {
-        const pocket: SlicerDateResults[] = [];
+    const compactedDivision = buckets.reduce<ReaderSlice[][]>((list, num) => {
+        const pocket: ReaderSlice[] = [];
         for (let i = 0; i < num; i += 1) {
-            const data = recoveryData.shift() as SlicerDateResults;
+            const data = recoveryData.shift() as ReaderSlice;
             pocket.push(data);
         }
         list.push(pocket);
@@ -197,7 +197,15 @@ function compactDivisions(
 
     segment.forEach((dates, index, arr) => {
         if (arr[index + 1] !== undefined) {
-            holes.push({ start: dates.limit, end: arr[index + 1].end });
+            if (!dates.limit) {
+                throw new Error(`Expected limit on slices for holes ${inspect(dates)}`);
+            }
+            const { end } = arr[index + 1];
+            if (!end) {
+                throw new Error(`Expected end on slices for holes ${inspect(arr)}`);
+            }
+
+            holes.push({ start: dates.limit, end });
             // we save existing holes, we do this second to maintain order
             if (dates.holes) holes.push(...dates.holes);
         }
@@ -211,7 +219,7 @@ function compactDivisions(
 }
 
 function expandDivisions(
-    recoveryData: SlicerDateResults[],
+    recoveryData: ReaderSlice[],
     buckets: number[],
     id: number
 ): DateRanges {
@@ -226,7 +234,7 @@ function expandDivisions(
 }
 
 function redistributeDates(
-    recoveryData: SlicerDateResults[],
+    recoveryData: ReaderSlice[],
     numOfSlicers: number,
     id: number,
 ) {
@@ -245,7 +253,6 @@ export function divideRange(
     endTime: moment.Moment,
     numOfSlicers: number,
 ): DateSegments[] {
-    const results: DateSegments[] = [];
     // 'x' is Unix Millisecond Timestamp format
     const startNum = toIntegerOrThrow(moment.utc(startTime).format('x'));
     const limitNum = toIntegerOrThrow(moment.utc(endTime).format('x'));
@@ -253,11 +260,11 @@ export function divideRange(
 
     const step = moment.utc(startTime);
 
-    for (let i = 0; i < numOfSlicers; i += 1) {
+    const results = times(numOfSlicers, (): DateSegments => {
         const start = moment.utc(step);
         const limit = moment.utc(step.add(range, 'ms'));
-        results.push({ start, limit });
-    }
+        return { start, limit };
+    });
 
     // make sure that end of last segment is always correct
     const endingDate = moment.utc(endTime);
@@ -286,7 +293,7 @@ export function delayedStreamSegment(
     return { start: delayedStart, limit: delayedLimit };
 }
 
-function convertToHole(rRecord: SlicerDateResults): DateConfig {
+function convertToHole(rRecord: ReaderSlice): DateConfig {
     return { start: moment.utc(rRecord.start), end: moment.utc(rRecord.end) };
 }
 
@@ -311,7 +318,7 @@ function compareDatesToLimit(dates: SlicerDates) {
 
 function compareRangeToRecoveryData(
     newDates: DateRanges,
-    recoveryData: SlicerDateResults[],
+    recoveryData: ReaderSlice[],
     interval: ParsedInterval,
     id: number,
     numOfSlicers: number
@@ -397,7 +404,7 @@ interface DateRanges {
     holes?: DateConfig[];
 }
 
-type RDate = SlicerDateResults|undefined;
+type RDate = ReaderSlice|undefined;
 
 export async function determineDateSlicerRange(
     {
@@ -422,7 +429,7 @@ export async function determineDateSlicerRange(
                 numOfSlicers
             )[id];
         }
-        const interval = await getInterval(newDates, id);
+        const { interval } = await getInterval(newDates, id);
         if (interval == null) return null;
 
         const correctDates = compareRangeToRecoveryData(
@@ -440,7 +447,10 @@ export async function determineDateSlicerRange(
 
     newDates = dateRange[id];
 
-    const interval = await getInterval(newDates, id);
+    // we can ignore the count here since it is not really need
+    // even though it was already asked for to potentially get
+    // the number of records
+    const { interval } = await getInterval(newDates, id);
     if (interval == null) return null;
 
     // we need to split up times
