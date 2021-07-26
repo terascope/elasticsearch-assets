@@ -82,7 +82,7 @@ describe('Reader API', () => {
             key_type: IDType.base64url,
             time_resolution: 'ms',
             connection: 'default',
-            starting_key_depth: 1
+            starting_key_depth: 0
         });
 
         it('can determine date ranges', async () => {
@@ -277,7 +277,7 @@ describe('Reader API', () => {
             id_field_name: idFieldName,
             time_resolution: 'ms',
             connection: 'default',
-            starting_key_depth: 1
+            starting_key_depth: 0
         });
 
         it('can determine date ranges', async () => {
