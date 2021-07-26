@@ -49,14 +49,14 @@ function _buildRangeQuery(
     // elasticsearch _id based query, we keep for v5 and lower
     if (params.keys?.length) {
         if (version >= 6) {
-            const fieldValue = opConfig.id_field_name;
-            if (!isString(fieldValue)) {
+            const idFieldName = opConfig.id_field_name;
+            if (!isString(idFieldName)) {
                 throw new Error(`Missing id_field_name for elasticsearch ${version} id slicer`);
             }
             body.query.bool.must.push({
                 bool: {
                     should: params.keys.map((key) => ({
-                        wildcard: { [fieldValue]: `${key}*` }
+                        wildcard: { [idFieldName]: `${key}*` }
                     }))
                 }
             });
@@ -67,7 +67,7 @@ function _buildRangeQuery(
             body.query.bool.must.push({
                 bool: {
                     should: params.keys.map((key) => ({
-                        _uid: `${opConfig.type}#${key}*`
+                        wildcard: { _uid: `${opConfig.type}#${key}*` }
                     }))
                 }
             });
