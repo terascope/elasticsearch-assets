@@ -127,10 +127,10 @@ describe('elasticsearch_reader schema', () => {
         await expect(makeSchema(Object.assign({}, testOpConfig, badOP))).toReject();
 
         const goodOp = await makeSchema(Object.assign({}, testOpConfig, goodOP));
-        expect(goodOp).toBeDefined();
+        expect(goodOp).toBeObject();
 
         const goodOp2 = await makeSchema(Object.assign({}, testOpConfig, otherGoodOP));
-        expect(goodOp2).toBeDefined();
+        expect(goodOp2).toBeObject();
     });
 
     it('will throw if configured incorrectly', async () => {
@@ -235,7 +235,6 @@ describe('elasticsearch_reader schema', () => {
             (api) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
         );
 
-        expect(apiConfig).toBeDefined();
-        expect(apiConfig!.index).toEqual(index);
+        expect(apiConfig).toMatchObject({ index });
     });
 });

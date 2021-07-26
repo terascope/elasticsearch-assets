@@ -78,7 +78,10 @@ export interface SettingResults {
 /**
  * An array of key spaces
 */
-export type IDSlicerRange = readonly string[];
+export interface IDSlicerRange {
+    readonly keys: readonly string[];
+    readonly count: number;
+}
 /**
  * This used a list of all of the ID slicer ranges, the
  * index of the range will correlate with the slicer instance
@@ -92,16 +95,6 @@ export enum IDType {
     HEXADECIMAL = 'HEXADECIMAL'
 }
 
-export interface WildCardQuery {
-    field: string;
-    value: string;
-}
-
-export interface IDSlicerResult {
-    count: number;
-    wildcard: WildCardQuery;
-}
-
 /**
  * This is used for an individual starting point
  * for a single range
@@ -110,6 +103,10 @@ export interface DateSlicerRange {
     readonly dates: SlicerDates;
     readonly range: DateSegments;
     readonly interval: ParsedInterval;
+    /**
+     * This may be null sometimes
+    */
+    readonly count: number|null;
 }
 
 /**
@@ -123,21 +120,78 @@ export interface DateSegments {
     limit: moment.Moment;
 }
 
+/**
+ * This information is just used during the
+ * slicing logic and not the fetch or count request
+*/
+export interface ReaderSliceMetadata {
+    /**
+     * The limit date of the whole slicer range
+    */
+    limit?: string;
+
+    /**
+     * This is just used as slice metadata,
+    */
+    holes?: readonly DateConfig[];
+}
+
+/**
+ * This can be used to count or fetch and is the
+ * metadata used stored on a slice
+*/
+export interface ReaderSlice extends ReaderSliceMetadata {
+    /**
+     * The query constraint provided in the config
+    */
+    query?: string;
+
+    /**
+     * The number of records to fetch,
+     * for count set this will be set to 0,
+     * for searching this will be set to the config size
+    */
+    count?: number;
+
+    /**
+     * The start of the date range
+    */
+    start?: string;
+
+    /**
+     * The end of the date range
+    */
+    end?: string;
+
+    /**
+     * Used for id wildcard queries,
+     * each key is ORd together so one
+     * query can be ran to the count for a single
+     * slicer range
+    */
+    keys?: readonly string[];
+}
+
+export interface CountFn {
+    (args: Pick<ReaderSlice, 'start'|'end'|'keys'>) : Promise<number>;
+}
+
+/**
+ * Built from the config and {@link IDSlicerConfig}
+ *
+ * @internal
+*/
 export interface IDSlicerArgs {
-    retryData?: any;
+    retryData?: string;
     logger: Logger;
-    range?: SlicerDateResults;
+    range?: ReaderSlice;
     keySet: readonly string[];
     baseKeyArray: readonly string[];
     events: EventEmitter;
     startingKeyDepth: number;
     version: number;
-    countFn: (args: {
-        start?: string;
-        end?: string;
-    }) => Promise<number>;
+    countFn: CountFn;
     type?: string | null;
-    idFieldName?: string | null;
     size: number;
 }
 
@@ -145,16 +199,13 @@ export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,
     recoveryData?: SlicerRecoveryData[],
-    keyType: IDType;
-    keyRange?: string[];
-    startingKeyDepth: number,
-    idFieldName: string | null;
 }
 
 export interface DateConfig {
     start: string | moment.Moment;
     end: string | moment.Moment;
 }
+
 export interface SlicerArgs {
     timeResolution: moment.unitOfTime.Base;
     size: number;
@@ -191,52 +242,24 @@ export interface SlicerArgs {
      * The elasticsearch server version (only the major version)
     */
     version: number;
-    countFn: (args: {
-        start?: string;
-        end?: string;
-    }) => Promise<number>
-}
-export interface SlicerDateResults {
-    start: string;
-    end: string;
-    limit: string;
-    count: number;
-    holes?: DateConfig[];
-    wildcard?: WildCardQuery;
-    key?: string;
+    countFn: CountFn;
 }
 
 export interface SlicerDates extends DateSegments {
     end: moment.Moment;
-    holes?: DateConfig[];
-}
-
-export interface IDReaderSlice {
-    start?: string;
-    end?: string;
-    count: number;
-    holes?: DateConfig[];
-    wildcard?: WildCardQuery;
-    key?: string;
+    holes?: readonly DateConfig[];
 }
 
 /** What a date slicer fn will return */
-export type DateSlicerResults = SlicerDateResults | SlicerDateResults[] | null;
-
-/** What a id slicer fn will return */
-export type IDSlicerResults = IDReaderSlice | null;
+export type DateSlicerResults = ReaderSlice | (readonly ReaderSlice[]) | null;
+export type IDSlicerResults = ReaderSlice|null;
 
 export type ParsedInterval = readonly [step: number, unit: moment.unitOfTime.Base];
 
 export type DateSlicerMetadata = Record<number, {
-    /**
-     * This is interval for the slicer, it will be null if
-     * there is no data for this time period
-    */
-    interval: ParsedInterval|null,
     start: string;
     end: string;
-}>;
+} & GetIntervalResult>;
 export type DateSlicerMetadataHook = (metadata: DateSlicerMetadata) => Promise<void>;
 
 export interface DateSlicerArgs {
@@ -259,18 +282,31 @@ export interface DateSlicerConfig {
     hook?: DateSlicerMetadataHook;
 }
 
+export interface GetIntervalResult {
+    /**
+     * This is interval for the slicer, it will be null if
+     * there is no data for this time period
+    */
+    readonly interval: ParsedInterval|null;
+    /**
+     * This is interval for the slicer, it will be null
+     * when the interval in config is not set to auto
+    */
+    readonly count: number|null;
+}
+
 /**
  * This function is used to determine the interval for each slicer,
 */
 export interface GetIntervalFn {
-    (dates: DateSegments, slicerId: number): ParsedInterval|null|Promise<ParsedInterval|null>;
+    (dates: DateSegments, slicerId: number): GetIntervalResult|Promise<GetIntervalResult>;
 }
 
 export interface StartPointConfig {
     dates: DateSegments;
     numOfSlicers: number;
     getInterval: GetIntervalFn;
-    recoveryData?: SlicerDateResults[];
+    recoveryData?: ReaderSlice[];
 }
 
 export interface InputDateSegments {
@@ -292,6 +328,7 @@ export interface ESReaderOptions {
     subslice_by_key: boolean;
     subslice_key_threshold: number;
     key_type: IDType;
+    key_range?: null | string[];
     type?: string | null;
     time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
@@ -321,10 +358,10 @@ export interface DetermineSliceResults {
     start: moment.Moment;
     end: moment.Moment;
     count: number;
-    key?: string;
+    keys?: readonly string[];
 }
 
 export interface SlicerDateConfig extends DateSegments {
     end: moment.Moment;
-    holes?: DateConfig[];
+    holes?: readonly DateConfig[];
 }

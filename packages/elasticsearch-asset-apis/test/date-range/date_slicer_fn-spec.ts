@@ -13,7 +13,7 @@ import moment from 'moment';
 import {
     WindowState, SlicerArgs, ParsedInterval,
     SlicerDateConfig, DateSegments,
-    SlicerDateResults, dateSlicer,
+    ReaderSlice, dateSlicer,
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src';
 import { MockClient } from '../helpers';
@@ -276,9 +276,9 @@ describe('date slicer function', () => {
 
             const slicer = makeSlicer(testConfig);
 
-            const results = await slicer() as SlicerDateResults;
+            const results = await slicer() as ReaderSlice;
 
-            expect(results).toBeDefined();
+            expect(results).toBeObject();
             expect(moment.utc(results.start).isSame(start)).toBeTrue();
             expect(moment.utc(results.end).isSame(moment.utc(limit))).toBeTrue();
             expect(moment.utc(results.limit).isSame(moment.utc(limit))).toBeTrue();
@@ -288,9 +288,9 @@ describe('date slicer function', () => {
 
             await pDelay(500);
 
-            const results4 = await slicer() as SlicerDateResults;
+            const results4 = await slicer() as ReaderSlice;
 
-            expect(results4).toBeDefined();
+            expect(results4).toBeObject();
             expect(moment.utc(results4.start).isSame(secondStart)).toBeTrue();
             expect(moment.utc(results4.end).isSame(secondEnd)).toBeTrue();
             expect(moment.utc(results4.limit).isSame(secondLimit)).toBeTrue();
@@ -300,9 +300,9 @@ describe('date slicer function', () => {
 
             await pDelay(500);
 
-            const results6 = await slicer() as SlicerDateResults;
+            const results6 = await slicer() as ReaderSlice;
 
-            expect(results6).toBeDefined();
+            expect(results6).toBeObject();
             expect(moment.utc(results6.start).isSame(thirdStart)).toBeTrue();
             expect(moment.utc(results6.end).isSame(thirdEnd)).toBeTrue();
             expect(moment.utc(results6.limit).isSame(thirdLimit)).toBeTrue();
@@ -343,12 +343,12 @@ describe('date slicer function', () => {
 
             const slicer = makeSlicer(testConfig);
 
-            const results = await slicer() as SlicerDateResults;
+            const results = await slicer() as ReaderSlice;
 
-            expect(results).toBeDefined();
-            expect(moment.utc(results.start)).toBeDefined();
-            expect(moment.utc(results.end).isSame(moment.utc(limit))).toBeDefined();
-            expect(moment.utc(results.limit).isSame(moment.utc(limit))).toBeDefined();
+            expect(results).toBeObject();
+            expect(results.start).toBeString();
+            expect(moment.utc(results.end).isSame(moment.utc(limit))).toBeTrue();
+            expect(moment.utc(results.limit).isSame(moment.utc(limit))).toBeTrue();
 
             const results2 = await slicer();
 
@@ -428,16 +428,14 @@ describe('date slicer function', () => {
             const slicer1 = makeSlicer(testConfig1);
             const slicer2 = makeSlicer(testConfig2);
 
-            const results = await slicer1() as SlicerDateResults;
+            const results = await slicer1() as ReaderSlice;
 
-            expect(results).toBeDefined();
             expect(moment.utc(results.start).isSame(date1.start)).toBeTrue();
             expect(moment.utc(results.end).isSame(moment.utc(date1.limit))).toBeTrue();
             expect(moment.utc(results.limit).isSame(moment.utc(date1.limit))).toBeTrue();
 
-            const results2 = await slicer2() as SlicerDateResults;
+            const results2 = await slicer2() as ReaderSlice;
 
-            expect(results2).toBeDefined();
             expect(moment.utc(results2.start).isSame(date2.start)).toBeTrue();
             expect(moment.utc(results2.end).isSame(moment.utc(date2.limit))).toBeTrue();
             expect(moment.utc(results2.limit).isSame(moment.utc(date2.limit))).toBeTrue();
@@ -452,9 +450,8 @@ describe('date slicer function', () => {
 
             await pDelay(500);
 
-            const results6 = await slicer1() as SlicerDateResults;
+            const results6 = await slicer1() as ReaderSlice;
 
-            expect(results6).toBeDefined();
             expect(moment.utc(results6.start).isSame(date3.start)).toBeTrue();
             expect(moment.utc(results6.end).isSame(moment.utc(date3.limit))).toBeTrue();
             expect(moment.utc(results6.limit).isSame(moment.utc(date3.limit))).toBeTrue();
@@ -469,9 +466,8 @@ describe('date slicer function', () => {
             const results8 = await slicer1();
             expect(results8).toEqual(null);
 
-            const results9 = await slicer2() as SlicerDateResults;
+            const results9 = await slicer2() as ReaderSlice;
 
-            expect(results9).toBeDefined();
             expect(moment.utc(results9.start).isSame(date4.start)).toBeTrue();
             expect(moment.utc(results9.end).isSame(moment.utc(date4.limit))).toBeTrue();
             expect(moment.utc(results9.limit).isSame(moment.utc(date4.limit))).toBeTrue();

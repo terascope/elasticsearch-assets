@@ -6,7 +6,6 @@ import { inspect } from 'util';
 import { idSlicer } from './idSlicer';
 import {
     SlicerArgs,
-    SlicerDateResults,
     SlicerDateConfig,
     ParsedInterval,
     DateConfig,
@@ -15,7 +14,8 @@ import {
     DetermineSliceResults,
     IDSlicerArgs,
     IDType,
-    DateSlicerResults
+    DateSlicerResults,
+    ReaderSlice
 } from '../interfaces';
 import {
     dateFormat as dFormat,
@@ -214,8 +214,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         };
     }
 
-    async function getIdData(slicerFn: any): Promise<Partial<SlicerDateResults>[]> {
-        const list: Partial<SlicerDateResults>[] = [];
+    async function getIdData(slicerFn: any): Promise<ReaderSlice[]> {
+        const list: ReaderSlice[] = [];
         return new Promise(((resolve, reject) => {
             const slicer = slicerFn;
             function iterate() {
@@ -246,7 +246,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             limit: moment(moment(limit).format(dateFormat)).toISOString(),
         };
 
-        const range: SlicerDateResults = Object.assign(
+        const range: ReaderSlice = Object.assign(
             data,
             dates
         );
@@ -262,13 +262,11 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             countFn,
             version,
             type,
-            idFieldName,
             size: querySize,
             startingKeyDepth
         };
 
         const idSlicers = idSlicer(idSlicerArs);
-
         return getIdData(idSlicers);
     }
 
@@ -301,7 +299,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                 dates: { start: moment.utc(newStart), limit: moment.utc(newLimit) },
                 numOfSlicers,
                 getInterval() {
-                    return interval;
+                    // we don't actually need the count here
+                    return { interval, count: null };
                 }
             };
 
@@ -401,7 +400,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                     return list.map((obj) => {
                         obj.limit = moment(dateParams.limit.format(dateFormat)).toISOString();
                         return obj;
-                    }) as SlicerDateResults[];
+                    });
                 } catch (err) {
                     throw new TSError(err, {
                         reason: 'error while sub-slicing by key'

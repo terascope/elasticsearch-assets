@@ -24,7 +24,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: []
             };
@@ -50,7 +50,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 2,
                 dates: { start: startOfRange, limit: endLimit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: []
             };
@@ -93,7 +93,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -135,7 +135,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -178,7 +178,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -222,7 +222,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -267,7 +267,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -311,7 +311,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -357,7 +357,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 1,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -400,7 +400,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 2,
                 dates: { start: startOfRange, limit: endLimit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStartSlicerOne.format(dateFormatSeconds),
@@ -458,7 +458,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 2,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),
@@ -510,7 +510,7 @@ describe('determineDateSlicerRanges', () => {
                 numOfSlicers: 2,
                 dates: { start, limit },
                 getInterval() {
-                    return interval;
+                    return { interval, count: null };
                 },
                 recoveryData: [{
                     start: recoveryStart.format(dateFormatSeconds),

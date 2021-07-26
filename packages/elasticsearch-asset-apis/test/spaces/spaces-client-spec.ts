@@ -68,7 +68,7 @@ describe('Spaces Reader Client', () => {
         beforeEach(async () => {
             query = buildQuery(client.config, {
                 count: 100,
-            });
+            }, client.getESVersion());
         });
 
         it('should be able to make a search request without use data frames', async () => {

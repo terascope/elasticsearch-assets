@@ -7,6 +7,7 @@ import {
 import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
+import { inspect } from 'util';
 import { SpacesAPIConfig } from './interfaces';
 import { ReaderClient, SettingResults } from '../elasticsearch-reader-api/interfaces';
 import { throwRequestError } from './throwRequestError';
@@ -130,7 +131,8 @@ export class SpacesReaderClient implements ReaderClient {
             const queryOptions = {
                 query_string: _parseEsQ,
                 range: _parseDate,
-                wildcard: _parseWildCard
+                wildcard: _parseWildCard,
+                bool: _parseBoolQuery
             };
             const sortQuery: any = {};
             const geoQuery = _parseGeoQuery();
@@ -230,6 +232,14 @@ export class SpacesReaderClient implements ReaderClient {
 
             // Teraslice date ranges are >= start and < end.
             return `${dateFieldName}:[${dateStart.toISOString()} TO ${dateEnd.toISOString()}}`;
+        }
+
+        function _parseBoolQuery(op: any): string {
+            if (!Array.isArray(op.should)) {
+                throw new Error(`Invalid input to _parseBoolQuery ${inspect(op)}`);
+            }
+            const terms = op.should.map(({ wildcard }: any) => _parseWildCard(wildcard));
+            return `(${terms.join(' OR ')})`;
         }
 
         return parseQueryConfig(mustQuery);

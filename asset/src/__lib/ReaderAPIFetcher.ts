@@ -1,6 +1,6 @@
 import { Fetcher, DataEntity } from '@terascope/job-components';
 import { DataFrame } from '@terascope/data-mate';
-import { ElasticsearchReaderAPI, SlicerDateResults } from '@terascope/elasticsearch-asset-apis';
+import { ElasticsearchReaderAPI, ReaderSlice } from '@terascope/elasticsearch-asset-apis';
 import { ESDateConfig } from '../elasticsearch_reader/interfaces';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
 
@@ -14,7 +14,7 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
         await super.initialize();
     }
 
-    async fetch(slice: SlicerDateResults): Promise<DataEntity[] | DataFrame> {
+    async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame> {
         return this.api.fetch(slice);
     }
 }

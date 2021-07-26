@@ -46,7 +46,6 @@ describe('elasticsearch bulk sender module', () => {
     it('can instantiate', async () => {
         const sender = createSender({ size: 100 });
 
-        expect(sender).toBeDefined();
         expect(sender).toHaveProperty('formatBulkData');
         expect(sender).toHaveProperty('send');
         expect(sender).toHaveProperty('verify');

@@ -10,7 +10,6 @@ import {
     cleanupIndex,
     populateIndex,
     waitForData,
-    formatWildcardQuery
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -18,7 +17,7 @@ import {
     ElasticsearchReaderClient,
     ESReaderOptions,
     IDType,
-    SlicerDateResults
+    ReaderSlice
 } from '../src';
 
 describe('Reader API', () => {
@@ -54,7 +53,7 @@ describe('Reader API', () => {
     });
 
     afterAll(async () => {
-        // await cleanupIndex(client, makeIndex('*'));
+        await cleanupIndex(client, makeIndex('*'));
     });
 
     const typeConfig: DataTypeConfig = {
@@ -77,20 +76,17 @@ describe('Reader API', () => {
             subslice_by_key: false,
             fields: [],
             delay: '1000s',
+            id_field_name: idFieldName,
             subslice_key_threshold: 1000000,
             key_type: IDType.base64url,
             time_resolution: 'ms',
             connection: 'default',
-            starting_key_depth: 1
+            starting_key_depth: 0
         });
 
         it('can make date slices', async () => {
-            const config: ESReaderOptions = {
-                ...defaultConfig
-            };
-
             const api = createElasticsearchReaderAPI({
-                config, client: readerClient, logger, emitter
+                config: defaultConfig, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeDateSlicer({
@@ -100,64 +96,45 @@ describe('Reader API', () => {
                 recoveryData: [],
             });
 
-            expect(slicer).toBeDefined();
+            const slice = await slicer() as ReaderSlice;
 
-            const slice = await slicer() as SlicerDateResults;
+            expect(slice).toEqual({
+                start: '2019-04-26T15:00:23.201Z',
+                end: '2019-04-26T15:00:23.394Z',
+                limit: '2019-04-26T15:00:23.394Z',
+                holes: [],
+                count: 1000
+            });
 
-            expect(slice).toBeDefined();
-            expect(slice.start).toEqual('2019-04-26T15:00:23.201Z');
-            expect(slice.end).toEqual('2019-04-26T15:00:23.394Z');
-            expect(slice.limit).toEqual('2019-04-26T15:00:23.394Z');
-            expect(slice.holes).toEqual([]);
-            expect(slice.count).toEqual(1000);
-
-            const nullSlice = await slicer();
-            expect(nullSlice).toBeNull();
+            expect(await slicer()).toBeNull();
         });
 
         it('can make id slices', async () => {
-            const config: ESReaderOptions = {
-                ...defaultConfig
-            };
-
             const api = createElasticsearchReaderAPI({
-                config, client: readerClient, logger, emitter
+                config: defaultConfig, client: readerClient, logger, emitter
             });
 
             const slicer = await api.makeIDSlicer({
                 slicerID: 0,
                 numOfSlicers: 1,
                 recoveryData: [],
-                keyType: IDType.base64url,
-                startingKeyDepth: 0,
-                idFieldName
             });
 
-            expect(slicer).toBeDefined();
+            const slice = await slicer() as ReaderSlice;
 
-            const slice = await slicer() as SlicerDateResults;
-
-            const expectedResults = formatWildcardQuery([
-                { key: 'a*', count: 58 },
-            ], version, docType, idFieldName);
-
-            [slice].forEach((result, index) => {
-                expect(result).toMatchObject(expectedResults[index]);
+            expect(slice).toEqual({
+                keys: ['a'], count: 58
             });
         });
 
         it('can fetch records', async () => {
-            const config: ESReaderOptions = {
-                ...defaultConfig
-            };
-
             const api = createElasticsearchReaderAPI({
-                config, client: readerClient, logger, emitter
+                config: defaultConfig, client: readerClient, logger, emitter
             });
 
             const results = await api.fetch() as DataFrame;
 
-            expect(results).toBeDefined();
+            expect(results).toBeInstanceOf(DataFrame);
             expect(results.size).toEqual(1000);
         });
     });

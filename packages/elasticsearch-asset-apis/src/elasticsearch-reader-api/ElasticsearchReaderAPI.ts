@@ -34,7 +34,6 @@ import {
 } from './algorithms';
 import {
     ESReaderOptions,
-    SlicerDateResults,
     DateSegments,
     InputDateSegments,
     SlicerArgs,
@@ -43,15 +42,16 @@ import {
     IDSlicerArgs,
     IDSlicerConfig,
     DateSlicerResults,
-    IDSlicerResults,
     ReaderClient,
     SettingResults,
     IDSlicerRanges,
     DateSlicerRanges,
-    ParsedInterval,
     DateSlicerRange,
     IDSlicerRange,
-    DateSlicerMetadata
+    DateSlicerMetadata,
+    GetIntervalResult,
+    ReaderSlice,
+    IDSlicerResults
 } from './interfaces';
 import { WindowState } from './WindowState';
 import { buildQuery } from './utils';
@@ -95,24 +95,26 @@ export class ElasticsearchReaderAPI {
         this.client = client;
         const timeResolution = time_resolution ? dateOptions(time_resolution) : '';
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
+        this.count = this.count.bind(this);
     }
 
     makeWindowState(numOfSlicers: number): WindowState {
         return new WindowState(numOfSlicers);
     }
 
-    async count(queryParams: Partial<SlicerDateResults> = {}): Promise<number> {
-        const query = buildQuery(this.config, queryParams);
+    async count(queryParams: ReaderSlice = {}): Promise<number> {
+        const query = buildQuery(this.config, { ...queryParams, count: 0 }, this.version);
         return this.client.count(query as CountParams);
     }
 
-    async fetch(queryParams: Partial<SlicerDateResults> = {}): Promise<DataEntity[]|DataFrame> {
+    async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame> {
         // attempt to get window if not set
         if (!this.windowSize) await this.setWindowSize();
 
         // if we did go ahead and complete query
-        const query = buildQuery(this.config, queryParams);
-        query.size = this.windowSize;
+        const query = buildQuery(this.config, {
+            ...queryParams, count: this.windowSize
+        }, this.version);
 
         return this.client.search(
             query, this.config.use_data_frames ?? false, this.config.type_config
@@ -132,9 +134,12 @@ export class ElasticsearchReaderAPI {
 
     async determineSliceInterval(
         interval: string, esDates?: InputDateSegments
-    ): Promise<ParsedInterval|null> {
+    ): Promise<GetIntervalResult> {
         if (this.config.interval !== 'auto') {
-            return processInterval(interval, this.config.time_resolution, esDates);
+            return {
+                interval: processInterval(interval, this.config.time_resolution, esDates),
+                count: null,
+            };
         }
 
         if (esDates == null) {
@@ -148,7 +153,12 @@ export class ElasticsearchReaderAPI {
 
         // we need to return early so the millisecondInterval doesn't
         // end up being Infinity because 1/0 === Infinity
-        if (count === 0) return null;
+        if (count === 0) {
+            return {
+                interval: null,
+                count
+            };
+        }
 
         const numOfSlices = Math.ceil(count / this.config.size);
         const timeRangeMilliseconds = moment(esDates.limit).diff(esDates.start);
@@ -167,7 +177,7 @@ export class ElasticsearchReaderAPI {
                     config: this.config
                 })}`);
             }
-            return [seconds, 's'];
+            return { interval: [seconds, 's'], count };
         }
 
         const millisecondIntervalResults = millisecondInterval < 1 ? 1 : millisecondInterval;
@@ -178,7 +188,10 @@ export class ElasticsearchReaderAPI {
                 config: this.config
             })}`);
         }
-        return [millisecondIntervalResults, 'ms'];
+        return {
+            interval: [millisecondIntervalResults, 'ms'],
+            count
+        };
     }
 
     async setWindowSize(): Promise<void> {
@@ -190,16 +203,16 @@ export class ElasticsearchReaderAPI {
         this.windowSize = windowSize;
     }
 
-    private validateIDSlicerConfig(config: unknown): void {
+    private validateIDSlicerConfig(config: IDSlicerConfig): void {
         if (isObject(config)) {
             if (!isNumber(config.slicerID)) {
                 throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
             }
 
             if (this.version >= 6 && (
-                !isString(config.idFieldName) || config.idFieldName.length === 0
+                !isString(this.config.id_field_name) || this.config.id_field_name.length === 0
             )) {
-                throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(config.idFieldName)}`);
+                throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(this.config.id_field_name)}`);
             }
 
             if (config.recoveryData) {
@@ -222,22 +235,22 @@ export class ElasticsearchReaderAPI {
      * slicer instance, then each "range" should be passed into
      * {@link ElasticsearchReaderAPI.makeIDSlicerFromRange}
     */
-    makeIDSlicerRanges(config: Pick<IDSlicerConfig, 'keyRange'|'keyType'|'numOfSlicers'>): IDSlicerRanges {
+    async makeIDSlicerRanges(
+        config: Pick<IDSlicerConfig, 'numOfSlicers'>
+    ): Promise<IDSlicerRanges> {
         const {
             numOfSlicers,
-            keyRange,
-            keyType,
         } = config;
 
-        if (!keyType || !(keyType in IDType)) {
-            throw new Error(`Invalid parameter key_type, got ${keyType}`);
+        if (!this.config.key_type || !(this.config.key_type in IDType)) {
+            throw new Error(`Invalid parameter key_type, got ${this.config.key_type}`);
         }
 
-        if (keyRange) {
-            if (keyRange.length === 0) {
+        if (this.config.key_range) {
+            if (this.config.key_range.length === 0) {
                 throw new Error('Invalid key_range parameter, must be an array with length > 0');
             }
-            if (!keyRange.every(isString)) {
+            if (!this.config.key_range.every(isString)) {
                 throw new Error('Invalid key_range parameter, must be an array of strings');
             }
         }
@@ -246,15 +259,19 @@ export class ElasticsearchReaderAPI {
             throw new Error(`Parameter numOfSlicers must be a number, got ${getTypeOf(numOfSlicers)}`);
         }
 
-        const baseKeyArray = getKeyArray(keyType);
+        const baseKeyArray = getKeyArray(this.config.key_type);
         // we slice as not to mutate for when this is called again
-        const keyArray: readonly string[] = keyRange ? keyRange.slice() : baseKeyArray;
+        const keyArray: readonly string[] = this.config.key_range
+            ? this.config.key_range.slice()
+            : baseKeyArray;
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            throw new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
+            throw new Error(`key_range specified for id_reader contains keys not found in: ${this.config.key_type}`);
         }
 
-        return determineIDSlicerRanges(keyArray, numOfSlicers);
+        return determineIDSlicerRanges(
+            keyArray, numOfSlicers, this.count
+        );
     }
 
     /**
@@ -263,7 +280,7 @@ export class ElasticsearchReaderAPI {
      * slicers since making all of the slicer ranges at once is more efficient
     */
     async makeIDSlicer(config: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
-        const ranges = this.makeIDSlicerRanges(config);
+        const ranges = await this.makeIDSlicerRanges(config);
         return this.makeIDSlicerFromRange(config, ranges[config.slicerID]);
     }
 
@@ -278,24 +295,20 @@ export class ElasticsearchReaderAPI {
     ): Promise<() => Promise<IDSlicerResults>> {
         this.validateIDSlicerConfig(config);
 
-        const countFn = this.count.bind(this);
-
         const {
             slicerID,
-            keyRange,
-            keyType,
             recoveryData,
-            startingKeyDepth,
-            idFieldName,
         } = config;
         const { type, size } = this.config;
 
-        const baseKeyArray = getKeyArray(keyType);
+        const baseKeyArray = getKeyArray(this.config.key_type);
         // we slice as not to mutate for when this is called again
-        const keyArray: readonly string[] = keyRange ? keyRange.slice() : baseKeyArray;
+        const keyArray: readonly string[] = this.config.key_range
+            ? this.config.key_range.slice()
+            : baseKeyArray;
 
         if (difference(keyArray, baseKeyArray).length > 0) {
-            throw new Error(`key_range specified for id_reader contains keys not found in: ${keyType}`);
+            throw new Error(`key_range specified for id_reader contains keys not found in: ${this.config.key_type}`);
         }
 
         if (!this.windowSize) await this.setWindowSize();
@@ -303,32 +316,29 @@ export class ElasticsearchReaderAPI {
         const slicerConfig: IDSlicerArgs = {
             events: this.emitter,
             logger: this.logger,
-            keySet: range,
+            keySet: range.keys.slice(),
             version: this.version,
             baseKeyArray,
-            startingKeyDepth,
-            countFn,
+            startingKeyDepth: this.config.starting_key_depth,
+            countFn: this.count,
             type,
-            idFieldName,
             size
         };
 
         if (recoveryData && recoveryData.length > 0) {
             // TODO: verify what retryData is
             // real retry of executionContext here, need to reformat retry data
-            const parsedRetry = recoveryData.map((obj) => {
-                // regex to get str between # and *
-                if (obj.lastSlice) {
-                    if (this.version <= 5) return obj.lastSlice.key.match(/#(.*)\*/)[1];
-                    const { value } = obj.lastSlice.wildcard;
-                    // get rid of the * char which is at the end of the string
-                    return value.slice(0, value.length - 1);
+            const parsedRetry: (string|undefined)[] = recoveryData.map((obj) => {
+                const slice = (obj.lastSlice as ReaderSlice|undefined);
+                // when we get here there should only be one key
+                if (slice?.keys?.length === 1) {
+                    return slice.keys[0];
                 }
                 // some slicers might not have a previous slice, need to start from scratch
-                return '';
-            })[slicerID];
+                return undefined;
+            });
 
-            slicerConfig.retryData = parsedRetry;
+            slicerConfig.retryData = parsedRetry[slicerID];
         }
 
         return idSlicer(slicerConfig);
@@ -381,11 +391,11 @@ export class ElasticsearchReaderAPI {
 
         const recoveryData = config.recoveryData?.map(
             (slice) => slice.lastSlice
-        ).filter(Boolean) as SlicerDateResults[]|undefined || [];
+        ).filter(Boolean) as ReaderSlice[]|undefined || [];
 
         if (isPersistent) {
             // we need to interval to get starting dates
-            const [interval, latencyInterval] = await Promise.all([
+            const [{ interval }, { interval: latencyInterval }] = await Promise.all([
                 this.determineSliceInterval(this.config.interval),
                 this.determineSliceInterval(this.config.delay)
             ]);
@@ -429,23 +439,23 @@ export class ElasticsearchReaderAPI {
             numOfSlicers,
             recoveryData,
             getInterval: async (dates, slicerId) => {
-                const interval = await this.determineSliceInterval(
+                const result = await this.determineSliceInterval(
                     this.config.interval,
                     dates
                 );
 
                 slicerMetadata[slicerId] = {
-                    interval,
+                    ...result,
                     start: moment(dates.start.format(this.dateFormat)).toISOString(),
                     end: moment(dates.limit.format(this.dateFormat)).toISOString(),
                 };
 
-                if (interval == null) {
+                if (result.interval == null) {
                     this.logger.warn(dates, `No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
-                    return null;
+                    return result;
                 }
 
-                return interval;
+                return result;
             }
         });
 
@@ -493,8 +503,6 @@ export class ElasticsearchReaderAPI {
         } = config;
 
         const isPersistent = lifecycle === 'persistent';
-        const countFn = this.count.bind(this);
-
         const {
             time_resolution: timeResolution,
             size,
@@ -515,7 +523,7 @@ export class ElasticsearchReaderAPI {
             id: slicerID,
             events: this.emitter,
             version: this.version,
-            countFn,
+            countFn: this.count,
             timeResolution,
             size,
             subsliceByKey,
@@ -536,7 +544,7 @@ export class ElasticsearchReaderAPI {
             }
 
             // we need to interval to get starting dates
-            const [interval, latencyInterval] = await Promise.all([
+            const [{ interval }, { interval: latencyInterval }] = await Promise.all([
                 this.determineSliceInterval(this.config.interval),
                 this.determineSliceInterval(this.config.delay)
             ]);

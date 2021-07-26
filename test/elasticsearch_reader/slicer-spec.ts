@@ -18,7 +18,6 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex,
-    formatWildcardQuery
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
 import unevenSpread from '../fixtures/data/uneven-spread';
@@ -177,8 +176,8 @@ describe('elasticsearch_reader slicer', () => {
         await expect(makeSlicerTest({ opConfig })).toReject();
     });
 
-    describe('it can respect start and end parameters and generate updates for range of job', () => {
-        it('with no start or end (auto)', async () => {
+    describe('when start and end parameters and generate updates for range of job', () => {
+        it('can handle no start or end (auto)', async () => {
             const test = await makeSlicerTest({ opConfig: {} });
             const update = await getMeta(test);
 
@@ -186,17 +185,23 @@ describe('elasticsearch_reader slicer', () => {
                 0: {
                     start: evenOriginalStart,
                     end: evenOriginalEnd,
-                    interval: [9, 'ms']
+                    interval: [9, 'ms'],
+                    count: 1000
                 }
             });
 
             const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(evenOriginalStart);
-            expect(slice!.limit).toEqual(evenOriginalEnd);
+            expect(slice).toEqual({
+                start: evenOriginalStart,
+                end: '2019-04-26T15:00:23.210Z',
+                limit: evenOriginalEnd,
+                count: 14,
+                holes: [],
+            });
         });
 
-        it('with start specified', async () => {
+        it('can handle only start specified', async () => {
             const start = '2019-04-26T15:00:23.250Z';
             const test = await makeSlicerTest({ opConfig: { start } });
             const update = await getMeta(test);
@@ -205,17 +210,23 @@ describe('elasticsearch_reader slicer', () => {
                 0: {
                     start,
                     end: evenOriginalEnd,
-                    interval: [8, 'ms']
+                    interval: [8, 'ms'],
+                    count: 868
                 }
             });
 
             const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(start);
-            expect(slice!.limit).toEqual(evenOriginalEnd);
+            expect(slice).toEqual({
+                start,
+                end: '2019-04-26T15:00:23.258Z',
+                limit: evenOriginalEnd,
+                count: 48,
+                holes: []
+            });
         });
 
-        it('with end specified', async () => {
+        it('can handle only end specified', async () => {
             const end = '2019-04-26T15:00:23.280Z';
             const test = await makeSlicerTest({ opConfig: { end } });
             const update = await getMeta(test);
@@ -224,14 +235,20 @@ describe('elasticsearch_reader slicer', () => {
                 0: {
                     start: evenOriginalStart,
                     end,
-                    interval: [13, 'ms']
+                    interval: [13, 'ms'],
+                    count: 275
                 }
             });
 
             const [slice] = await test.createSlices();
 
-            expect(slice!.start).toEqual(evenOriginalStart);
-            expect(slice!.limit).toEqual(end);
+            expect(slice).toEqual({
+                start: evenOriginalStart,
+                end: '2019-04-26T15:00:23.214Z',
+                limit: end,
+                count: 25,
+                holes: []
+            });
         });
     });
 
@@ -1145,73 +1162,73 @@ describe('elasticsearch_reader slicer', () => {
 
         const expectedKeyCounts = [
             {
-                key: '0*',
+                keys: ['0'],
                 count: 9,
             },
             {
-                key: '1*',
+                keys: ['1'],
                 count: 5,
             },
             {
-                key: '2*',
+                keys: ['2'],
                 count: 4,
             },
             {
-                key: '3*',
+                keys: ['3'],
                 count: 8,
             },
             {
-                key: '4*',
+                keys: ['4'],
                 count: 9,
             },
             {
-                key: '5*',
+                keys: ['5'],
                 count: 6,
             },
             {
-                key: '6*',
+                keys: ['6'],
                 count: 7,
             },
             {
-                key: '7*',
+                keys: ['7'],
                 count: 9,
             },
             {
-                key: '8*',
+                keys: ['8'],
                 count: 7,
             },
             {
-                key: '9*',
+                keys: ['9'],
                 count: 5,
             },
             {
-                key: 'a*',
+                keys: ['a'],
                 count: 6,
             },
             {
-                key: 'b*',
+                keys: ['b'],
                 count: 6,
             },
             {
-                key: 'c*',
+                keys: ['c'],
                 count: 2,
             },
             {
-                key: 'd*',
+                keys: ['d'],
                 count: 7,
             },
             {
-                key: 'e*',
+                keys: ['e'],
                 count: 4,
             },
             {
-                key: 'f*',
+                keys: ['f'],
                 count: 6,
             },
         ];
 
-        const expectedResults = formatWildcardQuery(expectedKeyCounts, version, docType, 'uuid')
-            .map((obj) => Object.assign({}, obj, dates));
+        const expectedResults = expectedKeyCounts
+            .map((obj) => ({ ...obj, ...dates }));
 
         // this signals the end of slices
         expect(allSlices.pop()).toBeNull();
