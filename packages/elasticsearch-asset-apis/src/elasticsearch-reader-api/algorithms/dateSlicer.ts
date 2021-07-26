@@ -400,7 +400,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
                     return list.map((obj) => {
                         obj.limit = moment(dateParams.limit.format(dateFormat)).toISOString();
                         return obj;
-                    }) as ReaderSlice[];
+                    });
                 } catch (err) {
                     throw new TSError(err, {
                         reason: 'error while sub-slicing by key'
