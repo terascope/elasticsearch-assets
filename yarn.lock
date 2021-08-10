@@ -632,27 +632,6 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.30.3":
-  version "0.30.3"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.30.3.tgz#2edf506838f3ef09502dd33d77382d6928ec3298"
-  integrity sha512-RbM+ab/tum+evnzZ4Lju3KMSFj1eYuu84m2PpOMsK7+ykLzgN1pd6UUNxZTz/4JhbDX56arKNnCAicXeyQwpeA==
-  dependencies:
-    "@terascope/data-types" "^0.30.7"
-    "@terascope/types" "^0.10.1"
-    "@terascope/utils" "^0.40.7"
-    date-fns "^2.23.0"
-    ip-bigint "^3.0.3"
-    ip6addr "^0.2.3"
-    ipaddr.js "^2.0.1"
-    is-cidr "^4.0.2"
-    is-ip "^3.1.0"
-    jexl "^2.2.2"
-    mnemonist "^0.38.3"
-    uuid "^8.3.2"
-    valid-url "^1.0.9"
-    validator "^13.6.0"
-    xlucene-parser "^0.38.3"
-
 "@terascope/data-mate@^0.31.0":
   version "0.31.0"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.31.0.tgz#64d2391f2eb614ccd2d8b77be63ab8df9521db3a"
@@ -2268,12 +2247,12 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.52.4:
-  version "0.52.4"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.52.4.tgz#1c0ee50d262dcf357a7a0219e84424e28e3e6fc8"
-  integrity sha512-puW+fF/TyKBNxMCLdKyVsAHQAVV0CiN1b9rg+eg6mYpLXy5jlWKF/rq3DMxeSVbb9BvFL+W0Z+pTQV4fm1SJuA==
+elasticsearch-store@^0.53.0:
+  version "0.53.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.53.0.tgz#5876f207836f5723aa0d8ff25cfeee39efe5b80b"
+  integrity sha512-dRZWQt/xmIgxHh1pc3z+Yxg5w338G6GccRdoQglL+ldhPdYYxc3ptQKjIzvFwpK7qv82+V3b6Omr+XM2kIa1yQ==
   dependencies:
-    "@terascope/data-mate" "^0.30.3"
+    "@terascope/data-mate" "^0.31.0"
     "@terascope/data-types" "^0.30.7"
     "@terascope/types" "^0.10.1"
     "@terascope/utils" "^0.40.7"
