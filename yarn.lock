@@ -653,6 +653,27 @@
     validator "^13.6.0"
     xlucene-parser "^0.38.3"
 
+"@terascope/data-mate@^0.31.0":
+  version "0.31.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.31.0.tgz#64d2391f2eb614ccd2d8b77be63ab8df9521db3a"
+  integrity sha512-VxjsL4WyZ22MX5lefLikMxO1sb9z4/i09ATe/kB+In/iMLbjH9jOXx+NteLMrczxewgzaSlz/bFgu2mme9D07A==
+  dependencies:
+    "@terascope/data-types" "^0.30.7"
+    "@terascope/types" "^0.10.1"
+    "@terascope/utils" "^0.40.7"
+    date-fns "^2.23.0"
+    ip-bigint "^3.0.3"
+    ip6addr "^0.2.3"
+    ipaddr.js "^2.0.1"
+    is-cidr "^4.0.2"
+    is-ip "^3.1.0"
+    jexl "^2.2.2"
+    mnemonist "^0.38.3"
+    uuid "^8.3.2"
+    valid-url "^1.0.9"
+    validator "^13.6.0"
+    xlucene-parser "^0.38.3"
+
 "@terascope/data-types@^0.30.5", "@terascope/data-types@^0.30.7":
   version "0.30.7"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.30.7.tgz#3061b52d3d28c5148a3f7ec9f0a86d672b98a3e7"
