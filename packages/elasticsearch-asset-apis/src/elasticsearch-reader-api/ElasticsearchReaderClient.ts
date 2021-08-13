@@ -7,7 +7,7 @@ import type {
     Client, SearchParams, SearchResponse, CountParams
 } from 'elasticsearch';
 import { DataTypeConfig } from '@terascope/types';
-import { ReaderClient, SettingResults } from './interfaces';
+import { ReaderClient, FetchResponseType, SettingResults } from './interfaces';
 
 export class ElasticsearchReaderClient implements ReaderClient {
     private readonly _baseClient: Client;
@@ -41,47 +41,52 @@ export class ElasticsearchReaderClient implements ReaderClient {
 
     search(
         query: SearchParams,
-        useDataFrames: false,
+        responseType: FetchResponseType.raw,
+        typeConfig?: DataTypeConfig
+    ): Promise<Buffer>;
+    search(
+        query: SearchParams,
+        responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
         query: SearchParams,
-        useDataFrames: true,
+        responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     async search(
         query: SearchParams,
-        useDataFrames: boolean,
+        responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
-    ): Promise<DataEntity[]|DataFrame> {
-        if (!useDataFrames) {
+    ): Promise<DataEntity[]|DataFrame|Buffer> {
+        if (responseType === FetchResponseType.data_entities) {
             return this._searchRequest(query, false);
         }
-        const start = Date.now();
+
         const searchResults = await this._searchRequest(
             query, true
         );
 
-        const searchEnd = Date.now();
         const records = searchResults.hits.hits.map((data) => data._source);
         const metrics = {
-            fetch_time: searchEnd - start,
-            fetched: records.length,
             total: get(searchResults, 'hits.total.value', get(searchResults, 'hits.total'))
         };
 
         // we do not have access to complexity right now
-        return DataFrame.fromJSON(
+        const dataFrame = DataFrame.fromJSON(
             typeConfig!,
             records,
             {
                 name: '<unknown>',
                 metadata: {
-                    search_end_time: searchEnd,
                     metrics
                 }
             }
         );
+        if (responseType === FetchResponseType.raw) {
+            return Buffer.from(dataFrame.serialize());
+        }
+        return dataFrame;
     }
 
     _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
