@@ -111,6 +111,7 @@ export class SpacesReaderClient implements ReaderClient {
         if (response.statusCode >= 400) {
             throwRequestError(this.uri, response.statusCode, response.body);
         }
+        if (format === 'dfjson') return response.rawBody;
         return response.body;
     }
 
