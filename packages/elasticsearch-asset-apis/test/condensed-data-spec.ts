@@ -21,8 +21,6 @@ import {
     ReaderSlice
 } from '../src';
 
-jest.setTimeout(15_000);
-
 describe('ReaderAPI with condensed time data', () => {
     const client = makeClient();
 
