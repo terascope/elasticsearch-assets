@@ -17,12 +17,11 @@ import {
     createElasticsearchReaderAPI,
     ElasticsearchReaderClient,
     ESReaderOptions,
+    FetchResponseType,
     IDType,
     InputDateSegments,
     ReaderSlice
 } from '../src';
-
-jest.setTimeout(15_000);
 
 describe('Reader API', () => {
     const client = makeClient();
@@ -70,7 +69,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             type: docType,
-            use_data_frames: true,
+            response_type: FetchResponseType.data_frame,
             type_config: typeConfig,
             start: null,
             end: null,
@@ -257,6 +256,198 @@ describe('Reader API', () => {
         });
     });
 
+    describe('returning raw data frames', () => {
+        const defaultConfig: ESReaderOptions = Object.seal({
+            index: evenIndex,
+            size: 1000,
+            date_field_name: 'created',
+            query: '*',
+            type: docType,
+            response_type: FetchResponseType.raw,
+            type_config: typeConfig,
+            start: null,
+            end: null,
+            interval: 'auto',
+            subslice_by_key: false,
+            fields: [],
+            delay: '1000s',
+            subslice_key_threshold: 1000000,
+            key_type: IDType.base64url,
+            time_resolution: 'ms',
+            connection: 'default',
+            starting_key_depth: 0
+        });
+
+        it('can determine date ranges', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const results = await api.determineDateRanges();
+
+            expect(results.start?.toISOString()).toEqual('2019-04-26T15:00:23.201Z');
+            expect(results.limit?.toISOString()).toEqual('2019-04-26T15:00:23.394Z');
+        });
+
+        it('can determine slice interval', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const dates = await api.determineDateRanges() as InputDateSegments;
+            const result = await api.determineSliceInterval(defaultConfig.interval, dates);
+
+            expect(result).toEqual({ interval: [193, 'ms'], count: 1000 });
+        });
+
+        it('can make date slices', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeDateSlicer({
+                lifecycle: 'once',
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const slice = await slicer() as ReaderSlice;
+
+            expect(slice).toEqual({
+                start: '2019-04-26T15:00:23.201Z',
+                end: '2019-04-26T15:00:23.394Z',
+                limit: '2019-04-26T15:00:23.394Z',
+                holes: [],
+                count: 1000
+            });
+
+            expect(await slicer()).toBeNull();
+        });
+
+        it('can handle the case where no data is returned from the query', async () => {
+            const config: ESReaderOptions = Object.freeze({
+                ...defaultConfig,
+                // there should be nothing with this range
+                start: '2001-01-31T17:23:25.000Z',
+                end: '2001-01-31T17:23:26.000Z'
+            });
+
+            const api = createElasticsearchReaderAPI({
+                config, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeDateSlicer({
+                lifecycle: 'once',
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            expect(await slicer()).toBeNull();
+        });
+
+        it('can count a slice', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+            // query is set to * above
+            const count = await api.count();
+
+            expect(count).toEqual(1000);
+        });
+
+        it('can fetch records', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const results = await api.fetch() as DataFrame;
+
+            expect(results).toBeInstanceOf(Buffer);
+        });
+
+        it('can getWindowSize', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const size = await api.getWindowSize();
+
+            expect(size).toBeNumber();
+        });
+
+        it('can get api version', async () => {
+            const config: ESReaderOptions = {
+                ...defaultConfig
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config, client: readerClient, logger, emitter
+            });
+
+            const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
+            expect(api.version).toEqual(parsedNumber);
+        });
+
+        // TODO this is badly named method, might need to change in the future
+        it('can verify index', async () => {
+            const config: ESReaderOptions = {
+                ...defaultConfig
+            };
+
+            let warnMessage: undefined|string;
+
+            const testLogger = {
+                info: () => {},
+                warn: (msg: string) => {
+                    warnMessage = msg;
+                    return null;
+                }
+            } as any;
+
+            const api = createElasticsearchReaderAPI({
+                config,
+                client: new ElasticsearchReaderClient(
+                    client,
+                    { index: evenIndex },
+                    testLogger
+                ),
+                logger: testLogger,
+                emitter
+            });
+
+            await api.verifyIndex();
+
+            expect(warnMessage).toBeString();
+        });
+
+        it('can make id slices', async () => {
+            const config: ESReaderOptions = {
+                ...defaultConfig,
+                id_field_name: idFieldName,
+                starting_key_depth: 0,
+                key_type: IDType.base64url,
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const slice = await slicer() as ReaderSlice;
+
+            expect(slice).toMatchObject({
+                keys: ['a']
+            });
+        });
+    });
+
     describe('returning data entities', () => {
         const defaultConfig: ESReaderOptions = Object.freeze({
             index: evenIndex,
@@ -264,7 +455,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             type: docType,
-            use_data_frames: false,
+            response_type: FetchResponseType.data_entities,
             type_config: typeConfig,
             start: null,
             end: null,

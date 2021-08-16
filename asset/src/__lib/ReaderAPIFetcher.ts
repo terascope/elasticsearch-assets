@@ -14,7 +14,7 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
         await super.initialize();
     }
 
-    async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame> {
+    async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame | Buffer> {
         return this.api.fetch(slice);
     }
 }

@@ -18,10 +18,9 @@ import {
     InputDateSegments,
     DateSlicerArgs,
     ElasticsearchReaderClient,
-    ReaderSlice
+    ReaderSlice,
+    FetchResponseType
 } from '../src';
-
-jest.setTimeout(15_000);
 
 describe('ReaderAPI with condensed time data', () => {
     const client = makeClient();
@@ -67,7 +66,7 @@ describe('ReaderAPI with condensed time data', () => {
         date_field_name: 'created',
         query: '*',
         type: docType,
-        use_data_frames: false,
+        response_type: FetchResponseType.data_entities,
         type_config: typeConfig,
         start: null,
         end: null,

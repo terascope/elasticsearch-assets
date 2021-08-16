@@ -6,6 +6,7 @@ import 'jest-extended';
 import nock from 'nock';
 import {
     buildQuery,
+    FetchResponseType,
     IDType,
     SpacesAPIConfig,
     SpacesReaderClient
@@ -81,7 +82,7 @@ describe('Spaces Reader Client', () => {
                 total: 1000
             });
 
-            const result = await client.search(query, false);
+            const result = await client.search(query, FetchResponseType.data_entities);
             expect(result).toEqual([
                 { foo: 'foo', bar: 'bar', byte: 10 }
             ]);
@@ -105,7 +106,7 @@ describe('Spaces Reader Client', () => {
                 size: 100,
             }).reply(200, frame.serialize());
 
-            const result = await client.search(query, true, dataTypeConfig);
+            const result = await client.search(query, FetchResponseType.data_frame, dataTypeConfig);
 
             expect(result).toBeInstanceOf(DataFrame);
             expect(result.toJSON()).toEqual([
@@ -114,11 +115,8 @@ describe('Spaces Reader Client', () => {
 
             expect(result.metadata).toEqual({
                 metrics: {
-                    fetch_time: expect.any(Number),
-                    fetched: 1,
                     total: 1000
                 },
-                search_end_time: expect.any(Number),
             });
         });
     });

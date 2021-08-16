@@ -51,7 +51,8 @@ import {
     DateSlicerMetadata,
     GetIntervalResult,
     ReaderSlice,
-    IDSlicerResults
+    IDSlicerResults,
+    FetchResponseType
 } from './interfaces';
 import { WindowState } from './WindowState';
 import { buildQuery } from './utils';
@@ -83,7 +84,7 @@ export class ElasticsearchReaderAPI {
     ) {
         const { time_resolution } = config;
 
-        if (config.use_data_frames) {
+        if (config.response_type === FetchResponseType.data_frame) {
             if (!isValidDataTypeConfig(config.type_config)) {
                 throw new Error('Parameter "type_config" must be set if DataFrames are being returned');
             }
@@ -107,7 +108,11 @@ export class ElasticsearchReaderAPI {
         return this.client.count(query as CountParams);
     }
 
-    async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame> {
+    /**
+     * Fetch a given slice, the data will be returned in the format
+     * specified under `response_type` in the config
+    */
+    async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame|Buffer> {
         // attempt to get window if not set
         if (!this.windowSize) await this.setWindowSize();
 
@@ -117,7 +122,9 @@ export class ElasticsearchReaderAPI {
         }, this.version);
 
         return this.client.search(
-            query, this.config.use_data_frames ?? false, this.config.type_config
+            query,
+            this.config.response_type ?? FetchResponseType.data_entities,
+            this.config.type_config
         );
     }
 

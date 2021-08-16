@@ -8,8 +8,9 @@ import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
 import { inspect } from 'util';
-import { SpacesAPIConfig } from './interfaces';
-import { ReaderClient, SettingResults } from '../elasticsearch-reader-api/interfaces';
+import {
+    SpacesAPIConfig, ReaderClient, SettingResults, FetchResponseType
+} from './interfaces';
 import { throwRequestError } from './throwRequestError';
 
 // eslint-disable-next-line
@@ -71,12 +72,12 @@ export class SpacesReaderClient implements ReaderClient {
     protected async makeRequest(
         query: AnyObject,
         format: 'dfjson'
-    ): Promise<string>
+    ): Promise<Buffer>
     protected async makeRequest(
         query: AnyObject,
         format?: 'json'|'dfjson'
-    ): Promise<SearchResult|string> {
-        let response: Response<SearchResult|string>;
+    ): Promise<SearchResult|Buffer> {
+        let response: Response<SearchResult|Buffer>;
 
         try {
             response = await got.post<SearchResult>(
@@ -110,6 +111,7 @@ export class SpacesReaderClient implements ReaderClient {
         if (response.statusCode >= 400) {
             throwRequestError(this.uri, response.statusCode, response.body);
         }
+        if (format === 'dfjson') return response.rawBody;
         return response.body;
     }
 
@@ -259,36 +261,36 @@ export class SpacesReaderClient implements ReaderClient {
 
     search(
         query: SearchParams,
-        useDataFrames: false,
+        responseType: FetchResponseType.raw,
+        typeConfig?: DataTypeConfig
+    ): Promise<Buffer>;
+    search(
+        query: SearchParams,
+        responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
         query: SearchParams,
-        useDataFrames: true,
+        responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     async search(
         query: SearchParams,
-        useDataFrames: boolean,
-    ): Promise<DataEntity[]|DataFrame> {
-        if (!useDataFrames) {
+        responseType: FetchResponseType,
+    ): Promise<DataEntity[]|DataFrame|Buffer> {
+        if (responseType === FetchResponseType.data_entities) {
             return this._searchRequest(query, false);
         }
 
-        const start = Date.now();
         const data = await this._searchRequest(
             query, true, 'dfjson'
         );
 
-        const dataFrame = await DataFrame.deserialize(data);
+        if (responseType === FetchResponseType.raw) {
+            return data;
+        }
 
-        const searchEnd = Date.now();
-        dataFrame.metadata.search_end_time = searchEnd;
-        dataFrame.metadata.metrics.fetch_time = searchEnd - start;
-        dataFrame.metadata.metrics.fetched = dataFrame.size;
-
-        // we do not have access to complexity right now
-        return dataFrame;
+        return DataFrame.deserialize(data);
     }
 
     _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
@@ -296,7 +298,7 @@ export class SpacesReaderClient implements ReaderClient {
         query: SearchParams,
         fullResponse: true,
         format: 'dfjson'
-    ): Promise<string>;
+    ): Promise<Buffer>;
     _searchRequest(
         query: SearchParams,
         fullResponse: true,
@@ -306,7 +308,7 @@ export class SpacesReaderClient implements ReaderClient {
         query: SearchParams,
         fullResponse?: boolean,
         format?: 'json'|'dfjson'
-    ): Promise<DataEntity[]|SearchResult|string> {
+    ): Promise<DataEntity[]|SearchResult|Buffer> {
         const searchQuery = this.translateSearchQuery(query);
         if (fullResponse) {
             if (format === 'dfjson') {

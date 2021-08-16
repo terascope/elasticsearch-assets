@@ -16,6 +16,7 @@ import {
     createElasticsearchReaderAPI,
     ElasticsearchReaderClient,
     ESReaderOptions,
+    FetchResponseType,
     IDType,
     ReaderSlice
 } from '../src';
@@ -68,7 +69,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             type: docType,
-            use_data_frames: true,
+            response_type: FetchResponseType.data_frame,
             type_config: typeConfig,
             start: null,
             end: null,

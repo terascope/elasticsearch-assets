@@ -25,19 +25,24 @@ export interface ReaderClient {
     */
     search(
         query: SearchParams,
-        useDataFrames: false,
+        responseType: FetchResponseType.raw,
+        typeConfig?: DataTypeConfig
+    ): Promise<Buffer>;
+    search(
+        query: SearchParams,
+        responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
         query: SearchParams,
-        useDataFrames: true,
+        responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     search(
         query: SearchParams,
-        useDataFrames: boolean,
+        responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
-    ): Promise<DataEntity[]|DataFrame>;
+    ): Promise<DataEntity[]|DataFrame|Buffer>;
 
     /**
      * Used to make a custom search request
@@ -314,6 +319,12 @@ export interface InputDateSegments {
     limit: moment.Moment | string | Date;
 }
 
+export enum FetchResponseType {
+    data_entities = 'data_entities',
+    data_frame = 'data_frame',
+    raw = 'raw',
+}
+
 export interface ESReaderOptions {
     index: string;
     id_field_name?: string;
@@ -341,7 +352,7 @@ export interface ESReaderOptions {
     geo_sort_unit?: string;
     connection: string;
     starting_key_depth: number;
-    use_data_frames?: boolean;
+    response_type?: FetchResponseType;
     type_config?: DataTypeConfig
 }
 
