@@ -117,7 +117,6 @@ describe('Spaces Reader Client', () => {
                 metrics: {
                     total: 1000
                 },
-                search_end_time: expect.any(Number),
             });
         });
     });
