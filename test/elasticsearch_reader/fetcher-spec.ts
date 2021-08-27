@@ -144,8 +144,12 @@ describe('elasticsearch_reader fetcher', () => {
         try {
             const test = await makeJobTest({ size });
             await test.runToCompletion();
+            throw new Error('should have error');
         } catch (err) {
-            expect(err.message).toEqual(errMsg);
+            expect(
+                // @ts-expect-error
+                err.message
+            ).toEqual(errMsg);
         }
     });
 });

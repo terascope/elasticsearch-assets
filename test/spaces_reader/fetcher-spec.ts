@@ -280,7 +280,10 @@ describe('spaces_reader fetcher', () => {
                     await harness.runSlice({ count: 5000 });
                     throw new Error('Expected slice to fail');
                 } catch (err) {
-                    expect(err.message).toInclude('HTTP request timed out connecting to API endpoint.');
+                    expect(
+                        // @ts-expect-error
+                        err.message
+                    ).toEqual('HTTP request timed out connecting to API endpoint.');
                 }
 
                 expect(scope.isDone()).toBeTrue();
