@@ -664,12 +664,12 @@
     lodash "^4.17.21"
     yargs "^17.1.1"
 
-"@terascope/elasticsearch-api@^2.23.1":
-  version "2.23.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.23.1.tgz#59b9ec2cda28479e10595d7335d1e770348fa0df"
-  integrity sha512-TdooxMH9cbm3BrDAFDXAz8LkOQJLUARS3O6i7L0T51KDHkA1eQhdQBrOQ/jxasCIixZYn1wwupdAJV3ncTbAbg==
+"@terascope/elasticsearch-api@^2.23.1", "@terascope/elasticsearch-api@^2.23.3":
+  version "2.23.3"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.23.3.tgz#068967636dea3c1e9e2e04cefcafd6f48306c626"
+  integrity sha512-cJG1uNligakMRXg8VwPRHcHZNvlWLwIOzFTqRtMBg7MnagAX2zoY6meOy9X5sBnt3qXd/4j+np50kRpg6SdbIw==
   dependencies:
-    "@terascope/utils" "^0.42.1"
+    "@terascope/utils" "^0.42.3"
     bluebird "^3.7.2"
 
 "@terascope/eslint-config@^0.6.0":
@@ -731,10 +731,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.10.1.tgz#5a1d3993e84d98a2b841218d5f301d30ce290d39"
   integrity sha512-IL28o1zVXWLlLhF3STeQJmrBqEy3+h2MKRctcWw3ZvBd39opC1RUHzblvkOFCxnF4e1uTQ8kuNvlQXWE/HFLoQ==
 
-"@terascope/utils@^0.42.1":
-  version "0.42.1"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.42.1.tgz#05b9a9bd0df67bd6534151c891d52d441156c8a9"
-  integrity sha512-QvgAjRyDfvwfjjJxlvHvHEmE7PRH2OklVVIE98AUCA4TwYuVvplqIdJgxV85oYIZRikR7BBnQGRXnvocHsg1UA==
+"@terascope/utils@^0.42.1", "@terascope/utils@^0.42.3":
+  version "0.42.3"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.42.3.tgz#3f2ba879df3a04b9d9de1f9c5e6641c8cf6e5ae4"
+  integrity sha512-HURUwC+JyxtRvi9opeLLmAx93ZYcKYAcT2ZTmX+O2GI0xVn24kN4or0QpmYfi2wyc91CEmPgAxfqWYvt349QOA==
   dependencies:
     "@terascope/types" "^0.10.1"
     "@turf/bbox" "^6.4.0"
@@ -749,7 +749,7 @@
     "@turf/helpers" "^6.2.0"
     "@turf/invariant" "^6.2.0"
     "@turf/line-to-polygon" "^6.4.0"
-    awesome-phonenumber "^2.57.0"
+    awesome-phonenumber "^2.58.0"
     date-fns "^2.23.0"
     date-fns-tz "^1.1.5"
     datemath-parser "^1.0.6"
@@ -1458,10 +1458,10 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-awesome-phonenumber@^2.57.0:
-  version "2.57.0"
-  resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.57.0.tgz#0d2986247553b0e3d97e459bb365a82c13a4f259"
-  integrity sha512-RWrCCQpnmkYeL3AGFdlUOpWkpkTauZm7FE9kgDz6xJG6PNUiiIm+rKI95wnre0TSV01PHvgFFwQZhDixPCM9ZA==
+awesome-phonenumber@^2.58.0:
+  version "2.58.0"
+  resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.58.0.tgz#eaa788910b567abd6c1283025bcf491ac5b55d85"
+  integrity sha512-rsbIn7Htq/QqUfJ7E53oGiGnLca5SUJEshg8zG5h9WK+fTxoGA12/NDKC5eCvkK2eaP8gR/RVA1yuf0Arib7vg==
 
 axe-core@^4.0.2:
   version "4.3.2"
