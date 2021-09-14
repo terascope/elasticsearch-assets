@@ -632,12 +632,12 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.34.6":
-  version "0.34.6"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.34.6.tgz#195bc0c88316f0cd753aba37e0360ac5b8d8421e"
-  integrity sha512-rgTy8rfFUVcFrORfvN3aq7SLvuJN0g6VbJHmpVJYKQyJLmHKILlenYXHaIrjLL/CtRbLcjpU8lweVaaLeAMreA==
+"@terascope/data-mate@^0.34.6", "@terascope/data-mate@^0.34.7":
+  version "0.34.7"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.34.7.tgz#f23013a3e7f34d93342556618279161fbc733851"
+  integrity sha512-IQhNmfeVyvYh02abx9InwA090Cqm9EEgJXxI+2Cb/tyHlK0E0XviuBQQLrTUphjSkjly1uxB8FFD6M5YolsYBg==
   dependencies:
-    "@terascope/data-types" "^0.32.5"
+    "@terascope/data-types" "^0.32.6"
     "@terascope/types" "^0.10.1"
     "@terascope/utils" "^0.42.5"
     date-fns "^2.23.0"
@@ -653,10 +653,10 @@
     validator "^13.6.0"
     xlucene-parser "^0.40.5"
 
-"@terascope/data-types@^0.32.1", "@terascope/data-types@^0.32.5":
-  version "0.32.5"
-  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.32.5.tgz#f618523d7b14b9598a950c0a6e80c633ee8c9cb7"
-  integrity sha512-rlS7cbjc3XO8m+B6Z1CRB7VQ4cbb53nqSQfyOQvzifEidw5C4dAmnflbQYxmlRu49pcxKBYOPdI04caVxXzQDA==
+"@terascope/data-types@^0.32.1", "@terascope/data-types@^0.32.6":
+  version "0.32.6"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.32.6.tgz#8e8167d2a098f1c09de774e19db636333882cb22"
+  integrity sha512-DTvoX/Mr0A8D1MtrPZ9VxjQUUhCVWhgpJ021Tz1aeojGLdBJKF2SpPgb+8RWN0yHPJBphECC54UshQ8cQQARjA==
   dependencies:
     "@terascope/types" "^0.10.1"
     "@terascope/utils" "^0.42.5"
@@ -2245,13 +2245,13 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.56.6:
-  version "0.56.6"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.56.6.tgz#c78a2057fb08fdd1ac9166569cb0ca1e0152a465"
-  integrity sha512-9X1a3YA/AwdylfoXs3n0JKg6NjLknH1ggCjWucUosphl2iA7DfBCRxKgLLL1uwUxffdcGmWtY/spEf2I0DeBjw==
+elasticsearch-store@^0.56.7:
+  version "0.56.7"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.56.7.tgz#5e5f477b96c278d5c70833a819dd175e9f238c4e"
+  integrity sha512-wEOD307ZhWAmmU2kTD+LgNmH0huVJLrSVv3QIwq8rDPSzGjt4m4ipXRZxcjRXQHWq4Is975YkhafFC0JDrIaxg==
   dependencies:
-    "@terascope/data-mate" "^0.34.6"
-    "@terascope/data-types" "^0.32.5"
+    "@terascope/data-mate" "^0.34.7"
+    "@terascope/data-types" "^0.32.6"
     "@terascope/types" "^0.10.1"
     "@terascope/utils" "^0.42.5"
     ajv "^6.12.6"
