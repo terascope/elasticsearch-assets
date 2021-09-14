@@ -16,7 +16,7 @@
     "license": "MIT",
     "description": "",
     "dependencies": {
-        "@terascope/data-mate": "^0.34.6",
+        "@terascope/data-mate": "^0.34.7",
         "@terascope/elasticsearch-api": "^2.23.5",
         "@terascope/elasticsearch-asset-apis": "^0.8.0",
         "@terascope/job-components": "^0.54.5",
