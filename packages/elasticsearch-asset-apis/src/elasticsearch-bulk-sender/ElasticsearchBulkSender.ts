@@ -132,7 +132,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
 
             // allows for creation of new record and deletion of old record in one pass
             // useful for fixing keying mistakes
-            if ((!this.config.update && !this.config.upsert) && record.getMetadata('_delete_key')) {
+            if (record.getMetadata('_delete_key')) {
                 results.push(
                     {
                         delete: {

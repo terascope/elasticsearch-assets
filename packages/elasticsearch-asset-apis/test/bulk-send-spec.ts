@@ -255,33 +255,6 @@ describe('elasticsearch bulk sender module', () => {
             });
         });
 
-        it('will not format update with delete data even if _delete_key in metadata', async () => {
-            const sender = createSender({ update: true });
-            const data = [
-                DataEntity.make(
-                    { action: 'update' },
-                    { _delete_key: 'bar' }
-                )
-            ];
-
-            const [
-                meta,
-                doc,
-                deleteBulk
-            ] = sender.formatBulkData(data);
-
-            expect(meta).toEqual({
-                update: {
-                    _index: 'es_assets__sender_api_',
-                    _type: type,
-                }
-            });
-
-            expect(doc).toEqual({ doc: data[0] });
-
-            expect(deleteBulk).toBeUndefined();
-        });
-
         it('can upsert specified fields by passing in an array of keys matching the document', async () => {
             const opConfig = {
                 index: 'some_index',
