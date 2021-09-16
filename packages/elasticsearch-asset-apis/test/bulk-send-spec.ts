@@ -207,6 +207,81 @@ describe('elasticsearch bulk sender module', () => {
             });
         });
 
+        it('can format bulk create and delete data', async () => {
+            const sender = createSender({ create: true });
+            const data = [
+                DataEntity.make(
+                    { action: 'create', field: 'a', _key: 'one' },
+                    { _delete_key: 'bar1', _key: 'one' }
+                ),
+                DataEntity.make(
+                    { action: 'create', field: 'b', _key: 'two' },
+                    { _delete_key: 'bar2', _key: 'two' }
+                ),
+                DataEntity.make(
+                    { action: 'create', field: 'c', _key: 'three' },
+                    { _delete_key: 'bar3', _key: 'three' }
+                )
+            ];
+
+            const bulkReq = sender.formatBulkData(data);
+
+            expect(bulkReq.length).toBe(9);
+
+            expect(bulkReq[0]).toEqual({
+                create: {
+                    _index: 'es_assets__sender_api_',
+                    _type: type,
+                    _id: 'one'
+                }
+            });
+
+            expect(bulkReq[1]).toEqual(data[0]);
+
+            expect(bulkReq[2]).toEqual({
+                delete: {
+                    _index: 'es_assets__sender_api_',
+                    _type: type,
+                    _id: 'bar1'
+                }
+            });
+
+            expect(bulkReq[8]).toEqual({
+                delete: {
+                    _index: 'es_assets__sender_api_',
+                    _type: type,
+                    _id: 'bar3'
+                }
+            });
+        });
+
+        it('will not format update with delete data even if _delete_key in metadata', async () => {
+            const sender = createSender({ update: true });
+            const data = [
+                DataEntity.make(
+                    { action: 'update' },
+                    { _delete_key: 'bar' }
+                )
+            ];
+
+            const [
+                meta,
+                doc,
+                deleteBulk
+            ] = sender.formatBulkData(data);
+
+            expect(meta).toEqual({
+                update: {
+                    _index: 'es_assets__sender_api_',
+                    _type: type,
+                }
+            });
+
+            expect(doc).toEqual({ doc: data[0] });
+
+            expect(deleteBulk).toBeUndefined();
+        });
+
         it('can upsert specified fields by passing in an array of keys matching the document', async () => {
             const opConfig = {
                 index: 'some_index',

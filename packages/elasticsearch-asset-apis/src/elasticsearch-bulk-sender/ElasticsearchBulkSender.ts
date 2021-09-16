@@ -37,20 +37,28 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return index;
     }
 
+    private getType(): string {
+        if (this.clientVersion < 7 && this.config.type) {
+            return this.config.type;
+        }
+
+        return '_doc';
+    }
+
     private createBulkMeta(record: DataEntity) {
         const indexMeta: IndexSpec = {};
+
         const index = this.createRoute(record);
+
         let data: DataEntity | null | UpdateConfig = record;
+
         const meta: Partial<BulkMeta> = {
             _index: index
         };
+
         let update: UpdateConfig | null = null;
 
-        if (this.clientVersion < 7 && this.config.type) {
-            meta._type = this.config.type;
-        } else {
-            meta._type = '_doc';
-        }
+        meta._type = this.getType();
 
         const id = record.getMetadata('_key');
 
@@ -121,6 +129,20 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
             const { indexMeta, data } = this.createBulkMeta(record);
             results.push(indexMeta);
             if (data) results.push(data);
+
+            // allows for creation of new record and deletion of old record in one pass
+            // useful for fixing keying mistakes
+            if ((!this.config.update && !this.config.upsert) && record.getMetadata('_delete_key')) {
+                results.push(
+                    {
+                        delete: {
+                            _id: record.getMetadata('_delete_key'),
+                            _index: this.createRoute(record),
+                            _type: this.getType()
+                        }
+                    }
+                );
+            }
         }
 
         return results;
