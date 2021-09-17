@@ -2,8 +2,7 @@
 
 The `elasticsearch_sender_api` makes the elasticsearch sender functionality available to any processor.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory) to create, cache, and manage multiple elasticsearch senders.   This api is the core of the [elasticsearch bulk](../operations/elasticsearch_bulk.md) operation and utilizes the standard metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
-The elasticsearch_sender_api will also look for the metadata field `_delete_key` in each record, if this field exists it adds a delete action to the bulk request.  This adds the ability to do an index and a delete action in the same bulk request which is useful for fixing keying mistakes without having to read through the data twice.
-
+The elasticsearch_sender_api will also look for the metadata field `_delete_id` in each record's metadata, if this field exists it adds a delete operation for the id in the `_delete_id` field to the bulk request.  This allows for an index (or any other action) and a delete operation in the same bulk request.
 
 ## Usage
 ### Example using the elasticsearch sender API
