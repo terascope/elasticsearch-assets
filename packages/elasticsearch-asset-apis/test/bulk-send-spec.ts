@@ -212,15 +212,15 @@ describe('elasticsearch bulk sender module', () => {
             const data = [
                 DataEntity.make(
                     { action: 'create', field: 'a', _key: 'one' },
-                    { _delete_key: 'bar1', _key: 'one' }
+                    { _delete_id: 'bar1', _key: 'one' }
                 ),
                 DataEntity.make(
                     { action: 'create', field: 'b', _key: 'two' },
-                    { _delete_key: 'bar2', _key: 'two' }
+                    { _delete_id: 'bar2', _key: 'two' }
                 ),
                 DataEntity.make(
                     { action: 'create', field: 'c', _key: 'three' },
-                    { _delete_key: 'bar3', _key: 'three' }
+                    { _delete_id: 'bar3', _key: 'three' }
                 )
             ];
 
