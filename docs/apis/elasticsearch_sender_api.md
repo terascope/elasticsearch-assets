@@ -1,20 +1,19 @@
 # elasticsearch_sender_api
 
-This is a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis), which encapsulates a specific functionality that can be utilized by any processor, reader or slicer.
+The `elasticsearch_sender_api` makes the elasticsearch sender functionality available to any processor.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory) to create, cache, and manage multiple elasticsearch senders.   This api is the core of the [elasticsearch bulk](../operations/elasticsearch_bulk.md) operation and utilizes the standard metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
- The `elasticsearch_sender_api` will provide an [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory), which is a singleton that can create, cache and manage multiple elasticsearch readers that can be accessed in any operation through the `getAPI` method on the operation.
+The elasticsearch_sender_api will also look for the metadata field `_delete_key` in each record, if this field exists it adds a delete action to the bulk request.  This adds the ability to do an index and a delete action in the same bulk request which is useful for fixing keying mistakes without having to read through the data twice.
 
-This api is the core of the [elasticsearch_bulk](../operations/elasticsearch_bulk.md). This contains all the same behavior, functionality and configuration of that reader
 
 ## Usage
-### Example Processor using a elasticsearch sender API
-This is an example of a custom fetcher using the elasticsearch_reader_api to make its own queries to elasticsearch.
+### Example using the elasticsearch sender API
+A teraslice job and the associated processor using the elasticsearch_sender_api
 
 Example Job
 
 ```json
 {
-    "name" : "testing",
+    "name" : "example",
     "workers" : 1,
     "slicers" : 1,
     "lifecycle" : "once",
@@ -24,41 +23,42 @@ Example Job
     "apis" : [
         {
             "_name": "elasticsearch_sender_api",
-            "index": "new_index",
-            "size": 1000,
-            "type": "events",
-            "connection": "default"
+            "connection": "ELASTICSEARCH_CONNECTION",
+            "index": "example_index",
+            "type": "_doc",
+            "size": 1000
         }
     ],
     "operations" : [
         {
-            "_op" : "test-reader",
+            "_op" : "example-reader",
         },
          {
-            "_op" : "some_sender",
+            "_op" : "example_sender",
             "api_name" : "elasticsearch_sender_api"
         },
     ]
 }
 ```
-Here is a custom processor for the job described above
+The processor for the job described above
 
-```typescript
-// located at /some_sender/processor.ts
+```javascript
+// located at /example_sender/processor.ts
 
-export default class SomeSender extends BatchProcessor<ElasticsearchBulkConfig> {
-    client!: ElasticsearchBulkSender;
-    apiManager!: ElasticSenderAPI;
+const { BatchProcessor } = require('@terascope/job-components');
 
-    async initialize(): Promise<void> {
+export default class SomeSender extends BatchProcessor {
+    async initialize() {
         await super.initialize();
-        const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig.api_name);
+        const apiManager = this.getAP(this.opConfig.api_name);
         this.client = await apiManager.create('bulkSender', {});
     }
 
-    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
+    async onBatch(data) {
         if (data == null || data.length === 0) return data;
+
         await this.client.send(data);
+
         // NOTE: its important to return original data so operators afterwards can run
         return data;
     }
@@ -69,48 +69,48 @@ export default class SomeSender extends BatchProcessor<ElasticsearchBulkConfig> 
 
 ### size
 
-this will return how many separate sender apis are in the cache
+Returns the number of separate sender apis
 
 ### get
 parameters:
 - name: String
 
-this will fetch any sender api that is associated with the name provided
+Fetches any sender api associated with the name provided
 
 ### getConfig
 parameters:
 - name: String
 
-this will fetch any sender api config that is associated with the name provided
+Fetches any sender api config associated with the name provided
 
 ### create (async)
 parameters:
 - name: String
 - configOverrides: Check options below, optional
 
-this will create an instance of a [sender api](#elasticsearch_sender_instance), and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
+Creates an instance of a [sender api](#elasticsearch_sender_instance) and caches it with the name given. Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if you try creating another api with the same name.
 
 ### remove (async)
 parameters:
 - name: String
 
-this will remove an instance of a sender api from the cache and will follow any cleanup code specified in the api code.
+Removes an instance of a sender api and follows any cleanup code specified in the api code.
 
 ### entries
 
-This will allow you to iterate over the cache name and client of the cache
+Iterates over the cached names and clients
 
 ### keys
 
-This will allow you to iterate over the cache name of the cache
+Iterates over the cached names
 
 ### values
 
-This will allow you to iterate over the values of the cache
+Iterates over the values
 
 
 ## Example of using the factory methods in a processor
-```typescript
+```javascript
 // example of api configuration
 const apiConfig = {
   _name: "elasticsearch_sender_api",
@@ -121,23 +121,23 @@ const apiConfig = {
 };
 
 
-const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+const apiManager = this.getAPI(apiName);
 
 apiManager.size() === 0
 
-// this will return an api cached at "normalClient" and it will use the default api config
+// returns an api cached at "normalClient" and uses the default api config
 const normalClient = await apiManager.create('normalClient', {})
 
 apiManager.size() === 1
 
 apiManager.get('normalClient') === normalClient
 
-// this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
+// returns an api cached at "overrideClient" and it will use the api config, but overrides the index to "other_index" in the new instance.
 const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other", update: true })
 
 apiManager.size() === 2
 
-// this will return the full configuration for this client
+// returns the full configuration for this client
 apiManger.getConfig('overrideClient') === {
   _name: "elasticsearch_sender_api",
   index: "other_index",
@@ -157,18 +157,18 @@ apiManager.get('normalClient') === undefined
 ```
 
 ## Elasticsearch Sender Instance
-This is the sender class that is returned from the create method of the APIFactory. This returns a [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/routesenderapi), which is a common interface used for sender apis.
+The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/routesenderapi),  returned from the create method of the APIFactory, follows our common sender api interface.
 
 ### send (async)
 ```(records: DataEntities[]) => Promise<void>```
-This method will format the records into an elasticsearch bulk request and send them to elasticsearch
+Formats an elasticsearch bulk request and sends it to elasticsearch
 
 parameters:
 - records: an array of data-entities
 
 ### verify (async)
 ```(route?: string) => Promise<void>```
-This method ensures that the index is created. However, this currently is a noop as the bulk index request will make the index, this might change in the future. This exists because this follows a common interface. Other senders might need to verify that the destination exists before sending data.
+Ensures that the index is created. The bulk index request will make the index if it doesn't exist so this function is not necessary for the Elasticsearch sender, but this might change in the future. 
 
 parameters:
 - route: a string representing the index to create
