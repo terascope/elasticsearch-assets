@@ -621,16 +621,16 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.35.0":
-  version "0.35.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.35.0.tgz#7e2954f898e0bda0f6fcb8203027c28e9d1abc2a"
-  integrity sha512-hSBg7IVzkO4VF0QHngOqUdVjcZBDUTs9ebuW14+haHiN12px4uNgYL16QRg6UZ6DCt9B96CuPU4fz/87c1f0WA==
+"@terascope/data-mate@^0.35.0", "@terascope/data-mate@^0.35.1":
+  version "0.35.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.35.1.tgz#c8f5b07c136b8024dafea8e13d7081c88bbb7105"
+  integrity sha512-M7uavM1I9eXqusvSb89OCvgPVe+qBfzX1V7WShjElF9liJuLN8twec7ZB+7gQgA177erHPLIg7kSOH8yCnxjLw==
   dependencies:
     "@terascope/data-types" "^0.33.0"
     "@terascope/types" "^0.10.2"
     "@terascope/utils" "^0.43.0"
     "@types/validator" "^13.6.3"
-    awesome-phonenumber "^2.62.1"
+    awesome-phonenumber "^2.63.0"
     date-fns "^2.25.0"
     ip-bigint "^3.0.3"
     ip6addr "^0.2.3"
@@ -1455,7 +1455,7 @@ atob@^2.1.2:
   resolved "https://registry.yarnpkg.com/atob/-/atob-2.1.2.tgz#6d9517eb9e030d2436666651e86bd9f6f13533c9"
   integrity sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==
 
-awesome-phonenumber@^2.62.1:
+awesome-phonenumber@^2.62.1, awesome-phonenumber@^2.63.0:
   version "2.63.0"
   resolved "https://registry.yarnpkg.com/awesome-phonenumber/-/awesome-phonenumber-2.63.0.tgz#de088b4254ed86062b940314d4bf4d0e1083f73c"
   integrity sha512-TdnsVNDsukBME05gWqH2w9eW3ZxG55H/gjzP3kK08VJq9VSOkj/awzcsglULTAkany++itq/0ffzEfriDZLI9Q==
