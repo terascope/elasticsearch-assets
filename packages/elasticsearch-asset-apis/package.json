@@ -27,14 +27,14 @@
     "dependencies": {
         "@terascope/data-mate": "^0.35.1",
         "@terascope/data-types": "^0.33.0",
-        "@terascope/elasticsearch-api": "^2.24.0",
+        "@terascope/elasticsearch-api": "^2.24.1",
         "@terascope/utils": "^0.43.1",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
         "moment": "^2.29.1"
     },
     "devDependencies": {
-        "@terascope/job-components": "^0.55.0",
+        "@terascope/job-components": "^0.55.1",
         "@types/elasticsearch": "^5.0.38",
         "elasticsearch": "^15.4.1"
     },

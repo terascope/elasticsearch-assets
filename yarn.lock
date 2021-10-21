@@ -656,12 +656,12 @@
     lodash "^4.17.21"
     yargs "^17.2.0"
 
-"@terascope/elasticsearch-api@^2.24.0":
-  version "2.24.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.24.0.tgz#8c2b116c827aac15d311b15e5eb56c3c088ba049"
-  integrity sha512-nshDn5GwGSuqHXFl2Xr6bSKl1K6HCAjvAI1XarrE+sS0jy/hzSAwm24ciKYa0VkrKjQ/Rgm36brjR5PyNKElkA==
+"@terascope/elasticsearch-api@^2.24.0", "@terascope/elasticsearch-api@^2.24.1":
+  version "2.24.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.24.1.tgz#db9cf705a13740ff6b3400edc89e453c554af4ad"
+  integrity sha512-eI7ued2NGQEg5Sa0O7RXLyvStzTy8LCwAk/Z3jrZqcB6SrThpWcR+XC3uJUGpnIXTK/m1z+2FvQTRcIs3mgGIg==
   dependencies:
-    "@terascope/utils" "^0.43.0"
+    "@terascope/utils" "^0.43.1"
     bluebird "^3.7.2"
 
 "@terascope/eslint-config@^0.6.1":
@@ -691,12 +691,12 @@
     progress "^2.0.3"
     yargs "^17.2.1"
 
-"@terascope/job-components@^0.55.0":
-  version "0.55.0"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.55.0.tgz#8292a52fc3753ce87304995d376ab3bde74b9a02"
-  integrity sha512-sGlapi7Vycu4Zs1jTvSLvjdUqXkVg4e+iesyfEl36nGylwczkUaaR5fIdKRTuNi4KepBdSp2BiJVexYYQS/0eA==
+"@terascope/job-components@^0.55.1":
+  version "0.55.1"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.55.1.tgz#a0256b8da8432c8fa9dc6ab6cfc45f5ded202dc1"
+  integrity sha512-W+Z/3erKwJRTLvrH/hNbFWyXOuIHsHfnAX7TxEdYWjSIjKjPWbIcclXcS0kprCEd731vDcW8cyYkn1rH5xrFxw==
   dependencies:
-    "@terascope/utils" "^0.43.0"
+    "@terascope/utils" "^0.43.1"
     convict "^4.4.1"
     datemath-parser "^1.0.6"
     uuid "^8.3.2"

@@ -39,9 +39,9 @@
     "dependencies": {},
     "devDependencies": {
         "@terascope/data-types": "^0.33.0",
-        "@terascope/elasticsearch-api": "^2.24.0",
+        "@terascope/elasticsearch-api": "^2.24.1",
         "@terascope/eslint-config": "^0.6.1",
-        "@terascope/job-components": "^0.55.0",
+        "@terascope/job-components": "^0.55.1",
         "@terascope/teraslice-state-storage": "^0.32.0",
         "@terascope/types": "^0.10.2",
         "@types/bluebird": "^3.5.36",
