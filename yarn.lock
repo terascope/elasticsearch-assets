@@ -656,12 +656,12 @@
     lodash "^4.17.21"
     yargs "^17.2.0"
 
-"@terascope/elasticsearch-api@^2.24.0":
-  version "2.24.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.24.0.tgz#8c2b116c827aac15d311b15e5eb56c3c088ba049"
-  integrity sha512-nshDn5GwGSuqHXFl2Xr6bSKl1K6HCAjvAI1XarrE+sS0jy/hzSAwm24ciKYa0VkrKjQ/Rgm36brjR5PyNKElkA==
+"@terascope/elasticsearch-api@^2.24.0", "@terascope/elasticsearch-api@^2.24.1":
+  version "2.24.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-2.24.1.tgz#db9cf705a13740ff6b3400edc89e453c554af4ad"
+  integrity sha512-eI7ued2NGQEg5Sa0O7RXLyvStzTy8LCwAk/Z3jrZqcB6SrThpWcR+XC3uJUGpnIXTK/m1z+2FvQTRcIs3mgGIg==
   dependencies:
-    "@terascope/utils" "^0.43.0"
+    "@terascope/utils" "^0.43.1"
     bluebird "^3.7.2"
 
 "@terascope/eslint-config@^0.6.1":
