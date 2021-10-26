@@ -123,17 +123,19 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
     }
 
     formatBulkData(input: DataEntity[]): AnyObject[] {
-        const results: any[] = [];
+        const bulkRequest: any[] = [];
 
         for (const record of input) {
             const { indexMeta, data } = this.createBulkMeta(record);
-            results.push(indexMeta);
-            if (data) results.push(data);
+
+            bulkRequest.push(indexMeta);
+
+            if (data) bulkRequest.push(data);
 
             // allows for creation of new record and deletion of old record in one pass
             // useful for fixing keying mistakes
             if (record.getMetadata('_delete_id')) {
-                results.push(
+                bulkRequest.push(
                     {
                         delete: {
                             _id: record.getMetadata('_delete_id'),
@@ -145,15 +147,16 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
             }
         }
 
-        return results;
+        return bulkRequest;
     }
 
     async send(dataArray: DataEntity[]): Promise<void> {
-        const formattedData = this.formatBulkData(dataArray);
-        const slicedData = splitArray(formattedData, this.config.size)
+        const bulkRequest = this.formatBulkData(dataArray);
+
+        const bulkRequestResponse = splitArray(bulkRequest, this.config.size)
             .map((data: any) => this.client.bulkSend(data));
 
-        await Promise.all(slicedData);
+        await Promise.all(bulkRequestResponse);
     }
     // unknown if needs to be implemented for elasticsearch
     async verify(): Promise<void> {}
