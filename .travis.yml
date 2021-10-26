@@ -39,6 +39,10 @@ jobs:
     # Don't build es 5 on node 14 to reduce the number of test jobs
     - node_js: '14.17'
       env: ELASTICSEARCH_VERSION=5.6
+before_install:
+  # Install latest yarn
+  - npm install --global yarn
+  - export PATH="$HOME/.yarn/bin:$PATH"
 before_script:
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then
     echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin;
