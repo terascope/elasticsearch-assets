@@ -1,4 +1,5 @@
 import { AnyObject } from '@terascope/types';
+import { DataEntity } from '@terascope/job-components';
 
 export interface ElasticsearchSenderConfig {
     size: number;
@@ -15,6 +16,16 @@ export interface ElasticsearchSenderConfig {
     script?: string;
     script_params?: AnyObject;
     _key?: string
+}
+
+export interface BulkAction {
+    action: {
+        update?: Partial<BulkMeta>;
+        index?: Partial<BulkMeta>;
+        create?: Partial<BulkMeta>;
+        delete?: Partial<BulkMeta>;
+    };
+    data?: UpdateConfig | DataEntity;
 }
 
 export interface BulkMeta {

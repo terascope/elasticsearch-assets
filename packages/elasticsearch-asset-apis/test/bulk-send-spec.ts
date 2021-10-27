@@ -54,33 +54,36 @@ describe('elasticsearch bulk sender module', () => {
     describe('can format bulk data', () => {
         it('can format bulk index data', async () => {
             const sender = createSender();
-            const data = [DataEntity.make({ action: 'index' })];
+            const docArray = [DataEntity.make({ action: 'index' })];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(docArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
                     _type: type
                 }
             });
-            expect(doc).toEqual(data[0]);
+
+            expect(data).toEqual(docArray[0]);
         });
 
         it('can format bulk index data with es7', async () => {
             const sender = createSender();
+
             sender.clientVersion = 7;
-            const data = [DataEntity.make({ action: 'index' })];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const docArray = [DataEntity.make({ action: 'index' })];
 
-            expect(meta).toEqual({
+            const [{ action, data }] = sender.formatBulkData(docArray);
+
+            expect(action).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
                     _type: '_doc'
                 }
             });
-            expect(doc).toEqual(data[0]);
+            expect(data).toEqual(docArray[0]);
         });
 
         it('can format bulk index and preserve id', async () => {
@@ -88,103 +91,104 @@ describe('elasticsearch bulk sender module', () => {
             const key = 'foo';
             const obj = DataEntity.make({ action: 'index' });
             obj.setKey(key);
-            const data = [obj];
+            const dataArray = [obj];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
                     _id: key
                 }
             });
-            expect(doc).toEqual(data[0]);
+            expect(data).toEqual(dataArray[0]);
         });
 
         it('will not by default have dynamic routing', async () => {
             const sender = createSender();
             const route = 'foo';
-            const data = [
+            const dataArray = [
                 DataEntity.make({ action: 'index' }, { [META_ROUTE]: route })
             ];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 index: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
                 }
             });
-            expect(doc).toEqual(data[0]);
+            expect(data).toEqual(dataArray[0]);
         });
 
         it('will have dynamic routing if _key is passed in by dynamic router', async () => {
             const route = 'foo';
             const sender = createSender({ _key: '**' });
-            const data = [
+            const dataArray = [
                 DataEntity.make({ action: 'index' }, { 'standard:route': route })
             ];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 index: {
                     _index: `${senderIndex}-${route}`,
                     _type: type,
                 }
             });
-            expect(doc).toEqual(data[0]);
+            expect(data).toEqual(dataArray[0]);
         });
 
         it('can format bulk create data', async () => {
             const sender = createSender({ create: true });
-            const data = [DataEntity.make({ action: 'create' })];
+            const dataArray = [DataEntity.make({ action: 'create' })];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 create: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
                 }
             });
-            expect(doc).toEqual(data[0]);
+            expect(data).toEqual(dataArray[0]);
         });
 
         it('can format bulk update data', async () => {
             const sender = createSender({ update: true });
-            const data = [DataEntity.make({ action: 'update' })];
+            const dataArray = [DataEntity.make({ action: 'update' })];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 update: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
                 }
             });
-            expect(doc).toEqual({
-                doc: data[0]
+
+            expect(data).toEqual({
+                doc: dataArray[0]
             });
         });
 
         it('can format bulk upsert data', async () => {
             const sender = createSender({ upsert: true });
-            const data = [DataEntity.make({ action: 'update' })];
+            const dataArray = [DataEntity.make({ action: 'update' })];
 
-            const [meta, doc] = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(meta).toEqual({
+            expect(action).toEqual({
                 update: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
                 }
             });
-            expect(doc).toEqual({
-                upsert: data[0],
-                doc: data[0]
+            expect(data).toEqual({
+                upsert: dataArray[0],
+                doc: dataArray[0]
             });
         });
 
@@ -193,12 +197,13 @@ describe('elasticsearch bulk sender module', () => {
             const key = 'foo';
             const obj = DataEntity.make({ action: 'index' });
             obj.setKey(key);
-            const data = [obj];
+            const dataArray = [obj];
 
-            const results = sender.formatBulkData(data);
+            const [{ action, data }] = sender.formatBulkData(dataArray);
 
-            expect(results.length).toEqual(1);
-            expect(results[0]).toEqual({
+            expect(data).toBeUndefined();
+
+            expect(action).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
@@ -217,18 +222,14 @@ describe('elasticsearch bulk sender module', () => {
                 DataEntity.make(
                     { action: 'create', field: 'b', _key: 'two' },
                     { _delete_id: 'bar2', _key: 'two' }
-                ),
-                DataEntity.make(
-                    { action: 'create', field: 'c', _key: 'three' },
-                    { _delete_id: 'bar3', _key: 'three' }
                 )
             ];
 
             const bulkReq = sender.formatBulkData(data);
 
-            expect(bulkReq.length).toBe(9);
+            expect(bulkReq.length).toBe(4);
 
-            expect(bulkReq[0]).toEqual({
+            expect(bulkReq[0].action).toEqual({
                 create: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
@@ -236,9 +237,9 @@ describe('elasticsearch bulk sender module', () => {
                 }
             });
 
-            expect(bulkReq[1]).toEqual(data[0]);
+            expect(bulkReq[0].data).toEqual(data[0]);
 
-            expect(bulkReq[2]).toEqual({
+            expect(bulkReq[1]).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
@@ -246,11 +247,21 @@ describe('elasticsearch bulk sender module', () => {
                 }
             });
 
-            expect(bulkReq[8]).toEqual({
+            expect(bulkReq[2].action).toEqual({
+                create: {
+                    _index: 'es_assets__sender_api_',
+                    _type: type,
+                    _id: 'two'
+                }
+            });
+
+            expect(bulkReq[2].data).toEqual(data[1]);
+
+            expect(bulkReq[3]).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
-                    _id: 'bar3'
+                    _id: 'bar2'
                 }
             });
         });
@@ -262,11 +273,13 @@ describe('elasticsearch bulk sender module', () => {
                 upsert: true,
                 update_fields: ['name', 'job']
             };
-            const data = [
+
+            const dataArray = [
                 DataEntity.make({ some: 'data', name: 'someName', job: 'to be awesome!' })
             ];
+
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(data);
+            const results = sender.formatBulkData(dataArray);
 
             const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
@@ -275,9 +288,10 @@ describe('elasticsearch bulk sender module', () => {
                 doc: { name: 'someName', job: 'to be awesome!' }
             };
 
-            expect(results).toBeArrayOfSize(2);
-            expect(results[0]).toMatchObject(expectedMetadata);
-            expect(results[1]).toMatchObject(expectedMutateMetadata);
+            expect(results).toBeArrayOfSize(1);
+
+            expect(results[0].action).toMatchObject(expectedMetadata);
+            expect(results[0].data).toMatchObject(expectedMutateMetadata);
         });
 
         it('script file to run as part of an update request', async () => {
@@ -289,11 +303,13 @@ describe('elasticsearch bulk sender module', () => {
                 script_file: 'someFile',
                 script_params: { aKey: 'job' }
             };
-            const data = [
+
+            const dataArray = [
                 DataEntity.make({ some: 'data', name: 'someName', job: 'to be awesome!' })
             ];
+
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(data);
+            const results = sender.formatBulkData(dataArray);
 
             const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
@@ -302,9 +318,9 @@ describe('elasticsearch bulk sender module', () => {
                 script: { file: 'someFile', params: { aKey: 'to be awesome!' } }
             };
 
-            expect(results).toBeArrayOfSize(2);
-            expect(results[0]).toMatchObject(expectedMetadata);
-            expect(results[1]).toMatchObject(expectedMutateMetadata);
+            expect(results).toBeArrayOfSize(1);
+            expect(results[0].action).toMatchObject(expectedMetadata);
+            expect(results[0].data).toMatchObject(expectedMutateMetadata);
         });
 
         it('script to run as part of an update request', async () => {
@@ -317,11 +333,11 @@ describe('elasticsearch bulk sender module', () => {
                 script_params: { add: 'add' }
             };
 
-            const data = [
+            const dataArray = [
                 DataEntity.make({ count: 1, add: 2 })
             ];
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(data);
+            const results = sender.formatBulkData(dataArray);
 
             const expectedMetadata = { update: { _index: 'hello', _type: type } };
 
@@ -335,9 +351,9 @@ describe('elasticsearch bulk sender module', () => {
                 }
             };
 
-            expect(results).toBeArrayOfSize(2);
-            expect(results[0]).toMatchObject(expectedMetadata);
-            expect(results[1]).toMatchObject(expectedMutateMetadata);
+            expect(results).toBeArrayOfSize(1);
+            expect(results[0].action).toMatchObject(expectedMetadata);
+            expect(results[0].data).toMatchObject(expectedMutateMetadata);
         });
     });
 
