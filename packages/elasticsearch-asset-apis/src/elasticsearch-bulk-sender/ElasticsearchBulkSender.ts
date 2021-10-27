@@ -5,10 +5,11 @@ import {
     AnyObject,
     isString,
     fastAssign,
-    set
+    set,
+    chunk
 } from '@terascope/utils';
 import {
-    ElasticsearchSenderConfig, IndexSpec, BulkMeta, UpdateConfig
+    ElasticsearchSenderConfig, BulkMeta, UpdateConfig, BulkAction
 } from './interfaces';
 
 export class ElasticsearchBulkSender implements RouteSenderAPI {
@@ -25,6 +26,18 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         if (config._key && isString(config._key)) this.isRouter = true;
     }
 
+    async send(dataArray: DataEntity[]): Promise<void> {
+        const bulkMetadata = this.createBulkMetadata(dataArray);
+
+        const bulkRequestResponse = this.createBulkRequest(bulkMetadata)
+            .map((data: any) => this.client.bulkSend(data));
+
+        await Promise.all(bulkRequestResponse);
+    }
+
+    // unknown if needs to be implemented for elasticsearch
+    async verify(): Promise<void> {}
+
     private createRoute(record: DataEntity): string {
         let { index } = this.config;
         // we only allow dynamic routes with the router
@@ -37,133 +50,135 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return index;
     }
 
-    private createBulkMeta(record: DataEntity) {
-        const indexMeta: IndexSpec = {};
-        const index = this.createRoute(record);
-        let data: DataEntity | null | UpdateConfig = record;
-        const meta: Partial<BulkMeta> = {
-            _index: index
-        };
-        let update: UpdateConfig | null = null;
-
+    private getType(): string {
         if (this.clientVersion < 7 && this.config.type) {
-            meta._type = this.config.type;
-        } else {
-            meta._type = '_doc';
+            return this.config.type;
         }
 
-        const id = record.getMetadata('_key');
+        return '_doc';
+    }
+
+    createBulkMetadata(input: DataEntity[]): AnyObject[] {
+        const bulkMetadata: BulkAction[] = [];
+
+        for (const record of input) {
+            bulkMetadata.push(this.createEsActionMeta(record));
+
+            // allows for creation of new record and deletion of old record in one pass
+            // useful for fixing keying mistakes
+            if (record.getMetadata('_delete_id')) {
+                bulkMetadata.push(
+                    { action: { delete: this.buildMetadata(record, '_delete_id') } }
+                );
+            }
+        }
+
+        return bulkMetadata;
+    }
+
+    private createEsActionMeta(record: DataEntity): BulkAction {
+        const meta = this.buildMetadata(record);
+
+        if (this.config.update || this.config.upsert) {
+            return this.update(meta, record);
+        }
+
+        if (this.config.delete) {
+            return { action: { delete: meta } };
+        }
+
+        if (this.config.create) {
+            return { action: { create: meta }, data: record };
+        }
+
+        return { action: { index: meta }, data: record };
+    }
+
+    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkMeta> {
+        const meta: Partial<BulkMeta> = {
+            _index: this.createRoute(record),
+            _type: this.getType()
+        };
+
+        if (this.config.update_retry_on_conflict && this.config.update_retry_on_conflict > 0) {
+            meta.retry_on_conflict = this.config.update_retry_on_conflict;
+        }
+
+        const id = record.getMetadata(metaKey);
 
         if (id) meta._id = id;
 
-        if (this.config.update || this.config.upsert) {
-            indexMeta.update = meta;
+        return meta;
+    }
 
-            if (this.config.update_retry_on_conflict && this.config.update_retry_on_conflict > 0) {
-                meta.retry_on_conflict = this.config.update_retry_on_conflict;
-            }
+    update(meta: Partial<BulkMeta>, record: DataEntity): BulkAction {
+        const data = this.addUpdateMethod(record);
 
-            update = {};
-
-            if (this.config.upsert) {
-                // The upsert field is what is inserted if the key doesn't already exist
-                update.upsert = fastAssign({}, record);
-            }
-
-            // This will merge this record with the existing record.
-            if (this.config.update_fields && this.config.update_fields.length > 0) {
-                update.doc = {};
-                this.config.update_fields.forEach((field) => {
-                    // @ts-expect-error
-                    update.doc[field] = record[field];
-                });
-            } else if (this.config.script_file || this.config.script) {
-                if (this.config.script_file) {
-                    update.script = {
-                        file: this.config.script_file
-                    };
-                }
-
-                if (this.config.script) {
-                    update.script = {
-                        source: this.config.script
-                    };
-                }
-
-                set(update, 'script.params', {});
-                for (const [key, field] of Object.entries(this.config.script_params ?? {})) {
-                    if (record[field]) {
-                    // @ts-expect-error
-                        update.script.params[key] = record[field];
-                    }
-                }
-            } else {
-                update.doc = fastAssign({}, record);
-            }
-
-            data = update;
-        } else if (this.config.delete) {
-            indexMeta.delete = meta;
-            data = null;
-        } else if (this.config.create) {
-            indexMeta.create = meta;
-        } else {
-            indexMeta.index = meta;
+        if (this.config.upsert) {
+            // The upsert field is what is inserted if the key doesn't already exist
+            data.upsert = fastAssign({}, record);
         }
 
-        return { indexMeta, data };
+        return { action: { update: meta }, data };
     }
 
-    formatBulkData(input: DataEntity[]): AnyObject[] {
-        const results: any[] = [];
+    addUpdateMethod(record: DataEntity): UpdateConfig {
+        const data: UpdateConfig = {};
 
-        for (const record of input) {
-            const { indexMeta, data } = this.createBulkMeta(record);
-            results.push(indexMeta);
-            if (data) results.push(data);
+        if (this.config.update_fields && this.config.update_fields.length > 0) {
+            return this.applyUpdateFields(data, record);
         }
 
-        return results;
+        if (this.config.script_file || this.config.script) {
+            return this.applyScript(data, record);
+        }
+
+        data.doc = fastAssign({}, record);
+
+        return data;
     }
 
-    async send(dataArray: DataEntity[]): Promise<void> {
-        const formattedData = this.formatBulkData(dataArray);
-        const slicedData = splitArray(formattedData, this.config.size)
-            .map((data: any) => this.client.bulkSend(data));
+    applyUpdateFields(data: UpdateConfig, record: DataEntity): UpdateConfig {
+        data.doc = {};
 
-        await Promise.all(slicedData);
+        this.config.update_fields!.forEach((field) => {
+            data.doc![field] = record[field];
+        });
+
+        return data;
     }
-    // unknown if needs to be implemented for elasticsearch
-    async verify(): Promise<void> {}
-}
 
-function splitArray(dataArray: AnyObject[], splitLimit: number) {
-    const docLimit = splitLimit * 2;
+    applyScript(data: UpdateConfig, record: DataEntity): UpdateConfig {
+        if (this.config.script_file) data.script = { file: this.config.script_file };
 
-    if (dataArray.length > docLimit) {
-        const splitResults = [];
+        if (this.config.script) data.script = { source: this.config.script };
 
-        while (dataArray.length) {
-            const end = dataArray.length - 1 > docLimit ? docLimit : dataArray.length - 1;
-            const isMetaData = isMeta(dataArray[end]);
-            if (isMetaData && isMetaData.type !== 'delete') {
-                splitResults.push(dataArray.splice(0, end));
-            } else {
-                splitResults.push(dataArray.splice(0, end + 1));
+        set(data, 'script.params', {});
+
+        for (const [key, field] of Object.entries(this.config.script_params ?? {})) {
+            if (record[field]) data.script!.params![key] = record[field];
+        }
+
+        return data;
+    }
+
+    createBulkRequest(dataArray: AnyObject[]): AnyObject[][] {
+        const preppedData = [];
+        const chunks = chunk(dataArray, this.config.size);
+
+        for (const c of chunks) {
+            const bulkChunk = [];
+
+            for (const i of c) {
+                const { data, action } = i;
+
+                bulkChunk.push(action);
+                if (data) bulkChunk.push(data);
             }
+
+            preppedData.push(bulkChunk);
         }
 
-        return splitResults;
+        return preppedData;
     }
-
-    return [dataArray];
-}
-
-function isMeta(meta: AnyObject) {
-    if (meta.index) return { type: 'index', realMeta: meta.index };
-    if (meta.create) return { type: 'create', realMeta: meta.create };
-    if (meta.update) return { type: 'update', realMeta: meta.update };
-    if (meta.delete) return { type: 'delete', realMeta: meta.delete };
-
-    return false;
 }
