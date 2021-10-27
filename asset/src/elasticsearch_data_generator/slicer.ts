@@ -3,7 +3,7 @@ import { DataGenerator, CounterResults } from './interfaces';
 import Counter from './counter';
 
 export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
-    countHandle!: () => Promise<CounterResults>
+    countHandle!: () => Promise<CounterResults>;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         await super.initialize(recoveryData);
