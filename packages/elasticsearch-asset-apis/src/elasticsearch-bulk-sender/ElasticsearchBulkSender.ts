@@ -59,33 +59,25 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
     }
 
     createBulkMetadata(input: DataEntity[]): AnyObject[] {
-        const bulkRequest: any[] = [];
+        const bulkMetadata: BulkAction[] = [];
 
         for (const record of input) {
-            const reps = this.createEsActionMeta(record);
-
-            bulkRequest.push(reps);
+            bulkMetadata.push(this.createEsActionMeta(record));
 
             // allows for creation of new record and deletion of old record in one pass
             // useful for fixing keying mistakes
             if (record.getMetadata('_delete_id')) {
-                bulkRequest.push(
-                    {
-                        delete: {
-                            _id: record.getMetadata('_delete_id'),
-                            _index: this.createRoute(record),
-                            _type: this.getType()
-                        }
-                    }
+                bulkMetadata.push(
+                    { action: { delete: this.buildMetadata(record, '_delete_id') } }
                 );
             }
         }
 
-        return bulkRequest;
+        return bulkMetadata;
     }
 
     private createEsActionMeta(record: DataEntity): BulkAction {
-        const meta = this.createActionMeta(record);
+        const meta = this.buildMetadata(record);
 
         if (this.config.update || this.config.upsert) {
             return this.update(meta, record);
@@ -101,7 +93,8 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
 
         return { action: { index: meta }, data: record };
     }
-    createActionMeta(record: DataEntity): Partial<BulkMeta> {
+
+    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkMeta> {
         const meta: Partial<BulkMeta> = {
             _index: this.createRoute(record),
             _type: this.getType()
@@ -111,7 +104,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
             meta.retry_on_conflict = this.config.update_retry_on_conflict;
         }
 
-        const id = record.getMetadata('_key');
+        const id = record.getMetadata(metaKey);
 
         if (id) meta._id = id;
 

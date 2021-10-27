@@ -239,7 +239,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[0].data).toEqual(data[0]);
 
-            expect(bulkReq[1]).toEqual({
+            expect(bulkReq[1].action).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
@@ -257,7 +257,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[2].data).toEqual(data[1]);
 
-            expect(bulkReq[3]).toEqual({
+            expect(bulkReq[3].action).toEqual({
                 delete: {
                     _index: 'es_assets__sender_api_',
                     _type: type,
