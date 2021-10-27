@@ -46,7 +46,7 @@ describe('elasticsearch bulk sender module', () => {
     it('can instantiate', async () => {
         const sender = createSender({ size: 100 });
 
-        expect(sender).toHaveProperty('formatBulkData');
+        expect(sender).toHaveProperty('createBulkMetadata');
         expect(sender).toHaveProperty('send');
         expect(sender).toHaveProperty('verify');
     });
@@ -56,7 +56,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender();
             const docArray = [DataEntity.make({ action: 'index' })];
 
-            const [{ action, data }] = sender.formatBulkData(docArray);
+            const [{ action, data }] = sender.createBulkMetadata(docArray);
 
             expect(action).toEqual({
                 index: {
@@ -75,7 +75,7 @@ describe('elasticsearch bulk sender module', () => {
 
             const docArray = [DataEntity.make({ action: 'index' })];
 
-            const [{ action, data }] = sender.formatBulkData(docArray);
+            const [{ action, data }] = sender.createBulkMetadata(docArray);
 
             expect(action).toEqual({
                 index: {
@@ -93,7 +93,7 @@ describe('elasticsearch bulk sender module', () => {
             obj.setKey(key);
             const dataArray = [obj];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 index: {
@@ -112,7 +112,7 @@ describe('elasticsearch bulk sender module', () => {
                 DataEntity.make({ action: 'index' }, { [META_ROUTE]: route })
             ];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 index: {
@@ -130,7 +130,7 @@ describe('elasticsearch bulk sender module', () => {
                 DataEntity.make({ action: 'index' }, { 'standard:route': route })
             ];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 index: {
@@ -145,7 +145,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender({ create: true });
             const dataArray = [DataEntity.make({ action: 'create' })];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 create: {
@@ -160,7 +160,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender({ update: true });
             const dataArray = [DataEntity.make({ action: 'update' })];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 update: {
@@ -178,7 +178,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender({ upsert: true });
             const dataArray = [DataEntity.make({ action: 'update' })];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(action).toEqual({
                 update: {
@@ -199,7 +199,7 @@ describe('elasticsearch bulk sender module', () => {
             obj.setKey(key);
             const dataArray = [obj];
 
-            const [{ action, data }] = sender.formatBulkData(dataArray);
+            const [{ action, data }] = sender.createBulkMetadata(dataArray);
 
             expect(data).toBeUndefined();
 
@@ -225,7 +225,7 @@ describe('elasticsearch bulk sender module', () => {
                 )
             ];
 
-            const bulkReq = sender.formatBulkData(data);
+            const bulkReq = sender.createBulkMetadata(data);
 
             expect(bulkReq.length).toBe(4);
 
@@ -279,7 +279,7 @@ describe('elasticsearch bulk sender module', () => {
             ];
 
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(dataArray);
+            const results = sender.createBulkMetadata(dataArray);
 
             const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
@@ -309,7 +309,7 @@ describe('elasticsearch bulk sender module', () => {
             ];
 
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(dataArray);
+            const results = sender.createBulkMetadata(dataArray);
 
             const expectedMetadata = { update: { _index: 'some_index', _type: type } };
 
@@ -337,7 +337,7 @@ describe('elasticsearch bulk sender module', () => {
                 DataEntity.make({ count: 1, add: 2 })
             ];
             const sender = createSender(opConfig);
-            const results = sender.formatBulkData(dataArray);
+            const results = sender.createBulkMetadata(dataArray);
 
             const expectedMetadata = { update: { _index: 'hello', _type: type } };
 

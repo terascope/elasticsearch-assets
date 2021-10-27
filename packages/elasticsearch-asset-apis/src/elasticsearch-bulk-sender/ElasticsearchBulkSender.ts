@@ -26,6 +26,18 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         if (config._key && isString(config._key)) this.isRouter = true;
     }
 
+    async send(dataArray: DataEntity[]): Promise<void> {
+        const bulkMetadata = this.createBulkMetadata(dataArray);
+
+        const bulkRequestResponse = this.createBulkRequest(bulkMetadata)
+            .map((data: any) => this.client.bulkSend(data));
+
+        await Promise.all(bulkRequestResponse);
+    }
+
+    // unknown if needs to be implemented for elasticsearch
+    async verify(): Promise<void> {}
+
     private createRoute(record: DataEntity): string {
         let { index } = this.config;
         // we only allow dynamic routes with the router
@@ -46,25 +58,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return '_doc';
     }
 
-    private createEsActionMeta(record: DataEntity): BulkAction {
-        const meta = this._createActionMeta(record);
-
-        if (this.config.update || this.config.upsert) {
-            return this._update(meta, record);
-        }
-
-        if (this.config.delete) {
-            return { action: { delete: meta } };
-        }
-
-        if (this.config.create) {
-            return { action: { create: meta }, data: record };
-        }
-
-        return { action: { index: meta }, data: record };
-    }
-
-    formatBulkData(input: DataEntity[]): AnyObject[] {
+    createBulkMetadata(input: DataEntity[]): AnyObject[] {
         const bulkRequest: any[] = [];
 
         for (const record of input) {
@@ -90,18 +84,24 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return bulkRequest;
     }
 
-    async send(dataArray: DataEntity[]): Promise<void> {
-        const bulkRequest = this.formatBulkData(dataArray);
+    private createEsActionMeta(record: DataEntity): BulkAction {
+        const meta = this.createActionMeta(record);
 
-        const bulkRequestResponse = splitArray(bulkRequest, this.config.size)
-            .map((data: any) => this.client.bulkSend(data));
+        if (this.config.update || this.config.upsert) {
+            return this.update(meta, record);
+        }
 
-        await Promise.all(bulkRequestResponse);
+        if (this.config.delete) {
+            return { action: { delete: meta } };
+        }
+
+        if (this.config.create) {
+            return { action: { create: meta }, data: record };
+        }
+
+        return { action: { index: meta }, data: record };
     }
-    // unknown if needs to be implemented for elasticsearch
-    async verify(): Promise<void> {}
-
-    _createActionMeta(record: DataEntity): Partial<BulkMeta> {
+    createActionMeta(record: DataEntity): Partial<BulkMeta> {
         const meta: Partial<BulkMeta> = {
             _index: this.createRoute(record),
             _type: this.getType()
@@ -118,8 +118,8 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return meta;
     }
 
-    _update(meta: Partial<BulkMeta>, record: DataEntity): BulkAction {
-        const data = this._addUpdateMethod(record);
+    update(meta: Partial<BulkMeta>, record: DataEntity): BulkAction {
+        const data = this.addUpdateMethod(record);
 
         if (this.config.upsert) {
             // The upsert field is what is inserted if the key doesn't already exist
@@ -129,15 +129,15 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return { action: { update: meta }, data };
     }
 
-    _addUpdateMethod(record: DataEntity): UpdateConfig {
+    addUpdateMethod(record: DataEntity): UpdateConfig {
         const data: UpdateConfig = {};
 
         if (this.config.update_fields && this.config.update_fields.length > 0) {
-            return this._applyUpdateFields(data, record);
+            return this.applyUpdateFields(data, record);
         }
 
         if (this.config.script_file || this.config.script) {
-            return this._applyScript(data, record);
+            return this.applyScript(data, record);
         }
 
         data.doc = fastAssign({}, record);
@@ -145,7 +145,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    _applyUpdateFields(data: UpdateConfig, record: DataEntity): UpdateConfig {
+    applyUpdateFields(data: UpdateConfig, record: DataEntity): UpdateConfig {
         data.doc = {};
 
         this.config.update_fields!.forEach((field) => {
@@ -155,7 +155,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    _applyScript(data: UpdateConfig, record: DataEntity): UpdateConfig {
+    applyScript(data: UpdateConfig, record: DataEntity): UpdateConfig {
         if (this.config.script_file) data.script = { file: this.config.script_file };
 
         if (this.config.script) data.script = { source: this.config.script };
@@ -168,25 +168,24 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
 
         return data;
     }
-}
 
-function splitArray(dataArray: AnyObject[], splitLimit: number) {
-    const preppedData = [];
+    createBulkRequest(dataArray: AnyObject[]): AnyObject[][] {
+        const preppedData = [];
+        const chunks = chunk(dataArray, this.config.size);
 
-    const chunks = chunk(dataArray, splitLimit);
+        for (const c of chunks) {
+            const bulkChunk = [];
 
-    for (const c of chunks) {
-        const bulkChunk = [];
+            for (const i of c) {
+                const { data, action } = i;
 
-        for (const i of c) {
-            const { data, action } = i;
+                bulkChunk.push(action);
+                if (data) bulkChunk.push(data);
+            }
 
-            bulkChunk.push(action);
-            if (data) bulkChunk.push(data);
+            preppedData.push(bulkChunk);
         }
 
-        preppedData.push(bulkChunk);
+        return preppedData;
     }
-
-    return preppedData;
 }
