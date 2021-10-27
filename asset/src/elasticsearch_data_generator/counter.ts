@@ -5,7 +5,7 @@ export default class Counter {
     numOfRecordsProcessed: number;
     sliceSize: number;
     size: number;
-    handle: () => Promise<CounterResults>
+    handle: () => Promise<CounterResults>;
 
     constructor(isPersistent: boolean, size: number, sliceSize = 5000, startingCount = 0) {
         this.numOfRecordsProcessed = startingCount;
