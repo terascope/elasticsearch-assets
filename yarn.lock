@@ -689,10 +689,10 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.10.2.tgz#022cbd6c75b036f4af4366244cc0589ca93f6535"
   integrity sha512-SFZosbIyGtjiB/Wa32pIgycahZMIqrvZ73iVWhHyWFs7WQGJvHZDX1pPm6Wb91Pxa/+6s9yS8L6IueXnkyJZAQ==
 
-"@terascope/utils@^0.43.1":
-  version "0.43.1"
-  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.43.1.tgz#e305185ff223a2c99b209bad728d25dfe6814c0f"
-  integrity sha512-mjnkJhYRC4RS8WbXa+SB9Bn/Qv+BTfrJAM/JQcwMoBwmec7LDThgg85jqGSC+NXmddgrG953pMv5ys/A8KsdKA==
+"@terascope/utils@^0.43.1", "@terascope/utils@^0.43.2":
+  version "0.43.2"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.43.2.tgz#ea55529593e128395b0b974b7d4f6fe6691990ab"
+  integrity sha512-ER8+L+XJFIG/yttbxt/kkAi0xWI60/+ZRDW1vmWDnlBQkk+x+pgV93OD7bnXrCFbBQZwpYx5/1p8wQUAiv1ZCA==
   dependencies:
     "@terascope/types" "^0.10.2"
     "@turf/bbox" "^6.4.0"
@@ -725,7 +725,7 @@
     kind-of "^6.0.3"
     latlon-geohash "^1.1.0"
     lodash "^4.17.21"
-    mnemonist "^0.38.4"
+    mnemonist "^0.38.5"
     p-map "^4.0.0"
     shallow-clone "^3.0.1"
     validator "^13.6.0"
@@ -4039,7 +4039,7 @@ minimist@^1.2.0, minimist@^1.2.5:
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.5.tgz#67d66014b66a6a8aaa0c083c5fd58df4e4e97602"
   integrity sha512-FM9nNUYrRBAELZQT3xeZQ7fmMOBg6nWNmJKTcgsJeaLstP/UODVpGsr5OhXhhXg6f+qtJ8uiZ+PUxkDWcgIXLw==
 
-mnemonist@^0.38.4, mnemonist@^0.38.5:
+mnemonist@^0.38.5:
   version "0.38.5"
   resolved "https://registry.yarnpkg.com/mnemonist/-/mnemonist-0.38.5.tgz#4adc7f4200491237fe0fa689ac0b86539685cade"
   integrity sha512-bZTFT5rrPKtPJxj8KSV0WkPyNxl72vQepqqVUAW2ARUpUSF2qXMB6jZj7hW5/k7C1rtpzqbD/IIbJwLXUjCHeg==
