@@ -589,14 +589,14 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.36.0":
-  version "0.36.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.36.0.tgz#7ff8ad8f93873a1d7cb8f1c28943e30c0d08c196"
-  integrity sha512-449vGQWxeebiqr1n/RZqCu8eDW12VDik96LySSM+Ufm1Ub/2fceAeF52TO+s1gUal7HTpa8PReBBTR9hroVWfw==
+"@terascope/data-mate@^0.36.0", "@terascope/data-mate@^0.36.1":
+  version "0.36.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.36.1.tgz#013b2fd64d98b6bbb8b467464fb756c2fbda64a5"
+  integrity sha512-ZGVPDxOIPVeNN9MVDdHklwe1mbEYddIRqK7W3nHi+S5pnavlf64F4pQtuNNDX/2qitKZUXWj/9hToqrTWASZ4Q==
   dependencies:
-    "@terascope/data-types" "^0.33.1"
+    "@terascope/data-types" "^0.33.2"
     "@terascope/types" "^0.10.2"
-    "@terascope/utils" "^0.43.1"
+    "@terascope/utils" "^0.43.2"
     "@types/validator" "^13.6.4"
     awesome-phonenumber "^2.64.0"
     date-fns "^2.25.0"
@@ -611,7 +611,7 @@
     uuid "^8.3.2"
     valid-url "^1.0.9"
     validator "^13.6.0"
-    xlucene-parser "^0.41.1"
+    xlucene-parser "^0.41.2"
 
 "@terascope/data-types@^0.33.1", "@terascope/data-types@^0.33.2":
   version "0.33.2"
@@ -5365,13 +5365,13 @@ ws@^7.4.6:
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.5.5.tgz#8b4bc4af518cfabd0473ae4f99144287b33eb881"
   integrity sha512-BAkMFcAzl8as1G/hArkxOxq3G7pjUqQ3gzYbLL0/5zNkph70e+lCoxBGnm6AW1+/aiNeV4fnKqZ8m4GZewmH2w==
 
-xlucene-parser@^0.41.1:
-  version "0.41.1"
-  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.41.1.tgz#368af0bd82dea5156a3f5f29ec08c592562eec05"
-  integrity sha512-TL79VaLkgpRO/yNQm6J1tGqt4eYPY6duz8BT3WiYhwnLdx6AZwL9VgySIRCwmqauJ7a6l0+6K0lATZ7mTAKVYA==
+xlucene-parser@^0.41.1, xlucene-parser@^0.41.2:
+  version "0.41.2"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.41.2.tgz#31651a44acf7aa6b26a038d5065bbdbb417348e4"
+  integrity sha512-v+qbxwZApjjdy9Urs1yfEOMsMh23fSIw1F4yZUUI2lyAbxAW4V98aj4V+8os2oqAEkNC2XEbgVzVq0SEGeLYew==
   dependencies:
     "@terascope/types" "^0.10.2"
-    "@terascope/utils" "^0.43.1"
+    "@terascope/utils" "^0.43.2"
     netmask "^2.0.2"
 
 xlucene-translator@^0.25.1:
