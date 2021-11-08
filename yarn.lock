@@ -589,19 +589,19 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.36.1":
-  version "0.36.1"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.36.1.tgz#013b2fd64d98b6bbb8b467464fb756c2fbda64a5"
-  integrity sha512-ZGVPDxOIPVeNN9MVDdHklwe1mbEYddIRqK7W3nHi+S5pnavlf64F4pQtuNNDX/2qitKZUXWj/9hToqrTWASZ4Q==
+"@terascope/data-mate@^0.36.1", "@terascope/data-mate@^0.36.2":
+  version "0.36.2"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.36.2.tgz#4b8366c64fec998162d52cfa27b813f04d312f37"
+  integrity sha512-EWlqURbEBT4C/IxiVu1OxiR+WwKXbP9FRZ8HGoUhZakDJTfGPlnSSOaJfvD1/7aVVGxoqnhQr+irYyrdWDrjXw==
   dependencies:
     "@terascope/data-types" "^0.33.2"
     "@terascope/types" "^0.10.2"
     "@terascope/utils" "^0.43.2"
-    "@types/validator" "^13.6.4"
+    "@types/validator" "^13.6.6"
     awesome-phonenumber "^2.64.0"
     date-fns "^2.25.0"
     ip-bigint "^3.0.3"
-    ip6addr "^0.2.3"
+    ip6addr "^0.2.4"
     ipaddr.js "^2.0.1"
     is-cidr "^4.0.2"
     is-ip "^3.1.0"
@@ -610,7 +610,7 @@
     mnemonist "^0.38.5"
     uuid "^8.3.2"
     valid-url "^1.0.9"
-    validator "^13.6.0"
+    validator "^13.7.0"
     xlucene-parser "^0.41.2"
 
 "@terascope/data-types@^0.33.2":
@@ -1065,6 +1065,11 @@
   version "13.6.5"
   resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.6.5.tgz#e9f5b23ebc51100db7ac38f7e950746f8f580c8b"
   integrity sha512-ilpDKpjjq/w/IyyTuQ38mABdaEzTzTugPyU7DlMCMKd8MMYngnPKhA2TgdO1MfEDED9KVV7uSOL1fDkgwJp/wg==
+
+"@types/validator@^13.6.6":
+  version "13.6.6"
+  resolved "https://registry.yarnpkg.com/@types/validator/-/validator-13.6.6.tgz#6e6e2d086148db5ae14851614971b715670cbd52"
+  integrity sha512-+qogUELb4gMhrMjSh/seKmGVvN+uQLfyqJAqYRWqVHsvBsUO2xDBCL8CJ/ZSukbd8vXaoYbpIssAmfLEzzBHEw==
 
 "@types/yargs-parser@*":
   version "20.2.1"
@@ -2030,16 +2035,16 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.58.1:
-  version "0.58.1"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.58.1.tgz#268dcbde63416f5897e5ab603d1d441878190de1"
-  integrity sha512-XOCw8+JJn9J5qlJbg+BmjRKyhkxnm0DoFyA6tPxw1sZikfzfbmKrFQLC9TzqIFN16uvaB111a++F1PVw/5fpTQ==
+elasticsearch-store@^0.58.2:
+  version "0.58.2"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.58.2.tgz#f0d932a2d1fb632834fbf1406781cd384741dd2f"
+  integrity sha512-7oRyeic25Rds8JpAbpKk6UREbCUGNsDsgjr9zEpdwdH7OALh5ZawKz2pXWI0MfU52dF+k3G/YiFXqGUdnuQyHQ==
   dependencies:
-    "@terascope/data-mate" "^0.36.1"
+    "@terascope/data-mate" "^0.36.2"
     "@terascope/data-types" "^0.33.2"
     "@terascope/types" "^0.10.2"
     "@terascope/utils" "^0.43.2"
-    "@types/elasticsearch" "^5.0.37"
+    "@types/elasticsearch" "^5.0.39"
     ajv "^6.12.6"
     uuid "^8.3.2"
     xlucene-translator "^0.25.2"
@@ -2984,6 +2989,14 @@ ip6addr@^0.2.3:
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/ip6addr/-/ip6addr-0.2.3.tgz#660df0d27092434f0aadee025aba8337c6d7d4d4"
   integrity sha512-qA9DXRAUW+lT47/i/4+Q3GHPwZjGt/atby1FH/THN6GVATA6+Pjp2nztH7k6iKeil7hzYnBwfSsxjthlJ8lJKw==
+  dependencies:
+    assert-plus "^1.0.0"
+    jsprim "^1.4.0"
+
+ip6addr@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.yarnpkg.com/ip6addr/-/ip6addr-0.2.4.tgz#01d963a29464c9feab26c1367e054e2d65b104e7"
+  integrity sha512-LrIYoxSeUgRogprmfljfbTmAxaG6SM3FluILQmOyATWS7uQEFoc1uTaEFAkRf//m8FXmOWc1HafmeapMkX8a4A==
   dependencies:
     assert-plus "^1.0.0"
     jsprim "^1.4.0"
@@ -5244,6 +5257,11 @@ validator@^13.6.0:
   version "13.6.0"
   resolved "https://registry.yarnpkg.com/validator/-/validator-13.6.0.tgz#1e71899c14cdc7b2068463cb24c1cc16f6ec7059"
   integrity sha512-gVgKbdbHgtxpRyR8K0O6oFZPhhB5tT1jeEHZR0Znr9Svg03U0+r9DXWMrnRAB+HtCStDQKlaIZm42tVsVjqtjg==
+
+validator@^13.7.0:
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-13.7.0.tgz#4f9658ba13ba8f3d82ee881d3516489ea85c0857"
+  integrity sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==
 
 verror@1.10.0:
   version "1.10.0"
