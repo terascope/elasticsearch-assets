@@ -27,7 +27,7 @@
         "elasticsearch": "^15.4.1"
     },
     "devDependencies": {
-        "@types/elasticsearch": "^5.0.39"
+        "@types/elasticsearch": "^5.0.40"
     },
     "engines": {
         "node": ">=10.16.0"
