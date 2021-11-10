@@ -166,7 +166,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    * createBulkRequest(dataArray: Iterable<AnyObject>): Iterable<AnyObject[]> {
+    * createBulkRequest(dataArray: Iterable<BulkAction>): Iterable<AnyObject[]> {
         let i = 0;
         let bulkChunk: AnyObject[] = [];
 
