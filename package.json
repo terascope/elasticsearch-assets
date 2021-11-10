@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.7.7",
+    "version": "2.7.8",
     "private": true,
     "workspaces": [
         "packages/*",
@@ -40,6 +40,7 @@
     "devDependencies": {
         "@terascope/data-types": "^0.33.3",
         "@terascope/elasticsearch-api": "^2.24.3",
+        "@terascope/elasticsearch-asset-apis": "^0.8.4",
         "@terascope/eslint-config": "^0.7.0",
         "@terascope/job-components": "^0.55.3",
         "@terascope/teraslice-state-storage": "^0.32.3",
