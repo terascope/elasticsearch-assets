@@ -181,5 +181,9 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
                 bulkChunk = [];
             }
         }
+
+        if (bulkChunk.length) {
+            yield bulkChunk;
+        }
     }
 }
