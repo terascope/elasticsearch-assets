@@ -1,5 +1,5 @@
-import { AnyObject } from '@terascope/types';
-import { DataEntity } from '@terascope/job-components';
+import type { AnyObject } from '@terascope/types';
+import type { DataEntity } from '@terascope/utils';
 
 export interface ElasticsearchSenderConfig {
     size: number;

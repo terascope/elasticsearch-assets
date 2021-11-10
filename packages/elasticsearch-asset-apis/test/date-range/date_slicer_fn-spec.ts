@@ -1,14 +1,11 @@
 import 'jest-extended';
 import { EventEmitter } from 'events';
 import {
-    newTestExecutionConfig,
-    LifeCycle,
     AnyObject,
     debugLogger,
-    newTestJobConfig,
     times,
     pDelay,
-} from '@terascope/job-components';
+} from '@terascope/utils';
 import moment from 'moment';
 import {
     WindowState, SlicerArgs, ParsedInterval,
@@ -20,7 +17,7 @@ import { MockClient } from '../helpers';
 
 interface TestConfig {
     slicers?: number;
-    lifecycle?: LifeCycle;
+    lifecycle?: 'once'|'persistent';
     id?: number;
     config?: AnyObject;
     client?: MockClient;
@@ -73,20 +70,7 @@ describe('date slicer function', () => {
             return data.hits.total;
         }
 
-        const job = newTestJobConfig({
-            analytics: true,
-            slicers,
-            lifecycle,
-            operations: [
-                Object.assign(readerConfig, config, { _op: 'elasticsearch_reader', index: 'some_index' }),
-                {
-                    _op: 'noop'
-                }
-            ],
-        });
-
-        const executionConfig = newTestExecutionConfig(job);
-        const opConfig = executionConfig.operations[0];
+        const opConfig = Object.assign(readerConfig, config, { _op: 'elasticsearch_reader', index: 'some_index' });
         const _windowState = windowState !== undefined ? windowState : new WindowState(slicers);
 
         const {
@@ -102,7 +86,7 @@ describe('date slicer function', () => {
 
         const slicerArgs: SlicerArgs = {
             events,
-            timeResolution: timeResolutionParam,
+            timeResolution: timeResolutionParam as moment.unitOfTime.Base,
             size,
             subsliceKeyThreshold,
             subsliceByKey,

@@ -3,7 +3,6 @@ import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
 import type {
     SearchParams
 } from 'elasticsearch';
-import type { LifeCycle, SlicerRecoveryData } from '@terascope/job-components';
 import type { EventEmitter } from 'events';
 import type { DataTypeConfig, xLuceneVariables } from '@terascope/types';
 import type { WindowState } from './WindowState';
@@ -200,10 +199,20 @@ export interface IDSlicerArgs {
     size: number;
 }
 
+export type RecoveryData = {
+    slicer_id: number;
+    lastSlice?: {
+        /** A reserved key for sending work to a particular worker */
+        request_worker?: string;
+        /** The slice request can contain any metadata */
+        [prop: string]: any;
+    }
+}
+
 export interface IDSlicerConfig {
     slicerID: number,
     numOfSlicers: number,
-    recoveryData?: SlicerRecoveryData[],
+    recoveryData?: RecoveryData[],
 }
 
 export interface DateConfig {
@@ -267,11 +276,13 @@ export type DateSlicerMetadata = Record<number, {
 } & GetIntervalResult>;
 export type DateSlicerMetadataHook = (metadata: DateSlicerMetadata) => Promise<void>;
 
+export type LifeCycle = 'once'|'persistent';
+
 export interface DateSlicerArgs {
     lifecycle: LifeCycle,
     slicerID: number,
     numOfSlicers: number,
-    recoveryData?: SlicerRecoveryData[];
+    recoveryData?: RecoveryData[];
     windowState?: WindowState,
     startTime?: Date | string
     hook?: DateSlicerMetadataHook;
@@ -281,7 +292,7 @@ export interface DateSlicerConfig {
     lifecycle: LifeCycle,
     slicerID: number,
     numOfSlicers: number,
-    recoveryData?: SlicerRecoveryData[],
+    recoveryData?: RecoveryData[],
     windowState?: WindowState,
     startTime?: Date | string,
     hook?: DateSlicerMetadataHook;
