@@ -1,13 +1,13 @@
-import { RouteSenderAPI } from '@terascope/job-components';
-import elasticAPI from '@terascope/elasticsearch-api';
 import {
+    RouteSenderAPI,
     DataEntity,
     AnyObject,
     isString,
     fastAssign,
     set,
-    chunk
+    pMap
 } from '@terascope/utils';
+import elasticAPI from '@terascope/elasticsearch-api';
 import {
     ElasticsearchSenderConfig, BulkMeta, UpdateConfig, BulkAction
 } from './interfaces';
@@ -26,17 +26,23 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         if (config._key && isString(config._key)) this.isRouter = true;
     }
 
-    async send(dataArray: DataEntity[]): Promise<void> {
-        const bulkMetadata = this.createBulkMetadata(dataArray);
+    async send(dataArray: Iterable<DataEntity>): Promise<number> {
+        let affectedRecords = 0;
 
-        const bulkRequestResponse = this.createBulkRequest(bulkMetadata)
-            .map((data: any) => this.client.bulkSend(data));
+        await pMap(
+            this.createBulkRequest(
+                this.createBulkMetadata(dataArray)
+            ),
+            async (data) => {
+                const result = await this.client.bulkSend(data);
+                if (Array.isArray(result.items)) {
+                    affectedRecords += result.items.length;
+                }
+            }
+        );
 
-        await Promise.all(bulkRequestResponse);
+        return affectedRecords;
     }
-
-    // unknown if needs to be implemented for elasticsearch
-    async verify(): Promise<void> {}
 
     private createRoute(record: DataEntity): string {
         let { index } = this.config;
@@ -58,22 +64,20 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return '_doc';
     }
 
-    createBulkMetadata(input: DataEntity[]): AnyObject[] {
-        const bulkMetadata: BulkAction[] = [];
-
+    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<BulkAction> {
         for (const record of input) {
-            bulkMetadata.push(this.createEsActionMeta(record));
+            yield this.createEsActionMeta(record);
 
             // allows for creation of new record and deletion of old record in one pass
             // useful for fixing keying mistakes
             if (record.getMetadata('_delete_id')) {
-                bulkMetadata.push(
-                    { action: { delete: this.buildMetadata(record, '_delete_id') } }
-                );
+                yield {
+                    action: {
+                        delete: this.buildMetadata(record, '_delete_id')
+                    }
+                };
             }
         }
-
-        return bulkMetadata;
     }
 
     private createEsActionMeta(record: DataEntity): BulkAction {
@@ -162,23 +166,24 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    createBulkRequest(dataArray: AnyObject[]): AnyObject[][] {
-        const preppedData = [];
-        const chunks = chunk(dataArray, this.config.size);
+    * createBulkRequest(dataArray: Iterable<BulkAction>): Iterable<AnyObject[]> {
+        let i = 0;
+        let bulkChunk: AnyObject[] = [];
 
-        for (const c of chunks) {
-            const bulkChunk = [];
+        for (const item of dataArray) {
+            const { data, action } = item;
 
-            for (const i of c) {
-                const { data, action } = i;
+            bulkChunk.push(action);
+            if (data) bulkChunk.push(data);
 
-                bulkChunk.push(action);
-                if (data) bulkChunk.push(data);
+            if (++i >= this.config.size) {
+                yield bulkChunk;
+                bulkChunk = [];
             }
-
-            preppedData.push(bulkChunk);
         }
 
-        return preppedData;
+        if (bulkChunk.length) {
+            yield bulkChunk;
+        }
     }
 }
