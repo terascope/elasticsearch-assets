@@ -48,7 +48,6 @@ describe('elasticsearch bulk sender module', () => {
 
         expect(sender).toHaveProperty('createBulkMetadata');
         expect(sender).toHaveProperty('send');
-        expect(sender).toHaveProperty('verify');
     });
 
     describe('can format bulk data', () => {
