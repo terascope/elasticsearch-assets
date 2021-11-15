@@ -31,7 +31,7 @@ describe('spaces-reader schema', () => {
 
     const docType = version === 5 ? 'events' : '_doc';
 
-    async function makeTest(opConfig: AnyObject = {}, apiConfig?: AnyObject) {
+    async function makeTest(opConfig: AnyObject, apiConfig?: AnyObject) {
         const readerConfig = Object.assign({
             _op: 'spaces_reader',
         }, opConfig);

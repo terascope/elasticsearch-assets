@@ -50,13 +50,14 @@ describe('spaces_reader slicer', () => {
         let harness: SlicerTestHarness;
 
         async function makeSlicerTest(
-            config: any, numOfSlicers = 1,
+            config: any,
+            numOfSlicers?: number,
             recoveryData?: SlicerRecoveryData[],
             eventHook?: EventHook
         ) {
             const job = newTestJobConfig({
                 analytics: true,
-                slicers: numOfSlicers,
+                slicers: numOfSlicers ?? 1,
                 operations: [
                     config,
                     {

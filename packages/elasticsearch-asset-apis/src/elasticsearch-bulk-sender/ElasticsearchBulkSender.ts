@@ -1,15 +1,13 @@
 import {
     RouteSenderAPI,
     DataEntity,
-    AnyObject,
     isString,
-    fastAssign,
     set,
     pMap
 } from '@terascope/utils';
-import elasticAPI from '@terascope/elasticsearch-api';
+import elasticAPI, { BulkActionMetadata, BulkRecord } from '@terascope/elasticsearch-api';
 import {
-    ElasticsearchSenderConfig, BulkMeta, UpdateConfig, BulkAction
+    ElasticsearchSenderConfig, UpdateConfig
 } from './interfaces';
 
 export class ElasticsearchBulkSender implements RouteSenderAPI {
@@ -30,14 +28,11 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         let affectedRecords = 0;
 
         await pMap(
-            this.createBulkRequest(
+            this.chunkRequests(
                 this.createBulkMetadata(dataArray)
             ),
             async (data) => {
-                const result = await this.client.bulkSend(data);
-                if (Array.isArray(result.items)) {
-                    affectedRecords += result.items.length;
-                }
+                affectedRecords += await this.client.bulkSend(data);
             }
         );
 
@@ -64,7 +59,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return '_doc';
     }
 
-    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<BulkAction> {
+    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<BulkRecord> {
         for (const record of input) {
             yield this.createEsActionMeta(record);
 
@@ -80,7 +75,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         }
     }
 
-    private createEsActionMeta(record: DataEntity): BulkAction {
+    private createEsActionMeta(record: DataEntity): BulkRecord {
         const meta = this.buildMetadata(record);
 
         if (this.config.update || this.config.upsert) {
@@ -98,8 +93,8 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return { action: { index: meta }, data: record };
     }
 
-    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkMeta> {
-        const meta: Partial<BulkMeta> = {
+    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkActionMetadata> {
+        const meta: Partial<BulkActionMetadata> = {
             _index: this.createRoute(record),
             _type: this.getType()
         };
@@ -115,12 +110,12 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return meta;
     }
 
-    update(meta: Partial<BulkMeta>, record: DataEntity): BulkAction {
+    update(meta: Partial<BulkActionMetadata>, record: DataEntity): BulkRecord {
         const data = this.addUpdateMethod(record);
 
         if (this.config.upsert) {
             // The upsert field is what is inserted if the key doesn't already exist
-            data.upsert = fastAssign({}, record);
+            data.upsert = Object.assign({}, record);
         }
 
         return { action: { update: meta }, data };
@@ -137,7 +132,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
             return this.applyScript(data, record);
         }
 
-        data.doc = fastAssign({}, record);
+        data.doc = Object.assign({}, record);
 
         return data;
     }
@@ -166,15 +161,12 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    * createBulkRequest(dataArray: Iterable<BulkAction>): Iterable<AnyObject[]> {
+    * chunkRequests(dataArray: Iterable<BulkRecord>): Iterable<BulkRecord[]> {
         let i = 0;
-        let bulkChunk: AnyObject[] = [];
+        let bulkChunk: BulkRecord[] = [];
 
         for (const item of dataArray) {
-            const { data, action } = item;
-
-            bulkChunk.push(action);
-            if (data) bulkChunk.push(data);
+            bulkChunk.push(item);
 
             if (++i >= this.config.size) {
                 yield bulkChunk;
