@@ -26,7 +26,7 @@ const apiSchema = {
     },
     timeout: {
         doc: 'Time in milliseconds to wait for a connection to timeout.',
-        default: '30 seconds',
+        default: '2 minutes',
         format: 'duration'
     },
     headers: {
