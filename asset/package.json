@@ -20,7 +20,7 @@
         "@terascope/elasticsearch-api": "^3.0.0",
         "@terascope/elasticsearch-asset-apis": "^0.8.5",
         "@terascope/job-components": "^0.55.3",
-        "@terascope/teraslice-state-storage": "^0.33.0",
+        "@terascope/teraslice-state-storage": "^0.33.1",
         "@terascope/utils": "^0.43.3",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.2",
