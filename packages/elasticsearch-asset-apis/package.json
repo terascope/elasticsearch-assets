@@ -25,10 +25,10 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "license": "MIT",
     "dependencies": {
-        "@terascope/data-mate": "^0.37.0",
-        "@terascope/data-types": "^0.34.0",
-        "@terascope/elasticsearch-api": "^3.0.0",
-        "@terascope/utils": "^0.43.3",
+        "@terascope/data-mate": "^0.37.4",
+        "@terascope/data-types": "^0.34.1",
+        "@terascope/elasticsearch-api": "^3.0.2",
+        "@terascope/utils": "^0.44.1",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.3",
         "moment": "^2.29.1"
