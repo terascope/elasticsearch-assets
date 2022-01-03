@@ -48,7 +48,7 @@
         "@types/bluebird": "^3.5.36",
         "@types/elasticsearch": "^5.0.40",
         "@types/got": "^9.6.12",
-        "@types/jest": "^27.0.3",
+        "@types/jest": "^27.4.0",
         "@types/node": "^16.11.18",
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.60.4",
