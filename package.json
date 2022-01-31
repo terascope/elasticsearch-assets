@@ -52,7 +52,7 @@
         "@types/node": "^16.11.21",
         "elasticsearch": "^15.4.1",
         "elasticsearch-store": "^0.60.4",
-        "eslint": "^8.7.0",
+        "eslint": "^8.8.0",
         "jest": "^27.4.7",
         "jest-extended": "^1.2.0",
         "moment": "^2.29.1",
