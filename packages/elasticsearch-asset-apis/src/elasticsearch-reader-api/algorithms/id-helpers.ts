@@ -1,5 +1,6 @@
 /* eslint-disable no-useless-escape */
 
+import pMap from 'p-map';
 import {
     CountFn, IDSlicerRange, IDSlicerRanges, IDType, ReaderSlice
 } from '../interfaces';
@@ -46,26 +47,33 @@ export async function determineIDSlicerRanges(
     num: number,
     getCount: CountFn
 ): Promise<IDSlicerRanges> {
-    const results: IDSlicerRange[] = [];
-    const len = num;
+    const arrayLength = keysArray.length;
+    const list: string[][] = [];
 
-    let lastDivideNum = 0;
-    for (let i = 0; i < len; i += 1) {
-        let divideNum = Math.ceil(keysArray.length / len);
-
-        if (i === num - 1) {
-            divideNum = keysArray.length;
-        }
-
-        const keys = keysArray.slice(lastDivideNum, divideNum);
-        results.push({
-            keys,
-            count: await getCount(
-                generateCountQueryForKeys(keys)
-            )
-        });
-        lastDivideNum = divideNum;
+    for (let i = 0; i < num; i += 1) {
+        list.push([]);
     }
 
-    return results;
+    let counter = 0;
+
+    for (let i = 0; i < arrayLength; i += 1) {
+        // console.log('what counter', counter, keysArray[i])
+        list[counter].push(keysArray[i]);
+        counter += 1;
+
+        if (counter >= num) {
+            counter = 0;
+        }
+    }
+
+    return pMap(list, async (keys) => {
+        const count = await getCount(
+            generateCountQueryForKeys(keys)
+        );
+
+        return {
+            keys,
+            count
+        };
+    });
 }
