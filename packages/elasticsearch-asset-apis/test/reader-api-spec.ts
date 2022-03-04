@@ -15,6 +15,7 @@ import {
 import evenSpread from './fixtures/data/even-spread';
 import {
     createElasticsearchReaderAPI,
+    DateSlicerRange,
     ElasticsearchReaderClient,
     ESReaderOptions,
     FetchResponseType,
@@ -645,6 +646,219 @@ describe('Reader API', () => {
                     err.message
                 ).toEqual(errMsg);
             }
+        });
+
+        it('can properly make id slicer ranges', async () => {
+            const config: ESReaderOptions = {
+                ...defaultConfig,
+                id_field_name: idFieldName,
+                starting_key_depth: 0,
+                key_type: IDType.base64url,
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config, client: readerClient, logger, emitter
+            });
+
+            const results = await api.makeIDSlicerRanges({
+                numOfSlicers: 7,
+            });
+
+            expect(results).toEqual([
+                {
+                    keys: [
+                        'a', 'h', 'o', 'v',
+                        'C', 'J', 'Q', 'X',
+                        '4', '_'
+                    ],
+                    count: 126
+                },
+                {
+                    keys: [
+                        'b', 'i', 'p',
+                        'w', 'D', 'K',
+                        'R', 'Y', '5'
+                    ],
+                    count: 146
+                },
+                {
+                    keys: [
+                        'c', 'j', 'q',
+                        'x', 'E', 'L',
+                        'S', 'Z', '6'
+                    ],
+                    count: 116
+                },
+                {
+                    keys: [
+                        'd', 'k', 'r',
+                        'y', 'F', 'M',
+                        'T', '0', '7'
+                    ],
+                    count: 199
+                },
+                {
+                    keys: [
+                        'e', 'l', 's',
+                        'z', 'G', 'N',
+                        'U', '1', '8'
+                    ],
+                    count: 189
+                },
+                {
+                    keys: [
+                        'f', 'm', 't',
+                        'A', 'H', 'O',
+                        'V', '2', '9'
+                    ],
+                    count: 170
+                },
+                {
+                    keys: [
+                        'g', 'n', 'u',
+                        'B', 'I', 'P',
+                        'W', '3', '-'
+                    ],
+                    count: 54
+                }
+            ]);
+        });
+
+        it('can make date ranges for slicers', async () => {
+            const api = createElasticsearchReaderAPI({
+                config: defaultConfig, client: readerClient, logger, emitter
+            });
+
+            const ranges = await api.makeDateSlicerRanges({
+                lifecycle: 'once',
+                numOfSlicers: 7,
+                recoveryData: [],
+            });
+
+            if (!ranges || ranges.length === 0) {
+                throw new Error('Faulty test');
+            }
+
+            const data = ranges
+                .map((node) => {
+                    if (node == null) return node;
+                    const {
+                        count,
+                        dates: mDates,
+                        interval,
+                        range: mRange
+                    } = node as DateSlicerRange;
+                    return {
+                        count,
+                        interval,
+                        dates: {
+                            start: mDates.start.toISOString(),
+                            end: mDates.end.toISOString(),
+                            limit: mDates.limit.toISOString(),
+                            ...(mDates.holes && { holes: mDates.holes })
+                        },
+                        range: {
+                            start: mRange.start.toISOString(),
+                            limit: mRange.limit.toISOString()
+                        }
+                    };
+                });
+
+            expect(data.length).toBeGreaterThan(0);
+
+            expect(data).toMatchObject([
+                {
+                    count: 71,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        end: '2019-04-26T15:00:23.228Z',
+                        limit: '2019-04-26T15:00:23.228Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 89,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.228Z',
+                        end: '2019-04-26T15:00:23.255Z',
+                        limit: '2019-04-26T15:00:23.255Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 124,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.255Z',
+                        end: '2019-04-26T15:00:23.282Z',
+                        limit: '2019-04-26T15:00:23.282Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 109,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.282Z',
+                        end: '2019-04-26T15:00:23.309Z',
+                        limit: '2019-04-26T15:00:23.309Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 204,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.309Z',
+                        end: '2019-04-26T15:00:23.336Z',
+                        limit: '2019-04-26T15:00:23.336Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 118,
+                    interval: [27, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.336Z',
+                        end: '2019-04-26T15:00:23.363Z',
+                        limit: '2019-04-26T15:00:23.363Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                },
+                {
+                    count: 285,
+                    interval: [31, 'ms'],
+                    dates: {
+                        start: '2019-04-26T15:00:23.363Z',
+                        end: '2019-04-26T15:00:23.394Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    },
+                    range: {
+                        start: '2019-04-26T15:00:23.201Z',
+                        limit: '2019-04-26T15:00:23.394Z'
+                    }
+                }
+            ]);
         });
     });
 });
