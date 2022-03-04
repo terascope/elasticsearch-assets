@@ -57,7 +57,6 @@ export async function determineIDSlicerRanges(
     let counter = 0;
 
     for (let i = 0; i < arrayLength; i += 1) {
-        // console.log('what counter', counter, keysArray[i])
         list[counter].push(keysArray[i]);
         counter += 1;
 
