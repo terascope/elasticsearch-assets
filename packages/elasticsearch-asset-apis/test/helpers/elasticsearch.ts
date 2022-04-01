@@ -28,7 +28,7 @@ export function formatUploadData(
     data.forEach((record) => {
         const meta: any = { _index: index };
 
-        // meta._type = type || '_doc';
+        meta._type = type || '_doc';
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -86,7 +86,7 @@ export async function populateIndex(
         index,
         type,
         body,
-        refresh: true,
+        refresh: true
     });
 
     if (results.errors) {
@@ -135,10 +135,11 @@ export async function cleanupIndex(
     client: Client, index: string, template?: string
 ): Promise<void> {
     await client.indices
-        .delete({ index })
-        .catch((err) => {
-            throw new Error(`Could not delete index: ${index}, error: ${err.message}`);
-        });
+        .delete({
+            index,
+            requestTimeout: 3000,
+        })
+        .catch(() => {});
 
     if (template) {
         await client.indices

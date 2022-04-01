@@ -1,15 +1,16 @@
 import 'jest-extended';
+import { getESVersion } from 'elasticsearch-store';
 import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity, toNumber } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
     TEST_INDEX_PREFIX,
+    makeClient,
     cleanupIndex,
     populateIndex,
     waitForData,
     ELASTICSEARCH_VERSION,
-    ELASTICSEARCH_HOST
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -23,11 +24,8 @@ import {
     ReaderSlice
 } from '../src';
 
-// eslint-disable-next-line import/no-relative-packages
-import * as connector from '../../terafoundation_elasticsearch_connector';
-
 describe('Reader API', () => {
-    // TODO: do we need dependency of elasticsearch store??
+    const client = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
     const logger = debugLogger('api-dataFrame-test');
     const emitter = new EventEmitter();
@@ -39,25 +37,18 @@ describe('Reader API', () => {
 
     const evenIndex = makeIndex(evenSpread.index);
 
-    let readerClient: ElasticsearchReaderClient;
+    const readerClient = new ElasticsearchReaderClient(
+        client,
+        { index: evenIndex },
+        logger,
+    );
 
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
-    const docType = '_doc';
-    let client: any;
+    const version = getESVersion(client);
+    const docType = version === 5 ? 'events' : '_doc';
 
     beforeAll(async () => {
-        const { client: esClient, } = await connector.default.createClient({
-            host: ELASTICSEARCH_HOST,
-            ssl: { rejectUnauthorized: false }
-        } as any, logger);
-        client = esClient;
-
-        readerClient = new ElasticsearchReaderClient(
-            client,
-            { index: evenIndex },
-            logger,
-        );
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(client, evenIndex, evenSpread.types, evenBulkData, docType);
         await waitForData(client, evenIndex, evenBulkData.length);
