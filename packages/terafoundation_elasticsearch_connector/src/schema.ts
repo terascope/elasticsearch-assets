@@ -1,4 +1,4 @@
-export = {
+export const legacySchema = {
     host: {
         doc: 'A list of hosts to connect to',
         default: ['127.0.0.1:9200']

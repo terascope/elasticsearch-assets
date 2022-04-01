@@ -17,8 +17,9 @@ export class ElasticsearchReaderClient implements ReaderClient {
     constructor(
         elasticsearchClient: Client,
         clientConfig: {
-            connection?: string
-            index: string
+            connection?: string;
+            index: string;
+            [key: string]: any
         },
         logger: Logger,
     ) {
