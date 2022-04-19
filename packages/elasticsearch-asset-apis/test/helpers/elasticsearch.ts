@@ -137,6 +137,5 @@ export async function cleanupIndex(
             .catch((err) => {
                 throw err;
             });
-
     }
 }

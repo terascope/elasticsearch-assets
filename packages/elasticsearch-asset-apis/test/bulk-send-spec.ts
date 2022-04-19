@@ -23,8 +23,7 @@ describe('elasticsearch bulk sender module', () => {
         } as any, logger);
         client = rawClient;
         apiClient = elasticAPI(client, logger);
-        type = apiClient.isElasticsearch6() ? 'events' : '_doc'
-
+        type = apiClient.isElasticsearch6() ? 'events' : '_doc';
         await cleanupIndex(client, `${senderIndex}*`);
     });
 
