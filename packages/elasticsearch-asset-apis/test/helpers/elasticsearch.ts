@@ -8,8 +8,8 @@ import elasticAPI from '@terascope/elasticsearch-api';
 
 const logger = debugLogger('elasticsearch_helpers');
 
-// automatically set the timeout to 10s when using elasticsearch
-jest.setTimeout(10000);
+// automatically set the timeout to 30s when using elasticsearch
+jest.setTimeout(30000);
 
 export function formatUploadData(
     index: string, type: string, data: any[]

@@ -117,7 +117,6 @@ export class ElasticsearchReaderClient implements ReaderClient {
             includeDefaults: true,
             allowNoIndices: true
         });
-
-        return results.body;
+        return results.body || results;
     }
 }

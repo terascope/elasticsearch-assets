@@ -9,8 +9,8 @@ import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
 
 const logger = debugLogger('elasticsearch_helpers');
 
-// automatically set the timeout to 10s when using elasticsearch
-jest.setTimeout(10000);
+// automatically set the timeout to 30s when using elasticsearch
+jest.setTimeout(30000);
 
 export function makeClient(): Client {
     return new Client({
