@@ -22,7 +22,6 @@ cache:
 services:
   - docker
 env:
-  - ELASTICSEARCH_VERSION=5.6
   - ELASTICSEARCH_VERSION=6.8.6
   - ELASTICSEARCH_VERSION=7.2.1
 jobs:
@@ -36,9 +35,6 @@ jobs:
     # Don't build es 6 on node 12 to reduce the number of test jobs
     - node_js: '12.22'
       env: ELASTICSEARCH_VERSION=6.8.6
-    # Don't build es 5 on node 14 to reduce the number of test jobs
-    - node_js: '14.17'
-      env: ELASTICSEARCH_VERSION=5.6
 before_install:
   # Install latest yarn
   - npm install --global yarn
