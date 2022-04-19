@@ -11,10 +11,11 @@ describe('elasticsearch bulk sender module', () => {
     const META_ROUTE = 'standard:route';
     const logger = debugLogger('sender_api_test');
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
-    const type = '_doc';
+
     let apiClient: elasticAPI.Client;
     let harness: WorkerTestHarness;
     let client: any;
+    let type: string;
 
     beforeAll(async () => {
         const { client: rawClient } = await createClient({
@@ -22,6 +23,7 @@ describe('elasticsearch bulk sender module', () => {
         } as any, logger);
         client = rawClient;
         apiClient = elasticAPI(client, logger);
+        type = apiClient.isElasticsearch6() ? 'events' : '_doc'
 
         await cleanupIndex(client, `${senderIndex}*`);
     });
@@ -45,7 +47,6 @@ describe('elasticsearch bulk sender module', () => {
             },
             config
         ) as any;
-
         return createElasticsearchBulkSender({ client: apiClient, config: senderConfig });
     }
 
@@ -76,7 +77,7 @@ describe('elasticsearch bulk sender module', () => {
         it('can format bulk index data with es7', async () => {
             const sender = createSender();
 
-            sender.clientVersion = 7;
+            sender.isElasticsearch6 = false;
 
             const docArray = [DataEntity.make({ action: 'index' })];
 
@@ -363,7 +364,7 @@ describe('elasticsearch bulk sender module', () => {
     });
 
     describe('send', () => {
-        it('can bulk send data', async () => {
+        it('can bulk send data test', async () => {
             const sender = createSender();
             const data = [
                 DataEntity.make({ some: 'data' }),

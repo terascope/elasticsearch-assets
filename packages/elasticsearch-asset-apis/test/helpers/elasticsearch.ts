@@ -126,18 +126,17 @@ export async function cleanupIndex(
     client: Client, index: string, template?: string
 ): Promise<void> {
     await client.indices
-        .delete({
-            index,
-            requestTimeout: 3000,
-        })
-        .catch(() => {});
+        .delete({ index })
+        .catch((err) => {
+            throw err;
+        });
 
     if (template) {
         await client.indices
-            .deleteTemplate({
-                name: template,
-                requestTimeout: 3000,
-            })
-            .catch(() => {});
+            .deleteTemplate({ name: template })
+            .catch((err) => {
+                throw err;
+            });
+
     }
 }

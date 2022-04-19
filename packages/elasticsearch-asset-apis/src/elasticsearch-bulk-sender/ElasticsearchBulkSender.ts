@@ -13,12 +13,12 @@ import {
 export class ElasticsearchBulkSender implements RouteSenderAPI {
     client: elasticAPI.Client;
     config: ElasticsearchSenderConfig;
-    clientVersion: number;
+    isElasticsearch6: boolean;
     private isRouter = false;
 
     constructor(client: elasticAPI.Client, config: ElasticsearchSenderConfig) {
         this.client = client;
-        this.clientVersion = client.getESVersion();
+        this.isElasticsearch6 = client.isElasticsearch6();
         this.config = config;
         // _key is the char from router
         if (config._key && isString(config._key)) this.isRouter = true;
@@ -52,7 +52,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
     }
 
     private getType(): string {
-        if (this.clientVersion < 7 && this.config.type) {
+        if (this.isElasticsearch6 && this.config.type) {
             return this.config.type;
         }
 
