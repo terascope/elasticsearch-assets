@@ -25,7 +25,6 @@ import {
 } from '../src';
 
 describe('Reader API', () => {
-    // TODO: do we need dependency of elasticsearch store??
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;
     const logger = debugLogger('api-dataFrame-test');
     const emitter = new EventEmitter();
@@ -36,13 +35,10 @@ describe('Reader API', () => {
     }
 
     const evenIndex = makeIndex(evenSpread.index);
-
-    let readerClient: ElasticsearchReaderClient;
-
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-
     const docType = '_doc';
     let client: any;
+    let readerClient: ElasticsearchReaderClient;
 
     beforeAll(async () => {
         const { client: esClient, } = await createClient({
