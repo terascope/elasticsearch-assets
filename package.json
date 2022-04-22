@@ -50,7 +50,7 @@
         "@types/jest": "^27.4.1",
         "@types/node": "^17.0.25",
         "elasticsearch": "^15.4.1",
-        "elasticsearch-store": "^0.61.1",
+        "elasticsearch-store": "^0.61.2",
         "eslint": "^8.13.0",
         "jest": "^27.5.1",
         "jest-extended": "^2.0.0",
