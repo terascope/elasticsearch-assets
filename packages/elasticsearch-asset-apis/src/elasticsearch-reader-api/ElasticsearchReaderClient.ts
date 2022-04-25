@@ -110,12 +110,13 @@ export class ElasticsearchReaderClient implements ReaderClient {
         await this.client.version();
     }
 
-    getSettings(index: string): Promise<SettingResults> {
-        return this._baseClient.indices.getSettings({
+    async getSettings(index: string): Promise<SettingResults> {
+        const results = await this._baseClient.indices.getSettings({
             index,
             flatSettings: true,
             includeDefaults: true,
             allowNoIndices: true
         });
+        return results.body || results;
     }
 }

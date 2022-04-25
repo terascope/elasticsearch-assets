@@ -2,13 +2,13 @@ import 'jest-extended';
 import { EventEmitter } from 'events';
 import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
-import { getESVersion } from 'elasticsearch-store';
+import { createClient } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
-    makeClient,
     cleanupIndex,
     populateIndex,
     waitForData,
+    ELASTICSEARCH_HOST
 } from './helpers';
 import condensedData from './fixtures/data/condensed-spread';
 import {
@@ -23,8 +23,6 @@ import {
 } from '../src';
 
 describe('ReaderAPI with condensed time data', () => {
-    const client = makeClient();
-
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_condensed_`;
     const logger = debugLogger('api-condensed-test');
     const emitter = new EventEmitter();
@@ -32,20 +30,26 @@ describe('ReaderAPI with condensed time data', () => {
     const condensedIndex = makeIndex(condensedData.index);
     const evenBulkData = condensedData.data.map((obj) => DataEntity.make(obj, { _key: obj.bytes }));
 
-    const readerClient = new ElasticsearchReaderClient(
-        client,
-        { index: condensedIndex },
-        logger,
-    );
-
-    const version = getESVersion(client);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
     }
+    let client: any;
+    let readerClient: ElasticsearchReaderClient;
 
     beforeAll(async () => {
+        const { client: esClient, } = await createClient({
+            node: ELASTICSEARCH_HOST,
+        } as any, logger);
+        client = esClient;
+
+        readerClient = new ElasticsearchReaderClient(
+            client,
+            { index: condensedIndex },
+            logger,
+        );
+
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(client, condensedIndex, condensedData.types, evenBulkData, docType);
         await waitForData(client, condensedIndex, evenBulkData.length);

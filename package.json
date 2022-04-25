@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "description": "bundle of processors for teraslice",
-    "version": "2.7.12",
+    "version": "2.8.0",
     "private": true,
     "workspaces": [
         "packages/*",
@@ -18,7 +18,6 @@
         "test:all": "yarn workspaces run test",
         "test": "jest",
         "test:7": "ELASTICSEARCH_VERSION=7.x jest",
-        "test:5": "ELASTICSEARCH_VERSION=5.6 jest",
         "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
         "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand",
         "publish:changed": "./scripts/publish.sh"
@@ -38,28 +37,28 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@terascope/data-types": "^0.34.1",
-        "@terascope/elasticsearch-api": "^3.0.2",
-        "@terascope/elasticsearch-asset-apis": "^0.8.5",
+        "@terascope/data-types": "^0.35.1",
+        "@terascope/elasticsearch-api": "^3.1.1",
+        "@terascope/elasticsearch-asset-apis": "^0.9.0",
         "@terascope/eslint-config": "^0.7.1",
-        "@terascope/job-components": "^0.56.1",
-        "@terascope/teraslice-state-storage": "^0.33.2",
-        "@terascope/types": "^0.10.2",
+        "@terascope/job-components": "^0.56.4",
+        "@terascope/teraslice-state-storage": "^0.34.1",
+        "@terascope/types": "^0.10.3",
         "@types/bluebird": "^3.5.36",
         "@types/elasticsearch": "^5.0.40",
         "@types/got": "^9.6.12",
         "@types/jest": "^27.4.1",
-        "@types/node": "^17.0.21",
+        "@types/node": "^17.0.25",
         "elasticsearch": "^15.4.1",
-        "elasticsearch-store": "^0.60.4",
-        "eslint": "^8.10.0",
+        "elasticsearch-store": "^0.61.2",
+        "eslint": "^8.13.0",
         "jest": "^27.5.1",
         "jest-extended": "^2.0.0",
-        "moment": "^2.29.1",
+        "moment": "^2.29.3",
         "nock": "^13.2.4",
         "node-notifier": "^10.0.1",
         "teraslice-test-harness": "^0.28.2",
-        "ts-jest": "^27.1.3",
-        "typescript": "^4.5.5"
+        "ts-jest": "^27.1.4",
+        "typescript": "^4.6.3"
     }
 }

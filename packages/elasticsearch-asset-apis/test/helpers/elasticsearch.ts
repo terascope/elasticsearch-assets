@@ -5,20 +5,11 @@ import {
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import elasticAPI from '@terascope/elasticsearch-api';
-import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
 
 const logger = debugLogger('elasticsearch_helpers');
 
-// automatically set the timeout to 10s when using elasticsearch
-jest.setTimeout(10000);
-
-export function makeClient(): Client {
-    return new Client({
-        host: ELASTICSEARCH_HOST,
-        log: 'error',
-        apiVersion: ELASTICSEARCH_VERSION,
-    });
-}
+// automatically set the timeout to 30s when using elasticsearch
+jest.setTimeout(30000);
 
 export function formatUploadData(
     index: string, type: string, data: any[]
@@ -135,18 +126,16 @@ export async function cleanupIndex(
     client: Client, index: string, template?: string
 ): Promise<void> {
     await client.indices
-        .delete({
-            index,
-            requestTimeout: 3000,
-        })
-        .catch(() => {});
+        .delete({ index })
+        .catch((err) => {
+            throw err;
+        });
 
     if (template) {
         await client.indices
-            .deleteTemplate({
-                name: template,
-                requestTimeout: 3000,
-            })
-            .catch(() => {});
+            .deleteTemplate({ name: template })
+            .catch((err) => {
+                throw err;
+            });
     }
 }
