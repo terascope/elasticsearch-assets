@@ -322,19 +322,19 @@
     tslib "^2.3.0"
     undici "^4.14.1"
 
-"@eslint/eslintrc@^1.2.1":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.2.1.tgz#8b5e1c49f4077235516bc9ec7d41378c0f69b8c6"
-  integrity sha512-bxvbYnBPN1Gibwyp6NrpnFzA3YtRL3BBAyEAFVIpNTm2Rn4Vy87GA5M4aSn3InRrlsbX5N0GW7XIx+U4SAEKdQ==
+"@eslint/eslintrc@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@eslint/eslintrc/-/eslintrc-1.3.0.tgz#29f92c30bb3e771e4a2048c95fa6855392dfac4f"
+  integrity sha512-UWW0TMTmk2d7hLcWD1/e2g5HDM/HQ3csaLSqXCfqwh4uNDuNqlaKWXmEsL4Cs41Z0KnILNvwbHAah3C2yt06kw==
   dependencies:
     ajv "^6.12.4"
     debug "^4.3.2"
-    espree "^9.3.1"
-    globals "^13.9.0"
+    espree "^9.3.2"
+    globals "^13.15.0"
     ignore "^5.2.0"
     import-fresh "^3.2.1"
     js-yaml "^4.1.0"
-    minimatch "^3.0.4"
+    minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
 "@humanwhocodes/config-array@^0.9.2":
@@ -646,13 +646,14 @@
     lodash "^4.17.21"
     yargs "^17.4.0"
 
-"@terascope/elasticsearch-api@^3.1.1":
-  version "3.1.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.1.1.tgz#e3c3f5b06c286719082ce341c5fb652efc603632"
-  integrity sha512-k2dX0Al1UDfmxquS93OnLeJdk6ZT11AwDMs8cVmXf43U88NMvRH5ydNpqnquMT8vUxdIBDduyfvGm2WlykBndg==
+"@terascope/elasticsearch-api@^3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.2.0.tgz#435fd824641a7be98d1968e64c868446facb0831"
+  integrity sha512-iuLX1kCMvDSM9MSggXocA1ScTHs3vka/PfTaiflwDn5xls1IOfbixLe/8QLI3Wg6beSWjrbeqCgq9V2yzoTb4Q==
   dependencies:
     "@terascope/utils" "^0.44.2"
     bluebird "^3.7.2"
+    setimmediate "^1.0.5"
 
 "@terascope/eslint-config@^0.7.1":
   version "0.7.1"
@@ -698,12 +699,12 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.34.1":
-  version "0.34.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.34.1.tgz#dcbd7cbcde052c8dd01cf29c0331e4d760542732"
-  integrity sha512-HbKV18GO+izJzFaenZD89/BtBj7abyrUbacFTKBIbDEoKPoxGulxptojhhSj1ieeFfDS3JO25Sh/xrBXjl3FpQ==
+"@terascope/teraslice-state-storage@^0.35.0":
+  version "0.35.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.35.0.tgz#c2c360bb7552f3ae52010738a4586f78df27794f"
+  integrity sha512-eyqTGGwxDdxhUd4Bf99KZjj/yTLU+GH8FAWtG14rEFf+Pfe7ZNBmIzKd+dtb29fa27YVyHXJTG2FzxKPMZwHTg==
   dependencies:
-    "@terascope/elasticsearch-api" "^3.1.1"
+    "@terascope/elasticsearch-api" "^3.2.0"
     "@terascope/utils" "^0.44.2"
 
 "@terascope/types@^0.10.3":
@@ -1061,10 +1062,15 @@
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.182.tgz#05301a4d5e62963227eaafe0ce04dd77c54ea5c2"
   integrity sha512-/THyiqyQAP9AfARo4pF+aCGcyiQ94tX/Is2I7HofNRqoYLgN1PBoOWu2/zTA5zMxzP5EFutMtWtGAFRKUe961Q==
 
-"@types/node@*", "@types/node@^17.0.25":
+"@types/node@*":
   version "17.0.25"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.25.tgz#527051f3c2f77aa52e5dc74e45a3da5fb2301448"
   integrity sha512-wANk6fBrUwdpY4isjWrKTufkrXdu1D2YHCot2fD/DfWxF5sMrVSA+KN7ydckvaTCh0HiqX9IVl0L5/ZoXg5M7w==
+
+"@types/node@^17.0.42":
+  version "17.0.42"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.42.tgz#d7e8f22700efc94d125103075c074396b5f41f9b"
+  integrity sha512-Q5BPGyGKcvQgAMbsr7qEGN/kIPN6zZecYYABeTDBizOsau+2NMdSVTar9UQw21A2+JyA2KRNDYaYrPB0Rpk2oQ==
 
 "@types/prettier@^2.1.5":
   version "2.6.0"
@@ -1212,7 +1218,7 @@ acorn-globals@^6.0.0:
     acorn "^7.1.1"
     acorn-walk "^7.1.1"
 
-acorn-jsx@^5.3.1:
+acorn-jsx@^5.3.2:
   version "5.3.2"
   resolved "https://registry.yarnpkg.com/acorn-jsx/-/acorn-jsx-5.3.2.tgz#7ed5bb55908b3b2f1bc55c6af1653bada7f07937"
   integrity sha512-rq9s+JNhf0IChjtDXxllJ7g41oZk5SlXtp0LHwyA5cejwn7vKmKp4pPri6YEePv2PU65sAsegbXtIinmDFDXgQ==
@@ -1227,10 +1233,15 @@ acorn@^7.1.1:
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-7.4.1.tgz#feaed255973d2e77555b83dbc08851a6c63520fa"
   integrity sha512-nQyp0o1/mNdbTO1PO6kHkwSrmgZ0MT/jCCpNiwbUjGoRN4dlBhqJtoQuCnEOKzgTVwg0ZWiCoQy6SxMebQVh8A==
 
-acorn@^8.2.4, acorn@^8.7.0:
+acorn@^8.2.4:
   version "8.7.0"
   resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.7.0.tgz#90951fde0f8f09df93549481e5fc141445b791cf"
   integrity sha512-V/LGr1APy+PXIwKebEWrkZPwoeoF+w1jiOBUmuxuiUIaOHtob8Qc9BTrYo7VuI5fR8tqsy+buA2WFooR5olqvQ==
+
+acorn@^8.7.1:
+  version "8.7.1"
+  resolved "https://registry.yarnpkg.com/acorn/-/acorn-8.7.1.tgz#0197122c843d1bf6d0a5e83220a788f278f63c30"
+  integrity sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==
 
 agent-base@6:
   version "6.0.2"
@@ -2070,10 +2081,10 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.61.2:
-  version "0.61.2"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.61.2.tgz#e138e7d98b95d510374ac293389003afbbaffa17"
-  integrity sha512-E+qtp6YovTxFO6oeQ6Her8EbkAA6GW8Uhz2KY+aVNo74vMTGc4NQY4qT2PsN2k8GRplvbYtOHfw9wNfPVi/B6A==
+elasticsearch-store@^0.62.0:
+  version "0.62.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.62.0.tgz#0750d7558026d7eb78782a4129f287eaedf27fc9"
+  integrity sha512-v3vGrTM80Xffv5xOvjaR5UjeEte3UIuJ3Lq3JbGHcXdzH7xISjPnEUh/chyQ6rnQgHF3HqE2Ogkb6g3TihlmJQ==
   dependencies:
     "@opensearch-project/opensearch" "^1.0.2"
     "@terascope/data-mate" "^0.38.1"
@@ -2081,9 +2092,11 @@ elasticsearch-store@^0.61.2:
     "@terascope/types" "^0.10.3"
     "@terascope/utils" "^0.44.2"
     ajv "^6.12.6"
+    elasticsearch "^15.4.1"
     elasticsearch6 "npm:@elastic/elasticsearch@^6.7.0"
     elasticsearch7 "npm:@elastic/elasticsearch@^7.0.0"
     elasticsearch8 "npm:@elastic/elasticsearch@^8.0.0"
+    setimmediate "^1.0.5"
     uuid "^8.3.2"
     xlucene-translator "^0.27.1"
 
@@ -2372,12 +2385,12 @@ eslint-visitor-keys@^3.0.0, eslint-visitor-keys@^3.3.0:
   resolved "https://registry.yarnpkg.com/eslint-visitor-keys/-/eslint-visitor-keys-3.3.0.tgz#f6480fa6b1f30efe2d1968aa8ac745b862469826"
   integrity sha512-mQ+suqKJVyeuwGYHAdjMFqjCyfl8+Ldnxuyp3ldiMBFKkvytrXUZWaiPCEav8qDHKty44bD+qV1IP4T+w+xXRA==
 
-eslint@^8.13.0:
-  version "8.13.0"
-  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.13.0.tgz#6fcea43b6811e655410f5626cfcf328016badcd7"
-  integrity sha512-D+Xei61eInqauAyTJ6C0q6x9mx7kTUC1KZ0m0LSEexR0V+e94K12LmWX076ZIsldwfQ2RONdaJe0re0TRGQbRQ==
+eslint@^8.17.0:
+  version "8.17.0"
+  resolved "https://registry.yarnpkg.com/eslint/-/eslint-8.17.0.tgz#1cfc4b6b6912f77d24b874ca1506b0fe09328c21"
+  integrity sha512-gq0m0BTJfci60Fz4nczYxNAlED+sMcihltndR8t9t1evnU/azx53x3t2UHXC/uRjcbvRw/XctpaNygSTcQD+Iw==
   dependencies:
-    "@eslint/eslintrc" "^1.2.1"
+    "@eslint/eslintrc" "^1.3.0"
     "@humanwhocodes/config-array" "^0.9.2"
     ajv "^6.10.0"
     chalk "^4.0.0"
@@ -2388,14 +2401,14 @@ eslint@^8.13.0:
     eslint-scope "^7.1.1"
     eslint-utils "^3.0.0"
     eslint-visitor-keys "^3.3.0"
-    espree "^9.3.1"
+    espree "^9.3.2"
     esquery "^1.4.0"
     esutils "^2.0.2"
     fast-deep-equal "^3.1.3"
     file-entry-cache "^6.0.1"
     functional-red-black-tree "^1.0.1"
     glob-parent "^6.0.1"
-    globals "^13.6.0"
+    globals "^13.15.0"
     ignore "^5.2.0"
     import-fresh "^3.0.0"
     imurmurhash "^0.1.4"
@@ -2404,7 +2417,7 @@ eslint@^8.13.0:
     json-stable-stringify-without-jsonify "^1.0.1"
     levn "^0.4.1"
     lodash.merge "^4.6.2"
-    minimatch "^3.0.4"
+    minimatch "^3.1.2"
     natural-compare "^1.4.0"
     optionator "^0.9.1"
     regexpp "^3.2.0"
@@ -2413,13 +2426,13 @@ eslint@^8.13.0:
     text-table "^0.2.0"
     v8-compile-cache "^2.0.3"
 
-espree@^9.3.1:
-  version "9.3.1"
-  resolved "https://registry.yarnpkg.com/espree/-/espree-9.3.1.tgz#8793b4bc27ea4c778c19908e0719e7b8f4115bcd"
-  integrity sha512-bvdyLmJMfwkV3NCRl5ZhJf22zBFo1y8bYh3VYb+bfzqNB4Je68P2sSuXyuFquzWLebHpNd2/d5uv7yoP9ISnGQ==
+espree@^9.3.2:
+  version "9.3.2"
+  resolved "https://registry.yarnpkg.com/espree/-/espree-9.3.2.tgz#f58f77bd334731182801ced3380a8cc859091596"
+  integrity sha512-D211tC7ZwouTIuY5x9XnS0E9sWNChB7IYKX/Xp5eQj3nFXhqmiUDB9q27y76oFl8jTg3pXcQx/bpxMfs3CIZbA==
   dependencies:
-    acorn "^8.7.0"
-    acorn-jsx "^5.3.1"
+    acorn "^8.7.1"
+    acorn-jsx "^5.3.2"
     eslint-visitor-keys "^3.3.0"
 
 esprima@^4.0.0, esprima@^4.0.1:
@@ -2823,10 +2836,10 @@ globals@^11.1.0:
   resolved "https://registry.yarnpkg.com/globals/-/globals-11.12.0.tgz#ab8795338868a0babd8525758018c2a7eb95c42e"
   integrity sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==
 
-globals@^13.6.0, globals@^13.9.0:
-  version "13.13.0"
-  resolved "https://registry.yarnpkg.com/globals/-/globals-13.13.0.tgz#ac32261060d8070e2719dd6998406e27d2b5727b"
-  integrity sha512-EQ7Q18AJlPwp3vUDL4mKA0KXrXyNIQyWon6T6XQiBQF0XHvRsiCSrWmmeATpUzdJN2HhWZU6Pdl0a9zdep5p6A==
+globals@^13.15.0:
+  version "13.15.0"
+  resolved "https://registry.yarnpkg.com/globals/-/globals-13.15.0.tgz#38113218c907d2f7e98658af246cef8b77e90bac"
+  integrity sha512-bpzcOlgDhMG070Av0Vy5Owklpv1I6+j96GhUI7Rh7IzDCKLzboflLrrfqMu8NquDbiR4EOQk7XzJwqVJxicxog==
   dependencies:
     type-fest "^0.20.2"
 
@@ -3964,11 +3977,6 @@ lodash.merge@^4.6.2:
   resolved "https://registry.yarnpkg.com/lodash.merge/-/lodash.merge-4.6.2.tgz#558aa53b43b661e1925a0afdfa36a9a1085fe57a"
   integrity sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==
 
-lodash.set@^4.3.2:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/lodash.set/-/lodash.set-4.3.2.tgz#d8757b1da807dde24816b0d6a84bea1a76230b23"
-  integrity sha1-2HV7HagH3eJIFrDWqEvqGnYjCyM=
-
 lodash@^4.17.10, lodash@^4.17.21, lodash@^4.7.0:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
@@ -4144,14 +4152,14 @@ netmask@^2.0.2:
   resolved "https://registry.yarnpkg.com/netmask/-/netmask-2.0.2.tgz#8b01a07644065d536383835823bc52004ebac5e7"
   integrity sha512-dBpDMdxv9Irdq66304OLfEmQ9tbNRFnFTuZiLo+bD+r332bBmMJ8GBLXklIXXgxd3+v9+KUnZaUR5PJMa75Gsg==
 
-nock@^13.2.4:
-  version "13.2.4"
-  resolved "https://registry.yarnpkg.com/nock/-/nock-13.2.4.tgz#43a309d93143ee5cdcca91358614e7bde56d20e1"
-  integrity sha512-8GPznwxcPNCH/h8B+XZcKjYPXnUV5clOKCjAqyjsiqA++MpNx9E9+t8YPp0MbThO+KauRo7aZJ1WuIZmOrT2Ug==
+nock@^13.2.6:
+  version "13.2.6"
+  resolved "https://registry.yarnpkg.com/nock/-/nock-13.2.6.tgz#35e419cd9d385ffa67e59523d9699e41b29e1a03"
+  integrity sha512-GbyeSwSEP0FYouzETZ0l/XNm5tNcDNcXJKw3LCAb+mx8bZSwg1wEEvdL0FAyg5TkBJYiWSCtw6ag4XfmBy60FA==
   dependencies:
     debug "^4.1.0"
     json-stringify-safe "^5.0.1"
-    lodash.set "^4.3.2"
+    lodash "^4.17.21"
     propagate "^2.0.0"
 
 node-int64@^0.4.0:
@@ -4768,6 +4776,11 @@ semver@^6.0.0, semver@^6.3.0:
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/semver/-/semver-6.3.0.tgz#ee0a64c8af5e8ceea67687b133761e1becbd1d3d"
   integrity sha512-b39TBaTSfV6yBrapU89p5fKekE2m/NwnDocOVruQFS1/veMgdzuPcnOM34M6CwxW8jH/lxEa5rBoDeUwu5HHTw==
+
+setimmediate@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/setimmediate/-/setimmediate-1.0.5.tgz#290cbb232e306942d7d7ea9b83732ab7856f8285"
+  integrity sha512-MATJdZp8sLqDl/68LfQmbP8zKPLQNV6BIZoIgrscFDQ+RsvK/BxeDQOgyxKKoh0y/8h3BqVFnCqQ/gd+reiIXA==
 
 shallow-clone@^3.0.1:
   version "3.0.1"
