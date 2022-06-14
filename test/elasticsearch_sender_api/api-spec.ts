@@ -1,6 +1,5 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { isNil } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient, fetch, waitForData
 } from '../helpers';
@@ -8,25 +7,24 @@ import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/inter
 
 describe('elasticsearch sender api', () => {
     const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;
-    const esClient = makeClient();
-
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
-
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
+    const docType = '_doc';
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                create: () => ({
+                    client: esClient
+                }),
+            }
+        ];
         await cleanupIndex(esClient, `${apiSendIndex}*`);
     });
 

@@ -25,7 +25,7 @@ describe('spaces_reader slicer', () => {
         defaultClient = new MockClient();
         clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'default',
                 create: () => ({
                     client: defaultClient

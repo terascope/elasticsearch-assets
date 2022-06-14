@@ -1,7 +1,6 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
-import { getESVersion } from 'elasticsearch-store';
 import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
     makeClient,
@@ -17,16 +16,16 @@ interface ClientCalls {
 }
 
 describe('elasticsearch_bulk', () => {
+    const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
+    const docType = '_doc';
+
     let harness: WorkerTestHarness;
     let clients: any;
     let clientCalls: ClientCalls = {};
-    const esClient = makeClient();
-    const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
+    let esClient: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
         await cleanupIndex(esClient, `${bulkIndex}*`);
     });
 
@@ -34,9 +33,10 @@ describe('elasticsearch_bulk', () => {
         await cleanupIndex(esClient, `${bulkIndex}*`);
     });
 
-    function proxyClient(endpoint: string) {
-        const client = makeClient();
+    async function proxyClient(endpoint: string) {
+        const client = await makeClient();
         const bulkFn = esClient.bulk.bind(client);
+
         client.bulk = (params: BulkIndexDocumentsParams) => {
             clientCalls[endpoint] = params;
             return bulkFn(params);
@@ -50,21 +50,26 @@ describe('elasticsearch_bulk', () => {
         return bulkIndex;
     }
 
-    beforeEach(() => {
+    beforeEach(async () => {
+        const [defaultClient, otherClient] = await Promise.all([
+            proxyClient('default'),
+            proxyClient('otherConnection')
+        ]);
+
         clientCalls = {};
         clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'default',
                 create: () => ({
-                    client: proxyClient('default')
+                    client: defaultClient
                 }),
             },
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
                 create: () => ({
-                    client: proxyClient('otherConnection')
+                    client: otherClient
                 }),
             }
         ];

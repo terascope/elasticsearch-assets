@@ -1,33 +1,32 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
-import { TEST_INDEX_PREFIX, makeClient, ELASTICSEARCH_VERSION } from '../helpers';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 
 describe('elasticsearch reader api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_api_schema_`;
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
-
-    let harness: WorkerTestHarness;
-
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
-            }
-        }
-    ];
+    const docType = '_doc';
 
     const apiName = DEFAULT_API_NAME;
     const harnesses: WorkerTestHarness[] = [];
+
+    let harness: WorkerTestHarness;
+    let clients: any;
+    let esClient: any;
+
+    beforeAll(async () => {
+        esClient = await makeClient();
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                create: () => ({
+                    client: esClient
+                })
+            }
+        ];
+    });
 
     async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchReaderAPIConfig> {
         const defaults = {
@@ -98,12 +97,7 @@ describe('elasticsearch reader api schema', () => {
     });
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
-        if (version <= 5) {
-            await expect(makeSchema({ subslice_by_key: true, type: undefined })).toReject();
-            await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
-        } else {
-            await expect(makeSchema({ subslice_by_key: true })).toReject();
-            await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
-        }
+        await expect(makeSchema({ subslice_by_key: true })).toReject();
+        await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
     });
 });

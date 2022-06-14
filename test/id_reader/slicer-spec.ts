@@ -1,9 +1,7 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SlicerRecoveryData, DataEntity, AnyObject } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     cleanupIndex,
     makeClient,
     populateIndex,
@@ -11,14 +9,11 @@ import {
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
 
+jest.setTimeout(30 * 1000);
+
 describe('id_reader slicer', () => {
-    jest.setTimeout(30 * 1000);
-
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
-    const esClient = makeClient();
-
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
     const field = 'uuid';
 
     // for compatibility tests for older elasticsearch version,
@@ -27,8 +22,10 @@ describe('id_reader slicer', () => {
 
     let harness: SlicerTestHarness;
     let clients: any;
+    let esClient: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
         await populateIndex(esClient, apiReaderIndex, evenSpread.types, bulkData, docType);
         await waitForData(esClient, apiReaderIndex, bulkData.length);
@@ -41,14 +38,11 @@ describe('id_reader slicer', () => {
     beforeEach(() => {
         clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'default',
                 create: () => ({
                     client: esClient
-                }),
-                config: {
-                    apiVersion: ELASTICSEARCH_VERSION
-                }
+                })
             }
         ];
     });

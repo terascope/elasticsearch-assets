@@ -682,10 +682,10 @@
     progress "^2.0.3"
     yargs "^17.2.1"
 
-"@terascope/job-components@^0.56.4":
-  version "0.56.4"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.56.4.tgz#55be34d4b4d026110735bfe657e20915c39cccf7"
-  integrity sha512-Nmy14U75lX+/L44fHJeFzeF+1cKzyzYZrgrDGhpp0QBbJEA+Al0qVAlQaYi5EjyhfdwRUuD8ICV/TVt6QRRDtQ==
+"@terascope/job-components@^0.57.0":
+  version "0.57.0"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.57.0.tgz#626fa923a911c1fd9b2e4bd9e74f7ff92a519c91"
+  integrity sha512-DDL+/PL0y0Ve9IqrXnrZZEvwHG00kptOstefZ4MlHo66Xrq1hS+fF8ao8V8GDGexOANPe2F7iLJcAEKxRPPK5Q==
   dependencies:
     "@terascope/utils" "^0.44.2"
     convict "^4.4.1"

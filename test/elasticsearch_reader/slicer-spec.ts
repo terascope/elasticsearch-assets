@@ -9,12 +9,10 @@ import {
     SliceRequest
 } from '@terascope/job-components';
 import moment from 'moment';
-import { getESVersion } from 'elasticsearch-store';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '@terascope/elasticsearch-asset-apis';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     makeClient,
     cleanupIndex,
     populateIndex,
@@ -23,7 +21,6 @@ import evenSpread from '../fixtures/data/even-spread';
 import unevenSpread from '../fixtures/data/uneven-spread';
 
 describe('elasticsearch_reader slicer', () => {
-    const esClient = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_slicer_`;
 
     function makeIndex(str: string) {
@@ -32,14 +29,10 @@ describe('elasticsearch_reader slicer', () => {
 
     const evenIndex = makeIndex(evenSpread.index);
     const unevenIndex = makeIndex(unevenSpread.index);
-
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
 
     const evenOriginalStart = '2019-04-26T15:00:23.201Z';
     const evenOriginalEnd = '2019-04-26T15:00:23.394Z';
-
-    let harness: SlicerTestHarness;
 
     async function consume(test: SlicerTestHarness): Promise<SliceRequest[]> {
         const results: SliceRequest[] = [];
@@ -59,24 +52,28 @@ describe('elasticsearch_reader slicer', () => {
         return results;
     }
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
-            }
-        }
-    ];
-
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
     const unevenBulkData = unevenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
+    let harness: SlicerTestHarness;
+    let esClient: any;
+    let clients: any;
+
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                create: () => ({
+                    client: esClient
+                })
+            }
+        ];
+
         await cleanupIndex(esClient, makeIndex('*'));
+
         await Promise.all([
             await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType),
             await populateIndex(esClient, unevenIndex, unevenSpread.types, unevenBulkData, docType)

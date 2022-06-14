@@ -1,12 +1,10 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject, ValidatedJobConfig, DataEntity } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     makeClient,
     cleanupIndex,
     populateIndex
@@ -23,31 +21,18 @@ describe('id_reader Schema', () => {
         return `${readerIndex}_${str}`;
     }
 
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
 
     const index = makeIndex(evenSpread.index);
 
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
-            }
-        },
-    ];
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
     async function makeSchema(config: AnyObject = {}): Promise<ESIDReaderConfig> {
         const base: AnyObject = {};
-        if (version <= 5) base.type = docType;
         const opConfig = Object.assign(base, { _op: name, index, id_field_name }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
@@ -65,17 +50,28 @@ describe('id_reader Schema', () => {
         await harness.initialize();
     }
 
-    afterEach(async () => {
-        if (harness) await harness.shutdown();
-    });
-
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                create: () => ({
+                    client: esClient
+                })
+            },
+        ];
         await cleanupIndex(esClient, makeIndex('*'));
         await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
     });
 
     afterAll(async () => {
         await cleanupIndex(esClient, makeIndex('*'));
+    });
+
+    afterEach(async () => {
+        if (harness) await harness.shutdown();
     });
 
     describe('when validating the schema', () => {
@@ -228,17 +224,6 @@ describe('id_reader Schema', () => {
             await expect(testValidation(job2)).toReject();
             await expect(testValidation(job4)).toReject();
             await expect(testValidation(job6)).toReject();
-        });
-
-        it('will throw if version is <=5 and no type is specified', async () => {
-            if (version <= 5) {
-                await expect(makeSchema({ type: '' })).toReject();
-                await expect(makeSchema({ type: null })).toReject();
-                await expect(makeSchema({ type: ['hello', 'world'] })).toReject();
-                await expect(makeSchema({ type: docType })).toResolve();
-            } else {
-                await expect(makeSchema({})).toResolve();
-            }
         });
     });
 });

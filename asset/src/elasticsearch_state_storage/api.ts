@@ -1,27 +1,18 @@
-import { OperationAPI, WorkerContext, ExecutionConfig } from '@terascope/job-components';
+import { OperationAPI } from '@terascope/job-components';
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
-import { ESStateStorageConfig } from './interfaces';
 
 export default class ElasticsearchStateStorage extends OperationAPI {
-    stateStorage: ESCachedStateStorage;
-
-    constructor(
-        context: WorkerContext,
-        apiConfig: ESStateStorageConfig,
-        executionConfig: ExecutionConfig
-    ) {
-        super(context, apiConfig, executionConfig);
-        const { client } = this.context.foundation.getConnection({
-            endpoint: this.apiConfig.connection,
-            type: 'elasticsearch',
-            cached: true
-        });
-        // @ts-expect-error
-        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig);
-    }
+    stateStorage!: ESCachedStateStorage;
 
     async initialize(): Promise<void> {
+        const { client } = await this.context.apis.foundation.createClient({
+            endpoint: this.apiConfig.connection,
+            type: 'elasticsearch-next',
+            cached: true
+        });
         await super.initialize();
+
+        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig as any);
         await this.stateStorage.initialize();
     }
 
