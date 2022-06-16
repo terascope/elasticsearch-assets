@@ -3,7 +3,7 @@ const {
     ELASTICSEARCH_HOST = 'http://localhost:9200',
     ELASTICSEARCH_API_VERSION = '6.5',
     ELASTICSEARCH_VERSION = '6.8.6',
-    OPENSEARCH_PORT = '9200',
+    OPENSEARCH_PORT = '49210',
     OPENSEARCH_HOSTNAME = `http://localhost:${OPENSEARCH_PORT}`,
     OPENSEARCH_USER = 'admin',
     OPENSEARCH_PASSWORD = 'admin',

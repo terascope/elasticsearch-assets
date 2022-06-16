@@ -5,7 +5,8 @@
     "private": true,
     "workspaces": [
         "packages/*",
-        "asset"
+        "asset",
+        "."
     ],
     "scripts": {
         "asset:build": "yarn && yarn run build",
@@ -15,11 +16,13 @@
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
         "lint:fix": "yarn lint --fix",
         "setup": "yarn && yarn build --force",
-        "test:all": "yarn workspaces run test",
-        "test": "jest",
-        "test:7": "ELASTICSEARCH_VERSION=7.x jest",
-        "test:watch": "jest --coverage=false --notify --watch --onlyChanged",
-        "test:debug": "env DEBUG=\"${DEBUG:-*teraslice*}\" jest --detectOpenHandles --coverage=false --runInBand",
+        "test": "ts-scripts test",
+        "test:7": "ELASTICSEARCH_VERSION='7.9.3' yarn run test",
+        "test:8": "ELASTICSEARCH_VERSION='8.1.2' yarn run test",
+        "test:debug": "ts-scripts test --debug",
+        "test:legacy": "LEGACY_CLIENT=true yarn run test",
+        "test:opensearch": "TEST_OPENSEARCH='true' yarn run test",
+        "test:watch": "ts-scripts test --watch . --",
         "publish:changed": "./scripts/publish.sh"
     },
     "repository": {
@@ -42,6 +45,7 @@
         "@terascope/elasticsearch-asset-apis": "^0.9.0",
         "@terascope/eslint-config": "^0.7.1",
         "@terascope/job-components": "^0.57.0",
+        "@terascope/scripts": "^0.48.1",
         "@terascope/teraslice-state-storage": "^0.35.0",
         "@terascope/types": "^0.10.3",
         "@types/bluebird": "^3.5.36",
@@ -60,5 +64,25 @@
         "teraslice-test-harness": "^0.28.2",
         "ts-jest": "^27.1.4",
         "typescript": "^4.6.3"
+    },
+    "terascope": {
+        "root": true,
+        "testSuite": "search",
+        "tests": {
+            "suites": {
+                "unit": [],
+                "search": [
+                    "elasticsearch"
+                ]
+            }
+        },
+        "docker": {
+            "registries": [
+                "terascope/teraslice"
+            ]
+        },
+        "npm": {
+            "registry": "https://registry.npmjs.org/"
+        }
     }
 }

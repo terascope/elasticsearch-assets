@@ -104,7 +104,7 @@ export class ElasticsearchReaderAPI {
     }
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
-        const query = buildQuery(this.config, { ...queryParams, count: 0 }, this.version);
+        const query = buildQuery(this.config, { ...queryParams, count: 0 });
         return this.client.count(query as CountParams);
     }
 
@@ -119,7 +119,7 @@ export class ElasticsearchReaderAPI {
         // if we did go ahead and complete query
         const query = buildQuery(this.config, {
             ...queryParams, count: this.windowSize
-        }, this.version);
+        });
 
         return this.client.search(
             query,
@@ -216,9 +216,9 @@ export class ElasticsearchReaderAPI {
                 throw new Error(`Parameter slicerID must be a number, got ${getTypeOf(config.slicerID)}`);
             }
 
-            if (this.version >= 6 && (
+            if (
                 !isString(this.config.id_field_name) || this.config.id_field_name.length === 0
-            )) {
+            ) {
                 throw new Error(`Parameter idFieldName must be a string, got ${getTypeOf(this.config.id_field_name)}`);
             }
 
@@ -306,7 +306,7 @@ export class ElasticsearchReaderAPI {
             slicerID,
             recoveryData,
         } = config;
-        const { type, size } = this.config;
+        const { size } = this.config;
 
         const baseKeyArray = getKeyArray(this.config.key_type);
         // we slice as not to mutate for when this is called again
@@ -324,11 +324,9 @@ export class ElasticsearchReaderAPI {
             events: this.emitter,
             logger: this.logger,
             keySet: range.keys.slice(),
-            version: this.version,
             baseKeyArray,
             startingKeyDepth: this.config.starting_key_depth,
             countFn: this.count,
-            type,
             size
         };
 
@@ -517,8 +515,7 @@ export class ElasticsearchReaderAPI {
             subslice_key_threshold: subsliceKeyThreshold,
             key_type: keyType,
             id_field_name: idFieldName,
-            starting_key_depth: startingKeyDepth,
-            type
+            starting_key_depth: startingKeyDepth
         } = this.config;
 
         if (!this.windowSize) await this.setWindowSize();
@@ -529,7 +526,6 @@ export class ElasticsearchReaderAPI {
             logger: this.logger,
             id: slicerID,
             events: this.emitter,
-            version: this.version,
             countFn: this.count,
             timeResolution,
             size,
@@ -537,8 +533,7 @@ export class ElasticsearchReaderAPI {
             subsliceKeyThreshold,
             keyType,
             idFieldName,
-            startingKeyDepth,
-            type
+            startingKeyDepth
         };
 
         if (isPersistent) {

@@ -1,16 +1,15 @@
 import 'jest-extended';
 import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
-import { debugLogger, DataEntity, toNumber } from '@terascope/utils';
+import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
-import { createClient } from 'elasticsearch-store';
 import { EventEmitter } from 'events';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
     populateIndex,
     waitForData,
-    ELASTICSEARCH_VERSION,
-    ELASTICSEARCH_HOST
+    makeClient,
+    majorVersion
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -37,14 +36,12 @@ describe('Reader API', () => {
     const evenIndex = makeIndex(evenSpread.index);
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
     const docType = '_doc';
+
     let client: any;
     let readerClient: ElasticsearchReaderClient;
 
     beforeAll(async () => {
-        const { client: esClient, } = await createClient({
-            node: ELASTICSEARCH_HOST,
-        } as any, logger);
-        client = esClient;
+        client = await makeClient();
 
         readerClient = new ElasticsearchReaderClient(
             client,
@@ -71,7 +68,6 @@ describe('Reader API', () => {
             size: 1000,
             date_field_name: 'created',
             query: '*',
-            type: docType,
             response_type: FetchResponseType.data_frame,
             type_config: typeConfig,
             start: null,
@@ -197,8 +193,7 @@ describe('Reader API', () => {
                 config, client: readerClient, logger, emitter
             });
 
-            const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
-            expect(api.version).toEqual(parsedNumber);
+            expect(api.version).toEqual(majorVersion);
         });
 
         // TODO this is badly named method, might need to change in the future
@@ -265,7 +260,6 @@ describe('Reader API', () => {
             size: 1000,
             date_field_name: 'created',
             query: '*',
-            type: docType,
             response_type: FetchResponseType.raw,
             type_config: typeConfig,
             start: null,
@@ -389,8 +383,7 @@ describe('Reader API', () => {
                 config, client: readerClient, logger, emitter
             });
 
-            const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
-            expect(api.version).toEqual(parsedNumber);
+            expect(api.version).toEqual(majorVersion);
         });
 
         // TODO this is badly named method, might need to change in the future
@@ -457,7 +450,6 @@ describe('Reader API', () => {
             size: 1000,
             date_field_name: 'created',
             query: '*',
-            type: docType,
             response_type: FetchResponseType.data_entities,
             type_config: typeConfig,
             start: null,
@@ -574,8 +566,7 @@ describe('Reader API', () => {
                 config: defaultConfig, client: readerClient, logger, emitter
             });
 
-            const parsedNumber = toNumber(ELASTICSEARCH_VERSION.split('.')[0]);
-            expect(api.version).toEqual(parsedNumber);
+            expect(api.version).toEqual(majorVersion);
         });
 
         // TODO this is badly named method, might need to change in the future
