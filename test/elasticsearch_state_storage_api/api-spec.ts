@@ -53,6 +53,7 @@ describe('elasticsearch state storage api', () => {
             },
             {
                 _op: 'noop',
+                apiName: 'apiName'
             },
 
         ],
@@ -69,7 +70,7 @@ describe('elasticsearch state storage api', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }

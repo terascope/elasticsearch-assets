@@ -1,10 +1,7 @@
 import { APIFactory } from '@terascope/job-components';
 import {
-    isNil,
-    isString,
-    isPlainObject,
-    getTypeOf,
-    AnyObject
+    isNil, isString, isPlainObject,
+    getTypeOf, AnyObject
 } from '@terascope/utils';
 import {
     ESReaderOptions, createElasticsearchReaderAPI,

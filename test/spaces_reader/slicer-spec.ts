@@ -27,7 +27,7 @@ describe('spaces_reader slicer', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: defaultClient
                 }),
             }
@@ -66,8 +66,13 @@ describe('spaces_reader slicer', () => {
                 ]
             });
             const myTest = new SlicerTestHarness(job, { assetDir, clients });
-            if (eventHook) myTest.events.on(eventHook.event, eventHook.fn);
+
+            if (eventHook) {
+                myTest.events.on(eventHook.event, eventHook.fn);
+            }
+
             await myTest.initialize(recoveryData);
+
             return myTest;
         }
 

@@ -20,7 +20,7 @@ describe('spaces_reader fetcher', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: defaultClient
                 }),
             }

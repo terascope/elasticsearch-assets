@@ -21,7 +21,7 @@ describe('elasticsearch sender api schema', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }
@@ -55,7 +55,6 @@ describe('elasticsearch sender api schema', () => {
         });
 
         harness = new WorkerTestHarness(job, { clients });
-
         await harness.initialize();
 
         const { apis } = harness.executionContext.config;
@@ -109,14 +108,14 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es1',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }
@@ -156,8 +155,6 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
         });
 
         context = harness.context;
-
-        delete context.sysconfig.terafoundation.connectors.elasticsearch.default;
     });
 
     afterEach(async () => {
@@ -247,13 +244,13 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
         expect(() => schema.validateJob(job)).not.toThrow();
     });
 
-    it('should throw if default is not an es endpoint and routed sender is not an operation', async () => {
+    it('should throw if no valid connection is defined', async () => {
         const job2 = newTestJobConfig({
             max_retries: 3,
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    connection: 'default',
+                    connection: 'test-whatever',
                     index: 'test-index',
                 }
             ],

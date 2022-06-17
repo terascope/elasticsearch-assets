@@ -1,9 +1,6 @@
 import {
-    ParallelSlicer,
-    SlicerFn,
-    AnyObject,
-    isFunction,
-    SlicerRecoveryData,
+    ParallelSlicer, SlicerFn, AnyObject,
+    isFunction, SlicerRecoveryData,
 } from '@terascope/job-components';
 import moment from 'moment';
 import {

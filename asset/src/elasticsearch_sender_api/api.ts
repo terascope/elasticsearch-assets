@@ -1,6 +1,7 @@
 import { APIFactory } from '@terascope/job-components';
 import {
-    isNil, isString, isPlainObject, AnyObject, isNumber, getTypeOf
+    isNil, isString, isPlainObject,
+    AnyObject, isNumber, getTypeOf
 } from '@terascope/utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {

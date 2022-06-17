@@ -1,13 +1,7 @@
 import {
-    ConvictSchema,
-    ValidatedJobConfig,
-    get,
-    AnyObject,
-    isString,
-    getTypeOf,
-    cloneDeep,
-    isNumber,
-    isNotNil
+    ConvictSchema, ValidatedJobConfig, get,
+    AnyObject, isString, getTypeOf, cloneDeep,
+    isNumber, isNotNil
 } from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from './interfaces';
 import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
@@ -108,10 +102,14 @@ export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
             return false;
         });
 
-        if (opConfig == null) throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
+        if (opConfig == null) {
+            throw new Error('Could not find elasticsearch_bulk operation in jobConfig');
+        }
 
-        const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch');
-        if (elasticConnectors == null) throw new Error('Could not find elasticsearch connector in terafoundation config');
+        const elasticConnectors = get(this.context, 'sysconfig.terafoundation.connectors.elasticsearch-next');
+        if (elasticConnectors == null) {
+            throw new Error('Could not find elasticsearch connector in terafoundation config');
+        }
 
         const {
             api_name, ...newConfig

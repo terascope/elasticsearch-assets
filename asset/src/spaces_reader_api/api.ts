@@ -1,6 +1,7 @@
 import { APIFactory } from '@terascope/job-components';
 import {
-    isNil, isString, isPlainObject, getTypeOf, AnyObject, isNumber
+    isNil, isString, isPlainObject,
+    getTypeOf, AnyObject, isNumber
 } from '@terascope/utils';
 import { createSpacesReaderAPI, SpacesAPIConfig, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
 

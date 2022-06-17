@@ -1,10 +1,6 @@
 import {
-    ConvictSchema,
-    AnyObject,
-    cloneDeep,
-    ValidatedJobConfig,
-    isObjectEntity,
-    getTypeOf
+    ConvictSchema, AnyObject, cloneDeep,
+    ValidatedJobConfig, isObjectEntity, getTypeOf
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';

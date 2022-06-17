@@ -1,9 +1,6 @@
 import {
-    ConvictSchema,
-    ValidatedJobConfig,
-    AnyObject,
-    getTypeOf,
-    isNil
+    ConvictSchema, ValidatedJobConfig, AnyObject,
+    getTypeOf, isNil
 } from '@terascope/job-components';
 import { opSchema } from '../__lib/schema';
 import { ESReaderConfig } from './interfaces';

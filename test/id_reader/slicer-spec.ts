@@ -40,7 +40,7 @@ describe('id_reader slicer', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             }

@@ -5,14 +5,7 @@ export default class ElasticsearchStateStorage extends OperationAPI {
     stateStorage!: ESCachedStateStorage;
 
     async initialize(): Promise<void> {
-        const { client } = await this.context.apis.foundation.createClient({
-            endpoint: this.apiConfig.connection,
-            type: 'elasticsearch-next',
-            cached: true
-        });
         await super.initialize();
-
-        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig as any);
         await this.stateStorage.initialize();
     }
 
@@ -22,6 +15,16 @@ export default class ElasticsearchStateStorage extends OperationAPI {
     }
 
     async createAPI(): Promise<ESCachedStateStorage> {
+        if (this.stateStorage) {
+            return this.stateStorage;
+        }
+
+        const { client } = await this.context.apis.foundation.createClient({
+            endpoint: this.apiConfig.connection,
+            type: 'elasticsearch-next',
+            cached: true
+        });
+        this.stateStorage = new ESCachedStateStorage(client, this.logger, this.apiConfig as any);
         return this.stateStorage;
     }
 }

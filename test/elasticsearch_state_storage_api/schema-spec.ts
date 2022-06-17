@@ -20,7 +20,7 @@ describe('elasticsearch state storage api schema', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }

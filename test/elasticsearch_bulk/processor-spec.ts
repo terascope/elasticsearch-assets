@@ -61,14 +61,14 @@ describe('elasticsearch_bulk', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: defaultClient
                 }),
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
-                create: () => ({
+                createClient: async () => ({
                     client: otherClient
                 }),
             }

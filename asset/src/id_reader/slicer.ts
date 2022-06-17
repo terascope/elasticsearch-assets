@@ -1,7 +1,5 @@
 import {
-    ParallelSlicer,
-    SlicerFn,
-    SlicerRecoveryData
+    ParallelSlicer, SlicerFn, SlicerRecoveryData
 } from '@terascope/job-components';
 import { ElasticsearchReaderAPI, IDSlicerRanges } from '@terascope/elasticsearch-asset-apis';
 import { ESIDReaderConfig } from './interfaces';

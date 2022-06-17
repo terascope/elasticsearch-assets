@@ -33,7 +33,7 @@ describe('elasticsearch_reader fetcher', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             },

@@ -46,14 +46,14 @@ describe('id_reader fetcher', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             }

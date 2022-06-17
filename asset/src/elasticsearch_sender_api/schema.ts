@@ -1,10 +1,6 @@
 import {
-    ConvictSchema,
-    AnyObject,
-    cloneDeep,
-    ValidatedJobConfig,
-    APIConfig,
-    getOpConfig
+    ConvictSchema, AnyObject, cloneDeep,
+    ValidatedJobConfig, APIConfig, getOpConfig,
 } from '@terascope/job-components';
 import { ElasticsearchAPISenderConfig, DEFAULT_API_NAME } from './interfaces';
 import { isValidIndex } from '../__lib/schema';
@@ -39,16 +35,17 @@ export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> 
         const { connectors } = this.context.sysconfig.terafoundation;
 
         // hack to get around default connection check until schema updates and further discussion
-        if (connectors.elasticsearch.default == null && getOpConfig(job, 'routed_sender')) {
+        if (connectors['elasticsearch-next'].default == null && getOpConfig(job, 'routed_sender')) {
             this._applyRoutedSenderConnection(job, apiConfigs);
         }
 
         apiConfigs.forEach((apiConfig: AnyObject) => {
             const { connection } = apiConfig;
+            const endpointConfig = connectors['elasticsearch-next'][connection];
 
-            const endpointConfig = connectors.elasticsearch[connection];
-
-            if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+            if (endpointConfig == null) {
+                throw new Error(`Could not find elasticsearch-next endpoint configuration for connection ${connection}`);
+            }
         });
     }
 

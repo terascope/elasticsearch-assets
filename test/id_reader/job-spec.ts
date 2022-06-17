@@ -44,14 +44,14 @@ describe('id_reader job', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             }

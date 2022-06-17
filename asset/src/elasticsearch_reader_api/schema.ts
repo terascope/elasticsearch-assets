@@ -1,13 +1,7 @@
 import {
-    ConvictSchema,
-    AnyObject,
-    ValidatedJobConfig,
-    toNumber,
-    isString,
-    isNumber,
-    getTypeOf,
-    isNotNil,
-    has
+    ConvictSchema, AnyObject, ValidatedJobConfig,
+    toNumber, isString, isNumber, getTypeOf,
+    isNotNil, has
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -263,18 +257,22 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
             const { connection, id_field_name, subslice_by_key } = apiConfig;
 
             const { connectors } = this.context.sysconfig.terafoundation;
-            const endpointConfig = connectors.elasticsearch[connection];
+            const endpointConfig = connectors['elasticsearch-next'][connection];
 
-            if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+            if (endpointConfig == null) {
+                throw new Error(`Could not find elasticsearch-next endpoint configuration for connection ${connection}`);
+            }
 
             elasticAPI({}, logger).validateGeoParameters(apiConfig);
 
-            const apiVersion = endpointConfig.apiVersion
-                ? toNumber(endpointConfig.apiVersion.charAt(0))
-                : 6;
-
             if (subslice_by_key) {
-                if (apiVersion > 5 && (id_field_name == null || !isString(id_field_name) || id_field_name.length === 0)) throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
+                if (
+                    id_field_name == null
+                    || !isString(id_field_name)
+                    || id_field_name.length === 0
+                ) {
+                    throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
+                }
             }
 
             if (apiConfig.key_range && job.slicers > apiConfig.key_range.length) {

@@ -57,7 +57,7 @@ describe('id_reader Schema', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             },

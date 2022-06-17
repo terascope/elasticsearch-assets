@@ -21,7 +21,7 @@ describe('elasticsearch reader api schema', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 })
             }

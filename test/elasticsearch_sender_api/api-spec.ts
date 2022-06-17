@@ -20,7 +20,7 @@ describe('elasticsearch sender api', () => {
             {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }
