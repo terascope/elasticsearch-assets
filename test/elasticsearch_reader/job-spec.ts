@@ -1,10 +1,8 @@
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { getESVersion } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     getTotalSliceCounts,
     makeClient,
     cleanupIndex,
@@ -13,15 +11,9 @@ import {
 import evenSpread from '../fixtures/data/even-spread';
 
 describe('date_reader job', () => {
-    const esClient = makeClient();
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
     const date_field_name = 'created';
-    const version = getESVersion(esClient);
-
-    let harness: JobTestHarness;
-    let clients: any;
-    const docType = version === 5 ? 'events' : '_doc';
-    // in es5 this should be ignored
+    const docType = '_doc';
     const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     function makeIndex(str: string) {
@@ -30,7 +22,12 @@ describe('date_reader job', () => {
 
     const evenIndex = makeIndex(`${evenSpread.index}-2020.0.1`);
 
+    let harness: JobTestHarness;
+    let clients: any;
+    let esClient: any;
+
     beforeAll(async () => {
+        esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
         await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
     });
@@ -42,24 +39,18 @@ describe('date_reader job', () => {
     beforeEach(() => {
         clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
-                }),
-                config: {
-                    apiVersion: ELASTICSEARCH_VERSION
-                }
+                })
             },
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
-                }),
-                config: {
-                    apiVersion: ELASTICSEARCH_VERSION
-                }
+                })
             }
         ];
     });

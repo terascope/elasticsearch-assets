@@ -2,9 +2,8 @@ import 'jest-extended';
 import {
     newTestJobConfig, AnyObject
 } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { makeClient, ELASTICSEARCH_VERSION } from '../helpers';
+import { makeClient } from '../helpers';
 import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces';
 
 describe('spaces-reader schema', () => {
@@ -12,24 +11,24 @@ describe('spaces-reader schema', () => {
     const index = 'some_index';
     const name = 'spaces_reader';
 
-    const esClient = makeClient();
+    const docType = '_doc';
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
+    let esClient: any;
+    let clients: any;
+
+    beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
             }
-        },
-    ];
-
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
+        ];
+    });
 
     async function makeTest(opConfig: AnyObject, apiConfig?: AnyObject) {
         const readerConfig = Object.assign({

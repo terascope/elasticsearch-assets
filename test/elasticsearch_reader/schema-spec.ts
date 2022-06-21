@@ -1,13 +1,11 @@
 import 'jest-extended';
 import { AnyObject, newTestJobConfig, DataEntity } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     makeClient,
     cleanupIndex,
     populateIndex
@@ -22,30 +20,26 @@ describe('elasticsearch_reader schema', () => {
         return `${readerIndex}_${str}`;
     }
 
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
-
+    const docType = '_doc';
     const index = makeIndex(evenSpread.index);
-
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
-            }
-        }
-    ];
-
+    let clients: any;
     let harness: WorkerTestHarness;
+    let esClient: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                })
+            }
+        ];
+
         await cleanupIndex(esClient, makeIndex('*'));
         await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
     });
@@ -172,14 +166,9 @@ describe('elasticsearch_reader schema', () => {
         await expect(makeSchema({ time_resolution: 'something' })).toReject();
     });
 
-    it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
-        if (version <= 5) {
-            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
-            await expect(makeSchema({ subslice_by_key: true, type: docType })).toResolve();
-        } else {
-            await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
-            await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
-        }
+    it('should throw if in subslice_by_key is set', async () => {
+        await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
+        await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
     });
 
     it('should throw if api is created but opConfig has index set to another value', async () => {

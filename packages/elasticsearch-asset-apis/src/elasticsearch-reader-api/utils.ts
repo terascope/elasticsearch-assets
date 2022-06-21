@@ -9,7 +9,7 @@ import { ESReaderOptions, ReaderSlice } from './interfaces';
  * @todo this should be switch to return an xLucene query
 */
 export function buildQuery(
-    opConfig: ESReaderOptions, params: ReaderSlice, version: number
+    opConfig: ESReaderOptions, params: ReaderSlice
 ): SearchParams {
     if (params.count == null) {
         throw new Error('Expected count to buildQuery');
@@ -17,7 +17,7 @@ export function buildQuery(
     const query: SearchParams = {
         index: opConfig.index,
         size: params.count,
-        body: _buildRangeQuery(opConfig, params, version),
+        body: _buildRangeQuery(opConfig, params),
     };
 
     if (opConfig.fields) query._source = opConfig.fields;
@@ -26,7 +26,7 @@ export function buildQuery(
 }
 
 function _buildRangeQuery(
-    opConfig: ESReaderOptions, params: ReaderSlice, version: number
+    opConfig: ESReaderOptions, params: ReaderSlice
 ) {
     const body: AnyObject = {
         query: {
@@ -48,30 +48,17 @@ function _buildRangeQuery(
     }
     // elasticsearch _id based query, we keep for v5 and lower
     if (params.keys?.length) {
-        if (version >= 6) {
-            const idFieldName = opConfig.id_field_name;
-            if (!isString(idFieldName)) {
-                throw new Error(`Missing id_field_name for elasticsearch ${version} id slicer`);
-            }
-            body.query.bool.must.push({
-                bool: {
-                    should: params.keys.map((key) => ({
-                        wildcard: { [idFieldName]: `${key}*` }
-                    }))
-                }
-            });
-        } else {
-            if (!isString(opConfig.type)) {
-                throw new Error(`Missing type for elasticsearch ${version} id slicer`);
-            }
-            body.query.bool.must.push({
-                bool: {
-                    should: params.keys.map((key) => ({
-                        wildcard: { _uid: `${opConfig.type}#${key}*` }
-                    }))
-                }
-            });
+        const idFieldName = opConfig.id_field_name;
+        if (!isString(idFieldName)) {
+            throw new Error('Missing id_field_name for id slicer');
         }
+        body.query.bool.must.push({
+            bool: {
+                should: params.keys.map((key) => ({
+                    wildcard: { [idFieldName]: `${key}*` }
+                }))
+            }
+        });
     }
 
     // elasticsearch lucene based query

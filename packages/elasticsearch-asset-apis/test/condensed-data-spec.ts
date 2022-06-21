@@ -2,13 +2,12 @@ import 'jest-extended';
 import { EventEmitter } from 'events';
 import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
-import { createClient } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
     populateIndex,
     waitForData,
-    ELASTICSEARCH_HOST
+    makeClient
 } from './helpers';
 import condensedData from './fixtures/data/condensed-spread';
 import {
@@ -39,10 +38,7 @@ describe('ReaderAPI with condensed time data', () => {
     let readerClient: ElasticsearchReaderClient;
 
     beforeAll(async () => {
-        const { client: esClient, } = await createClient({
-            node: ELASTICSEARCH_HOST,
-        } as any, logger);
-        client = esClient;
+        client = await makeClient();
 
         readerClient = new ElasticsearchReaderClient(
             client,
@@ -69,7 +65,6 @@ describe('ReaderAPI with condensed time data', () => {
         size: 100_000,
         date_field_name: 'created',
         query: '*',
-        type: docType,
         response_type: FetchResponseType.data_entities,
         type_config: typeConfig,
         start: null,

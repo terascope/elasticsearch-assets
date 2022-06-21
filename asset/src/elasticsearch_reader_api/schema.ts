@@ -1,13 +1,7 @@
 import {
-    ConvictSchema,
-    AnyObject,
-    ValidatedJobConfig,
-    toNumber,
-    isString,
-    isNumber,
-    getTypeOf,
-    isNotNil,
-    has
+    ConvictSchema, AnyObject, ValidatedJobConfig,
+    toNumber, isString, isNumber, getTypeOf,
+    isNotNil, has
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -144,11 +138,6 @@ export const schema = {
         default: 'base64url',
         format: Object.keys(IDType)
     },
-    type: {
-        doc: 'The type of the records in the index, only used if subslice_by_key is set to true and in elasticsearch <= v5 ',
-        default: null,
-        format: 'optional_String'
-    },
     time_resolution: {
         doc: 'indicate if data reading has second or millisecond resolutions',
         default: 's',
@@ -265,25 +254,25 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
                 delete apiConfig.field;
             }
 
-            const configType = apiConfig.type;
             const { connection, id_field_name, subslice_by_key } = apiConfig;
 
             const { connectors } = this.context.sysconfig.terafoundation;
-            const endpointConfig = connectors.elasticsearch[connection];
+            const endpointConfig = connectors['elasticsearch-next'][connection];
 
-            if (endpointConfig == null) throw new Error(`Could not find elasticsearch endpoint configuration for connection ${connection}`);
+            if (endpointConfig == null) {
+                throw new Error(`Could not find elasticsearch-next endpoint configuration for connection ${connection}`);
+            }
 
             elasticAPI({}, logger).validateGeoParameters(apiConfig);
 
-            const apiVersion = endpointConfig.apiVersion
-                ? toNumber(endpointConfig.apiVersion.charAt(0))
-                : 6;
-
-            if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
-
             if (subslice_by_key) {
-                if (apiVersion <= 5 && (configType == null || !isString(configType) || configType.length === 0)) throw new Error(`For elasticsearch apiVersion ${endpointConfig.apiVersion}, a type must be specified`);
-                if (apiVersion > 5 && (id_field_name == null || !isString(id_field_name) || id_field_name.length === 0)) throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
+                if (
+                    id_field_name == null
+                    || !isString(id_field_name)
+                    || id_field_name.length === 0
+                ) {
+                    throw new Error('If subslice_by_key is set to true, the id_field_name parameter of the documents must also be set');
+                }
             }
 
             if (apiConfig.key_range && job.slicers > apiConfig.key_range.length) {

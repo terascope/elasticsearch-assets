@@ -1,7 +1,6 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { DataEntity } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
 import {
     TEST_INDEX_PREFIX,
@@ -14,19 +13,9 @@ import {
 describe('elasticsearch state storage api', () => {
     const idField = '_key';
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'type' : '_doc';
+    const docType = '_doc';
+
     let api: ESCachedStateStorage;
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
 
     function addTestMeta(obj: any, index: number) {
         return DataEntity.make(obj, { [idField]: index + 1 });
@@ -64,14 +53,28 @@ describe('elasticsearch state storage api', () => {
             },
             {
                 _op: 'noop',
+                apiName: 'apiName'
             },
 
         ],
     });
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
+            }
+        ];
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
     });
 

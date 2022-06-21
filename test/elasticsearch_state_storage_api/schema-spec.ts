@@ -1,29 +1,31 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
 import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces';
 
 describe('elasticsearch state storage api schema', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'type' : '_doc';
+    const docType = '_doc';
+    const apiName = 'elasticsearch_state_storage';
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
+    beforeAll(async () => {
+        esClient = await makeClient();
 
-    const apiName = 'elasticsearch_state_storage';
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
+            }
+        ];
+    });
 
     async function makeSchema(config: AnyObject = {}): Promise<ESStateStorageConfig> {
         const base: AnyObject = {
@@ -32,7 +34,7 @@ describe('elasticsearch state storage api schema', () => {
             type: docType,
             cache_size: 100000,
         };
-        if (version <= 5) base.type = docType;
+
         const apiConfig = Object.assign({ _name: apiName }, base, config);
 
         const job = newTestJobConfig({

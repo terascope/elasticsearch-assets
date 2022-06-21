@@ -69,12 +69,10 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         primaryRange,
         windowState,
         countFn,
-        version,
         subsliceByKey,
         subsliceKeyThreshold,
         idFieldName = null,
         startingKeyDepth = 0,
-        type = null,
         keyType = IDType.base64url
     } = args;
 
@@ -260,8 +258,6 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             keySet: keyArray,
             baseKeyArray: keyArray,
             countFn,
-            version,
-            type,
             size: querySize,
             startingKeyDepth
         };

@@ -2,9 +2,10 @@ import 'jest-extended';
 import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import elasticAPI from '@terascope/elasticsearch-api';
-import { createClient } from 'elasticsearch-store';
-import { cleanupIndex, fetch } from '../test/helpers/elasticsearch';
-import { TEST_INDEX_PREFIX, waitForData, ELASTICSEARCH_HOST } from '../test/helpers';
+import {
+    TEST_INDEX_PREFIX, waitForData, cleanupIndex,
+    fetch, makeClient
+} from '../test/helpers';
 import { createElasticsearchBulkSender } from '../src/elasticsearch-bulk-sender';
 
 describe('elasticsearch bulk sender module', () => {
@@ -18,10 +19,7 @@ describe('elasticsearch bulk sender module', () => {
     let type: string;
 
     beforeAll(async () => {
-        const { client: rawClient } = await createClient({
-            node: ELASTICSEARCH_HOST,
-        } as any, logger);
-        client = rawClient;
+        client = await makeClient();
         apiClient = elasticAPI(client, logger);
         type = apiClient.isElasticsearch6() ? 'events' : '_doc';
         await cleanupIndex(client, `${senderIndex}*`);
@@ -65,7 +63,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 index: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type
                 }
             });
@@ -84,7 +82,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 index: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: '_doc'
                 }
             });
@@ -102,7 +100,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 index: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: key
                 }
@@ -121,7 +119,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 index: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                 }
             });
@@ -154,7 +152,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 create: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                 }
             });
@@ -169,7 +167,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 update: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                 }
             });
@@ -187,7 +185,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 update: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                 }
             });
@@ -210,7 +208,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(action).toEqual({
                 delete: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: key
                 }
@@ -236,7 +234,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[0].action).toEqual({
                 create: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: 'one'
                 }
@@ -246,7 +244,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[1].action).toEqual({
                 delete: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: 'bar1'
                 }
@@ -254,7 +252,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[2].action).toEqual({
                 create: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: 'two'
                 }
@@ -264,7 +262,7 @@ describe('elasticsearch bulk sender module', () => {
 
             expect(bulkReq[3].action).toEqual({
                 delete: {
-                    _index: 'es_assets__sender_api_',
+                    _index: 'ts_test__sender_api_',
                     _type: type,
                     _id: 'bar2'
                 }

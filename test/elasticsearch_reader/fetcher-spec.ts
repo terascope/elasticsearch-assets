@@ -1,10 +1,8 @@
 import 'jest-extended';
 import { DataEntity, AnyObject } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_VERSION,
     makeClient,
     cleanupIndex,
     populateIndex
@@ -12,7 +10,6 @@ import {
 import evenSpread from '../fixtures/data/even-spread';
 
 describe('elasticsearch_reader fetcher', () => {
-    const esClient = makeClient();
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher_`;
 
     function makeIndex(str: string) {
@@ -20,30 +17,29 @@ describe('elasticsearch_reader fetcher', () => {
     }
 
     const evenIndex = makeIndex(evenSpread.index);
-
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
 
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-            config: {
-                apiVersion: ELASTICSEARCH_VERSION
-            }
-        },
-
-    ];
-
     let workerHarness: WorkerTestHarness;
     let jobHarness: JobTestHarness;
+    let esClient: any;
+    let clients: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
+            },
+
+        ];
+
         await cleanupIndex(esClient, makeIndex('*'));
         await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
     });
@@ -72,7 +68,9 @@ describe('elasticsearch_reader fetcher', () => {
     async function makeFetcherTest(config: AnyObject = {}) {
         const opConfig = Object.assign({}, defaults, config);
         workerHarness = WorkerTestHarness.testFetcher(opConfig, { clients });
+
         await workerHarness.initialize();
+
         return workerHarness;
     }
 
@@ -86,7 +84,9 @@ describe('elasticsearch_reader fetcher', () => {
         });
 
         jobHarness = new JobTestHarness(job, { clients });
+
         await jobHarness.initialize();
+
         return jobHarness;
     }
 

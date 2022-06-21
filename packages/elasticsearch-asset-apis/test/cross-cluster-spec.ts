@@ -1,15 +1,14 @@
 import 'jest-extended';
-import { createClient } from 'elasticsearch-store';
 import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
     TEST_INDEX_PREFIX,
-    ELASTICSEARCH_HOST,
     cleanupIndex,
     populateIndex,
     waitForData,
+    makeClient
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -41,10 +40,7 @@ describe('Reader API', () => {
     let readerClient: ElasticsearchReaderClient;
 
     beforeAll(async () => {
-        const { client: esClient, } = await createClient({
-            node: ELASTICSEARCH_HOST,
-        } as any, logger);
-        client = esClient;
+        client = await makeClient();
 
         readerClient = new ElasticsearchReaderClient(
             client,

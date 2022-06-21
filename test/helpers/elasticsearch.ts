@@ -1,23 +1,46 @@
-import { fixMappingRequest, getESVersion } from 'elasticsearch-store';
+import { fixMappingRequest, getESVersion, createClient } from 'elasticsearch-store';
 import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import {
     DataEntity, AnyObject, debugLogger, pDelay, uniq
 } from '@terascope/utils';
 import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
 import elasticAPI from '@terascope/elasticsearch-api';
-import { ELASTICSEARCH_HOST, ELASTICSEARCH_VERSION } from './config';
+import {
+    ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION,
+    OPENSEARCH_HOST, ELASTICSEARCH_VERSION
+} from './config';
+
+const semver = ELASTICSEARCH_VERSION.split('.');
+const majorVersion = Number(semver[0]);
+
+const isOpensearchTest = process.env.TEST_OPENSEARCH != null;
+const isES8ClientTest = !isOpensearchTest && majorVersion === 8;
 
 const logger = debugLogger('elasticsearch_helpers');
 
 // automatically set the timeout to 30s when using elasticsearch
 jest.setTimeout(30000);
 
-export function makeClient(): Client {
-    return new Client({
-        host: ELASTICSEARCH_HOST,
-        log: 'error',
-        apiVersion: ELASTICSEARCH_VERSION,
+export async function makeClient() {
+    let host = ELASTICSEARCH_HOST;
+
+    if (process.env.TEST_OPENSEARCH) {
+        host = OPENSEARCH_HOST;
+    }
+
+    if (process.env.LEGACY_CLIENT != null) {
+        return new Client({
+            host,
+            log: 'error',
+            apiVersion: ELASTICSEARCH_API_VERSION,
+        });
+    }
+
+    const { client } = await createClient({
+        node: host,
     });
+
+    return client as unknown as Client;
 }
 
 export function formatUploadData(
@@ -28,7 +51,9 @@ export function formatUploadData(
     data.forEach((record) => {
         const meta: any = { _index: index };
 
-        meta._type = type || '_doc';
+        if (!isES8ClientTest) {
+            meta._type = '_doc';
+        }
 
         if (DataEntity.isDataEntity(record) && record.getKey()) {
             meta._id = record.getKey();
@@ -135,18 +160,25 @@ export async function cleanupIndex(
     client: Client, index: string, template?: string
 ): Promise<void> {
     await client.indices
-        .delete({
-            index,
-            requestTimeout: 3000,
-        })
-        .catch(() => {});
+        .delete({ index })
+        .catch((err) => {
+            // ignore index not found exceptions
+            const errType = err.meta ? err.meta : err;
+            if (errType.statusCode !== 404) {
+                throw err;
+            }
+        });
 
     if (template) {
         await client.indices
             .deleteTemplate({
                 name: template,
-                requestTimeout: 3000,
             })
-            .catch(() => {});
+            .catch((err) => {
+                const errType = err.meta ? err.meta : err;
+                if (errType.statusCode !== 404) {
+                    throw err;
+                }
+            });
     }
 }

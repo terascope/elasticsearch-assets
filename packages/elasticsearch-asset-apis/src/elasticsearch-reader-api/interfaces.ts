@@ -193,9 +193,7 @@ export interface IDSlicerArgs {
     baseKeyArray: readonly string[];
     events: EventEmitter;
     startingKeyDepth: number;
-    version: number;
     countFn: CountFn;
-    type?: string | null;
     size: number;
 }
 
@@ -227,7 +225,6 @@ export interface SlicerArgs {
     subsliceKeyThreshold?: number;
     idFieldName?: string,
     keyType?: IDType;
-    type?: string | null;
     startingKeyDepth?: number,
     interval?: ParsedInterval;
     latencyInterval?: ParsedInterval;
@@ -252,10 +249,6 @@ export interface SlicerArgs {
      * This is only used for persistent jobs
     */
     windowState?: WindowState;
-    /**
-     * The elasticsearch server version (only the major version)
-    */
-    version: number;
     countFn: CountFn;
 }
 
@@ -351,7 +344,6 @@ export interface ESReaderOptions {
     subslice_key_threshold: number;
     key_type: IDType;
     key_range?: null | string[];
-    type?: string | null;
     time_resolution: moment.unitOfTime.Base;
     geo_field?: string;
     geo_box_top_left?: string;

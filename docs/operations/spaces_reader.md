@@ -69,7 +69,6 @@ const expected fetchResults = [
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
 | api_name | name of api to be used by spaces reader | String | optional, defaults to 'spaces_reader_api' |
 | index | Which index to read from | String | required |
-| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id|String | required if using elasticsearch v5, optional otherwise, defaults to '_doc' |
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000 |
 | start | The start date to which it will read from | String/Number/ elasticsearch date math syntax | optional, inclusive , if not provided the index will be queried for earliest date, this date will be reflected in the opConfig saved in the execution context |
 | end | The end date to which it will read to| String/Number/ elasticsearch date math syntax | optional, exclusive, if not provided the index will be queried for latest date, this date will be reflected in the opConfig saved in the execution context |
@@ -202,7 +201,7 @@ Example of metadata from a fetched record
 // example record in elasticsearch
 {
     "_index" : "test_index",
-    "_type" : "events",
+    "_type" : "_doc",
     "_id" : "ltyRQW4B8WLke7PkER8L",
     "_score" : 1.0,
     "_source" : {
@@ -230,7 +229,7 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
+    _type:  "_doc",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

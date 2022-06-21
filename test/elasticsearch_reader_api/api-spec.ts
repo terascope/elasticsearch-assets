@@ -1,7 +1,6 @@
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { getESVersion } from 'elasticsearch-store';
 import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces';
 import {
     TEST_INDEX_PREFIX,
@@ -13,25 +12,26 @@ import {
 
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
-    const esClient = makeClient();
 
-    const version = getESVersion(esClient);
-
-    const docType = version === 5 ? 'events' : '_doc';
-
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
+    const docType = '_doc';
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
     beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
+            }
+        ];
+
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
 
         const data = [{ some: 'data' }, { other: 'data' }];
@@ -95,8 +95,6 @@ describe('elasticsearch reader api', () => {
         expect(api.config.index).toEqual(apiReaderIndex);
         expect(api.fetch).toBeFunction();
         expect(api.count).toBeFunction();
-
-        expect(api.version).toEqual(version);
 
         expect(apiFactory.size).toEqual(1);
     });

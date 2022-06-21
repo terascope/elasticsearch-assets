@@ -1,5 +1,6 @@
 import {
-    ConvictSchema, AnyObject, isNumber, getTypeOf, isString
+    ConvictSchema, AnyObject, isNumber,
+    getTypeOf, isString
 } from '@terascope/job-components';
 import { ESStateStorageConfig } from './interfaces';
 

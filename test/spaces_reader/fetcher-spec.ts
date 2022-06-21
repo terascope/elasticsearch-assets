@@ -18,9 +18,9 @@ describe('spaces_reader fetcher', () => {
         defaultClient = new MockClient();
         clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'default',
-                create: () => ({
+                createClient: async () => ({
                     client: defaultClient
                 }),
             }

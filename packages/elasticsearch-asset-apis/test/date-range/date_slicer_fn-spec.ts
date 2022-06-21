@@ -80,8 +80,7 @@ describe('date slicer function', () => {
             subslice_key_threshold: subsliceKeyThreshold,
             key_type: keyType,
             id_field_name: idFieldName,
-            starting_key_depth: startingKeyDepth,
-            type
+            starting_key_depth: startingKeyDepth
         } = opConfig;
 
         const slicerArgs: SlicerArgs = {
@@ -93,7 +92,6 @@ describe('date slicer function', () => {
             keyType,
             idFieldName,
             startingKeyDepth,
-            type,
             numOfSlicers: slicers,
             lifecycle,
             logger,
@@ -104,7 +102,6 @@ describe('date slicer function', () => {
             primaryRange,
             windowState: _windowState,
             countFn,
-            version: 6
         };
 
         return dateSlicer(slicerArgs);

@@ -1,10 +1,7 @@
 import { APIFactory } from '@terascope/job-components';
 import {
-    isNil,
-    isString,
-    isPlainObject,
-    getTypeOf,
-    AnyObject
+    isNil, isString, isPlainObject,
+    getTypeOf, AnyObject
 } from '@terascope/utils';
 import {
     ESReaderOptions, createElasticsearchReaderAPI,
@@ -36,9 +33,9 @@ ElasticsearchReaderAPI, Partial<ESReaderOptions>
     ): Promise<{ client: ElasticsearchReaderAPI, config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         const { connection } = config;
-        const { client: esClient } = this.context.foundation.getConnection({
+        const { client: esClient } = await this.context.apis.foundation.createClient({
             endpoint: connection,
-            type: 'elasticsearch',
+            type: 'elasticsearch-next',
             cached: true
         });
         const emitter = this.context.apis.foundation.getSystemEvents();

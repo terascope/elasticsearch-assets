@@ -2,28 +2,31 @@ import 'jest-extended';
 import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject, TestContext } from '@terascope/job-components';
-import { getESVersion } from 'elasticsearch-store';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema';
 
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
-    const esClient = makeClient();
-    const version = getESVersion(esClient);
-    const docType = version === 5 ? 'events' : '_doc';
+    const docType = '_doc';
 
     let harness: WorkerTestHarness;
+    let esClient: any;
+    let clients: any;
 
-    const clients = [
-        {
-            type: 'elasticsearch',
-            endpoint: 'default',
-            create: () => ({
-                client: esClient
-            }),
-        }
-    ];
+    beforeAll(async () => {
+        esClient = await makeClient();
+
+        clients = [
+            {
+                type: 'elasticsearch-next',
+                endpoint: 'default',
+                createClient: async () => ({
+                    client: esClient
+                }),
+            }
+        ];
+    });
 
     const apiName = DEFAULT_API_NAME;
 
@@ -52,7 +55,6 @@ describe('elasticsearch sender api schema', () => {
         });
 
         harness = new WorkerTestHarness(job, { clients });
-
         await harness.initialize();
 
         const { apis } = harness.executionContext.config;
@@ -100,20 +102,20 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
 
     beforeAll(async () => {
         // need this to create valid context to remove the default es connection
-        const esClient = makeClient();
+        const esClient = await makeClient();
 
         const clients = [
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'test-es',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             },
             {
-                type: 'elasticsearch',
+                type: 'elasticsearch-next',
                 endpoint: 'test-es1',
-                create: () => ({
+                createClient: async () => ({
                     client: esClient
                 }),
             }
@@ -153,8 +155,6 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
         });
 
         context = harness.context;
-
-        delete context.sysconfig.terafoundation.connectors.elasticsearch.default;
     });
 
     afterEach(async () => {
@@ -244,13 +244,13 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
         expect(() => schema.validateJob(job)).not.toThrow();
     });
 
-    it('should throw if default is not an es endpoint and routed sender is not an operation', async () => {
+    it('should throw if no valid connection is defined', async () => {
         const job2 = newTestJobConfig({
             max_retries: 3,
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    connection: 'default',
+                    connection: 'test-whatever',
                     index: 'test-index',
                 }
             ],

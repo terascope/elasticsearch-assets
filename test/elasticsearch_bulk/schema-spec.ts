@@ -10,9 +10,9 @@ describe('Elasticsearch Bulk Schema', () => {
 
     const clients = [
         {
-            type: 'elasticsearch',
+            type: 'elasticsearch-next',
             endpoint: 'default',
-            create: () => ({
+            createClient: async () => ({
                 client: {}
             }),
         },
