@@ -713,10 +713,10 @@
     datemath-parser "^1.0.6"
     uuid "^8.3.2"
 
-"@terascope/scripts@^0.48.1":
-  version "0.48.1"
-  resolved "https://registry.yarnpkg.com/@terascope/scripts/-/scripts-0.48.1.tgz#199f54dbab1b2f0db29ff360cab7067262ebd6df"
-  integrity sha512-qQ74ekqb+9XZvQa51zmeeZ9e1sMxV+J+0GZJwyooyLl08ZeneOqzhUIdQ/GZgZgma8ryl/TcY/eDSB4PDFhkpg==
+"@terascope/scripts@^0.49.0":
+  version "0.49.0"
+  resolved "https://registry.yarnpkg.com/@terascope/scripts/-/scripts-0.49.0.tgz#e3bc6c810c8a3ef99af0ed51105e66a819395392"
+  integrity sha512-eOrtrWoj7BuHW0RCFb1eO8m+YBRG3EzRR1sUjFN89MuRAliGiFImn2lONnhOeZoqZioWDiv5wJ3r1BopSYeSYA==
   dependencies:
     "@terascope/utils" "^0.44.2"
     codecov "^3.8.3"
