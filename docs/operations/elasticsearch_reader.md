@@ -212,7 +212,6 @@ Example Job
 | --------- | -------- | ------ | ------ |
 | \_op| Name of operation, it must reflect the exact name of the file | String | required |
 | index | Which index to read from | String | required |
-| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id|String | required if subslice_by_key is set to true and elasticsearch version <= 5 |
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000 |
 | start | The start date to which it will read from | String/Number/ elasticsearch date math syntax | optional, inclusive , if not provided the index will be queried for earliest date, this date will be reflected in the opConfig saved in the execution context |
 | end | The end date to which it will read to| String/Number/ elasticsearch date math syntax | optional, exclusive, if not provided the index will be queried for latest date, this date will be reflected in the opConfig saved in the execution context |
@@ -350,7 +349,7 @@ Example of metadata from a fetched record
 // example record in elasticsearch
 {
     "_index" : "test_index",
-    "_type" : "events",
+    "_type" : "_doc",
     "_id" : "ltyRQW4B8WLke7PkER8L",
     "_score" : 1.0,
     "_source" : {
@@ -378,7 +377,7 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
+    _type: "_doc",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

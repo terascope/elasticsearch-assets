@@ -3,11 +3,7 @@ The id_reader reads data from an elasticsearch index using an algorithm that par
 
 The behavior of this reader changes with the version of elasticsearch being searched.
 
-For this reader to function correctly the [connection config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors) must have an appropriately set `apiVersion` for the elasticsearch connection. The behavior changes according to the apiVersion
-
-when searching against elasticsearch <= v5, it will query directly against the _uid (the elasticsearch _id of the record) so parameter `id_field_name` is NOT needed. However the `type` of the record must be set
-
-when searching against elasticsearch >= 6,  parameter `id_field_name` IS needed.
+For this reader to function correctly the parameter `id_field_name` is required.
 
 Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 
@@ -15,24 +11,16 @@ this is a [recoverable](https://terascope.github.io/teraslice/docs/management-ap
 
 ## Usage
 
-Example Connector Config, apiVersion defaults to 6.5
+Example Teraslice Config
 ```yaml
 terafoundation:
     environment: 'development'
     log_level: info
     connectors:
-        elasticsearch:
+        elasticsearch-next:
             default:
-                host:
-                    - "localhost:9200"
-            es7:
-                host:
-                    - "localhost:9201"
-                apiVersion: "7.0",
-            es5:
-                host:
-                    - "localhost:9202"
-                apiVersion: "5.6"
+                node:
+                    - "http://localhost:9200"
 
 teraslice:
     workers: 8
@@ -73,7 +61,7 @@ Here is representation of elasticsearch data being sliced by the uuid field and 
 [
     {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "ltyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -88,7 +76,7 @@ Here is representation of elasticsearch data being sliced by the uuid field and 
       },
       {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "mdyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -103,7 +91,7 @@ Here is representation of elasticsearch data being sliced by the uuid field and 
       },
       {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "oNyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -180,7 +168,7 @@ Here is representation of elasticsearch data being sliced and filtered by the qu
 const elasticsearchData = [
     {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "ltyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -195,7 +183,7 @@ const elasticsearchData = [
       },
       {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "mdyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -210,7 +198,7 @@ const elasticsearchData = [
       },
       {
         "_index" : "test_index",
-        "_type" : "events",
+        "_type" : "_doc",
         "_id" : "oNyRQW4B8WLke7PkER8L",
         "_score" : 1.0,
         "_source" : {
@@ -263,74 +251,12 @@ This will create 4 slicers that will divide up the the chars that it will search
 ```
 `Note`: having too many slicers could potentially overwhelm your elasticsearch cluster since regex queries are a little more expensive to run
 
-### Batch read the entire content of an index with elasticsearch v5 or older
-This is a job that will run against an elasticsearch v5 cluster. This will query against the _uid (the elasticsearch _id of the record) that has `type` set to events
-
-```json
-{
-  "name": "ID_Reader",
-  "lifecycle": "once",
-  "slicers": 1,
-  "workers": 1,
-  "assets": ["elasticsearch"],
-  "operations": [
-    {
-      "_op": "id_reader",
-      "index": "test_index",
-      "type": "events",
-      "connection": "es5"
-    },
-    {
-      "_op": "noop"
-    }
-  ]
-}
-```
-Here is a simplified version of elasticsearch data being queried by its _id
-```javascript
-const elasticsearchData = [
-    {
-        _id : "anb11XABW6OedlSjjhbz"
-        _type : "events",
-        _source: {
-            some: 'data'
-        }
-    },
-    {
-        _id : "bab11XABW6OedlSjjhbz"
-        _type : "events",
-        _source: {
-            i: 'amB'
-        }
-    },
-     {
-        _id : "bdb11XABW6OedlSjjhbz"
-        _type : "events",
-        _source: {
-            me: 'too'
-        }
-    }
-]
-
-// the keys are iterated sequentially so "a" _id records are first
-const firstSliceResults = [
-    { some: 'data' }
-];
-
-// "a" is done, now will process "b" _id records
-const secondSliceResults = [
-    {  i: 'amB' },
-    { me: 'too' }
-];
-```
-
 ## Parameters
 
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
 | index | Which index to read from | String | required
-| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | only required for elasticsearch v5 and lower
 | size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000
 | key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`|
 | key_range | if provided, slicer will only recurse on these given keys | Array | optional |
@@ -339,7 +265,7 @@ const secondSliceResults = [
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
 | api_name | name of api to be used by id reader | String | optional, defaults to 'elasticsearch_reader_api' |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch|
-| id_field_name | The field on which we are searching against | String | required if running against elasticsearch >= v6, otherwise it is not needed on v5
+| id_field_name | The field on which we are searching against | String | required
 
 ## Advanced Configuration
 
