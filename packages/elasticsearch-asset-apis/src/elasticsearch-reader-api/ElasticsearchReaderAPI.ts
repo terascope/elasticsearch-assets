@@ -135,7 +135,11 @@ export class ElasticsearchReaderAPI {
         if (queryParams.count) {
             const expandedSize = Math.ceil(queryParams.count * countExpansionFactor);
             if (this.windowSize) {
-                querySize = (expandedSize <= this.windowSize) ? expandedSize : this.windowSize;
+                if (expandedSize >= this.windowSize) {
+                    throw new Error(`The query size: ${expandedSize} is greater than the indexes max window size: ${this.windowSize}`);
+                } else {
+                    querySize = expandedSize;
+                }
             }
         }
 
@@ -158,9 +162,13 @@ export class ElasticsearchReaderAPI {
                 // resultSize actually being larger than querySize so we will
                 // throw away these results, expand querySize and query again
                 // by relying on pRetry
-                querySize = Math.ceil(querySize * countExpansionFactor);
+                const expandedSize = Math.ceil(querySize * countExpansionFactor);
                 if (this.windowSize) {
-                    querySize = (querySize <= this.windowSize) ? querySize : this.windowSize;
+                    if (expandedSize >= this.windowSize) {
+                        throw new Error(`The query size: ${expandedSize} is greater than the indexes max window size: ${this.windowSize}`);
+                    } else {
+                        querySize = expandedSize;
+                    }
                 }
                 throw new Error(`The result set contained exactly ${querySize} records, searching again with size: ${querySize}`);
             }
@@ -168,7 +176,12 @@ export class ElasticsearchReaderAPI {
             return result;
         };
 
-        const result = await pRetry(() => _fetch(), { retries: retryLimit });
+        const result = await pRetry(() => _fetch(),
+            {
+                retries: retryLimit,
+                matches: ['result set contained exactly']
+            }
+        );
         return result;
     }
 

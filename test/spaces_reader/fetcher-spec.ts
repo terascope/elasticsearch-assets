@@ -42,7 +42,7 @@ describe('spaces_reader fetcher', () => {
             ['range query', {
                 query: {
                     q: 'date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z}',
-                    size: 100
+                    size: 150
                 },
                 opConfig: {
                     token,
@@ -60,7 +60,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query', {
                 query: {
                     q: '(foo:bar)',
-                    size: 5000,
+                    size: 7500,
                 },
                 opConfig: {
                     query: 'foo:bar',
@@ -75,7 +75,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query with url characters', {
                 query: {
                     q: '(foo:"bar+baz")',
-                    size: 5000,
+                    size: 7500,
                 },
                 opConfig: {
                     query: 'foo:"bar+baz"',
@@ -90,7 +90,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query with fields', {
                 query: {
                     q: '(test:query OR other:thing AND bytes:>=2000)',
-                    size: 100,
+                    size: 150,
                     fields: 'foo,bar,date'
                 },
                 opConfig: {
@@ -107,7 +107,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query with date range', {
                 query: {
                     q: 'example_date:[2017-09-23T18:07:14.332Z TO 2017-09-25T18:07:14.332Z} AND (foo:bar)',
-                    size: 200,
+                    size: 300,
                 },
                 opConfig: {
                     query: 'foo:bar',
@@ -124,7 +124,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query with geo point query', {
                 query: {
                     q: '(foo:bar)',
-                    size: 100,
+                    size: 150,
                     geo_point: '52.3456,79.6784',
                     geo_distance: '200km'
                 },
@@ -144,7 +144,7 @@ describe('spaces_reader fetcher', () => {
             ['lucene query with geo bounding box query', {
                 query: {
                     q: '(foo:bar)',
-                    size: 100000,
+                    size: 1500,
                     geo_box_top_left: '34.5234,79.42345',
                     geo_box_bottom_right: '54.5234,80.3456',
                     geo_sort_point: '52.3456,79.6784'
@@ -159,7 +159,9 @@ describe('spaces_reader fetcher', () => {
                     geo_box_bottom_right: '54.5234,80.3456',
                     geo_sort_point: '52.3456,79.6784',
                 },
-                msg: {}
+                msg: {
+                    count: 1000
+                }
             }],
 
         ])('when performing a %s', (m, { query, opConfig: _opConfig, msg }) => {
@@ -183,9 +185,6 @@ describe('spaces_reader fetcher', () => {
                 ]
             }), { clients });
 
-            // query size are overridden for unbounded fetches
-            query.size = maxSize;
-
             let results: DataEntity[];
 
             beforeEach(async () => {
@@ -205,6 +204,7 @@ describe('spaces_reader fetcher', () => {
                     });
 
                 await harness.initialize();
+                // FIXME: is msg ... a slice?
                 results = await harness.runSlice(msg);
             });
 
@@ -257,7 +257,7 @@ describe('spaces_reader fetcher', () => {
 
                 scope.post(`/${testIndex}?token=${token}`, {
                     q: '(test:query)',
-                    size: 100000,
+                    size: 7500,
                 })
                     .delay(500)
                     .reply(200, {
