@@ -5,9 +5,11 @@ import {
     TEST_INDEX_PREFIX,
     makeClient,
     cleanupIndex,
-    populateIndex
+    populateIndex,
+    addToIndex
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
+import evenSpreadExtra1 from '../fixtures/data/even-spread-extra1';
 
 describe('elasticsearch_reader fetcher', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher_`;
@@ -125,6 +127,99 @@ describe('elasticsearch_reader fetcher', () => {
         expect(metaData._type).toEqual(docType);
     });
 
+    describe('when more records are added to the slice range after slice creation', () => {
+        const evenSpreadExtra1BulkData = evenSpreadExtra1.data.map(
+            (obj) => DataEntity.make(obj, { _key: obj.uuid })
+        );
+
+        beforeAll(async () => {
+            await addToIndex(
+                esClient, evenIndex, evenSpreadExtra1BulkData, docType
+            );
+        });
+
+        // since I modify the indices in the beforeAll, I have to put them
+        // back right so the other tests will pass, I'm a little concerned that
+        // this could result in other test failures.  So if we start getting
+        // weird data consistency related test failures elsewhere, try
+        // commenting out this whole inner describe
+        afterAll(async () => {
+            await cleanupIndex(esClient, makeIndex('*'));
+            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
+        });
+
+        it('the fetcher successfully retrieves all 8 records', async () => {
+            // this range has 4 records to begin with (from the outer beforeAll)
+            // the inner beforeAll adds 4 more, making this count "stale"
+            // so the result set should contain 8 records
+            const slice = {
+                start: '2019-04-26T15:00:23.201Z',
+                end: '2019-04-26T15:00:23.207Z',
+                // limit: '2019-04-26T15:00:23.394Z',
+                count: 4
+            };
+
+            const test = await makeFetcherTest({ size: 100 });
+            const result = await test.runSlice(slice);
+            expect(result.length).toEqual(8);
+        });
+    });
+
+    describe('when too many records are added to the slice range after slice creation', () => {
+        const genExtraBulkData = () => evenSpreadExtra1.data.map(
+            (obj) => {
+                // we need random _keys to get new records rather than overwrite
+                const randomSuffix = [...Array(5)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+                const newKey = obj.uuid.slice(0, -5) + randomSuffix;
+                return DataEntity.make(obj, { _key: newKey });
+            }
+        );
+
+        beforeAll(async () => {
+            // add a bunch more records to make sure to trigger the retry failure
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+        });
+
+        // since I modify the indices in the beforeAll, I have to put them
+        // back right so the other tests will pass, I'm a little concerned that
+        // this could result in other test failures.  So if we start getting
+        // weird data consistency related test failures elsewhere, try
+        // commenting out this whole inner describe
+        afterAll(async () => {
+            await cleanupIndex(esClient, makeIndex('*'));
+            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
+        });
+
+        it('the fetcher raises an error after five retries', async () => {
+            // this range has 4 records to begin with (from the outer beforeAll)
+            // the inner beforeAll adds 4 more, making this count "stale"
+            // so the result set should contain 8 records
+            const slice = {
+                start: '2019-04-26T15:00:23.201Z',
+                end: '2019-04-26T15:00:23.207Z',
+                count: 4
+            };
+
+            const test = await makeFetcherTest({ size: 100 });
+            const errMsg = 'Retry limit (5) hit, caused by Error: The result set contained exactly 32 records, searching again with size: 48';
+            try {
+                await test.runSlice(slice);
+                throw new Error('should have error');
+            } catch (error) {
+                expect(
+                    // @ts-expect-error
+                    error.message
+                ).toEqual(errMsg);
+            }
+        });
+    });
+
     it('can fetch the entire index', async () => {
         const test = await makeJobTest({ size: 100 });
         let recordCount = 0;
@@ -136,6 +231,28 @@ describe('elasticsearch_reader fetcher', () => {
         }
 
         expect(recordCount).toEqual(evenSpread.data.length);
+    });
+
+    it('fetcher throws if query size exceeds the index.max_result_window setting', async () => {
+        // this range has 48 records
+        const slice = {
+            start: '2019-04-26T15:00:23.201Z',
+            end: '2019-04-26T15:00:23.220Z',
+            limit: '2019-04-26T15:00:23.394Z',
+            count: 10000
+        };
+
+        const errMsg = 'The query size, 15000, is greater than the index.max_result_window: 10000';
+        try {
+            const test = await makeFetcherTest({ size: 100 });
+            await test.runSlice(slice);
+            throw new Error('should have error');
+        } catch (error) {
+            expect(
+                // @ts-expect-error
+                error.message
+            ).toEqual(errMsg);
+        }
     });
 
     it('should throw if size is greater than window_size', async () => {

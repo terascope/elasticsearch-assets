@@ -136,7 +136,7 @@ export class ElasticsearchReaderAPI {
             const expandedSize = Math.ceil(queryParams.count * countExpansionFactor);
             if (this.windowSize) {
                 if (expandedSize >= this.windowSize) {
-                    throw new Error(`The query size: ${expandedSize} is greater than the indexes max window size: ${this.windowSize}`);
+                    throw new Error(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
                 } else {
                     querySize = expandedSize;
                 }
@@ -165,12 +165,14 @@ export class ElasticsearchReaderAPI {
                 const expandedSize = Math.ceil(querySize * countExpansionFactor);
                 if (this.windowSize) {
                     if (expandedSize >= this.windowSize) {
-                        throw new Error(`The query size: ${expandedSize} is greater than the indexes max window size: ${this.windowSize}`);
+                        throw new Error(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
                     } else {
                         querySize = expandedSize;
                     }
                 }
-                throw new Error(`The result set contained exactly ${querySize} records, searching again with size: ${querySize}`);
+                const msg = `The result set contained exactly ${resultSize} records, searching again with size: ${expandedSize}`;
+                this.logger.debug(msg);
+                throw new Error(msg); // throw for pRetry
             }
 
             return result;
@@ -178,8 +180,11 @@ export class ElasticsearchReaderAPI {
 
         const result = await pRetry(() => _fetch(),
             {
+                backoff: 1.1,
+                delay: 250,
                 retries: retryLimit,
-                matches: ['result set contained exactly']
+                matches: ['result set contained exactly'],
+                reason: `Retry limit (${retryLimit}) hit`
             }
         );
         return result;
