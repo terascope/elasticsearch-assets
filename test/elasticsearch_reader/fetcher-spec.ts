@@ -97,18 +97,19 @@ describe('elasticsearch_reader fetcher', () => {
 
     it('fetcher can return formatted data', async () => {
         // this range has 48 records
+        const sliceSize = 48;
         const slice = {
             start: '2019-04-26T15:00:23.201Z',
             end: '2019-04-26T15:00:23.220Z',
             limit: '2019-04-26T15:00:23.394Z',
-            count: 10000
+            count: sliceSize
         };
 
         const test = await makeFetcherTest({ size: 100 });
         const results = await test.runSlice(slice);
 
         expect(Array.isArray(results)).toEqual(true);
-        expect(results).toBeArrayOfSize(48);
+        expect(results).toBeArrayOfSize(sliceSize);
         const doc = results[0];
         expect(DataEntity.isDataEntity(doc)).toEqual(true);
 
