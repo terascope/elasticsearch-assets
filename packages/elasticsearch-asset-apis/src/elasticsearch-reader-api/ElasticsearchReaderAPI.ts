@@ -183,8 +183,10 @@ export class ElasticsearchReaderAPI {
                 backoff: 1.1,
                 delay: 250,
                 retries: retryLimit,
-                matches: ['result set contained exactly'],
-                reason: `Retry limit (${retryLimit}) hit`
+                matches: ['result set contained exactly']
+                // reason disable due to this bug:
+                // https://github.com/terascope/teraslice/issues/3286
+                // reason: `Retry limit (${retryLimit}) hit`
             }
         );
         return result;
