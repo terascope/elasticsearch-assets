@@ -93,18 +93,47 @@ export async function populateIndex(
     const version = getESVersion(client);
     const mapping = dataType.toESMapping({ typeName: type, overrides, version });
 
-    await client.indices.create(
-        fixMappingRequest(
-            client,
-            {
-                index,
-                waitForActiveShards: 'all',
-                body: mapping,
-            },
-            false
-        )
-    );
+    try {
+        await client.indices.create(
+            fixMappingRequest(
+                client,
+                {
+                    index,
+                    waitForActiveShards: 'all',
+                    body: mapping,
+                },
+                false
+            )
+        );
+    } catch (error) {
+        throw new Error(`Error encountered when creating ${index} index: ${error}`);
+    }
 
+    const body = formatUploadData(index, type, records);
+
+    const results = await client.bulk({
+        index,
+        type,
+        body,
+        refresh: true
+    });
+
+    if (results.errors) {
+        const errors: string[] = [];
+        for (const response of results.items) {
+            if (response.index.error) errors.push(response.index.error.reason);
+        }
+
+        throw new Error(`There were errors populating index, errors: ${uniq(errors).join(' ; ')}`);
+    }
+}
+
+export async function addToIndex(
+    client: Client,
+    index: string,
+    records: any[],
+    type = '_doc'
+): Promise<void> {
     const body = formatUploadData(index, type, records);
 
     const results = await client.bulk({
