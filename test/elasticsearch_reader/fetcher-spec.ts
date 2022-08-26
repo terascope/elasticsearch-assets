@@ -128,24 +128,19 @@ describe('elasticsearch_reader fetcher', () => {
     });
 
     describe('when more records are added to the slice range after slice creation', () => {
+        const evenIndexName1 = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher1_`;
         const evenSpreadExtra1BulkData = evenSpreadExtra1.data.map(
             (obj) => DataEntity.make(obj, { _key: obj.uuid })
         );
 
         beforeAll(async () => {
-            await addToIndex(
-                esClient, evenIndex, evenSpreadExtra1BulkData, docType
-            );
+            await cleanupIndex(esClient, evenIndexName1);
+            await populateIndex(esClient, evenIndexName1, evenSpread.types, evenBulkData, docType);
+            await addToIndex(esClient, evenIndexName1, evenSpreadExtra1BulkData, docType);
         });
 
-        // since I modify the indices in the beforeAll, I have to put them
-        // back right so the other tests will pass, I'm a little concerned that
-        // this could result in other test failures.  So if we start getting
-        // weird data consistency related test failures elsewhere, try
-        // commenting out this whole inner describe
         afterAll(async () => {
-            await cleanupIndex(esClient, makeIndex('*'));
-            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
+            await cleanupIndex(esClient, evenIndexName1);
         });
 
         it('the fetcher successfully retrieves all 8 records', async () => {
@@ -155,17 +150,17 @@ describe('elasticsearch_reader fetcher', () => {
             const slice = {
                 start: '2019-04-26T15:00:23.201Z',
                 end: '2019-04-26T15:00:23.207Z',
-                // limit: '2019-04-26T15:00:23.394Z',
                 count: 4
             };
 
-            const test = await makeFetcherTest({ size: 100 });
+            const test = await makeFetcherTest({ index: evenIndexName1, size: 100 });
             const result = await test.runSlice(slice);
             expect(result.length).toEqual(8);
         });
     });
 
     describe('when too many records are added to the slice range after slice creation', () => {
+        const evenIndexName2 = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher2_`;
         const genExtraBulkData = () => evenSpreadExtra1.data.map(
             (obj) => {
                 // we need random _keys to get new records rather than overwrite
@@ -176,24 +171,20 @@ describe('elasticsearch_reader fetcher', () => {
         );
 
         beforeAll(async () => {
+            await cleanupIndex(esClient, evenIndexName2);
+            await populateIndex(esClient, evenIndexName2, evenSpread.types, evenBulkData, docType);
             // add a bunch more records to make sure to trigger the retry failure
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndex, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
         });
 
-        // since I modify the indices in the beforeAll, I have to put them
-        // back right so the other tests will pass, I'm a little concerned that
-        // this could result in other test failures.  So if we start getting
-        // weird data consistency related test failures elsewhere, try
-        // commenting out this whole inner describe
         afterAll(async () => {
-            await cleanupIndex(esClient, makeIndex('*'));
-            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType);
+            await cleanupIndex(esClient, evenIndexName2);
         });
 
         it('the fetcher raises an error after five retries', async () => {
@@ -206,7 +197,7 @@ describe('elasticsearch_reader fetcher', () => {
                 count: 4
             };
 
-            const test = await makeFetcherTest({ size: 100 });
+            const test = await makeFetcherTest({ index: evenIndexName2, size: 100 });
             // Ideally we'd be testing for the following error message, but
             // there is a bug in pRetry. See _fetch in the
             // `ElasticsearchReaderAPI` for details
