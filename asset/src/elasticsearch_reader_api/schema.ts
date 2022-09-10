@@ -19,6 +19,11 @@ export const schema = {
             isValidIndex(val);
         }
     },
+    errorOnSizeTooBig: {
+        doc: 'changes behavior of slice size expansion during fetch, setting this to false will make failing queries succeed but could result in missed data',
+        default: true,
+        format: Boolean
+    },
     field: {
         doc: 'DEPRECATED: USE "id_field_name" INSTEAD. field to use for id_slicer if subslice_by_key is set to true',
         default: null,

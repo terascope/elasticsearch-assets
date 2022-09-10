@@ -52,6 +52,6 @@ export async function createSpacesReaderAPI({
     if (config.response_type === FetchResponseType.data_frame && !config.type_config) {
         config.type_config = await client.getDataType();
     }
-
+    config.errorOnSizeTooBig = false;
     return new ElasticsearchReaderAPI(config, client, emitter, logger);
 }

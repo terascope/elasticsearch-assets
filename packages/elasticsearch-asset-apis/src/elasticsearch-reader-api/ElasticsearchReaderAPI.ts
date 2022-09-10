@@ -136,7 +136,13 @@ export class ElasticsearchReaderAPI {
             const expandedSize = Math.ceil(queryParams.count * countExpansionFactor);
             if (this.windowSize) {
                 if (expandedSize >= this.windowSize) {
-                    throw new Error(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
+                    const msg = `The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`;
+                    if (this.config.errorOnSizeTooBig) {
+                        throw new Error(msg);
+                    } else {
+                        this.logger.warn(`${msg}, setting querySize to index.max_result_window`);
+                        querySize = this.windowSize;
+                    }
                 } else {
                     querySize = expandedSize;
                 }
@@ -163,9 +169,15 @@ export class ElasticsearchReaderAPI {
                 // throw away these results, expand querySize and query again
                 // by relying on pRetry
                 const expandedSize = Math.ceil(querySize * countExpansionFactor);
-                if (this.windowSize) {
+                if (this.windowSize && queryParams.count) {
                     if (expandedSize >= this.windowSize) {
-                        throw new Error(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
+                        const msg = `The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`;
+                        if (this.config.errorOnSizeTooBig) {
+                            throw new Error(msg);
+                        } else {
+                            this.logger.warn(`${msg}, setting querySize to index.max_result_window`);
+                            querySize = this.windowSize;
+                        }
                     } else {
                         querySize = expandedSize;
                     }

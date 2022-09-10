@@ -330,6 +330,7 @@ export enum FetchResponseType {
 }
 
 export interface ESReaderOptions {
+    errorOnSizeTooBig: boolean;
     index: string;
     id_field_name?: string;
     size: number;
