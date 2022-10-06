@@ -1,7 +1,5 @@
 import {
-    AnyObject,
-    isPlainObject,
-    cloneDeep,
+    AnyObject, isPlainObject, cloneDeep,
     isObjectEntity
 } from '@terascope/utils';
 
