@@ -16,6 +16,14 @@ import { throwRequestError } from './throwRequestError';
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+interface SettingsResponse {
+    params: {
+        size: {
+            max: number
+        }
+    }
+}
+
 export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
@@ -343,7 +351,7 @@ export class SpacesReaderClient implements ReaderClient {
         const uri = `${endpoint}/${index}/_info`;
 
         try {
-            const { body: { params: { size: { max } } } } = await got(uri, {
+            const { body: { params: { size: { max } } } } = await got<SettingsResponse>(uri, {
                 searchParams: { token },
                 responseType: 'json',
                 timeout: 1000000,

@@ -103,7 +103,7 @@ describe('elasticsearch reader api', () => {
         const apiFactory = await setupAPITest();
         const api = await apiFactory.create('test', { query: '*' });
 
-        const results = await api.fetch({}) as DataEntity[];
+        const results = await api.fetch({}) as unknown as DataEntity[];
         expect(results.length).toEqual(2);
 
         expect(api.windowSize).toEqual(10000);

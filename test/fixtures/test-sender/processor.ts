@@ -8,7 +8,7 @@ export default class TestSenderAPI extends BatchProcessor<AnyObject> {
         this.api = this.getAPI<RouteSenderAPI>(this.opConfig.apiName);
     }
 
-    async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
+    async onBatch(data: DataEntity[]) {
         await this.api.send(data);
         return data;
     }
