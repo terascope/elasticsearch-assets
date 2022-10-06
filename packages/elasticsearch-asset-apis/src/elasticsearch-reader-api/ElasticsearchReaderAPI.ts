@@ -1,19 +1,10 @@
 import { EventEmitter } from 'events';
 import {
-    AnyObject,
-    DataEntity,
-    isObjectEntity,
-    getTypeOf,
-    Logger,
-    isSimpleObject,
-    isNumber,
-    isValidDate,
-    isFunction,
-    isString,
-    isWildCardString,
-    matchWildcard,
-    pRetry,
-    toIntegerOrThrow
+    AnyObject, DataEntity, isObjectEntity,
+    getTypeOf, Logger, isSimpleObject,
+    isNumber, isValidDate, isFunction,
+    isString, isWildCardString, matchWildcard,
+    pRetry, toIntegerOrThrow
 } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -21,39 +12,19 @@ import moment from 'moment';
 import type { CountParams, SearchParams } from 'elasticsearch';
 import { inspect } from 'util';
 import {
-    dateSlicer,
-    idSlicer,
-    getKeyArray,
-    dateOptions,
-    processInterval,
-    dateFormat,
-    dateFormatSeconds,
-    parseDate,
-    delayedStreamSegment,
-    determineIDSlicerRanges,
-    determineDateSlicerRanges,
+    dateSlicer, idSlicer, getKeyArray,
+    dateOptions, processInterval, dateFormat,
+    dateFormatSeconds, parseDate, delayedStreamSegment,
+    determineIDSlicerRanges, determineDateSlicerRanges,
 } from './algorithms';
 import {
-    ESReaderOptions,
-    DateSegments,
-    InputDateSegments,
-    SlicerArgs,
-    IDType,
-    DateSlicerArgs,
-    IDSlicerArgs,
-    IDSlicerConfig,
-    DateSlicerResults,
-    ReaderClient,
-    SettingResults,
-    IDSlicerRanges,
-    DateSlicerRanges,
-    DateSlicerRange,
-    IDSlicerRange,
-    DateSlicerMetadata,
-    GetIntervalResult,
-    ReaderSlice,
-    IDSlicerResults,
-    FetchResponseType
+    ESReaderOptions, DateSegments, InputDateSegments,
+    SlicerArgs, IDType, DateSlicerArgs,
+    IDSlicerArgs, IDSlicerConfig, DateSlicerResults,
+    ReaderClient, SettingResults, IDSlicerRanges,
+    DateSlicerRanges, DateSlicerRange, IDSlicerRange,
+    DateSlicerMetadata, GetIntervalResult,
+    ReaderSlice, IDSlicerResults, FetchResponseType
 } from './interfaces';
 import { WindowState } from './WindowState';
 import { buildQuery } from './utils';
