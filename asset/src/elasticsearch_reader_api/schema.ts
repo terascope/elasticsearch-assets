@@ -236,6 +236,11 @@ export const schema = {
             }
         }
     },
+    useSimpleFetch: {
+        doc: 'Use the original fetch algorithm, that sets query size to windowSize without extra retry logic',
+        default: false,
+        format: Boolean
+    }
 };
 
 export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> {

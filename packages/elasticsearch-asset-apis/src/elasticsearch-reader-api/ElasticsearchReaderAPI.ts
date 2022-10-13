@@ -95,6 +95,10 @@ export class ElasticsearchReaderAPI {
      *   https://github.com/terascope/elasticsearch-assets/issues/948
      */
     async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame|Buffer> {
+        if (this.config.useSimpleFetch) {
+            return this.simpleFetch(queryParams);
+        }
+
         const countExpansionFactor = 1.5;
         let querySize = 10000;
         const retryLimit = 5;
@@ -161,6 +165,22 @@ export class ElasticsearchReaderAPI {
             }
         );
         return result;
+    }
+
+    async simpleFetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame|Buffer> {
+        // attempt to get window if not set
+        if (!this.windowSize) await this.setWindowSize();
+
+        // if we did go ahead and complete query
+        const query = buildQuery(this.config, {
+            ...queryParams, count: this.windowSize
+        });
+
+        return this.client.search(
+            query,
+            this.config.response_type ?? FetchResponseType.data_entities,
+            this.config.type_config
+        );
     }
 
     /**

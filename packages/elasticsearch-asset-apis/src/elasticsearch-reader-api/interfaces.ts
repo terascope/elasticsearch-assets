@@ -357,6 +357,7 @@ export interface ESReaderOptions {
     starting_key_depth: number;
     response_type?: FetchResponseType;
     type_config?: DataTypeConfig
+    useSimpleFetch?: boolean;
 }
 
 export interface SpacesAPIConfig extends ESReaderOptions {
