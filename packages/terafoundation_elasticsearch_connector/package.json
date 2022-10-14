@@ -24,7 +24,7 @@
     "license": "MIT",
     "dependencies": {
         "@elastic/elasticsearch": "7.13.0",
-        "@opensearch-project/opensearch": "^1.1.0",
+        "@opensearch-project/opensearch": "^2.0.0",
         "@terascope/utils": "^0.45.0",
         "elasticsearch": "^15.4.1"
     },
