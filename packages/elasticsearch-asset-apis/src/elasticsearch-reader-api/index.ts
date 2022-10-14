@@ -52,6 +52,10 @@ export async function createSpacesReaderAPI({
     if (config.response_type === FetchResponseType.data_frame && !config.type_config) {
         config.type_config = await client.getDataType();
     }
+    // simpleFetch should be used by the spaces reader to avoid the search size
+    // expansion algorithm, this is because most endpoints are configured with
+    // a much lower search limit than the backend clusters
+    config.useSimpleFetch = true;
 
     return new ElasticsearchReaderAPI(config, client, emitter, logger);
 }
