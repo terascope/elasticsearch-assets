@@ -1,8 +1,9 @@
 /* eslint-disable no-useless-escape */
 
-import pMap from 'p-map';
+import { pMap } from '@terascope/utils';
 import {
-    CountFn, IDSlicerRanges, IDType, ReaderSlice
+    CountFn, IDSlicerRanges, IDType,
+    ReaderSlice
 } from '../interfaces';
 
 export const base64url = Object.freeze(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w',
