@@ -1,4 +1,4 @@
-import { TypeConfigFields } from '@terascope/data-types';
+import { DataTypeFields } from '@terascope/types';
 import { cloneDeep } from '@terascope/utils';
 
 const data = [
@@ -10004,7 +10004,7 @@ const data = [
     }
 ];
 
-const types: TypeConfigFields = {
+const types: DataTypeFields = {
     ip: { type: 'IP' },
     userAgent: { type: 'Keyword' },
     url: { type: 'Keyword' },
@@ -10019,4 +10019,4 @@ export = {
     data: cloneDeep(data),
     types,
     index: 'even_spread'
-}
+} as { data: Record<string, unknown>[], types: DataTypeFields, index: string }

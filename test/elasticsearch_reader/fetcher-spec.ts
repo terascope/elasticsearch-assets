@@ -162,7 +162,7 @@ describe('elasticsearch_reader fetcher', () => {
     describe('when too many records are added to the slice range after slice creation', () => {
         const evenIndexName2 = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher2_`;
         const genExtraBulkData = () => evenSpreadExtra1.data.map(
-            (obj) => {
+            (obj: any) => {
                 // we need random _keys to get new records rather than overwrite
                 const randomSuffix = [...Array(5)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
                 const newKey = obj.uuid.slice(0, -5) + randomSuffix;
