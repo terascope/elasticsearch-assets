@@ -129,8 +129,8 @@ export async function fetch(
     client: Client, query: SearchParams, fullRequest = false
 ): Promise<(DataEntity[] | DataEntity)> {
     const esClient = elasticAPI(client, logger, { full_response: fullRequest });
-    const results = await esClient.search(query);
-    return results;
+    const results = await esClient.search(query as any);
+    return results as any;
 }
 
 export async function waitForData(

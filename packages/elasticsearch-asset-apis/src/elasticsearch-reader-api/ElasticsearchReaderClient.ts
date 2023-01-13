@@ -4,7 +4,7 @@ import {
     AnyObject, DataEntity, get, Logger
 } from '@terascope/utils';
 import type {
-    Client, SearchParams, SearchResponse, CountParams
+    Client, SearchParams, SearchResponse
 } from 'elasticsearch';
 import { DataTypeConfig } from '@terascope/types';
 import { ReaderClient, FetchResponseType, SettingResults } from './interfaces';
@@ -36,7 +36,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
     async count(query: SearchParams): Promise<number> {
         // this internally does a search request with size=0
         // I think the types a wrong
-        return this.client.count(query as CountParams);
+        return this.client.count(query as any);
     }
 
     search(
@@ -96,9 +96,11 @@ export class ElasticsearchReaderClient implements ReaderClient {
         fullResponse?: boolean
     ): Promise<DataEntity[]|SearchResponse<AnyObject>> {
         if (fullResponse) {
-            return this.fullResponseClient.search(query);
+            return this.fullResponseClient.search(
+                query as any
+            ) as Promise<SearchResponse<AnyObject>>;
         }
-        return this.client.search(query);
+        return this.client.search(query as any) as Promise<DataEntity[]>;
     }
 
     getESVersion(): number {
