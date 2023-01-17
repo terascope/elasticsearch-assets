@@ -15,7 +15,6 @@ describe('elasticsearch sender api', () => {
 
     beforeAll(async () => {
         esClient = await makeClient();
-
         clients = [
             {
                 type: 'elasticsearch-next',
@@ -80,6 +79,7 @@ describe('elasticsearch sender api', () => {
     it('can send data to an index', async () => {
         const data = [{ some: 'data' }, { other: 'data' }];
         const test = await setupTest();
+
         const results = await test.runSlice(data);
 
         expect(results).toEqual(data);

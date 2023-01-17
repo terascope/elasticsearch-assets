@@ -1,4 +1,4 @@
-import { TypeConfigFields } from '@terascope/data-types';
+import { DataTypeFields, FieldType } from '@terascope/types';
 import { cloneDeep } from '@terascope/utils';
 
 const data = [
@@ -3024,15 +3024,15 @@ end: "2020-08-12T16:00:00.000Z"
 100 at '2020-08-12T16:05:00.000Z'
 */
 
-const types: TypeConfigFields = {
-    ip: { type: 'IP' },
-    userAgent: { type: 'Keyword' },
-    url: { type: 'Keyword' },
-    uuid: { type: 'Keyword' },
-    created: { type: 'Date' },
-    ipv6: { type: 'Keyword' },
-    location: { type: 'GeoPoint' },
-    bytes: { type: 'Integer' }
+const types: DataTypeFields = {
+    ip: { type: FieldType.IP },
+    userAgent: { type: FieldType.Keyword },
+    url: { type: FieldType.Keyword },
+    uuid: { type: FieldType.Keyword },
+    created: { type: FieldType.Date },
+    ipv6: { type: FieldType.Keyword },
+    location: { type: FieldType.GeoPoint },
+    bytes: { type: FieldType.Integer }
 };
 
 export = {
