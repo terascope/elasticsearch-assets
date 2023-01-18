@@ -1,13 +1,11 @@
 import elasticAPI from '@terascope/elasticsearch-api';
+import { Client } from 'elasticsearch-store';
 import { DataFrame } from '@terascope/data-mate';
 import {
     AnyObject, DataEntity, get, Logger
 } from '@terascope/utils';
-import type {
-    Client, SearchParams, SearchResponse
-} from 'elasticsearch';
-import { DataTypeConfig } from '@terascope/types';
-import { ReaderClient, FetchResponseType, SettingResults } from './interfaces';
+import { DataTypeConfig, ClientParams, ClientResponse } from '@terascope/types';
+import { ReaderClient, FetchResponseType } from './interfaces';
 
 export class ElasticsearchReaderClient implements ReaderClient {
     private readonly _baseClient: Client;
@@ -33,29 +31,29 @@ export class ElasticsearchReaderClient implements ReaderClient {
         });
     }
 
-    async count(query: SearchParams): Promise<number> {
+    async count(query: ClientParams.SearchParams): Promise<number> {
         // this internally does a search request with size=0
         // I think the types a wrong
         return this.client.count(query as any);
     }
 
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.raw,
         typeConfig?: DataTypeConfig
     ): Promise<Buffer>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     async search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]|DataFrame|Buffer> {
@@ -67,7 +65,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
             query, true
         );
 
-        const records = searchResults.hits.hits.map((data) => data._source);
+        const records = searchResults.hits.hits.map((data) => data._source as AnyObject);
         const metrics = {
             total: get(searchResults, 'hits.total.value', get(searchResults, 'hits.total'))
         };
@@ -89,16 +87,19 @@ export class ElasticsearchReaderClient implements ReaderClient {
         return dataFrame;
     }
 
-    _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
-    _searchRequest(query: SearchParams, fullResponse: true): Promise<SearchResponse<AnyObject>>;
+    _searchRequest(query: ClientParams.SearchParams, fullResponse: false): Promise<DataEntity[]>;
+    _searchRequest(
+        query: ClientParams.SearchParams,
+        fullResponse: true
+    ): Promise<ClientResponse.SearchResponse<AnyObject>>;
     async _searchRequest(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         fullResponse?: boolean
-    ): Promise<DataEntity[]|SearchResponse<AnyObject>> {
+    ): Promise<DataEntity[]|ClientResponse.SearchResponse<AnyObject>> {
         if (fullResponse) {
             return this.fullResponseClient.search(
                 query as any
-            ) as Promise<SearchResponse<AnyObject>>;
+            ) as Promise<ClientResponse.SearchResponse<AnyObject>>;
         }
         return this.client.search(query as any) as Promise<DataEntity[]>;
     }
@@ -112,13 +113,14 @@ export class ElasticsearchReaderClient implements ReaderClient {
         await this.client.version();
     }
 
-    async getSettings(index: string): Promise<SettingResults> {
-        const results = await this._baseClient.indices.getSettings({
+    async getSettings(
+        index: string
+    ): Promise<ClientResponse.IndicesGetSettingsResponse> {
+        return this._baseClient.indices.getSettings({
             index,
-            flatSettings: true,
-            includeDefaults: true,
-            allowNoIndices: true
+            flat_settings: true,
+            include_defaults: true,
+            allow_no_indices: true,
         });
-        return results.body || results;
     }
 }

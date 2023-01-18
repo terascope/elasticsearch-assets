@@ -4,12 +4,12 @@ import {
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow
+    pRetry, toIntegerOrThrow, get
 } from '@terascope/utils';
+import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
-import type { CountParams, SearchParams } from 'elasticsearch';
 import { inspect } from 'util';
 import {
     dateSlicer, idSlicer, getKeyArray,
@@ -21,10 +21,10 @@ import {
     ESReaderOptions, DateSegments, InputDateSegments,
     SlicerArgs, IDType, DateSlicerArgs,
     IDSlicerArgs, IDSlicerConfig, DateSlicerResults,
-    ReaderClient, SettingResults, IDSlicerRanges,
-    DateSlicerRanges, DateSlicerRange, IDSlicerRange,
-    DateSlicerMetadata, GetIntervalResult,
-    ReaderSlice, IDSlicerResults, FetchResponseType
+    ReaderClient, IDSlicerRanges, DateSlicerRanges,
+    DateSlicerRange, IDSlicerRange, DateSlicerMetadata,
+    GetIntervalResult, ReaderSlice, IDSlicerResults,
+    FetchResponseType
 } from './interfaces';
 import { WindowState } from './WindowState';
 import { buildQuery } from './utils';
@@ -77,7 +77,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
-        return this.client.count(query as CountParams);
+        return this.client.count(query as any);
     }
 
     /**
@@ -201,10 +201,10 @@ export class ElasticsearchReaderAPI {
         return resultSize;
     }
 
-    _searchRequest(query: SearchParams, fullResponse?: false): Promise<DataEntity[]>;
-    _searchRequest(query: SearchParams, fullResponse: true): Promise<unknown>;
+    _searchRequest(query: ClientParams.SearchParams, fullResponse?: false): Promise<DataEntity[]>;
+    _searchRequest(query: ClientParams.SearchParams, fullResponse: true): Promise<unknown>;
     async _searchRequest(
-        query: SearchParams, fullResponse?: boolean
+        query: ClientParams.SearchParams, fullResponse?: boolean
     ): Promise<DataEntity[]|unknown> {
         return this.client._searchRequest(
             query,
@@ -703,7 +703,7 @@ export class ElasticsearchReaderAPI {
     /**
      * Get the index settings, used to determine the max_result_window size
     */
-    async getSettings(index: string): Promise<SettingResults> {
+    async getSettings(index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {
         return this.client.getSettings(index);
     }
 
@@ -721,8 +721,9 @@ export class ElasticsearchReaderAPI {
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
-                const defaultPath = configs.defaults[window];
-                const configPath = configs.settings[window];
+                const defaultPath = get(configs, `defaults.${window}`);
+                const configPath = get(configs, `settings.${window}`);
+
                 // config goes first as it overrides an defaults
                 if (configPath) return toIntegerOrThrow(configPath);
                 if (defaultPath) return toIntegerOrThrow(defaultPath);

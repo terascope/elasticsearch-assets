@@ -1,6 +1,5 @@
-import { AnyObject, GeoPoint } from '@terascope/types';
+import { AnyObject, GeoPoint, ClientParams } from '@terascope/types';
 import { isString, parseGeoPoint } from '@terascope/utils';
-import { SearchParams } from 'elasticsearch';
 import { ESReaderOptions, ReaderSlice } from './interfaces';
 
 /**
@@ -10,17 +9,17 @@ import { ESReaderOptions, ReaderSlice } from './interfaces';
 */
 export function buildQuery(
     opConfig: ESReaderOptions, params: ReaderSlice
-): SearchParams {
+): ClientParams.SearchParams {
     if (params.count == null) {
         throw new Error('Expected count to buildQuery');
     }
-    const query: SearchParams = {
+    const query: ClientParams.SearchParams = {
         index: opConfig.index,
         size: params.count,
         body: _buildRangeQuery(opConfig, params),
     };
-
-    if (opConfig.fields) query._source = opConfig.fields;
+    // TODO: fix _source reference in @terascope/types
+    if (opConfig.fields) query._source = opConfig.fields as any;
 
     return query;
 }

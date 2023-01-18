@@ -1,7 +1,6 @@
 import { DataFrame } from '@terascope/data-mate';
-import { DataTypeConfig, FieldType } from '@terascope/types';
+import { DataTypeConfig, FieldType, ClientParams } from '@terascope/types';
 import { debugLogger } from '@terascope/utils';
-import { SearchParams } from 'elasticsearch';
 import 'jest-extended';
 import nock from 'nock';
 import {
@@ -64,7 +63,7 @@ describe('Spaces Reader Client', () => {
         const client = newClient({
             query: 'foo:bar'
         });
-        let query: SearchParams;
+        let query: ClientParams.SearchParams;
 
         beforeEach(async () => {
             query = buildQuery(client.config, {
@@ -106,7 +105,11 @@ describe('Spaces Reader Client', () => {
                 size: 100,
             }).reply(200, frame.serialize());
 
-            const result = await client.search(query, FetchResponseType.data_frame, dataTypeConfig);
+            const result = await client.search(
+                query,
+                FetchResponseType.data_frame,
+                dataTypeConfig as any
+            );
 
             expect(result).toBeInstanceOf(DataFrame);
             expect(result.toJSON()).toEqual([

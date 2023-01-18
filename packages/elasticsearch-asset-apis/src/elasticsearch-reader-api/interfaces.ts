@@ -1,10 +1,10 @@
 import type { DataFrame } from '@terascope/data-mate';
 import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
-import type {
-    SearchParams
-} from 'elasticsearch';
 import type { EventEmitter } from 'events';
-import type { DataTypeConfig, xLuceneVariables } from '@terascope/types';
+import type {
+    DataTypeConfig, xLuceneVariables, ClientParams,
+    ClientResponse
+} from '@terascope/types';
 import type { WindowState } from './WindowState';
 
 /**
@@ -17,28 +17,28 @@ export interface ReaderClient {
     /**
      * Counts the number of documents for a given query
     */
-    count(query: SearchParams): Promise<number>;
+    count(query: ClientParams.SearchParams): Promise<number>;
 
     /**
      * Searches for documents for a given query
     */
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.raw,
         typeConfig?: DataTypeConfig
     ): Promise<Buffer>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]|DataFrame|Buffer>;
@@ -48,9 +48,15 @@ export interface ReaderClient {
      *
      * @note this API is subject to change
     */
-    _searchRequest(query: SearchParams, fullResponse?: false): Promise<DataEntity[]>;
-    _searchRequest(query: SearchParams, fullResponse: true): Promise<unknown>;
-    _searchRequest(query: SearchParams, fullResponse?: boolean): Promise<DataEntity[]|unknown>;
+    _searchRequest(
+        query: ClientParams.SearchParams,
+        fullResponse?: false
+    ): Promise<DataEntity[]>;
+    _searchRequest(query: ClientParams.SearchParams, fullResponse: true): Promise<unknown>;
+    _searchRequest(
+        query: ClientParams.SearchParams,
+        fullResponse?: boolean
+    ): Promise<DataEntity[]|unknown>;
 
     /**
      * Gets the elasticsearch major server version,
@@ -67,16 +73,7 @@ export interface ReaderClient {
     /**
      * Used to determine the max window size
     */
-    getSettings(index: string): Promise<SettingResults>;
-}
-
-export interface SettingResults {
-    [key: string]: {
-        settings: {
-            'index.max_result_window': number
-        },
-        defaults: AnyObject
-    }
+    getSettings(index: string): Promise<ClientResponse.IndicesGetSettingsResponse>;
 }
 
 /**

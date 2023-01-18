@@ -1,28 +1,19 @@
-import type {
-    SearchParams
-} from 'elasticsearch';
 import {
-    Logger, TSError, get, AnyObject, withoutNil, DataEntity
+    Logger, TSError, get, isNil,
+    AnyObject, withoutNil, DataEntity,
 } from '@terascope/utils';
+import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
 import { inspect } from 'util';
 import {
-    SpacesAPIConfig, ReaderClient, SettingResults, FetchResponseType
+    SpacesAPIConfig, ReaderClient, FetchResponseType
 } from './interfaces';
 import { throwRequestError } from './throwRequestError';
 
 // eslint-disable-next-line
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
-interface SettingsResponse {
-    params: {
-        size: {
-            max: number
-        }
-    }
-}
 
 export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
@@ -123,7 +114,7 @@ export class SpacesReaderClient implements ReaderClient {
         return response.body;
     }
 
-    protected translateSearchQuery(queryConfig: SearchParams): AnyObject {
+    protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
         const { config } = this;
 
         const fields = get(queryConfig, '_source', null) as string[]|null;
@@ -174,7 +165,7 @@ export class SpacesReaderClient implements ReaderClient {
                     if (sortType[dateFieldName]) {
                         // there is only one sort allowed
                         // {"date":{"order":"asc"}}
-                        sortQuery.sort = `${dateFieldName}:${queryConfig.body.sort[0][dateFieldName].order}`;
+                        sortQuery.sort = `${dateFieldName}:${queryConfig.body!.sort[0][dateFieldName].order}`;
                     }
                 });
             }
@@ -234,7 +225,7 @@ export class SpacesReaderClient implements ReaderClient {
             if (op) {
                 range = op;
             } else {
-                ({ range } = queryConfig.body.query);
+                ({ range } = queryConfig.body!.query);
             }
 
             const dateStart = new Date(range[dateFieldName].gte);
@@ -268,22 +259,22 @@ export class SpacesReaderClient implements ReaderClient {
     }
 
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.raw,
         typeConfig?: DataTypeConfig
     ): Promise<Buffer>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_entities,
         typeConfig?: DataTypeConfig
     ): Promise<DataEntity[]>;
     search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType.data_frame,
         typeConfig: DataTypeConfig
     ): Promise<DataFrame>;
     async search(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         responseType: FetchResponseType,
     ): Promise<DataEntity[]|DataFrame|Buffer> {
         if (responseType === FetchResponseType.data_entities) {
@@ -301,19 +292,19 @@ export class SpacesReaderClient implements ReaderClient {
         return DataFrame.deserialize(data);
     }
 
-    _searchRequest(query: SearchParams, fullResponse: false): Promise<DataEntity[]>;
+    _searchRequest(query: ClientParams.SearchParams, fullResponse: false): Promise<DataEntity[]>;
     _searchRequest(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         fullResponse: true,
         format: 'dfjson'
     ): Promise<Buffer>;
     _searchRequest(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         fullResponse: true,
         format?: 'json'|'dfjson'
     ): Promise<SearchResult>;
     async _searchRequest(
-        query: SearchParams,
+        query: ClientParams.SearchParams,
         fullResponse?: boolean,
         format?: 'json'|'dfjson'
     ): Promise<DataEntity[]|SearchResult|Buffer> {
@@ -331,7 +322,7 @@ export class SpacesReaderClient implements ReaderClient {
         }));
     }
 
-    async count(queryConfig: SearchParams): Promise<number> {
+    async count(queryConfig: ClientParams.SearchParams): Promise<number> {
         queryConfig.size = 0;
         const spaceResults = await this._searchRequest(queryConfig, true);
         return spaceResults.total;
@@ -346,12 +337,12 @@ export class SpacesReaderClient implements ReaderClient {
         return 6;
     }
 
-    async getSettings(_index: string): Promise<SettingResults> {
+    async getSettings(_index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {
         const { index, endpoint, token } = this.config;
         const uri = `${endpoint}/${index}/_info`;
 
         try {
-            const { body: { params: { size: { max } } } } = await got<SettingsResponse>(uri, {
+            const response = await got<ClientResponse.IndicesGetSettingsResponse>(uri, {
                 searchParams: { token },
                 responseType: 'json',
                 timeout: 1000000,
@@ -360,6 +351,11 @@ export class SpacesReaderClient implements ReaderClient {
                     methods: ['POST', 'GET'],
                 }
             });
+            const max = get(response, 'body.params.size.max', null) ?? get(response, 'params.size.max', null);
+
+            if (isNil(max)) {
+                throw new Error('Could not parse max from server response');
+            }
 
             return {
                 [index]: {
