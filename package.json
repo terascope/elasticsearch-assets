@@ -22,7 +22,7 @@
         "test:7": "ELASTICSEARCH_VERSION='7.9.3' yarn run test:all",
         "test:8": "ELASTICSEARCH_VERSION='8.1.2' yarn run test:all",
         "test:debug": "ts-scripts test --debug . --",
-        "test:legacy": "LEGACY_CLIENT=true yarn run test:all",
+        "test:legacy": "LEGACY_CLIENT=true yarn run test",
         "test:opensearch": "TEST_OPENSEARCH='true' yarn run test:all",
         "test:watch": "ts-scripts test --watch . --",
         "publish:changed": "./scripts/publish.sh"
@@ -74,7 +74,8 @@
             "suites": {
                 "unit": [],
                 "search": [
-                    "elasticsearch"
+                    "elasticsearch",
+                    "opensearch"
                 ]
             }
         },
