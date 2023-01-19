@@ -96,7 +96,7 @@ export async function populateIndex(
     };
 
     const dataType = new DataType({ version: LATEST_VERSION, fields });
-    const version = getESVersion(client);
+    const version = getESVersion(client) as any;
     const mapping = dataType.toESMapping({ typeName: type, overrides, version });
 
     await client.indices.create(
