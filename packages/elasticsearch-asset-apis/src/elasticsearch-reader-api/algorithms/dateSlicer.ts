@@ -1,5 +1,6 @@
 import {
-    cloneDeep, isNumber, TSError, isString
+    cloneDeep, isNumber, TSError,
+    isString
 } from '@terascope/utils';
 import moment from 'moment';
 import { inspect } from 'util';

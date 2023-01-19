@@ -1,18 +1,14 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
+import { ClientParams } from '@terascope/types';
 import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
-    makeClient,
-    cleanupIndex,
-    fetch,
-    upload,
-    waitForData,
-    TEST_INDEX_PREFIX,
+    makeClient, cleanupIndex, fetch,
+    upload, waitForData, TEST_INDEX_PREFIX,
 } from '../helpers';
 
 interface ClientCalls {
-    [key: string]: BulkIndexDocumentsParams
+    [key: string]: ClientParams.BulkParams
 }
 
 describe('elasticsearch_bulk', () => {
@@ -37,7 +33,7 @@ describe('elasticsearch_bulk', () => {
         const client = await makeClient();
         const bulkFn = esClient.bulk.bind(client);
 
-        client.bulk = (params: BulkIndexDocumentsParams) => {
+        client.bulk = (params: ClientParams.BulkParams) => {
             clientCalls[endpoint] = params;
             return bulkFn(params);
         };
@@ -126,7 +122,7 @@ describe('elasticsearch_bulk', () => {
         const index = makeIndex(testIndex);
         const opConfig = { size: 50, create: true, index };
 
-        const query: SearchParams = {
+        const query: ClientParams.SearchParams = {
             index,
             size: 200
         };
@@ -166,7 +162,7 @@ describe('elasticsearch_bulk', () => {
                 return newData;
             });
 
-        const query: SearchParams = {
+        const query: ClientParams.SearchParams = {
             index,
             size: 200
         };

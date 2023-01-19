@@ -1,9 +1,14 @@
-import { fixMappingRequest, getESVersion, createClient } from 'elasticsearch-store';
-import { Client, SearchParams, BulkIndexDocumentsParams } from 'elasticsearch';
 import {
-    DataEntity, AnyObject, debugLogger, pDelay, uniq
+    fixMappingRequest, getESVersion, createClient,
+    Client
+} from 'elasticsearch-store';
+import { ClientParams, DataTypeFields } from '@terascope/types';
+import { Client as LegacyClient } from 'elasticsearch';
+import {
+    DataEntity, AnyObject, debugLogger,
+    pDelay, uniq
 } from '@terascope/utils';
-import { DataType, LATEST_VERSION, TypeConfigFields } from '@terascope/data-types';
+import { DataType, LATEST_VERSION } from '@terascope/data-types';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
     ELASTICSEARCH_HOST, ELASTICSEARCH_API_VERSION,
@@ -29,7 +34,7 @@ export async function makeClient() {
     }
 
     if (process.env.LEGACY_CLIENT != null) {
-        return new Client({
+        return new LegacyClient({
             host,
             log: 'error',
             apiVersion: ELASTICSEARCH_API_VERSION,
@@ -66,7 +71,7 @@ export function formatUploadData(
 }
 
 export async function upload(
-    client: Client, queryBody: BulkIndexDocumentsParams, data: any[]
+    client: Client, queryBody: ClientParams.BulkParams, data: any[]
 ): Promise<AnyObject> {
     const body = formatUploadData(
         queryBody.index as string, queryBody.type as string, data
@@ -78,7 +83,7 @@ export async function upload(
 export async function populateIndex(
     client: Client,
     index: string,
-    fields: TypeConfigFields,
+    fields: DataTypeFields,
     records: any[],
     type = '_doc'
 ): Promise<void> {
@@ -90,7 +95,7 @@ export async function populateIndex(
     };
 
     const dataType = new DataType({ version: LATEST_VERSION, fields });
-    const version = getESVersion(client);
+    const version = getESVersion(client) as any;
     const mapping = dataType.toESMapping({ typeName: type, overrides, version });
 
     try {
@@ -121,7 +126,7 @@ export async function populateIndex(
     if (results.errors) {
         const errors: string[] = [];
         for (const response of results.items) {
-            if (response.index.error) errors.push(response.index.error.reason);
+            if (response.index?.error) errors.push(response.index.error.reason);
         }
 
         throw new Error(`There were errors populating index, errors: ${uniq(errors).join(' ; ')}`);
@@ -146,7 +151,7 @@ export async function addToIndex(
     if (results.errors) {
         const errors: string[] = [];
         for (const response of results.items) {
-            if (response.index.error) errors.push(response.index.error.reason);
+            if (response.index?.error) errors.push(response.index.error.reason);
         }
 
         throw new Error(`There were errors populating index, errors: ${uniq(errors).join(' ; ')}`);
@@ -154,11 +159,11 @@ export async function addToIndex(
 }
 
 export async function fetch(
-    client: Client, query: SearchParams, fullRequest = false
+    client: Client, query: ClientParams.SearchParams, fullRequest = false
 ): Promise<(DataEntity[] | DataEntity)> {
     const esClient = elasticAPI(client, logger, { full_response: fullRequest });
-    const results = await esClient.search(query);
-    return results;
+    const results = await esClient.search(query as any);
+    return results as any;
 }
 
 export async function waitForData(

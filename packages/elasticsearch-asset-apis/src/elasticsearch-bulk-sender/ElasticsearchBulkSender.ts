@@ -1,9 +1,6 @@
 import {
-    RouteSenderAPI,
-    DataEntity,
-    isString,
-    set,
-    pMap
+    RouteSenderAPI, DataEntity, isString,
+    set, pMap
 } from '@terascope/utils';
 import elasticAPI, { BulkActionMetadata, BulkRecord } from '@terascope/elasticsearch-api';
 import {
