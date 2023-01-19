@@ -4,7 +4,7 @@ import {
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow, get
+    pRetry, toIntegerOrThrow,
 } from '@terascope/utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
@@ -277,6 +277,7 @@ export class ElasticsearchReaderAPI {
     async setWindowSize(): Promise<void> {
         const { size } = this.config;
         const windowSize = await this.getWindowSize();
+
         if (size > windowSize) {
             throw new Error(`Invalid parameter size: ${size}, it cannot exceed the "index.max_result_window" index setting of ${windowSize} for index ${this.config.index}`);
         }
@@ -721,9 +722,8 @@ export class ElasticsearchReaderAPI {
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
-                const defaultPath = get(configs, `defaults.${window}`);
-                const configPath = get(configs, `settings.${window}`);
-
+                const defaultPath = configs.defaults![window];
+                const configPath = configs.settings![window];
                 // config goes first as it overrides an defaults
                 if (configPath) return toIntegerOrThrow(configPath);
                 if (defaultPath) return toIntegerOrThrow(defaultPath);
