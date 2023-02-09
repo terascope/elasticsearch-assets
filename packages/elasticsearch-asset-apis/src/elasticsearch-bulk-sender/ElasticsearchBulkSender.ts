@@ -167,6 +167,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
 
             if (++i >= this.config.size) {
                 yield bulkChunk;
+                i = 0;
                 bulkChunk = [];
             }
         }
