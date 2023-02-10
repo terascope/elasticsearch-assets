@@ -358,6 +358,29 @@ describe('elasticsearch bulk sender module', () => {
             expect(results[0].action).toMatchObject(expectedMetadata);
             expect(results[0].data).toMatchObject(expectedMutateMetadata);
         });
+
+        it('can chunk requests into config.size chunks', () => {
+            const opConfig = {
+                index: 'hello',
+                type: '_doc',
+                upsert: true,
+                size: 3
+            };
+
+            const dataArray = [...new Array(11)]
+                .map((_, i) => DataEntity.make({ count: i + 1, add: 1, _key: i }));
+
+            const sender = createSender(opConfig);
+
+            const results = Array.from(sender.chunkRequests(dataArray as Iterable<any>));
+
+            expect(results.length).toBe(4);
+
+            expect(results[0].length).toBe(3);
+            expect(results[1].length).toBe(3);
+            expect(results[2].length).toBe(3);
+            expect(results[3].length).toBe(2);
+        });
     });
 
     describe('send', () => {
