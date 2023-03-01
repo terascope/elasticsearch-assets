@@ -48,7 +48,7 @@ jobs:
       if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
       script: yarn --silent test:opensearch  --report-coverage false
 
-       - name: 'ES ASSET Client (elasticsearch 6) (node 16.19.1)'
+    - name: 'ES ASSET Client (elasticsearch 6) (node 16.19.1)'
       node_js: '16.19.1'
       # run only on pull-requests
       if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
@@ -66,7 +66,7 @@ jobs:
       if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
       script: yarn --silent test:opensearch  --report-coverage false
 
-       - name: 'ES ASSET Client (elasticsearch 6) (node 18.14.2)'
+    - name: 'ES ASSET Client (elasticsearch 6) (node 18.14.2)'
       node_js: '18.14.2'
       # run only on pull-requests
       if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
