@@ -355,6 +355,8 @@ export interface ESReaderOptions {
     response_type?: FetchResponseType;
     type_config?: DataTypeConfig
     useSimpleFetch?: boolean;
+    total?: number;
+    windowSize?: number;
 }
 
 export interface SpacesAPIConfig extends ESReaderOptions {
@@ -363,7 +365,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     timeout: number;
     headers?: AnyObject;
     retry?: number;
-    variables?: xLuceneVariables
+    variables?: xLuceneVariables;
 }
 
 export interface DetermineSliceResults {

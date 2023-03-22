@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import type { EventEmitter } from 'events';
 import {
     AnyObject, DataEntity, isObjectEntity,
     getTypeOf, Logger, isSimpleObject,
@@ -6,9 +6,9 @@ import {
     isString, isWildCardString, matchWildcard,
     pRetry, toIntegerOrThrow,
 } from '@terascope/utils';
-import { ClientParams, ClientResponse } from '@terascope/types';
-import { DataFrame } from '@terascope/data-mate';
-import { DataTypeConfig } from '@terascope/data-types';
+import type { ClientParams, ClientResponse } from '@terascope/types';
+import type { DataFrame } from '@terascope/data-mate';
+import type { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
 import { inspect } from 'util';
 import {
@@ -69,6 +69,7 @@ export class ElasticsearchReaderAPI {
         const timeResolution = time_resolution ? dateOptions(time_resolution) : '';
         this.dateFormat = timeResolution === 'ms' ? dateFormat : dateFormatSeconds;
         this.count = this.count.bind(this);
+        this.windowSize = config.windowSize;
     }
 
     makeWindowState(numOfSlicers: number): WindowState {
@@ -213,7 +214,7 @@ export class ElasticsearchReaderAPI {
     }
 
     async determineSliceInterval(
-        interval: string, esDates?: InputDateSegments
+        interval: string, esDates?: InputDateSegments, numSlicers?: number
     ): Promise<GetIntervalResult> {
         if (this.config.interval !== 'auto') {
             return {
@@ -226,10 +227,17 @@ export class ElasticsearchReaderAPI {
             throw new Error('Missing required dates to create interval');
         }
 
-        const count = await this.count({
-            start: moment(esDates.start).format(this.dateFormat),
-            end: moment(esDates.limit).format(this.dateFormat),
-        });
+        let count;
+        if (this.config.total && numSlicers) {
+            // interval just a guess so if already have a total just skip
+            // the await and divide total by slicers
+            count = Math.ceil(this.config.total / numSlicers);
+        } else {
+            count = await this.count({
+                start: moment(esDates.start).format(this.dateFormat),
+                end: moment(esDates.limit).format(this.dateFormat),
+            });
+        }
 
         // we need to return early so the millisecondInterval doesn't
         // end up being Infinity because 1/0 === Infinity
@@ -502,36 +510,27 @@ export class ElasticsearchReaderAPI {
             });
         }
 
-        const _esDates = await this.determineDateRanges();
+        const allSlicerDates = await this.determineDateRanges();
         // query with no results
-        if (_esDates.start == null || _esDates.limit == null) {
+        if (allSlicerDates.start == null || allSlicerDates.limit == null) {
             this.logger.warn(`No data was found in index: ${this.config.index} using query: ${this.config.query}`);
             // slicer will run and complete when a null is returned
             return;
         }
 
-        const allSlicerDates = _esDates as DateSegments;
-        const slicerMetadata: DateSlicerMetadata = {};
-
         const slicerRanges = await determineDateSlicerRanges({
-            dates: allSlicerDates,
+            dates: allSlicerDates as DateSegments,
             numOfSlicers,
             recoveryData,
-            getInterval: async (dates, slicerId) => {
+            getInterval: async (dates) => {
                 const result = await this.determineSliceInterval(
                     this.config.interval,
-                    dates
+                    dates,
+                    numOfSlicers
                 );
-
-                slicerMetadata[slicerId] = {
-                    ...result,
-                    start: moment(dates.start.format(this.dateFormat)).toISOString(),
-                    end: moment(dates.limit.format(this.dateFormat)).toISOString(),
-                };
 
                 if (result.interval == null) {
                     this.logger.warn(dates, `No data was found in index: ${this.config.index} using query: ${this.config.query} for slicer range`);
-                    return result;
                 }
 
                 return result;
@@ -542,6 +541,17 @@ export class ElasticsearchReaderAPI {
         // with the correct interval so it exposes the discovered intervals
         // and date ranges for each slicer to the user
         if (config.hook) {
+            const slicerMetadata: DateSlicerMetadata = {};
+            slicerRanges.forEach((range, slicerId) => {
+                if (!range) return;
+                const { interval, count } = range;
+                slicerMetadata[slicerId] = {
+                    interval,
+                    count,
+                    start: moment(range.dates.start.format(this.dateFormat)).toISOString(),
+                    end: moment(range.dates.limit.format(this.dateFormat)).toISOString(),
+                };
+            });
             await config.hook(slicerMetadata);
         }
         return slicerRanges;

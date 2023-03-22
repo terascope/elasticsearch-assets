@@ -4,7 +4,7 @@ import fs from 'fs';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
 import { inspect } from 'util';
-import {
+import type {
     StartPointConfig, SlicerDates, InputDateSegments,
     DateSegments, ReaderSlice, ParsedInterval,
     DateConfig, DateSlicerRanges, DateSlicerRange,
@@ -405,6 +405,7 @@ export async function determineDateSlicerRange(
         getInterval
     }: StartPointConfig,
     id: number,
+    preCalculatedDateRange?: DateSegments[]
 ): Promise<DateSlicerRange|null> {
     let newDates: DateRanges;
     // we are running in recovery
@@ -432,7 +433,7 @@ export async function determineDateSlicerRange(
         };
     }
 
-    const dateRange = divideRange(
+    const dateRange = preCalculatedDateRange || divideRange(
         dates.start,
         dates.limit,
         numOfSlicers
@@ -462,7 +463,13 @@ export async function determineDateSlicerRange(
 export async function determineDateSlicerRanges(
     config: StartPointConfig
 ): Promise<DateSlicerRanges> {
+    const dateRange = divideRange(
+        config.dates.start,
+        config.dates.limit,
+        config.numOfSlicers
+    );
+
     return Promise.all(times(config.numOfSlicers, async (id) => (
-        determineDateSlicerRange(config, id)
+        determineDateSlicerRange(config, id, dateRange)
     )));
 }
