@@ -1,7 +1,12 @@
+/* eslint-disable jest/no-focused-tests */
 import 'jest-extended';
+
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
-import { DataEntity, OpConfig } from '@terascope/job-components';
+
+import {
+    DataEntity, OpConfig
+} from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
     upload, waitForData, TEST_INDEX_PREFIX,
@@ -11,6 +16,7 @@ interface ClientCalls {
     [key: string]: ClientParams.BulkParams
 }
 
+let esClient: any;
 describe('elasticsearch_bulk', () => {
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
     const docType = '_doc';
@@ -18,7 +24,6 @@ describe('elasticsearch_bulk', () => {
     let harness: WorkerTestHarness;
     let clients: any;
     let clientCalls: ClientCalls = {};
-    let esClient: any;
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -187,5 +192,66 @@ describe('elasticsearch_bulk', () => {
 
         expect(Array.isArray(fetchedData)).toEqual(true);
         expect(fetchedData).toEqual([]);
+    });
+
+    it('dlq test', async () => {
+        const index = `${bulkIndex}-dlq-test`;
+
+        // adjust metadata to simulate a bulk rejection rejection
+        const data = [
+            { _key: 1, test_field: 2 },
+            { _key: 2, test_field: 4 }
+        ].map((doc) => DataEntity.make(doc, { _key: doc._key, _bulk_sender_rejection: 'unretryable error' }));
+
+        const job = newTestJobConfig({
+            max_retries: 0,
+            operations: [
+                {
+                    _op: 'test-reader',
+                    passthrough_slice: true,
+                },
+                {
+                    _op: 'elasticsearch_bulk',
+                    index,
+                    type: '_doc',
+                    _dead_letter_action: 'none'
+                }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        const esBulk = harness.getOperation('elasticsearch_bulk');
+
+        const rejected: (DataEntity | Error)[] = [];
+
+        // replace reject record function to verify the doc and err is getting passed in
+        esBulk.rejectRecord = (doc: DataEntity, err: Error) => {
+            rejected.push(doc, err);
+            return null;
+        };
+
+        await harness.initialize();
+
+        // replace opConfig _dead_letter_action setting to trigger reject record action
+        Object.defineProperty(
+            esBulk,
+            'opConfig',
+            {
+                value: { _dead_letter_action: 'kafka_dead_letter' },
+                writable: false
+            }
+        );
+
+        const results = await harness.runSlice(data);
+
+        expect(rejected).toEqual([
+            DataEntity.make({ _key: 1, test_field: 2 }),
+            'unretryable error',
+            DataEntity.make({ _key: 2, test_field: 4 }),
+            'unretryable error'
+        ]);
+
+        expect(results.length).toBe(2);
     });
 });
