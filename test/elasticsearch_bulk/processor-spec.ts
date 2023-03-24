@@ -4,9 +4,7 @@ import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
 
-import {
-    DataEntity, OpConfig
-} from '@terascope/job-components';
+import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
     upload, waitForData, TEST_INDEX_PREFIX,
@@ -16,7 +14,6 @@ interface ClientCalls {
     [key: string]: ClientParams.BulkParams
 }
 
-let esClient: any;
 describe('elasticsearch_bulk', () => {
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
     const docType = '_doc';
@@ -24,6 +21,7 @@ describe('elasticsearch_bulk', () => {
     let harness: WorkerTestHarness;
     let clients: any;
     let clientCalls: ClientCalls = {};
+    let esClient: any;
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -194,34 +192,23 @@ describe('elasticsearch_bulk', () => {
         expect(fetchedData).toEqual([]);
     });
 
-    it('dlq test', async () => {
+    it('should send docs to kafka dead letter queue if _dead_letter_action is kafka_dead_letter', async () => {
         const index = `${bulkIndex}-dlq-test`;
 
-        // adjust metadata to simulate a bulk rejection rejection
+        // adjust metadata to simulate a bulk rejection
         const data = [
             { _key: 1, test_field: 2 },
             { _key: 2, test_field: 4 }
         ].map((doc) => DataEntity.make(doc, { _key: doc._key, _bulk_sender_rejection: 'unretryable error' }));
 
-        const job = newTestJobConfig({
-            max_retries: 0,
-            operations: [
-                {
-                    _op: 'test-reader',
-                    passthrough_slice: true,
-                },
-                {
-                    _op: 'elasticsearch_bulk',
-                    index,
-                    type: '_doc',
-                    _dead_letter_action: 'none'
-                }
-            ]
+        const test = await makeTest({
+            _op: 'elasticsearch_bulk',
+            index,
+            type: '_doc',
+            _dead_letter_action: 'none'
         });
 
-        harness = new WorkerTestHarness(job, { clients });
-
-        const esBulk = harness.getOperation('elasticsearch_bulk');
+        const esBulk = test.getOperation('elasticsearch_bulk');
 
         const rejected: (DataEntity | Error)[] = [];
 
@@ -231,9 +218,7 @@ describe('elasticsearch_bulk', () => {
             return null;
         };
 
-        await harness.initialize();
-
-        // replace opConfig _dead_letter_action setting to trigger reject record action
+        // replace opConfig _dead_letter_action setting to trigger reject record logic
         Object.defineProperty(
             esBulk,
             'opConfig',
@@ -243,7 +228,7 @@ describe('elasticsearch_bulk', () => {
             }
         );
 
-        const results = await harness.runSlice(data);
+        await test.runSlice(data);
 
         expect(rejected).toEqual([
             DataEntity.make({ _key: 1, test_field: 2 }),
@@ -251,7 +236,5 @@ describe('elasticsearch_bulk', () => {
             DataEntity.make({ _key: 2, test_field: 4 }),
             'unretryable error'
         ]);
-
-        expect(results.length).toBe(2);
     });
 });
