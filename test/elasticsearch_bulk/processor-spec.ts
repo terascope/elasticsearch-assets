@@ -1,9 +1,7 @@
-/* eslint-disable jest/no-focused-tests */
 import 'jest-extended';
 
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
-
 import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
