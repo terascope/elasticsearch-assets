@@ -1,4 +1,5 @@
 import 'jest-extended';
+
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
 import { DataEntity, OpConfig } from '@terascope/job-components';
@@ -187,5 +188,51 @@ describe('elasticsearch_bulk', () => {
 
         expect(Array.isArray(fetchedData)).toEqual(true);
         expect(fetchedData).toEqual([]);
+    });
+
+    it('should send docs to kafka dead letter queue if _dead_letter_action is kafka_dead_letter', async () => {
+        const index = `${bulkIndex}-dlq-test`;
+
+        // adjust metadata to simulate a bulk rejection
+        const data = [
+            { _key: 1, test_field: 2 },
+            { _key: 2, test_field: 4 }
+        ].map((doc) => DataEntity.make(doc, { _key: doc._key, _bulk_sender_rejection: 'unretryable error' }));
+
+        const test = await makeTest({
+            _op: 'elasticsearch_bulk',
+            index,
+            type: '_doc',
+            _dead_letter_action: 'none'
+        });
+
+        const esBulk = test.getOperation('elasticsearch_bulk');
+
+        const rejected: (DataEntity | Error)[] = [];
+
+        // replace reject record function to verify the doc and err is getting passed in
+        esBulk.rejectRecord = (doc: DataEntity, err: Error) => {
+            rejected.push(doc, err);
+            return null;
+        };
+
+        // replace opConfig _dead_letter_action setting to trigger reject record logic
+        Object.defineProperty(
+            esBulk,
+            'opConfig',
+            {
+                value: { _dead_letter_action: 'kafka_dead_letter' },
+                writable: false
+            }
+        );
+
+        await test.runSlice(data);
+
+        expect(rejected).toEqual([
+            DataEntity.make({ _key: 1, test_field: 2 }),
+            'unretryable error',
+            DataEntity.make({ _key: 2, test_field: 4 }),
+            'unretryable error'
+        ]);
     });
 });

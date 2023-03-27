@@ -16,7 +16,17 @@ export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkC
 
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         if (data == null || data.length === 0) return data;
+
         await this.client.send(data);
+
+        if (this.opConfig._dead_letter_action === 'kafka_dead_letter') {
+            for (const doc of data) {
+                if (doc.getMetadata('_bulk_sender_rejection') !== null) {
+                    this.rejectRecord(doc, doc.getMetadata('_bulk_sender_rejection'));
+                }
+            }
+        }
+
         return data;
     }
 }
