@@ -3,9 +3,12 @@ dist: focal
 language: node_js
 node_js:
   - '14.21.3'
+  - '16.19.1'
+  - '18.16.0'
 os:
   - linux
   - osx
+osx_image: xcode12
 branches:
   only:
     - master
@@ -66,6 +69,24 @@ jobs:
       if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
       script: yarn --silent test:opensearch  --report-coverage false
 
+    - name: 'ES ASSET Client (elasticsearch 6) (node 18.16.0)'
+      node_js: '18.16.0'
+      # run only on pull-requests
+      if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
+      script: yarn --silent test:6  --report-coverage false
+
+    - name: 'ES ASSET Client (elasticsearch 7) (node 18.16.0)'
+      node_js: '18.16.0'
+      # run only on pull-requests
+      if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
+      script: yarn --silent test:7  --report-coverage false
+
+    - name: 'ES ASSET Opensearch (opensearch 1.3.0) (node 18.16.0)'
+      node_js: '18.16.0'
+      # run only on pull-requests
+      if: branch = master AND type IN (pull_request, cron) AND commit_message !~ /^WIP/
+      script: yarn --silent test:opensearch  --report-coverage false
+
 before_install:
   # Install latest yarn
   - npm install --global yarn
@@ -88,6 +109,7 @@ script:
   - teraslice-cli -v
   - teraslice-cli assets build --bundle-target node14
   - teraslice-cli assets build --bundle-target node16
+  - teraslice-cli assets build --bundle-target node18
 after_success:
   - bash <(curl -s https://codecov.io/bash)
 before_deploy:
