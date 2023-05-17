@@ -74,7 +74,8 @@
             "suites": {
                 "unit": [],
                 "search": [
-                    "elasticsearch"
+                    "elasticsearch",
+                    "opensearch"
                 ]
             }
         },

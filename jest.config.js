@@ -9,7 +9,7 @@ module.exports = {
     collectCoverage: true,
     coverageReporters: ['json', 'lcov', 'text', 'html'],
     coverageDirectory: 'coverage',
-    maxWorkers: '50%',
+    maxWorkers: '25%',
     workerIdleMemoryLimit: '300MB',
     collectCoverageFrom: [
         '<rootDir>/asset/**/*.ts',
