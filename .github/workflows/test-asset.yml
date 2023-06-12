@@ -40,7 +40,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1]
+        node-version: [14.21.3, 16.19.1, 18.16.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -67,7 +67,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1]
+        node-version: [14.21.3, 16.19.1, 18.16.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -94,7 +94,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1]
+        node-version: [14.21.3, 16.19.1, 18.16.0]
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
