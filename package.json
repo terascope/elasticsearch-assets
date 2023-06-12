@@ -18,7 +18,7 @@
         "setup": "yarn && yarn build --force",
         "test:all": "ts-scripts test",
         "test": "ts-scripts test . --",
-        "test:6": "ELASTICSEARCH_VERSION='6.8.6' yarn run test:all",
+        "test:6": "JEST_MAX_WORKERS=1 ELASTICSEARCH_VERSION='6.8.6' yarn run test:all",
         "test:7": "ELASTICSEARCH_VERSION='7.9.3' yarn run test:all",
         "test:8": "ELASTICSEARCH_VERSION='8.1.2' yarn run test:all",
         "test:debug": "ts-scripts test --debug . --",
