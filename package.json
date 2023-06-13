@@ -16,7 +16,7 @@
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
         "lint:fix": "yarn lint --fix",
         "setup": "yarn && yarn build --force",
-        "test:all": "JEST_MAX_WORKERS=1 ts-scripts test",
+        "test:all": "ts-scripts test",
         "test": "ts-scripts test . --",
         "test:6": "ELASTICSEARCH_VERSION='6.8.6' yarn run test:all",
         "test:7": "ELASTICSEARCH_VERSION='7.9.3' yarn run test:all",
