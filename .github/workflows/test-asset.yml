@@ -57,7 +57,9 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:6
-      # - run: yarn global add teraslice-cli
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+    # - run: yarn global add teraslice-cli
       # - run: teraslice-cli -v
       # - run: teraslice-cli assets build
       # - run: ls -l build/
@@ -84,7 +86,9 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:7
-      # - run: yarn global add teraslice-cli
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+    # - run: yarn global add teraslice-cli
       # - run: teraslice-cli -v
       # - run: teraslice-cli assets build
       # - run: ls -l build/
@@ -111,7 +115,9 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:opensearch
-      # - run: yarn global add teraslice-cli
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+    # - run: yarn global add teraslice-cli
       # - run: teraslice-cli -v
       # - run: teraslice-cli assets build
       # - run: ls -l build/
