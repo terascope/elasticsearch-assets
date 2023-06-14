@@ -10,6 +10,8 @@ on:
 jobs:
   test-es6-legacy-linux:
     runs-on: ubuntu-latest
+    env:
+      NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
@@ -57,9 +59,10 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:6
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-    # - run: yarn global add teraslice-cli
+      # TODO: We should add build back in, but it probably doesn't need to
+      # happen for each ES version, we just want to make sure a PR doesn't
+      # break build, see TODO below
+      # - run: yarn global add teraslice-cli
       # - run: teraslice-cli -v
       # - run: teraslice-cli assets build
       # - run: ls -l build/
@@ -86,12 +89,6 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:7
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-    # - run: yarn global add teraslice-cli
-      # - run: teraslice-cli -v
-      # - run: teraslice-cli assets build
-      # - run: ls -l build/
 
   test-opensearch-1-linux:
     runs-on: ubuntu-latest
@@ -115,12 +112,6 @@ jobs:
       - run: yarn setup
       - run: yarn lint
       - run: yarn --silent --report-coverage false test:opensearch
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-    # - run: yarn global add teraslice-cli
-      # - run: teraslice-cli -v
-      # - run: teraslice-cli assets build
-      # - run: ls -l build/
 
 # TODO:
 # - Add Macos Test
