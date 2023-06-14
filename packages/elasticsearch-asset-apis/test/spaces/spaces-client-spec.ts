@@ -74,7 +74,8 @@ describe('Spaces Reader Client', () => {
         it('should be able to make a search request without use data frames', async () => {
             scope.post(`/${index}?token=${token}`, {
                 q: '(foo:bar)',
-                size: 100
+                size: 100,
+                trackTotalHits: true
             }).reply(200, {
                 results: [{ foo: 'foo', bar: 'bar', byte: 10 }],
                 returning: 1,
@@ -103,6 +104,7 @@ describe('Spaces Reader Client', () => {
             scope.post(`/${index}?token=${token}&format=dfjson`, {
                 q: '(foo:bar)',
                 size: 100,
+                trackTotalHits: true
             }).reply(200, frame.serialize());
 
             const result = await client.search(
