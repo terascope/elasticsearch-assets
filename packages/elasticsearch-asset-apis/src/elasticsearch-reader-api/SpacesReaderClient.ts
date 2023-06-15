@@ -180,6 +180,7 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
+                trackTotalHits: true
             });
         }
 

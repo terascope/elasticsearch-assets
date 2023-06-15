@@ -186,6 +186,8 @@ describe('spaces_reader fetcher', () => {
             // query size are overridden for unbounded fetches
             query.size = maxSize;
 
+            (query as any).trackTotalHits = true;
+
             let results: DataEntity[];
 
             beforeEach(async () => {
@@ -258,6 +260,7 @@ describe('spaces_reader fetcher', () => {
                 scope.post(`/${testIndex}?token=${token}`, {
                     q: '(test:query)',
                     size: 100000,
+                    trackTotalHits: true
                 })
                     .delay(500)
                     .reply(200, {
