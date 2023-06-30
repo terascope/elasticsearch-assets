@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, ValidatedJobConfig, DataEntity } from '@terascope/job-components';
+import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
 import {
@@ -25,7 +25,7 @@ describe('id_reader Schema', () => {
 
     const index = makeIndex(evenSpread.index);
 
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data;
 
     let harness: WorkerTestHarness;
     let esClient: any;
@@ -63,7 +63,7 @@ describe('id_reader Schema', () => {
             },
         ];
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
+        await populateIndex(esClient, index, evenSpread.dataType, evenBulkData, docType);
     });
 
     afterAll(async () => {

@@ -1,5 +1,6 @@
-import { DataTypeFields, FieldType } from '@terascope/types';
-import { cloneDeep } from '@terascope/utils';
+import { FieldType } from '@terascope/types';
+import { DataEntity } from '@terascope/utils';
+import { DataType } from '@terascope/data-types';
 
 // These records are meant to fall within the following range
 // start: '2019-04-26T15:00:23.201Z',
@@ -51,21 +52,23 @@ const data = [
         location: '89.30019, -158.5777',
         bytes: 802825
     }
-];
+].map((record) => DataEntity.make(record, { _key: record.uuid }));
 
-const types: DataTypeFields = {
-    ip: { type: FieldType.IP },
-    userAgent: { type: FieldType.Keyword },
-    url: { type: FieldType.Keyword },
-    uuid: { type: FieldType.Keyword },
-    created: { type: FieldType.Date },
-    ipv6: { type: FieldType.Keyword },
-    location: { type: FieldType.GeoPoint },
-    bytes: { type: FieldType.Integer }
-};
+const ExtraEvenDataType = new DataType({
+    fields: {
+        ip: { type: FieldType.IP },
+        userAgent: { type: FieldType.Keyword },
+        url: { type: FieldType.Keyword },
+        uuid: { type: FieldType.Keyword },
+        created: { type: FieldType.Date },
+        ipv6: { type: FieldType.Keyword },
+        location: { type: FieldType.GeoPoint },
+        bytes: { type: FieldType.Integer }
+    }
+});
 
 export = {
-    data: cloneDeep(data),
-    types,
+    data,
+    datatype: ExtraEvenDataType,
     index: 'even_spread'
-}
+};

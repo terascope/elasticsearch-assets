@@ -1,5 +1,5 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SlicerRecoveryData, DataEntity, AnyObject } from '@terascope/job-components';
+import { SlicerRecoveryData, AnyObject } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
@@ -16,9 +16,7 @@ describe('id_reader slicer', () => {
     const docType = '_doc';
     const field = 'uuid';
 
-    // for compatibility tests for older elasticsearch version,
-    // we make the _id of the record the same as its uuid field
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     let harness: SlicerTestHarness;
     let clients: any;
@@ -27,7 +25,7 @@ describe('id_reader slicer', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
-        await populateIndex(esClient, apiReaderIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, apiReaderIndex, evenSpread.dataType, bulkData, docType);
         await waitForData(esClient, apiReaderIndex, bulkData.length);
     });
 

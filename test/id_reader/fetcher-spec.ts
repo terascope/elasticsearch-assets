@@ -3,12 +3,9 @@ import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
-    TEST_INDEX_PREFIX,
-    getListOfIds,
-    getTotalSliceCounts,
-    makeClient,
-    cleanupIndex,
-    populateIndex
+    TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts,
+    makeClient, cleanupIndex, populateIndex,
+    removeTypeTest
 } from '../helpers';
 import evenSpread from '../fixtures/data/even-spread';
 
@@ -18,7 +15,7 @@ describe('id_reader fetcher', () => {
     const docType = '_doc';
     // in es5 this should be ignored
     const id_field_name = 'uuid';
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
@@ -34,7 +31,7 @@ describe('id_reader fetcher', () => {
         esClient = await makeClient();
 
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.dataType, bulkData, docType);
     });
 
     afterAll(async () => {
@@ -167,7 +164,10 @@ describe('id_reader fetcher', () => {
         expect(metadata._eventTime).toBeNumber();
         expect(metadata._key).toBeString();
         expect(metadata._index).toEqual(evenIndex);
-        expect(metadata._type).toEqual(docType);
         expect(metadata._eventTime).toBeNumber();
+
+        if (!removeTypeTest) {
+            expect(metadata._type).toEqual(docType);
+        }
     });
 });

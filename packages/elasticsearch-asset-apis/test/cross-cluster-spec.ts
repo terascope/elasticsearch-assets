@@ -1,6 +1,5 @@
 import 'jest-extended';
-import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
@@ -33,7 +32,7 @@ describe('Reader API', () => {
     }
 
     const crossClusterTestIndex = makeIndex(baseIndex);
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data;
 
     const docType = '_doc';
     let client: any;
@@ -48,18 +47,15 @@ describe('Reader API', () => {
             logger,
         );
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, crossClusterTestIndex, evenSpread.types, evenBulkData, docType);
+        await populateIndex(
+            client, crossClusterTestIndex, evenSpread.dataType, evenBulkData, docType
+        );
         await waitForData(client, crossClusterTestIndex, evenBulkData.length);
     });
 
     afterAll(async () => {
         await cleanupIndex(client, makeIndex('*'));
     });
-
-    const typeConfig: DataTypeConfig = {
-        version: LATEST_VERSION,
-        fields: evenSpread.types
-    };
 
     describe('Cross cluster searching', () => {
         const defaultConfig: ESReaderOptions = Object.seal({
@@ -69,7 +65,7 @@ describe('Reader API', () => {
             query: '*',
             type: docType,
             response_type: FetchResponseType.data_frame,
-            type_config: typeConfig,
+            type_config: evenSpread.dataType,
             start: null,
             end: null,
             interval: 'auto',

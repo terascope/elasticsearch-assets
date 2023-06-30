@@ -1,6 +1,5 @@
 import 'jest-extended';
 import {
-    DataEntity,
     pDelay,
     LifeCycle,
     SlicerRecoveryData,
@@ -52,8 +51,8 @@ describe('elasticsearch_reader slicer', () => {
         return results;
     }
 
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    const unevenBulkData = unevenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data;
+    const unevenBulkData = unevenSpread.data;
 
     let harness: SlicerTestHarness;
     let esClient: any;
@@ -75,8 +74,10 @@ describe('elasticsearch_reader slicer', () => {
         await cleanupIndex(esClient, makeIndex('*'));
 
         await Promise.all([
-            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType),
-            await populateIndex(esClient, unevenIndex, unevenSpread.types, unevenBulkData, docType)
+            await populateIndex(esClient, evenIndex, evenSpread.dataType, evenBulkData, docType),
+            await populateIndex(
+                esClient, unevenIndex, unevenSpread.dataType, unevenBulkData, docType
+            )
         ]);
     });
 
