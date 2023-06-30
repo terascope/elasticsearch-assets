@@ -1,5 +1,4 @@
 import 'jest-extended';
-import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
@@ -9,7 +8,7 @@ import {
     populateIndex,
     waitForData,
     makeClient,
-    majorVersion
+    getMajorVersion
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -34,11 +33,12 @@ describe('Reader API', () => {
     }
 
     const evenIndex = makeIndex(evenSpread.index);
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data;
     const docType = '_doc';
 
     let client: any;
     let readerClient: ElasticsearchReaderClient;
+    const majorVersion = getMajorVersion();
 
     beforeAll(async () => {
         client = await makeClient();
@@ -49,18 +49,15 @@ describe('Reader API', () => {
             logger,
         );
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, evenIndex, evenSpread.types, evenBulkData, docType);
+        await populateIndex(
+            client, evenIndex, evenSpread.dataType, evenBulkData, docType
+        );
         await waitForData(client, evenIndex, evenBulkData.length);
     });
 
     afterAll(async () => {
         await cleanupIndex(client, makeIndex('*'));
     });
-
-    const typeConfig: DataTypeConfig = {
-        version: LATEST_VERSION,
-        fields: evenSpread.types
-    };
 
     describe('returning data frames', () => {
         const defaultConfig: ESReaderOptions = Object.seal({
@@ -69,7 +66,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.data_frame,
-            type_config: typeConfig,
+            type_config: evenSpread.dataType,
             start: null,
             end: null,
             interval: 'auto',
@@ -261,7 +258,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.raw,
-            type_config: typeConfig,
+            type_config: evenSpread.dataType,
             start: null,
             end: null,
             interval: 'auto',
@@ -451,7 +448,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.data_entities,
-            type_config: typeConfig,
+            type_config: evenSpread.dataType,
             start: null,
             end: null,
             interval: 'auto',

@@ -1,5 +1,4 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import {
     TEST_INDEX_PREFIX,
@@ -14,7 +13,7 @@ describe('date_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
     const date_field_name = 'created';
     const docType = '_doc';
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
@@ -29,7 +28,7 @@ describe('date_reader job', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.dataType, bulkData, docType);
     });
 
     afterAll(async () => {

@@ -1,5 +1,5 @@
 import { times } from '@terascope/utils';
-import { DataTypeFields } from '@terascope/types';
+import { DataType } from '@terascope/data-types';
 
 const baseDate = new Date('2019-04-26T08:00:23.207-07:00').valueOf();
 let counter = 0;
@@ -18,13 +18,15 @@ const data = times(2_000, (index) => {
     return results;
 });
 
-const types: DataTypeFields = {
-    created: { type: 'Date' },
-    bytes: { type: 'Integer' }
-};
+const CondensedSpread = new DataType({
+    fields: {
+        created: { type: 'Date' },
+        bytes: { type: 'Integer' }
+    }
+});
 
 export = {
     data,
-    types,
+    datatype: CondensedSpread,
     index: 'condensed_spread'
 }
