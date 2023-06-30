@@ -10,12 +10,13 @@ jest.setTimeout(30000);
 
 const {
     makeClient, cleanupIndex, upload,
-    populateIndex, waitForData, getTestENVClientInfo
+    populateIndex, waitForData, getTestENVClientInfo,
+    removeTypeTest
 } = ElasticsearchTestHelpers;
 
 export {
     makeClient, cleanupIndex, upload,
-    populateIndex, waitForData
+    populateIndex, waitForData, removeTypeTest
 };
 
 export function getMajorVersion() {

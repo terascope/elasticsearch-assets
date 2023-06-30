@@ -3,12 +3,9 @@ import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient,
-    getMajorVersion
+    TEST_INDEX_PREFIX, cleanupIndex, populateIndex,
+    waitForData, makeClient, getMajorVersion,
+    removeTypeTest
 } from './helpers';
 import evenSpread from './fixtures/data/even-spread';
 import {
@@ -542,7 +539,10 @@ describe('Reader API', () => {
                 _type, _index, _key, _createTime
             } = metadata;
 
-            expect(_type).toEqual(docType);
+            if (!removeTypeTest) {
+                expect(_type).toEqual(docType);
+            }
+
             expect(_index).toEqual(evenIndex);
             expect(_key).toBeString();
             expect(_createTime).toBeNumber();
