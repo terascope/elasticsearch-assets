@@ -29,11 +29,16 @@ module.exports = {
         '^terafoundation_elasticsearch_connector$': path.join(__dirname, '/packages/terafoundation_elasticsearch_connector/src/index.ts'),
     },
     preset: 'ts-jest',
-    globals: {
-        'ts-jest': {
+    transform: {
+        '\\.[jt]sx?$': ['ts-jest', {
+            isolatedModules: true,
             tsconfig: './tsconfig.json',
             diagnostics: true,
-        },
+            pretty: true,
+            useESM: true
+        }]
+    },
+    globals: {
         ignoreDirectories: ['dist'],
         availableExtensions: ['.js', '.ts']
     }
