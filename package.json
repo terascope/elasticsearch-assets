@@ -17,13 +17,14 @@
         "lint:fix": "yarn lint --fix",
         "setup": "yarn && yarn build --force",
         "test:all": "ts-scripts test",
-        "test": "ts-scripts test . --",
-        "test:6": "ELASTICSEARCH_VERSION='6.8.6' yarn run test:all",
-        "test:7": "ELASTICSEARCH_VERSION='7.9.3' yarn run test:all",
-        "test:8": "ELASTICSEARCH_VERSION='8.1.2' yarn run test:all",
-        "test:debug": "ts-scripts test --debug . --",
-        "test:legacy": "LEGACY_CLIENT=true yarn run test",
-        "test:opensearch": "TEST_OPENSEARCH='true' yarn run test:all",
+        "test": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:debug": "TEST_ELASTICSEARCH='true' ts-scripts test --debug . --",
+        "test:elasticsearch6": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:elasticsearch7": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='7.9.3' ts-scripts test . --",
+        "test:elasticsearch8": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='8.1.2' ts-scripts test . --",
+        "test:legacy": "TEST_ELASTICSEARCH='true' LEGACY_CLIENT=true ts-scripts test . --",
+        "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test . --",
+        "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test . --",
         "test:watch": "ts-scripts test --watch . --",
         "publish:changed": "./scripts/publish.sh"
     },
@@ -73,10 +74,7 @@
         "tests": {
             "suites": {
                 "unit": [],
-                "search": [
-                    "elasticsearch",
-                    "opensearch"
-                ]
+                "search": []
             }
         },
         "docker": {
