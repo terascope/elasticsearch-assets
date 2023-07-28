@@ -66,8 +66,12 @@ jobs:
       - run: yarn setup
       - run: yarn lint
 
-      - name: Test ${{ matrix.search-version }}
+      - name: Test asset for ${{ matrix.search-version }}
         run: yarn --silent test:${{ matrix.search-version }}
+
+      - name: Test apis for ${{ matrix.search-version }}
+        run: yarn --silent test:${{ matrix.search-version }}
+        working-directory: ./packages/elasticsearch-asset-apis
 
 
 # TODO:

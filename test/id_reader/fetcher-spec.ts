@@ -1,5 +1,6 @@
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
+import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
@@ -10,31 +11,34 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
 
 describe('id_reader fetcher', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     const docType = '_doc';
     // in es5 this should be ignored
     const id_field_name = 'uuid';
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
     }
 
-    const evenIndex = makeIndex(evenSpread.index);
+    const evenIndex = makeIndex('even_spread');
 
     let harness: JobTestHarness;
     let clients: any;
     let esClient: any;
+    let hasTypedDoc = true;
 
     beforeAll(async () => {
         esClient = await makeClient();
-
+        if (isOpensearch2(esClient) || isElasticsearch8(esClient)) {
+            hasTypedDoc = false;
+        }
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
     });
 
     afterAll(async () => {
@@ -167,7 +171,13 @@ describe('id_reader fetcher', () => {
         expect(metadata._eventTime).toBeNumber();
         expect(metadata._key).toBeString();
         expect(metadata._index).toEqual(evenIndex);
-        expect(metadata._type).toEqual(docType);
+
+        if (hasTypedDoc) {
+            expect(metadata._type).toEqual(docType);
+        } else {
+            expect(metadata._type).toBeUndefined();
+        }
+
         expect(metadata._eventTime).toBeNumber();
     });
 });

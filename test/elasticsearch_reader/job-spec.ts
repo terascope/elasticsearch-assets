@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import {
     TEST_INDEX_PREFIX,
@@ -8,19 +8,19 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
 
 describe('date_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
     const date_field_name = 'created';
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const docType = '_doc';
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
     }
 
-    const evenIndex = makeIndex(`${evenSpread.index}-2020.0.1`);
+    const evenIndex = makeIndex('even_spread-2020.0.1');
 
     let harness: JobTestHarness;
     let clients: any;
@@ -29,7 +29,7 @@ describe('date_reader job', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
     });
 
     afterAll(async () => {
@@ -153,7 +153,7 @@ describe('date_reader job', () => {
                 {
                     _name: 'elasticsearch_reader_api',
                     connection: 'otherConnection',
-                    index: `${makeIndex(evenSpread.index)}-*`,
+                    index: `${makeIndex('even_spread')}-*`,
                     type: '_doc',
                     date_field_name: 'created',
                     interval: 'auto',

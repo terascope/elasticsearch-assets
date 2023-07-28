@@ -1,13 +1,9 @@
 import 'jest-extended';
 import {
-    DataEntity,
-    pDelay,
-    LifeCycle,
-    SlicerRecoveryData,
-    AnyObject,
-    sortBy,
-    SliceRequest
+    pDelay, LifeCycle, SlicerRecoveryData,
+    AnyObject, sortBy, SliceRequest
 } from '@terascope/job-components';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import moment from 'moment';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '@terascope/elasticsearch-asset-apis';
@@ -17,8 +13,6 @@ import {
     cleanupIndex,
     populateIndex,
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
-import unevenSpread from '../fixtures/data/uneven-spread';
 
 describe('elasticsearch_reader slicer', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_slicer_`;
@@ -26,9 +20,11 @@ describe('elasticsearch_reader slicer', () => {
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
     }
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
+    const unevenSpread = ElasticsearchTestHelpers.UnevenDateData;
 
-    const evenIndex = makeIndex(evenSpread.index);
-    const unevenIndex = makeIndex(unevenSpread.index);
+    const evenIndex = makeIndex('even_data');
+    const unevenIndex = makeIndex('uneven_data');
     const docType = '_doc';
 
     const evenOriginalStart = '2019-04-26T15:00:23.201Z';
@@ -52,8 +48,8 @@ describe('elasticsearch_reader slicer', () => {
         return results;
     }
 
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    const unevenBulkData = unevenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenBulkData = evenSpread.data;
+    const unevenBulkData = unevenSpread.data;
 
     let harness: SlicerTestHarness;
     let esClient: any;
@@ -75,8 +71,12 @@ describe('elasticsearch_reader slicer', () => {
         await cleanupIndex(esClient, makeIndex('*'));
 
         await Promise.all([
-            await populateIndex(esClient, evenIndex, evenSpread.types, evenBulkData, docType),
-            await populateIndex(esClient, unevenIndex, unevenSpread.types, unevenBulkData, docType)
+            await populateIndex(
+                esClient, evenIndex, evenSpread.EvenDataType, evenBulkData, docType
+            ),
+            await populateIndex(
+                esClient, unevenIndex, unevenSpread.UnevenDataTypeFields, unevenBulkData, docType
+            )
         ]);
     });
 
