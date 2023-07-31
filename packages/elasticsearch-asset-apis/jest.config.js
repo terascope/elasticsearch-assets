@@ -12,11 +12,13 @@ module.exports = {
         '<rootDir>/test/*-spec.{ts,js}',
     ],
     preset: 'ts-jest',
-    globals: {
-        'ts-jest': {
+    transform: {
+        '\\.[jt]sx?$': ['ts-jest', {
+            isolatedModules: true,
             tsconfig: './tsconfig.json',
             diagnostics: true,
             pretty: true,
-        }
-    }
+            useESM: true
+        }]
+    },
 };
