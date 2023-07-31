@@ -1,6 +1,6 @@
 import 'jest-extended';
-import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
+import { ElasticsearchTestHelpers, getClientMetadata } from 'elasticsearch-store';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
@@ -8,10 +8,8 @@ import {
     cleanupIndex,
     populateIndex,
     waitForData,
-    makeClient,
-    majorVersion
+    makeClient
 } from './helpers';
-import evenSpread from './fixtures/data/even-spread';
 import {
     createElasticsearchReaderAPI,
     DateSlicerRange,
@@ -33,15 +31,21 @@ describe('Reader API', () => {
         return `${readerIndex}_${str}`;
     }
 
-    const evenIndex = makeIndex(evenSpread.index);
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
+
+    const evenIndex = makeIndex('even_spread');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
     const docType = '_doc';
 
     let client: any;
     let readerClient: ElasticsearchReaderClient;
+    let majorVersion: number;
 
     beforeAll(async () => {
         client = await makeClient();
+
+        const results = getClientMetadata(client);
+        majorVersion = results.majorVersion;
 
         readerClient = new ElasticsearchReaderClient(
             client,
@@ -49,18 +53,13 @@ describe('Reader API', () => {
             logger,
         );
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, evenIndex, evenSpread.types, evenBulkData, docType);
+        await populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
         await waitForData(client, evenIndex, evenBulkData.length);
     });
 
     afterAll(async () => {
         await cleanupIndex(client, makeIndex('*'));
     });
-
-    const typeConfig: DataTypeConfig = {
-        version: LATEST_VERSION,
-        fields: evenSpread.types
-    };
 
     describe('returning data frames', () => {
         const defaultConfig: ESReaderOptions = Object.seal({
@@ -69,7 +68,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.data_frame,
-            type_config: typeConfig,
+            type_config: evenSpread.EvenDataType,
             start: null,
             end: null,
             interval: 'auto',
@@ -261,7 +260,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.raw,
-            type_config: typeConfig,
+            type_config: evenSpread.EvenDataType,
             start: null,
             end: null,
             interval: 'auto',
@@ -451,7 +450,7 @@ describe('Reader API', () => {
             date_field_name: 'created',
             query: '*',
             response_type: FetchResponseType.data_entities,
-            type_config: typeConfig,
+            type_config: evenSpread.EvenDataType,
             start: null,
             end: null,
             interval: 'auto',
