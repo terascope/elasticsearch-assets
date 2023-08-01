@@ -1,6 +1,9 @@
 import 'jest-extended';
 import { debugLogger, DataEntity } from '@terascope/utils';
-import { ElasticsearchTestHelpers, getClientMetadata } from 'elasticsearch-store';
+import {
+    ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
+    isElasticsearch8
+} from 'elasticsearch-store';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'events';
 import {
@@ -35,7 +38,7 @@ describe('Reader API', () => {
 
     const evenIndex = makeIndex('even_spread');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    const docType = '_doc';
+    let docType: string|undefined;
 
     let client: any;
     let readerClient: ElasticsearchReaderClient;
@@ -43,6 +46,12 @@ describe('Reader API', () => {
 
     beforeAll(async () => {
         client = await makeClient();
+
+        if (isOpensearch2(client) || isElasticsearch8(client)) {
+            docType = undefined;
+        } else {
+            docType = '_doc';
+        }
 
         const results = getClientMetadata(client);
         majorVersion = results.majorVersion;
