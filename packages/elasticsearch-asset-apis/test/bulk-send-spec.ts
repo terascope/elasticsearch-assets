@@ -1,6 +1,7 @@
 import 'jest-extended';
 import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
+import { isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
     TEST_INDEX_PREFIX, waitForData, cleanupIndex,
@@ -16,11 +17,21 @@ describe('elasticsearch bulk sender module', () => {
     let apiClient: elasticAPI.Client;
     let harness: WorkerTestHarness;
     let client: any;
-    let type: string;
+    let type: string|undefined;
 
     beforeAll(async () => {
         client = await makeClient();
+
         apiClient = elasticAPI(client, logger);
+
+        if (apiClient.isElasticsearch6()) {
+            type = 'events';
+        } else if (isOpensearch2(client) || isElasticsearch8(client)) {
+            type = undefined;
+        } else {
+            type = '_doc';
+        }
+
         type = apiClient.isElasticsearch6() ? 'events' : '_doc';
         await cleanupIndex(client, `${senderIndex}*`);
     });

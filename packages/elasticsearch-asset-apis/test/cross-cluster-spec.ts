@@ -1,7 +1,7 @@
 import 'jest-extended';
-import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { EventEmitter } from 'events';
 import {
     TEST_INDEX_PREFIX,
@@ -10,7 +10,6 @@ import {
     waitForData,
     makeClient
 } from './helpers';
-import evenSpread from './fixtures/data/even-spread';
 import {
     createElasticsearchReaderAPI,
     ElasticsearchReaderClient,
@@ -27,6 +26,7 @@ describe('Reader API', () => {
     const idFieldName = 'uuid';
     const baseIndex = 'es_d1-foo-v1-bar';
     const queryIndex = 'es_d*-foo-v1-*';
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
@@ -48,18 +48,15 @@ describe('Reader API', () => {
             logger,
         );
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, crossClusterTestIndex, evenSpread.types, evenBulkData, docType);
+        await populateIndex(
+            client, crossClusterTestIndex, evenSpread.EvenDataType, evenBulkData, docType
+        );
         await waitForData(client, crossClusterTestIndex, evenBulkData.length);
     });
 
     afterAll(async () => {
         await cleanupIndex(client, makeIndex('*'));
     });
-
-    const typeConfig: DataTypeConfig = {
-        version: LATEST_VERSION,
-        fields: evenSpread.types
-    };
 
     describe('Cross cluster searching', () => {
         const defaultConfig: ESReaderOptions = Object.seal({
@@ -69,7 +66,7 @@ describe('Reader API', () => {
             query: '*',
             type: docType,
             response_type: FetchResponseType.data_frame,
-            type_config: typeConfig,
+            type_config: evenSpread.EvenDataType,
             start: null,
             end: null,
             interval: 'auto',

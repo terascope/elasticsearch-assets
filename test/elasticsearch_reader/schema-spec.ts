@@ -1,5 +1,6 @@
 import 'jest-extended';
-import { AnyObject, newTestJobConfig, DataEntity } from '@terascope/job-components';
+import { AnyObject, newTestJobConfig } from '@terascope/job-components';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
@@ -10,7 +11,6 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
 
 describe('elasticsearch_reader schema', () => {
     const name = 'elasticsearch_reader';
@@ -20,9 +20,10 @@ describe('elasticsearch_reader schema', () => {
         return `${readerIndex}_${str}`;
     }
 
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const docType = '_doc';
-    const index = makeIndex(evenSpread.index);
-    const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const index = makeIndex('even_spread');
+    const evenBulkData = evenSpread.data;
 
     let clients: any;
     let harness: WorkerTestHarness;
@@ -41,7 +42,7 @@ describe('elasticsearch_reader schema', () => {
         ];
 
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, index, evenSpread.types, evenBulkData, docType);
+        await populateIndex(esClient, index, evenSpread.EvenDataType, evenBulkData, docType);
     });
 
     afterAll(async () => {

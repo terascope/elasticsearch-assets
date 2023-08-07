@@ -1,5 +1,6 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SlicerRecoveryData, DataEntity, AnyObject } from '@terascope/job-components';
+import { SlicerRecoveryData, AnyObject } from '@terascope/job-components';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
@@ -7,7 +8,6 @@ import {
     populateIndex,
     waitForData,
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
 
 jest.setTimeout(30 * 1000);
 
@@ -15,10 +15,11 @@ describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
     const docType = '_doc';
     const field = 'uuid';
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     // for compatibility tests for older elasticsearch version,
     // we make the _id of the record the same as its uuid field
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const bulkData = evenSpread.data;
 
     let harness: SlicerTestHarness;
     let clients: any;
@@ -27,7 +28,7 @@ describe('id_reader slicer', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
-        await populateIndex(esClient, apiReaderIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, apiReaderIndex, evenSpread.EvenDataType, bulkData, docType);
         await waitForData(esClient, apiReaderIndex, bulkData.length);
     });
 

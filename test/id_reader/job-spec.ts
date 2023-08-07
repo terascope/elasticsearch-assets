@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
+import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
@@ -10,20 +10,21 @@ import {
     cleanupIndex,
     populateIndex
 } from '../helpers';
-import evenSpread from '../fixtures/data/even-spread';
 
 describe('id_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;
     const docType = '_doc';
     // in es5 this should be ignored
     const id_field_name = 'uuid';
-    const bulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+    const evenSpread = ElasticsearchTestHelpers.EvenDateData;
+
+    const bulkData = evenSpread.data;
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
     }
 
-    const evenIndex = makeIndex(evenSpread.index);
+    const evenIndex = makeIndex('even_data');
 
     let harness: JobTestHarness;
     let clients: any;
@@ -32,7 +33,7 @@ describe('id_reader job', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.types, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
     });
 
     afterAll(async () => {

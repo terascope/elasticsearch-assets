@@ -18,106 +18,61 @@ jobs:
         node-version: [14.21.3, 16.19.1, 18.16.0]
     steps:
       - uses: actions/checkout@v3
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
       # we login to docker to avoid docker pull limit rates
+
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - run: yarn setup
       - run: yarn lint
-      - run: yarn --silent --report-coverage false test:legacy
-      # - run: yarn global add teraslice-cli
-      # - run: teraslice-cli -v
-      # - run: teraslice-cli assets build
-      # - run: ls -l build/
+      - run: yarn --silent test:legacy
 
-  test-es6-linux:
+  test-elasticsearch-assets:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
+       # opensearch is finiky, keep testing others if it fails
+      fail-fast: false
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [14.21.3, 16.19.1, 18.16.0]
+        search-version: [elasticsearch6, elasticsearch7, opensearch1, opensearch2]
     steps:
       - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
-      # we login to docker to avoid docker pull limit rates
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - run: yarn setup
-      - run: yarn lint
-      - run: yarn --silent --report-coverage false test:6
-      # TODO: We should add build back in, but it probably doesn't need to
-      # happen for each ES version, we just want to make sure a PR doesn't
-      # break build, see TODO below
-      # - run: yarn global add teraslice-cli
-      # - run: teraslice-cli -v
-      # - run: teraslice-cli assets build
-      # - run: ls -l build/
 
-  test-es7-linux:
-    runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=4096"
-    strategy:
-      matrix:
-        # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1, 18.16.0]
-    steps:
-      - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
-      # we login to docker to avoid docker pull limit rates
-      - name: Login to Docker Hub
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-      - run: yarn setup
-      - run: yarn lint
-      - run: yarn --silent --report-coverage false test:7
 
-  test-opensearch-1-linux:
-    runs-on: ubuntu-latest
-    env:
-      NODE_OPTIONS: "--max-old-space-size=4096"
-    strategy:
-      matrix:
-        # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1, 18.16.0]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+
       - run: yarn setup
       - run: yarn lint
-      - run: yarn --silent --report-coverage false test:opensearch
+
+      - name: Test asset for ${{ matrix.search-version }}
+        run: yarn --silent test:${{ matrix.search-version }}
+
+      - name: Test apis for ${{ matrix.search-version }}
+        run: yarn --silent test:${{ matrix.search-version }}
+        working-directory: ./packages/elasticsearch-asset-apis
+
 
 # TODO:
 # - Add Macos Test

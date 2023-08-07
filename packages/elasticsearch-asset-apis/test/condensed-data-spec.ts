@@ -1,6 +1,5 @@
 import 'jest-extended';
 import { EventEmitter } from 'events';
-import { LATEST_VERSION, DataTypeConfig } from '@terascope/data-types';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import {
     TEST_INDEX_PREFIX,
@@ -47,7 +46,9 @@ describe('ReaderAPI with condensed time data', () => {
         );
 
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, condensedIndex, condensedData.types, evenBulkData, docType);
+        await populateIndex(
+            client, condensedIndex, condensedData.CondensedDataType, evenBulkData, docType
+        );
         await waitForData(client, condensedIndex, evenBulkData.length);
     });
 
@@ -55,18 +56,13 @@ describe('ReaderAPI with condensed time data', () => {
         await cleanupIndex(client, makeIndex('*'));
     });
 
-    const typeConfig: DataTypeConfig = {
-        version: LATEST_VERSION,
-        fields: condensedData.types
-    };
-
     const defaultConfig: ESReaderOptions = Object.seal({
         index: condensedIndex,
         size: 100_000,
         date_field_name: 'created',
         query: '*',
         response_type: FetchResponseType.data_entities,
-        type_config: typeConfig,
+        type_config: condensedData.CondensedDataType,
         start: null,
         end: null,
         interval: 'auto',
