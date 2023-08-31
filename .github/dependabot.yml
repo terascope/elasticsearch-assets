@@ -10,6 +10,8 @@ updates:
     assignees:
       - godber
       - jsnoble
+      - sotojn
+      - busma13
     ignore:
       - dependency-name: elasticsearch
         versions:
