@@ -1,8 +1,19 @@
 {
     "name": "elasticsearch-assets",
-    "description": "bundle of processors for teraslice",
+    "displayName": "Elasticsearch Assets",
     "version": "3.5.2",
     "private": true,
+    "description": "bundle of processors for teraslice",
+    "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
+    "bugs": {
+        "url": "https://github.com/terascope/elasticsearch-assets/issues"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/terascope/elasticsearch-assets.git"
+    },
+    "license": "MIT",
+    "author": "Terascope, LLC <info@terascope.io>",
     "workspaces": [
         "packages/*",
         "asset",
@@ -15,9 +26,10 @@
         "build:watch": "tsc --build --watch",
         "lint": "eslint --ignore-path .gitignore --ext .js,.ts .",
         "lint:fix": "yarn lint --fix",
+        "publish:changed": "./scripts/publish.sh",
         "setup": "yarn && yarn build --force",
-        "test:all": "ts-scripts test",
         "test": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:all": "ts-scripts test",
         "test:debug": "TEST_ELASTICSEARCH='true' ts-scripts test --debug . --",
         "test:elasticsearch6": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
         "test:elasticsearch7": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='7.9.3' ts-scripts test . --",
@@ -25,21 +37,7 @@
         "test:legacy": "TEST_ELASTICSEARCH='true' LEGACY_CLIENT=true ts-scripts test . --",
         "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test . --",
         "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test . --",
-        "test:watch": "ts-scripts test --watch . --",
-        "publish:changed": "./scripts/publish.sh"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/terascope/elasticsearch-assets.git"
-    },
-    "author": "Terascope, LLC <info@terascope.io>",
-    "license": "MIT",
-    "bugs": {
-        "url": "https://github.com/terascope/elasticsearch-assets/issues"
-    },
-    "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
-    "engines": {
-        "node": ">=14.17.0"
+        "test:watch": "ts-scripts test --watch . --"
     },
     "dependencies": {},
     "devDependencies": {
@@ -67,6 +65,10 @@
         "teraslice-test-harness": "^0.29.0",
         "ts-jest": "^29.1.1",
         "typescript": "^4.8.4"
+    },
+    "engines": {
+        "node": ">=14.17.0",
+        "yarn": ">=1.16.0"
     },
     "terascope": {
         "root": true,

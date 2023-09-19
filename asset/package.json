@@ -1,20 +1,21 @@
 {
     "name": "asset",
+    "displayName": "Asset",
     "version": "3.5.2",
     "private": true,
+    "description": "",
+    "license": "MIT",
+    "author": "",
     "workspaces": {
         "nohoist": [
             "**"
         ]
     },
     "scripts": {
-        "test": "yarn --cwd ../ test",
         "build": "tsc --project tsconfig.json",
-        "build:watch": "yarn build --watch"
+        "build:watch": "yarn build --watch",
+        "test": "yarn --cwd ../ test"
     },
-    "author": "",
-    "license": "MIT",
-    "description": "",
     "dependencies": {
         "@terascope/data-mate": "^0.42.0",
         "@terascope/elasticsearch-api": "^3.6.2",
@@ -27,5 +28,10 @@
         "mocker-data-generator": "^2.12.0",
         "moment": "^2.29.4"
     },
-    "devDependencies": {}
+    "devDependencies": {},
+    "engines": {
+        "node": ">=14.17.0",
+        "yarn": ">=1.16.0"
+    },
+    "terascope": {}
 }
