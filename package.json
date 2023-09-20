@@ -16,8 +16,7 @@
     "author": "Terascope, LLC <info@terascope.io>",
     "workspaces": [
         "packages/*",
-        "asset",
-        "."
+        "asset"
     ],
     "scripts": {
         "asset:build": "yarn && yarn run build",
