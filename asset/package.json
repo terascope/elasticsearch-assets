@@ -33,7 +33,5 @@
         "node": ">=14.17.0",
         "yarn": ">=1.16.0"
     },
-    "terascope": {
-        "testSuite": "none"
-    }
+    "terascope": {}
 }
