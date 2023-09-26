@@ -28,9 +28,9 @@ Example Job
     "operations" : [
         {
             "_op": "elasticsearch_reader",
+            "connection": "es-1",
             "index": "test_index",
-            "field": "created",
-            "connection": "es-1"
+            "date_field_name": "created"
         },
         {
             "_op": "elasticsearch_bulk",
@@ -77,7 +77,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "connection": "es-1"
         },
         {
@@ -124,7 +124,7 @@ Example Job
         {
             "_op": "elasticsearch_reader",
             "index": "test_index",
-            "field": "created",
+            "date_field_name": "created",
             "connection": "es-1"
         },
         {
@@ -256,6 +256,47 @@ this configuration will be expanded out to the long form underneath the hood
          {
             "_op": "elasticsearch_bulk",
             "api_name" : "elasticsearch_sender_api"
+        }
+    ]
+}
+```
+
+### Dead Letter Queue Support
+The elasticsearch_bulk processor supports the [dead letter queue api](https://github.com/terascope/kafka-assets/blob/master/docs/apis/kafka_dead_letter.md) as of version `3.5.0`.  When the dead_letter_queue is triggered records that are rejected by elasticsearch with a `_bulk_sender_rejection` error are forwarded to the kafka topic specified in the dead letter queue api configs. Records that do not have the error are still written to the designated cluster as usual.
+
+To trigger this behavior add the property and value `_dead_letter_action: kafka_dead_letter` to the `elasticsearch_bulk` _op configs.
+
+Example Job:
+```json
+{
+    "name" : "testing",
+    "workers" : 1,
+    "slicers" : 1,
+    "lifecycle" : "once",
+    "assets" : [
+        "elasticsearch"
+    ],
+    "apis": [
+         {
+            "_name": "kafka_dead_letter",
+            "connection": "KAFKA_CONNECTION",
+            "topic": "KAFKA_TOPIC",
+            "size": 10000
+        }
+    ]
+    "operations" : [
+        {
+            "_op": "elasticsearch_reader",
+            "index": "INDEX_NAME",
+            "date_field_name": "created",
+            "connection": "ES_CLUSTER_CONNECTION"
+        },
+        {
+            "_op": "elasticsearch_bulk",
+            "connection": "ES_CLUSTER_CONNECTION",
+            "index": "INDEX_NAME",
+            "type": "events",
+             "_dead_letter_action": "kafka_dead_letter"
         }
     ]
 }
