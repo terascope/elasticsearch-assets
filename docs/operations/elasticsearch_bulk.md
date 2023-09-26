@@ -262,7 +262,7 @@ this configuration will be expanded out to the long form underneath the hood
 ```
 
 ### Dead Letter Queue Support
-The elasticsearch_bulk processor supports the [dead letter queue api](https://github.com/terascope/kafka-assets/blob/master/docs/apis/kafka_dead_letter.md) as of version `3.5.0`.  When the dead_letter_queue is triggered records that are rejected by elasticsearch with a `_bulk_sender_rejection` error are forwarded to the kafka topic specified in the dead letter queue api configs. Records that do not have the error are still written to the designated cluster as usual.
+The elasticsearch_bulk processor supports the [dead letter queue api](https://github.com/terascope/kafka-assets/blob/master/docs/apis/kafka_dead_letter.md) as of version `3.5.0`.  When the dead_letter_queue functionality is active records that are rejected by elasticsearch with a `_bulk_sender_rejection` error are forwarded to the kafka topic specified in the dead letter queue api configs. Records that do not have the error are still written to the designated cluster as usual.
 
 To trigger this behavior add the property and value `_dead_letter_action: kafka_dead_letter` to the `elasticsearch_bulk` _op configs.
 
