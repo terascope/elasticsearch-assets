@@ -723,6 +723,30 @@
     validator "^13.9.0"
     xlucene-parser "^0.45.0"
 
+"@terascope/data-mate@^0.47.0":
+  version "0.47.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.47.0.tgz#b6c58799c8960912ccb72d5ee756560859edb635"
+  integrity sha512-q+4q4BG1aNRi/GXvLFpBGEqSRnNDyITdeS+4FoM1fZyro+Xu5E14ziZUCdlbFjo+qPSc7vyc6+09341X5kTWfA==
+  dependencies:
+    "@terascope/data-types" "^0.42.0"
+    "@terascope/types" "^0.11.2"
+    "@terascope/utils" "^0.51.0"
+    "@types/validator" "^13.7.17"
+    awesome-phonenumber "^2.70.0"
+    date-fns "^2.30.0"
+    ip-bigint "^3.0.3"
+    ip6addr "^0.2.5"
+    ipaddr.js "^2.0.1"
+    is-cidr "^4.0.2"
+    is-ip "^3.1.0"
+    jexl "^2.2.2"
+    lodash "^4.17.21"
+    mnemonist "^0.39.5"
+    uuid "^9.0.0"
+    valid-url "^1.0.9"
+    validator "^13.9.0"
+    xlucene-parser "^0.50.0"
+
 "@terascope/data-types@^0.37.0":
   version "0.37.0"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.37.0.tgz#6718cfd6e705d108ce1c1681558e3c5679886886"
@@ -730,6 +754,17 @@
   dependencies:
     "@terascope/types" "^0.11.2"
     "@terascope/utils" "^0.46.0"
+    graphql "^14.7.0"
+    lodash "^4.17.21"
+    yargs "^17.7.2"
+
+"@terascope/data-types@^0.42.0":
+  version "0.42.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.42.0.tgz#13bbb7739ff8b1352f98730f1829f5b61bd34933"
+  integrity sha512-EC+PObGY4d/gCN8NCOWbccctSQ3ZBMKIHzIMh7JJt4/HKjgxDNxvakOZU+V0janmPzw11Q4DziIxmvkNf5rqXg==
+  dependencies:
+    "@terascope/types" "^0.11.2"
+    "@terascope/utils" "^0.51.0"
     graphql "^14.7.0"
     lodash "^4.17.21"
     yargs "^17.7.2"
@@ -5829,6 +5864,14 @@ xlucene-parser@^0.45.0:
     "@terascope/types" "^0.11.2"
     "@terascope/utils" "^0.46.0"
     netmask "^2.0.2"
+
+xlucene-parser@^0.50.0:
+  version "0.50.0"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.50.0.tgz#1f4125545d87c36bf2bf2c7eef792fbcecb88577"
+  integrity sha512-v76Bghn30pzkTqS3l8wrS1wdXywmZ3kMZ4XNZHqQpYQAtsD3EaG4O8K7r7vmWcTzXy1sP+Cm47ylsWWFMWuJqw==
+  dependencies:
+    "@terascope/types" "^0.11.2"
+    "@terascope/utils" "^0.51.0"
 
 xlucene-translator@^0.30.0:
   version "0.30.0"
