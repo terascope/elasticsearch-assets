@@ -2,12 +2,15 @@ import {
     Fetcher, WorkerContext, ExecutionConfig, TSError, AnyObject
 } from '@terascope/job-components';
 import mocker from 'mocker-data-generator';
+import * as faker from 'faker';
+import Chance from 'chance';
 import path from 'path';
 import { existsSync } from 'fs';
 import { deprecate } from 'util';
 import { DataGenerator, CounterResults } from './interfaces';
 import defaultSchema from './data-schema';
 
+const chance = new Chance();
 const isDeprecated = deprecate(() => {}, 'elasticsearch_data_generator is deprecated, please use data_generator from standard assets');
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     dataSchema: any;
@@ -24,6 +27,8 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
 
         if (this.opConfig.stress_test) {
             return mocker()
+                .addGenerator('faker', faker)
+                .addGenerator('chance', chance)
                 .schema('schema', this.dataSchema, 1)
                 .build()
                 .then((dataObj) => {
@@ -38,6 +43,8 @@ export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
         }
 
         return mocker()
+            .addGenerator('faker', faker)
+            .addGenerator('chance', chance)
             .schema('schema', this.dataSchema, count)
             .build()
             .then((dataObj) => dataObj.schema)

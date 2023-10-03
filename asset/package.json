@@ -23,7 +23,11 @@
         "@terascope/job-components": "^0.59.0",
         "@terascope/teraslice-state-storage": "^0.39.2",
         "@terascope/utils": "^0.46.0",
+        "@types/chance": "^1.1.4",
+        "@types/faker": "5.5.9",
+        "chance": "^1.1.11",
         "datemath-parser": "^1.0.6",
+        "faker": "5.5.3",
         "got": "^11.8.3",
         "mocker-data-generator": "^3.0.3",
         "moment": "^2.29.4"
