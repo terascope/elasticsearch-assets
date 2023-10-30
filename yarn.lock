@@ -324,10 +324,10 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
-"@elastic/elasticsearch@7.13.0":
-  version "7.13.0"
-  resolved "https://registry.yarnpkg.com/@elastic/elasticsearch/-/elasticsearch-7.13.0.tgz#6dcf511dfa91187e22c81e54f41f4bd0fd96b4d6"
-  integrity sha512-WgwLWo2p9P2tdqzBGX9fHeG8p5IOTXprXNTECQG2mJ7z9n93N5AFBJpEw4d35tWWeCWi9jI13A2wzQZH7XZ/xw==
+"@elastic/elasticsearch@7.17.13":
+  version "7.17.13"
+  resolved "https://registry.yarnpkg.com/@elastic/elasticsearch/-/elasticsearch-7.17.13.tgz#6f5c17ed0c09d92c00ba2f10d5081bbb5d4d247b"
+  integrity sha512-GMXtFVqd3FgUlTtPL/GDc+3GhwvfZ0kSuegCvVVqb58kd+0I6U6u7PL8QFRLHtwzqLEBmYLdwr4PRkBAWKGlzA==
   dependencies:
     debug "^4.3.1"
     hpagent "^0.1.1"
@@ -3246,12 +3246,7 @@ hpagent@^0.1.1:
   resolved "https://registry.yarnpkg.com/hpagent/-/hpagent-0.1.2.tgz#cab39c66d4df2d4377dbd212295d878deb9bdaa9"
   integrity sha512-ePqFXHtSQWAFXYmj+JtOTHr84iNrII4/QRlAAPPE+zqnKy4xJo7Ie1Y4kC7AdB+LxLxSTTzBMASsEcy0q8YyvQ==
 
-hpagent@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/hpagent/-/hpagent-1.0.0.tgz#c68f68b3df845687dbdc4896546713ce09cc6bee"
-  integrity sha512-SCleE2Uc1bM752ymxg8QXYGW0TWtAV4ZW3TqH1aOnyi6T6YW2xadCcclm5qeVjvMvfQ2RKNtZxO7uVb9CTPt1A==
-
-hpagent@^1.2.0:
+hpagent@^1.0.0, hpagent@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/hpagent/-/hpagent-1.2.0.tgz#0ae417895430eb3770c03443456b8d90ca464903"
   integrity sha512-A91dYTeIB6NoXG+PxTQpCCDDnfHsW9kc06Lvpu1TEe9gnd6ZFeiBoRO9JvzEv6xK7EX97/dUE8g/vBMTqTS3CA==
