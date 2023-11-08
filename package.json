@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "displayName": "Elasticsearch Assets",
-    "version": "3.5.3",
+    "version": "3.5.4",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
@@ -44,7 +44,7 @@
     "devDependencies": {
         "@terascope/data-types": "^0.42.0",
         "@terascope/elasticsearch-api": "^3.11.0",
-        "@terascope/elasticsearch-asset-apis": "^0.11.8",
+        "@terascope/elasticsearch-asset-apis": "^0.11.9",
         "@terascope/eslint-config": "^0.8.0",
         "@terascope/job-components": "^0.64.0",
         "@terascope/scripts": "0.60.1",
