@@ -709,30 +709,6 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.47.0":
-  version "0.47.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.47.0.tgz#b6c58799c8960912ccb72d5ee756560859edb635"
-  integrity sha512-q+4q4BG1aNRi/GXvLFpBGEqSRnNDyITdeS+4FoM1fZyro+Xu5E14ziZUCdlbFjo+qPSc7vyc6+09341X5kTWfA==
-  dependencies:
-    "@terascope/data-types" "^0.42.0"
-    "@terascope/types" "^0.11.2"
-    "@terascope/utils" "^0.51.0"
-    "@types/validator" "^13.7.17"
-    awesome-phonenumber "^2.70.0"
-    date-fns "^2.30.0"
-    ip-bigint "^3.0.3"
-    ip6addr "^0.2.5"
-    ipaddr.js "^2.0.1"
-    is-cidr "^4.0.2"
-    is-ip "^3.1.0"
-    jexl "^2.2.2"
-    lodash "^4.17.21"
-    mnemonist "^0.39.5"
-    uuid "^9.0.0"
-    valid-url "^1.0.9"
-    validator "^13.9.0"
-    xlucene-parser "^0.50.0"
-
 "@terascope/data-mate@^0.48.0":
   version "0.48.0"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.48.0.tgz#1c012f92b040c43d1575f35dddff92bffca5cf2e"
@@ -2315,12 +2291,12 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.72.0:
-  version "0.72.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.72.0.tgz#6848835231e45369811ac8cb3b152b72e5642c3e"
-  integrity sha512-M/bSwcF3r3JTDotYirZFJU5faBDXo7MaBOeabpEmCaWX49bswW+XRkWxLZly4gYiGmS4yKY+YSobtT2h3OLjaA==
+elasticsearch-store@^0.73.0:
+  version "0.73.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.73.0.tgz#a6eb4e72b3d9715c47400f232136a48bcf1601c3"
+  integrity sha512-/DEbbVNIGYp+9rNoSaoWqS56MC1Jcl8piz4E4D7AjcKrSKnSHJYmgGniyvDXNv+kE+hjq9kTiRWSRHyiEgyN/Q==
   dependencies:
-    "@terascope/data-mate" "^0.47.0"
+    "@terascope/data-mate" "^0.48.0"
     "@terascope/data-types" "^0.42.0"
     "@terascope/types" "^0.11.2"
     "@terascope/utils" "^0.51.0"
