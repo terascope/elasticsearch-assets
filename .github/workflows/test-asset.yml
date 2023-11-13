@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1, 18.16.0]
+        node-version: [14.21.3, 16.20.2, 18.18.2]
     steps:
       - uses: actions/checkout@v3
 
@@ -45,7 +45,7 @@ jobs:
       fail-fast: false
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [14.21.3, 16.19.1, 18.16.0]
+        node-version: [14.21.3, 16.20.2, 18.18.2]
         search-version: [elasticsearch6, elasticsearch7, opensearch1, opensearch2]
     steps:
       - uses: actions/checkout@v3
@@ -86,7 +86,7 @@ jobs:
   #       uses: actions/setup-node@v3
   #       with:
   #         # NOTE: Hard Coded Node Version
-  #         node-version: '18.16.0'
+  #         node-version: '18.18.2'
   #     - run: yarn setup
   #     - run: yarn lint
   #     # TODO: Ideally we'd be able to at least run unit tests that don't require docker.
