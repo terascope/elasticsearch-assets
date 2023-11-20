@@ -2286,10 +2286,10 @@ drange@^1.0.2:
   resolved "https://registry.yarnpkg.com/drange/-/drange-1.1.1.tgz#b2aecec2aab82fcef11dbbd7b9e32b83f8f6c0b8"
   integrity sha512-pYxfDYpued//QpnLIm4Avk7rsNtAtQkUES2cwAYSvD/wd2pKD71gN2Ebj3e7klzXwjocvE8c5vx/1fxwpqmSxA==
 
-elasticsearch-store@^0.73.0:
-  version "0.73.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.73.0.tgz#a6eb4e72b3d9715c47400f232136a48bcf1601c3"
-  integrity sha512-/DEbbVNIGYp+9rNoSaoWqS56MC1Jcl8piz4E4D7AjcKrSKnSHJYmgGniyvDXNv+kE+hjq9kTiRWSRHyiEgyN/Q==
+elasticsearch-store@^0.74.0:
+  version "0.74.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.74.0.tgz#245fbfdc7c80a21ad3d92fa61c656fdc45cb28c6"
+  integrity sha512-3jNhSEgKIths7Lxzzc5NPJDq5Mb9Ug8JDJgpZdVmUC/2Ov2+eLENAgfnbSSu0/pekL3XRYEtG7FbW2Sirk5e+w==
   dependencies:
     "@terascope/data-mate" "^0.48.0"
     "@terascope/data-types" "^0.42.0"
@@ -2304,7 +2304,7 @@ elasticsearch-store@^0.73.0:
     opensearch2 "npm:@opensearch-project/opensearch@^2.2.1"
     setimmediate "^1.0.5"
     uuid "^9.0.0"
-    xlucene-translator "^0.35.0"
+    xlucene-translator "^0.36.0"
 
 "elasticsearch6@npm:@elastic/elasticsearch@^6.7.0":
   version "6.8.8"
@@ -6249,10 +6249,10 @@ xlucene-parser@^0.50.0:
     "@terascope/types" "^0.11.2"
     "@terascope/utils" "^0.51.0"
 
-xlucene-translator@^0.35.0:
-  version "0.35.0"
-  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.35.0.tgz#49a964d415ba91bd8bc0bbdd6cfe7c539072c915"
-  integrity sha512-2A9vE/h3AiHZBfSCNLObZSrV0jWjYbGbTnFpsdFbd6yaqSrI6OqOJ3p/l78Xnwj/lWrwT3pedyBZzh6yLczjow==
+xlucene-translator@^0.36.0:
+  version "0.36.0"
+  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.36.0.tgz#40ec4878e97974c3b9c82f79ea737b0d1c92207c"
+  integrity sha512-D9mwI2UnYNj4boDVelcDnD1GPMO+KsnUNgflmzEvh94Y2/UOKQtCKlv+wgR1I1EZDgovpD1WhJTyGXIaj/IsBg==
   dependencies:
     "@terascope/types" "^0.11.2"
     "@terascope/utils" "^0.51.0"
