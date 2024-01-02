@@ -26,7 +26,7 @@
         "test:watch": "ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "^0.49.0",
+        "@terascope/data-mate": "^0.49.1",
         "@terascope/data-types": "^0.43.0",
         "@terascope/elasticsearch-api": "^3.12.0",
         "@terascope/utils": "^0.52.0",
