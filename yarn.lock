@@ -761,16 +761,6 @@
     lodash "^4.17.21"
     yargs "^17.7.2"
 
-"@terascope/elasticsearch-api@^3.12.0":
-  version "3.12.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.12.1.tgz#a2169557f6a2f2646d2dd9e51a29502c62ec1de2"
-  integrity sha512-GCQpz0rAAOMmcnW9sI2KFX+LbAYONMSVtEuScMHIXQSeKrA8DcEFJ8XhZ9XyaLyLNNGeBm8ZAnF0FOtC4e11Tw==
-  dependencies:
-    "@terascope/types" "^0.12.1"
-    "@terascope/utils" "^0.52.1"
-    bluebird "^3.7.2"
-    setimmediate "^1.0.5"
-
 "@terascope/elasticsearch-api@^3.13.0":
   version "3.13.0"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.13.0.tgz#01d8fbad05af9147a86ac8cfb8877a7b9321b427"
@@ -868,7 +858,7 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.12.1.tgz#03631226caa16da6cb154e589dcae919e0b617b6"
   integrity sha512-G4OIVPIxngetkPoFL+rwA4F6L2uoBHyDbFvWFihnkeqihYGJcQk388TN2ffJjyI0r/j0oMaJ1aSe0JyoUycUig==
 
-"@terascope/utils@^0.52.0", "@terascope/utils@^0.52.1":
+"@terascope/utils@^0.52.0":
   version "0.52.1"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.52.1.tgz#26eeed6bdbe69cfa20226560456e70a1b8d65024"
   integrity sha512-6XH3bSHdwUznBecLjzoo+yytcwcA6cYIxbipm4LzCCbfCPycKK4j8fKSuXjOaT//DXU7vEFsSzH0o9GeoAPnEA==
