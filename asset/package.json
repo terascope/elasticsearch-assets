@@ -26,7 +26,7 @@
         "datemath-parser": "^1.0.6",
         "got": "^11.8.3",
         "mocker-data-generator": "^2.12.0",
-        "moment": "^2.29.4"
+        "moment": "^2.30.1"
     },
     "devDependencies": {},
     "engines": {
