@@ -750,13 +750,24 @@
     validator "^13.11.0"
     xlucene-parser "^0.51.1"
 
-"@terascope/data-types@^0.43.0", "@terascope/data-types@^0.43.1":
+"@terascope/data-types@^0.43.1":
   version "0.43.1"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.43.1.tgz#c6385bbdd9afc0e8611515f6a43649eaa573074e"
   integrity sha512-z/hhQzw1WLb/24kBXEzl6/CtLUC4ah0ZOgfzxrsq//jX3aJ8b28i9lNV/hR/2cJkzS5uRzgVAXTGD3ZLvVXUWA==
   dependencies:
     "@terascope/types" "^0.12.1"
     "@terascope/utils" "^0.52.1"
+    graphql "^14.7.0"
+    lodash "^4.17.21"
+    yargs "^17.7.2"
+
+"@terascope/data-types@^0.44.0":
+  version "0.44.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-0.44.0.tgz#b78c8457352ea35808cfa9e2c080921fd83d06bc"
+  integrity sha512-fRxkjLlRxD7c54eOJig973KQ0pcr+doMWrm2pg8Pqd+nM2uFqVBJofTI3gB7/Vt9H4gGCJ10Zc+DPIzyju+ZEg==
+  dependencies:
+    "@terascope/types" "^0.12.1"
+    "@terascope/utils" "^0.53.0"
     graphql "^14.7.0"
     lodash "^4.17.21"
     yargs "^17.7.2"
@@ -862,6 +873,48 @@
   version "0.52.1"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.52.1.tgz#26eeed6bdbe69cfa20226560456e70a1b8d65024"
   integrity sha512-6XH3bSHdwUznBecLjzoo+yytcwcA6cYIxbipm4LzCCbfCPycKK4j8fKSuXjOaT//DXU7vEFsSzH0o9GeoAPnEA==
+  dependencies:
+    "@terascope/types" "^0.12.1"
+    "@turf/bbox" "^6.4.0"
+    "@turf/bbox-polygon" "^6.4.0"
+    "@turf/boolean-contains" "^6.4.0"
+    "@turf/boolean-disjoint" "^6.4.0"
+    "@turf/boolean-equal" "^6.4.0"
+    "@turf/boolean-intersects" "^6.4.0"
+    "@turf/boolean-point-in-polygon" "^6.4.0"
+    "@turf/boolean-within" "^6.4.0"
+    "@turf/circle" "^6.4.0"
+    "@turf/helpers" "^6.2.0"
+    "@turf/invariant" "^6.2.0"
+    "@turf/line-to-polygon" "^6.4.0"
+    "@types/lodash" "^4.14.195"
+    "@types/validator" "^13.11.7"
+    awesome-phonenumber "^2.70.0"
+    date-fns "^2.30.0"
+    date-fns-tz "^1.3.7"
+    datemath-parser "^1.0.6"
+    debug "^4.3.4"
+    geo-tz "^7.0.7"
+    ip-bigint "^3.0.3"
+    ip-cidr "^3.1.0"
+    ip6addr "^0.2.5"
+    ipaddr.js "^2.0.1"
+    is-cidr "^4.0.2"
+    is-ip "^3.1.0"
+    is-plain-object "^5.0.0"
+    js-string-escape "^1.0.1"
+    kind-of "^6.0.3"
+    latlon-geohash "^1.1.0"
+    lodash "^4.17.21"
+    mnemonist "^0.39.5"
+    p-map "^4.0.0"
+    shallow-clone "^3.0.1"
+    validator "^13.11.0"
+
+"@terascope/utils@^0.53.0":
+  version "0.53.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.53.0.tgz#120dddb70ef0be165f4416132a2ac33109208911"
+  integrity sha512-RSwyaaPWcnhGMuC5W0qJ99y0GczPoU9NgH8JjM7+vKYT3i3Wt6CZuxHhHP9Aa8Vs3W+96BLmZwaqX5XSHu0zHw==
   dependencies:
     "@terascope/types" "^0.12.1"
     "@turf/bbox" "^6.4.0"
