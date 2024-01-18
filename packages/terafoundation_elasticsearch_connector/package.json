@@ -1,7 +1,7 @@
 {
     "name": "terafoundation_elasticsearch_connector",
     "displayName": "Terafoundation Elasticsearch Connector",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "Elasticsearch connector for terafoundation",
     "homepage": "https://github.com/terascope/terafoundation_elasticsearch_connector",
     "repository": "git@github.com:terascope/terafoundation_elasticsearch_connector.git",
@@ -29,7 +29,7 @@
         "@types/elasticsearch": "^5.0.40"
     },
     "engines": {
-        "node": ">=14.17.0",
+        "node": ">=16.19.0",
         "yarn": ">=1.22.19"
     },
     "publishConfig": {
