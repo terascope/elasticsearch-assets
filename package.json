@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "displayName": "Elasticsearch Assets",
-    "version": "3.5.5",
+    "version": "3.5.6",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
@@ -68,7 +68,7 @@
         "typescript": "~5.2.2"
     },
     "engines": {
-        "node": ">=16.19.0",
+        "node": ">=18.0.0",
         "yarn": ">=1.22.19"
     },
     "terascope": {
