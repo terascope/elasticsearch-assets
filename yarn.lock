@@ -889,7 +889,7 @@
     "@terascope/elasticsearch-api" "^3.13.1"
     "@terascope/utils" "^0.53.1"
 
-"@terascope/types@^0.12.0", "@terascope/types@^0.12.1", "@terascope/types@^0.12.2":
+"@terascope/types@^0.12.1", "@terascope/types@^0.12.2":
   version "0.12.2"
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.12.2.tgz#aa245bd996b8105eda3a30dcdaefa64502e6fbcb"
   integrity sha512-yKvFtvT0pnK6boVzu8o0Q6Wypsi3R2U5/BjQSdwF/CFsmXiOeqcFQGhCxp4TZhKijVyVwJr+nV7rlXg4SyL3WQ==
