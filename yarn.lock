@@ -859,6 +859,11 @@
   resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.14.0.tgz#eb5ad8a24b0a2d1b4517629fe5cf976f7ebef72c"
   integrity sha512-sX15SWV/AOlVBkcjgHlXMXSoJJHDBNWRMbxqcYxY7IlZq9WegU3SBtsxdD01uYSXvwKTrAInjeG1PA00WN0jtA==
 
+"@terascope/types@^0.15.0":
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/@terascope/types/-/types-0.15.0.tgz#820d6aa9fd76bdedfaad0e5b1cc5b77b5490b8dd"
+  integrity sha512-z5mfmFOXMEjq6S3WZANXBIEeM7FK/XSON+9kR6RX7GNHW/a6qNif9pSIAARQz4420JoYDliccSLJX9v0r6DfKg==
+
 "@terascope/utils@^0.55.0":
   version "0.55.0"
   resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-0.55.0.tgz#9f3db4632782fae3f043288482449de2f25a7672"
