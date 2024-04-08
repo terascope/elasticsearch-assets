@@ -726,10 +726,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.54.0":
-  version "0.54.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.54.0.tgz#f2f14df798e89bb43362d5b6672ff6242f9f1134"
-  integrity sha512-NY3BFva2BYZ5GD1ItiC9cChzfXTRuzIGW2t8KiRbCST4JoS4ZC8A9BdRJxFaDc+PRpR87nU/i5sv+XC1JUzBVw==
+"@terascope/data-mate@^0.54.0", "@terascope/data-mate@^0.54.1":
+  version "0.54.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.54.1.tgz#c9ffdda358a8eea6b87c5f4666b21c4c3cb3828d"
+  integrity sha512-t8zZTzAgOCthgU+dL1s0yAxbpxf8nLJgy6Z/8m2Yz/fUcLOe9I0rxssjPDNL7bad+DRcy52Z6939ZlvezUmiNg==
   dependencies:
     "@terascope/data-types" "^0.48.0"
     "@terascope/types" "^0.15.0"
@@ -748,7 +748,7 @@
     uuid "^9.0.1"
     valid-url "^1.0.9"
     validator "^13.11.0"
-    xlucene-parser "^0.56.0"
+    xlucene-parser "^0.56.1"
 
 "@terascope/data-types@^0.48.0":
   version "0.48.0"
@@ -6732,10 +6732,10 @@ ws@^8.11.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
   integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
 
-xlucene-parser@^0.56.0:
-  version "0.56.0"
-  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.56.0.tgz#60026b53876c31b08528c6fa9b1c31d6b178be5f"
-  integrity sha512-Tyl29Ap7EvY5FQn3H5MOTb3eLexYKlJBU8rHZcf4JHD7dFuP3d3+RYr0MZwt4pzLnW+QhVWsjKldzFlvhb0gjQ==
+xlucene-parser@^0.56.0, xlucene-parser@^0.56.1:
+  version "0.56.1"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.56.1.tgz#75ff0b955a623ab30c438c6ae2fe57d11c82045f"
+  integrity sha512-Z3MxAkQA50E2P5QkSh4YUiDX7pzrmIbKWdy2pIskoJ77VcyMKfvm4KNBrKmXA6wBhSs9LV3Ely2SzrK9mC+oew==
   dependencies:
     "@terascope/types" "^0.15.0"
     "@terascope/utils" "^0.57.0"
