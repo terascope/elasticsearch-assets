@@ -726,10 +726,10 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.54.0":
-  version "0.54.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.54.0.tgz#f2f14df798e89bb43362d5b6672ff6242f9f1134"
-  integrity sha512-NY3BFva2BYZ5GD1ItiC9cChzfXTRuzIGW2t8KiRbCST4JoS4ZC8A9BdRJxFaDc+PRpR87nU/i5sv+XC1JUzBVw==
+"@terascope/data-mate@^0.54.0", "@terascope/data-mate@^0.54.1":
+  version "0.54.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.54.1.tgz#c9ffdda358a8eea6b87c5f4666b21c4c3cb3828d"
+  integrity sha512-t8zZTzAgOCthgU+dL1s0yAxbpxf8nLJgy6Z/8m2Yz/fUcLOe9I0rxssjPDNL7bad+DRcy52Z6939ZlvezUmiNg==
   dependencies:
     "@terascope/data-types" "^0.48.0"
     "@terascope/types" "^0.15.0"
@@ -748,7 +748,7 @@
     uuid "^9.0.1"
     valid-url "^1.0.9"
     validator "^13.11.0"
-    xlucene-parser "^0.56.0"
+    xlucene-parser "^0.56.1"
 
 "@terascope/data-types@^0.48.0":
   version "0.48.0"
@@ -2503,17 +2503,16 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-elasticsearch-store@^0.80.0:
-  version "0.80.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.80.0.tgz#e5c9143c921d1505383c157036cd2fc40242bbcb"
-  integrity sha512-OhEchIW93Zb0klMKS/Ab0i5MvInbXWsrXbiuzkfosFuospTTSf+FQu5x8T2WsyhVfZt3qLnp+j9aUm7bIA8E1A==
+elasticsearch-store@^0.81.1:
+  version "0.81.1"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-0.81.1.tgz#aa59a0bc12f422029e714d22bac8a995853d6279"
+  integrity sha512-l5sgGPHm2UzH/KY+aUwIkKW2hB04kV5Tt6InDQgSHpNzviPrlIhrXS8JGLmYkmHFxFHLhXFx6r4kiidm26/+mA==
   dependencies:
-    "@terascope/data-mate" "^0.54.0"
+    "@terascope/data-mate" "^0.54.1"
     "@terascope/data-types" "^0.48.0"
     "@terascope/types" "^0.15.0"
     "@terascope/utils" "^0.57.0"
     ajv "^6.12.6"
-    elasticsearch "^15.4.1"
     elasticsearch6 "npm:@elastic/elasticsearch@^6.7.0"
     elasticsearch7 "npm:@elastic/elasticsearch@^7.0.0"
     elasticsearch8 "npm:@elastic/elasticsearch@^8.0.0"
@@ -2521,7 +2520,7 @@ elasticsearch-store@^0.80.0:
     opensearch2 "npm:@opensearch-project/opensearch@^2.2.1"
     setimmediate "^1.0.5"
     uuid "^9.0.1"
-    xlucene-translator "^0.42.0"
+    xlucene-translator "^0.42.1"
 
 "elasticsearch6@npm:@elastic/elasticsearch@^6.7.0":
   version "6.8.8"
@@ -6732,23 +6731,23 @@ ws@^8.11.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
   integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
 
-xlucene-parser@^0.56.0:
-  version "0.56.0"
-  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.56.0.tgz#60026b53876c31b08528c6fa9b1c31d6b178be5f"
-  integrity sha512-Tyl29Ap7EvY5FQn3H5MOTb3eLexYKlJBU8rHZcf4JHD7dFuP3d3+RYr0MZwt4pzLnW+QhVWsjKldzFlvhb0gjQ==
+xlucene-parser@^0.56.1:
+  version "0.56.1"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-0.56.1.tgz#75ff0b955a623ab30c438c6ae2fe57d11c82045f"
+  integrity sha512-Z3MxAkQA50E2P5QkSh4YUiDX7pzrmIbKWdy2pIskoJ77VcyMKfvm4KNBrKmXA6wBhSs9LV3Ely2SzrK9mC+oew==
   dependencies:
     "@terascope/types" "^0.15.0"
     "@terascope/utils" "^0.57.0"
 
-xlucene-translator@^0.42.0:
-  version "0.42.0"
-  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.42.0.tgz#a36a334eb69c837b587b9d44d882f3b5d683c826"
-  integrity sha512-NfpDcTtxnzj6nBHq6Vixnx5/YucZM2/p2A04JIDB9+8OJuFcHMsN6BwPYke2uNNt1Ml7GzfOYjxfVnNHDQdhNA==
+xlucene-translator@^0.42.1:
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-0.42.1.tgz#67c73dedf372cc6c33b586a2f67f0dbe4be2dbe8"
+  integrity sha512-TprlRp0BFzt9unpAnVOMYPhp8tjYHtnEqQ4ii1sxfUxXH8pnysNiPtrXPHqtFRtObm/ACdktimErs6ak0+iyoQ==
   dependencies:
     "@terascope/types" "^0.15.0"
     "@terascope/utils" "^0.57.0"
     "@types/elasticsearch" "^5.0.43"
-    xlucene-parser "^0.56.0"
+    xlucene-parser "^0.56.1"
 
 xtend@^4.0.0:
   version "4.0.2"
