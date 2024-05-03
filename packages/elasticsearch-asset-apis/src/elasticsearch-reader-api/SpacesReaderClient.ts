@@ -12,9 +12,6 @@ import {
 } from './interfaces';
 import { throwRequestError } from './throwRequestError';
 
-// eslint-disable-next-line
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
     // NOTE: currently we do no have access to _type or _id of each doc
