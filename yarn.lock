@@ -810,13 +810,13 @@
     datemath-parser "^1.0.6"
     uuid "^9.0.1"
 
-"@terascope/scripts@0.75.1":
-  version "0.75.1"
-  resolved "https://registry.yarnpkg.com/@terascope/scripts/-/scripts-0.75.1.tgz#a42833700d1b48d45961202082687f2b118eabe3"
-  integrity sha512-mkEXBRHrEKOwZcE/uwodyE+Gfx/qt3hrcuLSZI+35QKx04tElHDf2ns80sI2vStZIVuAdkPNX705m9IfRKhP4g==
+"@terascope/scripts@0.76.0":
+  version "0.76.0"
+  resolved "https://registry.yarnpkg.com/@terascope/scripts/-/scripts-0.76.0.tgz#95ce61423a7bba93cea12f76dfac7e3a1fe8467a"
+  integrity sha512-yIWVXdCVBuR89hfnJuOy0uUmQKQn+B7LEiUca7UoXCEivYdpfbrPYDvOh9KSbs08BJW4z9lNRVCIt4oTpV1S5Q==
   dependencies:
     "@kubernetes/client-node" "^0.20.0"
-    "@terascope/utils" "^0.57.0"
+    "@terascope/utils" "^0.58.0"
     codecov "^3.8.3"
     execa "^5.1.0"
     fs-extra "^11.2.0"
