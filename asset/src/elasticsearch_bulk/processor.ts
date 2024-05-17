@@ -7,11 +7,26 @@ import { ElasticsearchBulkConfig } from './interfaces';
 export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkConfig> {
     client!: ElasticsearchBulkSender;
     apiManager!: ElasticSenderAPI;
+    private recordsProcessed = 0;
 
     async initialize(): Promise<void> {
         await super.initialize();
         const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig.api_name);
         this.client = await apiManager.create('bulkSender', this.opConfig);
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const self = this;
+        this.context.apis.foundation.promMetrics.addGauge(
+            'records_processed',
+            'Number of records sent',
+            ['operation'],
+            async function collect() {
+                const labels = {
+                    operation: self.opConfig._op,
+                    ...self.context.apis.foundation.promMetrics.getDefaultLabels()
+                };
+                this.set(labels, self.getRecordsProcessed());
+            }
+        );
     }
 
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
@@ -27,6 +42,12 @@ export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkC
             }
         }
 
+        this.recordsProcessed += data.length;
+
         return data;
+    }
+
+    getRecordsProcessed() {
+        return this.recordsProcessed;
     }
 }

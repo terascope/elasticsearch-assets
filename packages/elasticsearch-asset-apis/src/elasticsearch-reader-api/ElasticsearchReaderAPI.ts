@@ -50,6 +50,7 @@ export class ElasticsearchReaderAPI {
     windowSize: number|undefined = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
+    recordsProcessed = 0;
 
     constructor(
         config: ESReaderOptions, client: ReaderClient, emitter: EventEmitter, logger: Logger
@@ -149,6 +150,7 @@ export class ElasticsearchReaderAPI {
                 this.logger.debug(msg);
                 throw new Error(msg); // throw for pRetry
             }
+            this.recordsProcessed += resultSize;
 
             return result;
         };
@@ -740,6 +742,10 @@ export class ElasticsearchReaderAPI {
     async verifyIndex(): Promise<void> {
         // this is method in api is badly named
         return this.client.verify();
+    }
+
+    getRecordsProcessed() {
+        return this.recordsProcessed;
     }
 }
 
