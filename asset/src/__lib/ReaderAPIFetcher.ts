@@ -15,16 +15,16 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
 
         const { context, api, opConfig } = this;
         await this.context.apis.foundation.promMetrics.addGauge(
-            'records_processed',
-            'Number of records fetched',
-            ['operation'],
+            'elasticsearch_records_read',
+            'Number of records read from elasticsearch',
+            ['op_name'],
             async function collect() {
-                const recordsProcessed = api.getRecordsProcessed();
+                const recordsRead = api.getRecordsFetched();
                 const labels = {
-                    operation: opConfig._op,
+                    op_name: opConfig._op,
                     ...context.apis.foundation.promMetrics.getDefaultLabels()
                 };
-                this.set(labels, recordsProcessed);
+                this.set(labels, recordsRead);
             });
     }
 

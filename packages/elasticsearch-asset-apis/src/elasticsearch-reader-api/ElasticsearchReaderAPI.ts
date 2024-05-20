@@ -50,7 +50,7 @@ export class ElasticsearchReaderAPI {
     windowSize: number|undefined = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
-    recordsProcessed = 0;
+    recordsFetched = 0;
 
     constructor(
         config: ESReaderOptions, client: ReaderClient, emitter: EventEmitter, logger: Logger
@@ -150,7 +150,7 @@ export class ElasticsearchReaderAPI {
                 this.logger.debug(msg);
                 throw new Error(msg); // throw for pRetry
             }
-            this.recordsProcessed += resultSize;
+            this.recordsFetched += resultSize;
 
             return result;
         };
@@ -744,8 +744,8 @@ export class ElasticsearchReaderAPI {
         return this.client.verify();
     }
 
-    getRecordsProcessed() {
-        return this.recordsProcessed;
+    getRecordsFetched() {
+        return this.recordsFetched;
     }
 }
 
