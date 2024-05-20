@@ -731,7 +731,7 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.56.2":
+"@terascope/data-mate@^0.56.1", "@terascope/data-mate@^0.56.2":
   version "0.56.2"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.56.2.tgz#51fa9b4ba49e5090acdb9e028e07f61ef3ac7f6d"
   integrity sha512-qRidKi3UcUThdzj+y9G160vgxO4X7x1v+5MVS0+pYgyx27kTmZ6LBlrD7aYwbm6TQt6Z4oc9048iMq8pnH5bjg==
@@ -852,13 +852,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.53.1":
-  version "0.53.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.53.1.tgz#b1c5c12e39202b42062b94e936f1b7466f69db27"
-  integrity sha512-U1Z75uekFBTjvbRT2CdMAED0HhZqsG1k37KS+YBXzHyQMFjCAQcAF9v5bCuVEQgA7lgFyfdyggSXAkp85C9MXg==
+"@terascope/teraslice-state-storage@^0.53.2":
+  version "0.53.2"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.53.2.tgz#bc21d9b5fd9bade3e82121ae2c0d6c69a67ba1c0"
+  integrity sha512-6uG/kTodEYNyWopfTHA2zMqr488HmZlryEIPa2eBGxZO5vr46cjnd1EOcY5gDDfdSruVQMwq2z++SFTv4+RgTw==
   dependencies:
-    "@terascope/elasticsearch-api" "^3.20.1"
-    "@terascope/utils" "^0.59.1"
+    "@terascope/elasticsearch-api" "^3.20.2"
+    "@terascope/utils" "^0.59.2"
 
 "@terascope/types@^0.17.1", "@terascope/types@^0.17.2":
   version "0.17.2"
