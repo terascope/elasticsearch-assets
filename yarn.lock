@@ -766,13 +766,13 @@
     lodash "^4.17.21"
     yargs "^17.7.2"
 
-"@terascope/elasticsearch-api@^3.20.1":
-  version "3.20.1"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.20.1.tgz#1ecf852f65f0acd2f78292853e616b2ec2c218ac"
-  integrity sha512-VuMP+mgFU4pb+ZXPUsS9h/ue/H7dJC/8rvVC5NJ07Wqob+MNJJ3a0S4Pv4X+oL92aFVMtahBOUUDGU5PpEUcWQ==
+"@terascope/elasticsearch-api@^3.20.1", "@terascope/elasticsearch-api@^3.20.2":
+  version "3.20.2"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.20.2.tgz#f207d68d672bb8bd36fa8e25e6c2c7f21204a70b"
+  integrity sha512-Tg5EKfKuGurHo9RSl5HHhRUKGXNpflqKjq6nXwfm6A3sO3cO4nMK/TzSxX+/+Dhx8yjgU/0BKOKwCHsoU8R+tw==
   dependencies:
-    "@terascope/types" "^0.17.1"
-    "@terascope/utils" "^0.59.1"
+    "@terascope/types" "^0.17.2"
+    "@terascope/utils" "^0.59.2"
     bluebird "^3.7.2"
     setimmediate "^1.0.5"
 
