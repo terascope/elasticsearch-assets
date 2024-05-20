@@ -731,7 +731,7 @@
   dependencies:
     defer-to-connect "^2.0.0"
 
-"@terascope/data-mate@^0.56.1", "@terascope/data-mate@^0.56.2":
+"@terascope/data-mate@^0.56.2":
   version "0.56.2"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.56.2.tgz#51fa9b4ba49e5090acdb9e028e07f61ef3ac7f6d"
   integrity sha512-qRidKi3UcUThdzj+y9G160vgxO4X7x1v+5MVS0+pYgyx27kTmZ6LBlrD7aYwbm6TQt6Z4oc9048iMq8pnH5bjg==
@@ -766,7 +766,7 @@
     lodash "^4.17.21"
     yargs "^17.7.2"
 
-"@terascope/elasticsearch-api@^3.20.1", "@terascope/elasticsearch-api@^3.20.2":
+"@terascope/elasticsearch-api@^3.20.2":
   version "3.20.2"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.20.2.tgz#f207d68d672bb8bd36fa8e25e6c2c7f21204a70b"
   integrity sha512-Tg5EKfKuGurHo9RSl5HHhRUKGXNpflqKjq6nXwfm6A3sO3cO4nMK/TzSxX+/+Dhx8yjgU/0BKOKwCHsoU8R+tw==
