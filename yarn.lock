@@ -766,7 +766,7 @@
     lodash "^4.17.21"
     yargs "^17.7.2"
 
-"@terascope/elasticsearch-api@^3.20.1", "@terascope/elasticsearch-api@^3.20.2":
+"@terascope/elasticsearch-api@^3.20.2":
   version "3.20.2"
   resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-3.20.2.tgz#f207d68d672bb8bd36fa8e25e6c2c7f21204a70b"
   integrity sha512-Tg5EKfKuGurHo9RSl5HHhRUKGXNpflqKjq6nXwfm6A3sO3cO4nMK/TzSxX+/+Dhx8yjgU/0BKOKwCHsoU8R+tw==
@@ -803,16 +803,17 @@
     progress "^2.0.3"
     yargs "^17.2.1"
 
-"@terascope/job-components@^0.74.1":
-  version "0.74.1"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.74.1.tgz#374fda9ba69a7ee035110ac13c5fe2a28a2f5bfe"
-  integrity sha512-DjDj2qGUIJVpiw8HGcdVCuEZsM8hi3d8GchNKFbherxyD7rtv3y+56nbT/rtHSoK8RhCuJTxfdaLwzpdLlpQcg==
+"@terascope/job-components@^0.74.2":
+  version "0.74.2"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-0.74.2.tgz#de875f792644abf3324f74d98e6b7daa046d7fff"
+  integrity sha512-FEliIWkcK43Q+kiONkwutXgV/f9qQMGUjesmJq9IyqYswOd7ZHtlXCjBUziKqdUWZ01OZ3YDzFxeuufJoLflUg==
   dependencies:
     "@terascope/utils" "^0.59.1"
     convict "^6.2.4"
     convict-format-with-moment "^6.2.0"
     convict-format-with-validator "^6.2.0"
     datemath-parser "^1.0.6"
+    prom-client "^15.1.2"
     uuid "^9.0.1"
 
 "@terascope/scripts@0.77.2":
@@ -851,13 +852,13 @@
   dependencies:
     bluebird "^3.7.2"
 
-"@terascope/teraslice-state-storage@^0.53.1":
-  version "0.53.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.53.1.tgz#b1c5c12e39202b42062b94e936f1b7466f69db27"
-  integrity sha512-U1Z75uekFBTjvbRT2CdMAED0HhZqsG1k37KS+YBXzHyQMFjCAQcAF9v5bCuVEQgA7lgFyfdyggSXAkp85C9MXg==
+"@terascope/teraslice-state-storage@^0.53.2":
+  version "0.53.2"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-0.53.2.tgz#bc21d9b5fd9bade3e82121ae2c0d6c69a67ba1c0"
+  integrity sha512-6uG/kTodEYNyWopfTHA2zMqr488HmZlryEIPa2eBGxZO5vr46cjnd1EOcY5gDDfdSruVQMwq2z++SFTv4+RgTw==
   dependencies:
-    "@terascope/elasticsearch-api" "^3.20.1"
-    "@terascope/utils" "^0.59.1"
+    "@terascope/elasticsearch-api" "^3.20.2"
+    "@terascope/utils" "^0.59.2"
 
 "@terascope/types@^0.17.1", "@terascope/types@^0.17.2":
   version "0.17.2"

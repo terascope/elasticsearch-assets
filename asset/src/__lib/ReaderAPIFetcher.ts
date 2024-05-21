@@ -12,6 +12,20 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
         await super.initialize();
+
+        const { context, api, opConfig } = this;
+        await this.context.apis.foundation.promMetrics.addGauge(
+            'elasticsearch_records_read',
+            'Number of records read from elasticsearch',
+            ['op_name'],
+            async function collect() {
+                const recordsRead = api.getRecordsFetched();
+                const labels = {
+                    op_name: opConfig._op,
+                    ...context.apis.foundation.promMetrics.getDefaultLabels()
+                };
+                this.set(labels, recordsRead);
+            });
     }
 
     async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame | Buffer> {
