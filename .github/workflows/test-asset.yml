@@ -72,6 +72,10 @@ jobs:
       - name: Test apis for ${{ matrix.search-version }}
         run: yarn --silent test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
+      - run: yarn global add teraslice-cli
+      - run: teraslice-cli -v
+      - run: teraslice-cli assets build
+      - run: ls -l build/
 
 
 # TODO:
