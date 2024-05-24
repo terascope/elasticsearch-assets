@@ -1,4 +1,4 @@
-import { BatchProcessor } from '@terascope/job-components';
+import { BatchProcessor, isPromAvailable } from '@terascope/job-components';
 import { DataEntity } from '@terascope/utils';
 import { ElasticsearchBulkSender } from '@terascope/elasticsearch-asset-apis';
 import { ElasticSenderAPI } from '../elasticsearch_sender_api/interfaces';
@@ -15,18 +15,20 @@ export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkC
         this.client = await apiManager.create('bulkSender', this.opConfig);
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;
-        this.context.apis.foundation.promMetrics.addGauge(
-            'elasticsearch_records_written',
-            'Number of records written to elasticsearch',
-            ['op_name'],
-            async function collect() {
-                const labels = {
-                    op_name: self.opConfig._op,
-                    ...self.context.apis.foundation.promMetrics.getDefaultLabels()
-                };
-                this.set(labels, self.getRecordsWritten());
-            }
-        );
+        if (isPromAvailable(this.context)) {
+            this.context.apis.foundation.promMetrics.addGauge(
+                'elasticsearch_records_written',
+                'Number of records written to elasticsearch',
+                ['op_name'],
+                async function collect() {
+                    const labels = {
+                        op_name: self.opConfig._op,
+                        ...self.context.apis.foundation.promMetrics.getDefaultLabels()
+                    };
+                    this.set(labels, self.getRecordsWritten());
+                }
+            );
+        }
     }
 
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {

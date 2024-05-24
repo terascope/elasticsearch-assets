@@ -1,4 +1,4 @@
-import { Fetcher, DataEntity } from '@terascope/job-components';
+import { Fetcher, DataEntity, isPromAvailable } from '@terascope/job-components';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchReaderAPI, ReaderSlice } from '@terascope/elasticsearch-asset-apis';
 import { ESDateConfig } from '../elasticsearch_reader/interfaces';
@@ -14,18 +14,20 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
         await super.initialize();
 
         const { context, api, opConfig } = this;
-        await this.context.apis.foundation.promMetrics.addGauge(
-            'elasticsearch_records_read',
-            'Number of records read from elasticsearch',
-            ['op_name'],
-            async function collect() {
-                const recordsRead = api.getRecordsFetched();
-                const labels = {
-                    op_name: opConfig._op,
-                    ...context.apis.foundation.promMetrics.getDefaultLabels()
-                };
-                this.set(labels, recordsRead);
-            });
+        if (isPromAvailable(context)) {
+            await this.context.apis.foundation.promMetrics.addGauge(
+                'elasticsearch_records_read',
+                'Number of records read from elasticsearch',
+                ['op_name'],
+                async function collect() {
+                    const recordsRead = api.getRecordsFetched();
+                    const labels = {
+                        op_name: opConfig._op,
+                        ...context.apis.foundation.promMetrics.getDefaultLabels()
+                    };
+                    this.set(labels, recordsRead);
+                });
+        }
     }
 
     async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame | Buffer> {
