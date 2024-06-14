@@ -1,10 +1,10 @@
 import elasticAPI from '@terascope/elasticsearch-api';
 import { isNil, isPlainObject, isString } from '@terascope/utils';
-import { ElasticsearchBulkSender } from './ElasticsearchBulkSender';
-import { ElasticsearchSenderConfig } from './interfaces';
+import { ElasticsearchBulkSender } from './ElasticsearchBulkSender.js';
+import { ElasticsearchSenderConfig } from './interfaces.js';
 
-export * from './ElasticsearchBulkSender';
-export * from './interfaces';
+export * from './ElasticsearchBulkSender.js';
+export * from './interfaces.js';
 
 interface BulkAPIArgs {
     config: ElasticsearchSenderConfig,

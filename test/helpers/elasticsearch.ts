@@ -14,9 +14,6 @@ const {
 
 const logger = debugLogger('elasticsearch_helpers');
 
-// automatically set the timeout to 30s when using elasticsearch
-jest.setTimeout(30000);
-
 export {
     makeClient, formatUploadData, upload,
     populateIndex, waitForData, cleanupIndex,

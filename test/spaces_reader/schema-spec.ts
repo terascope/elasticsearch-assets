@@ -1,10 +1,8 @@
 import 'jest-extended';
-import {
-    newTestJobConfig, AnyObject
-} from '@terascope/job-components';
+import { newTestJobConfig, AnyObject } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { makeClient } from '../helpers';
-import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces';
+import { makeClient } from '../helpers/index.js';
+import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces.js';
 
 describe('spaces-reader schema', () => {
     let harness: WorkerTestHarness;

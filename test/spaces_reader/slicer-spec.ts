@@ -1,10 +1,10 @@
 import 'jest-extended';
 import nock from 'nock';
-import path from 'path';
+import path from 'node:path';
 import moment from 'moment';
 import { newTestJobConfig, SlicerRecoveryData } from '@terascope/job-components';
 import { SlicerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client';
+import MockClient from '../helpers/mock_client.js';
 
 describe('spaces_reader slicer', () => {
     const baseUri = 'http://test.dev';

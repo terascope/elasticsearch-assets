@@ -6,11 +6,11 @@ import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
 import got, { OptionsOfJSONResponseBody, Response } from 'got';
 import { DataFrame } from '@terascope/data-mate';
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import {
     SpacesAPIConfig, ReaderClient, FetchResponseType
-} from './interfaces';
-import { throwRequestError } from './throwRequestError';
+} from './interfaces.js';
+import { throwRequestError } from './throwRequestError.js';
 
 export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries

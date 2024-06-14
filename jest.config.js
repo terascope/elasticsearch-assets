@@ -5,12 +5,13 @@ const path = require('path');
 module.exports = {
     verbose: true,
     testEnvironment: 'node',
-    setupFilesAfterEnv: ['jest-extended/all', '<rootDir>/test/test.setup.js'],
+    setupFilesAfterEnv: ['jest-extended/all'],
     collectCoverage: true,
     coverageReporters: ['json', 'lcov', 'text', 'html'],
     coverageDirectory: 'coverage',
     maxConcurrency: 4,
     workerIdleMemoryLimit: '400MB',
+    testTimeout: 60 * 1000,
     collectCoverageFrom: [
         '<rootDir>/asset/**/*.ts',
         '!<rootDir>/packages/*/**/*.ts',

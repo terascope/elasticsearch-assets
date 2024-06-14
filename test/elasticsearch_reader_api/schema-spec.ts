@@ -1,8 +1,8 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
-import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
 describe('elasticsearch reader api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_api_schema_`;

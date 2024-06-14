@@ -1,6 +1,6 @@
 import { Slicer, get, SlicerRecoveryData } from '@terascope/job-components';
-import { DataGenerator, CounterResults } from './interfaces';
-import Counter from './counter';
+import { DataGenerator, CounterResults } from './interfaces.js';
+import Counter from './counter.js';
 
 export default class DataGeneratorSlicer extends Slicer<DataGenerator> {
     countHandle!: () => Promise<CounterResults>;

@@ -5,7 +5,7 @@ import {
 import elasticAPI, { BulkActionMetadata, BulkRecord } from '@terascope/elasticsearch-api';
 import {
     ElasticsearchSenderConfig, UpdateConfig
-} from './interfaces';
+} from './interfaces.js';
 
 export class ElasticsearchBulkSender implements RouteSenderAPI {
     client: elasticAPI.Client;

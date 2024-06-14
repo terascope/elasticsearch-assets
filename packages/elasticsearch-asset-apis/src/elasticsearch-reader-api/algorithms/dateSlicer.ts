@@ -3,8 +3,8 @@ import {
     isString
 } from '@terascope/utils';
 import moment from 'moment';
-import { inspect } from 'util';
-import { idSlicer } from './idSlicer';
+import { inspect } from 'node:util';
+import { idSlicer } from './idSlicer.js';
 import {
     SlicerArgs,
     SlicerDateConfig,
@@ -17,14 +17,14 @@ import {
     IDType,
     DateSlicerResults,
     ReaderSlice
-} from '../interfaces';
+} from '../interfaces.js';
 import {
     dateFormat as dFormat,
     dateFormatSeconds,
     dateOptions,
     determineDateSlicerRange,
-} from './date-helpers';
-import { getKeyArray } from './id-helpers';
+} from './date-helpers.js';
+import { getKeyArray } from './id-helpers.js';
 
 interface DateParams {
     start: moment.Moment;

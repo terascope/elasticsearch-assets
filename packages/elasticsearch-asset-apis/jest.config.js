@@ -1,24 +1,20 @@
-'use strict';
-
-module.exports = {
+export default {
     verbose: true,
     testEnvironment: 'node',
-    setupFilesAfterEnv: ['jest-extended/all', '<rootDir>/test/test.setup.js'],
+    setupFilesAfterEnv: ['jest-extended/all'],
     collectCoverage: true,
     coverageReporters: ['json', 'lcov', 'text', 'html'],
     coverageDirectory: 'coverage',
+    extensionsToTreatAsEsm: ['.ts'],
     testMatch: [
         '<rootDir>/test/**/*-spec.{ts,js}',
         '<rootDir>/test/*-spec.{ts,js}',
     ],
-    preset: 'ts-jest',
-    transform: {
-        '\\.[jt]sx?$': ['ts-jest', {
-            isolatedModules: true,
-            tsconfig: './tsconfig.json',
-            diagnostics: true,
-            pretty: true,
-            useESM: true
-        }]
+    moduleNameMapper: {
+        '^(\\.{1,2}/.*)\\.js$': '$1',
     },
+    transform: {
+        '^.+\\.(t|j)sx?$': 'ts-jest'
+    },
+    testTimeout: 60 * 1000
 };

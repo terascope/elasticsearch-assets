@@ -1,6 +1,6 @@
 import { AnyObject, GeoPoint, ClientParams } from '@terascope/types';
 import { isString, parseGeoPoint } from '@terascope/utils';
-import { ESReaderOptions, ReaderSlice } from './interfaces';
+import { ESReaderOptions, ReaderSlice } from './interfaces.js';
 
 /**
  * Build the elasticsearch DSL query

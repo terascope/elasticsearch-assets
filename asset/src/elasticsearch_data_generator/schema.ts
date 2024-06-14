@@ -1,7 +1,7 @@
 import {
     ConvictSchema, ValidatedJobConfig, getOpConfig, AnyObject
 } from '@terascope/job-components';
-import { DataGenerator } from './interfaces';
+import { DataGenerator } from './interfaces.js';
 
 export default class Schema extends ConvictSchema<DataGenerator> {
     validateJob(job: ValidatedJobConfig): void {

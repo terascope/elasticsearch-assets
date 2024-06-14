@@ -8,8 +8,8 @@ import moment from 'moment';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
 import { dateOptions, IDType } from '@terascope/elasticsearch-asset-apis';
-import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from './interfaces';
-import { isValidIndex } from '../__lib/schema';
+import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from './interfaces.js';
+import { isValidIndex } from '../__lib/schema.js';
 
 export const schema = {
     index: {

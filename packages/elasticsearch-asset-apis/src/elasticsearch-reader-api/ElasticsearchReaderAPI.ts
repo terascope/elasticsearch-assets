@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import {
     AnyObject, DataEntity, isObjectEntity,
     getTypeOf, Logger, isSimpleObject,
@@ -10,13 +10,13 @@ import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import {
     dateSlicer, idSlicer, getKeyArray,
     dateOptions, processInterval, dateFormat,
     dateFormatSeconds, parseDate, delayedStreamSegment,
     determineIDSlicerRanges, determineDateSlicerRanges,
-} from './algorithms';
+} from './algorithms/index.js';
 import {
     ESReaderOptions, DateSegments, InputDateSegments,
     SlicerArgs, IDType, DateSlicerArgs,
@@ -25,9 +25,9 @@ import {
     DateSlicerRange, IDSlicerRange, DateSlicerMetadata,
     GetIntervalResult, ReaderSlice, IDSlicerResults,
     FetchResponseType
-} from './interfaces';
-import { WindowState } from './WindowState';
-import { buildQuery } from './utils';
+} from './interfaces.js';
+import { WindowState } from './WindowState.js';
+import { buildQuery } from './utils.js';
 
 type FetchDate = moment.Moment | null;
 

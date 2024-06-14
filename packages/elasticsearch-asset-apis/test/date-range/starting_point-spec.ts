@@ -6,7 +6,7 @@ import {
     divideRange,
     StartPointConfig,
     ParsedInterval
-} from '../../src';
+} from '../../src/index.js';
 
 function makeDate(format: string) {
     return moment.utc(moment.utc().format(format));

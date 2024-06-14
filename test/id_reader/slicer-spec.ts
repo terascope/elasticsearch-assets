@@ -7,9 +7,7 @@ import {
     makeClient,
     populateIndex,
     waitForData,
-} from '../helpers';
-
-jest.setTimeout(30 * 1000);
+} from '../helpers/index.js';
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;

@@ -12,7 +12,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex,
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch_reader slicer', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_slicer_`;

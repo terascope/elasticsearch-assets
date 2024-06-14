@@ -1,14 +1,14 @@
 import 'jest-extended';
 import { DataEntity } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
     makeClient,
     upload,
     waitForData
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;

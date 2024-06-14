@@ -2,7 +2,7 @@ import {
     ConvictSchema, AnyObject, isNumber,
     getTypeOf, isString
 } from '@terascope/job-components';
-import { ESStateStorageConfig } from './interfaces';
+import { ESStateStorageConfig } from './interfaces.js';
 
 export default class Schema extends ConvictSchema<ESStateStorageConfig> {
     build(): AnyObject {

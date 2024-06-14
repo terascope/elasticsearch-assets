@@ -10,7 +10,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('id_reader fetcher', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;

@@ -1,12 +1,11 @@
 import 'jest-extended';
-
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
 import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
     upload, waitForData, TEST_INDEX_PREFIX,
-} from '../helpers';
+} from '../helpers/index.js';
 
 interface ClientCalls {
     [key: string]: ClientParams.BulkParams

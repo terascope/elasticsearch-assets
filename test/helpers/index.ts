@@ -1,2 +1,2 @@
-export * from './elasticsearch';
-export * from './utils';
+export * from './elasticsearch.js';
+export * from './utils.js';

@@ -5,7 +5,7 @@ import {
     AnyObject, DataEntity, get, Logger
 } from '@terascope/utils';
 import { DataTypeConfig, ClientParams, ClientResponse } from '@terascope/types';
-import { ReaderClient, FetchResponseType } from './interfaces';
+import { ReaderClient, FetchResponseType } from './interfaces.js';
 
 export class ElasticsearchReaderClient implements ReaderClient {
     private readonly _baseClient: Client;

@@ -1,4 +1,4 @@
-import { CounterResults } from './interfaces';
+import { CounterResults } from './interfaces.js';
 
 export default class Counter {
     isPersistent: boolean;

@@ -1,9 +1,10 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { isNil } from '@terascope/job-components';
 import {
-    TEST_INDEX_PREFIX, cleanupIndex, makeClient, fetch, waitForData
-} from '../helpers';
-import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces';
+    TEST_INDEX_PREFIX, cleanupIndex, makeClient,
+    fetch, waitForData
+} from '../helpers/index.js';
+import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('elasticsearch sender api', () => {
     const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;

@@ -1,8 +1,8 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject } from '@terascope/job-components';
-import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces';
-import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
+import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('Elasticsearch Bulk Schema', () => {
     const index = 'some_index';

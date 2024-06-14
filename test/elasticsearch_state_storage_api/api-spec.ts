@@ -8,7 +8,7 @@ import {
     makeClient,
     waitForData,
     fetch
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch state storage api', () => {
     const idField = '_key';

@@ -2,14 +2,14 @@ import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
-import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
-import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
     TEST_INDEX_PREFIX,
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('id_reader Schema', () => {
     const name = 'id_reader';

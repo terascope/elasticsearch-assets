@@ -2,7 +2,7 @@ import 'jest-extended';
 import nock from 'nock';
 import { DataEntity, newTestJobConfig } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client';
+import MockClient from '../helpers/mock_client.js';
 
 describe('spaces_reader fetcher', () => {
     const baseUri = 'http://test.dev';

@@ -14,6 +14,7 @@
     },
     "license": "MIT",
     "author": "Terascope, LLC <info@terascope.io>",
+    "type": "module",
     "workspaces": [
         "packages/*",
         "asset"

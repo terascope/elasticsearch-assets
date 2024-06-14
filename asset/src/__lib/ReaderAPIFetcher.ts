@@ -1,8 +1,8 @@
 import { Fetcher, DataEntity, isPromAvailable } from '@terascope/job-components';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchReaderAPI, ReaderSlice } from '@terascope/elasticsearch-asset-apis';
-import { ESDateConfig } from '../elasticsearch_reader/interfaces';
-import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces';
+import { ESDateConfig } from '../elasticsearch_reader/interfaces.js';
+import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces.js';
 
 export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
     api!: ElasticsearchReaderAPI;

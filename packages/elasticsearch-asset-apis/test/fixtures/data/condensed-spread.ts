@@ -25,8 +25,8 @@ const CondensedDataType = new DataType({
     }
 });
 
-export = {
+export default {
     data,
     CondensedDataType,
     index: 'condensed_spread'
-}
+};

@@ -1,7 +1,7 @@
 import {
     has, tryParseJSON, TSError
 } from '@terascope/utils';
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 
 /**
  * Try and proxy the error as best as possible to avoid confusing errors
