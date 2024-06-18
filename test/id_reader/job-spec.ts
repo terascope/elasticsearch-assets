@@ -9,7 +9,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers/index.js';
+} from '../../dist/test/helpers/index.js';
 
 describe('id_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;

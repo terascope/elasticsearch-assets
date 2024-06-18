@@ -8,7 +8,7 @@ import {
     makeClient,
     upload,
     waitForData
-} from '../helpers/index.js';
+} from '../../dist/test/helpers/index.js';
 
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;

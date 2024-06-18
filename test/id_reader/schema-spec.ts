@@ -1,7 +1,7 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
-import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
+import { ValidatedJobConfig, OpConfig, APIConfig } from '@terascope/job-components';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
@@ -9,7 +9,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers/index.js';
+} from '../../dist/test/helpers/index.js';
 
 describe('id_reader Schema', () => {
     const name = 'id_reader';
@@ -33,15 +33,15 @@ describe('id_reader Schema', () => {
     let esClient: any;
     let clients: any;
 
-    async function makeSchema(config: AnyObject = {}): Promise<ESIDReaderConfig> {
-        const base: AnyObject = {};
+    async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
+        const base: Record<string, any> = {};
         const opConfig = Object.assign(base, { _op: name, index, id_field_name }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
         await harness.initialize();
 
         const validConfig = harness.executionContext.config.operations.find(
-            (testConfig) => testConfig._op === name
+            (testConfig: OpConfig) => testConfig._op === name
         );
 
         return validConfig as ESIDReaderConfig;
@@ -136,7 +136,7 @@ describe('id_reader Schema', () => {
             await harness.initialize();
 
             const apiConfig = harness.executionContext.config.apis.find(
-                (api) => api._name === 'elasticsearch_reader_api:id_reader-0'
+                (api: APIConfig) => api._name === 'elasticsearch_reader_api:id_reader-0'
             );
 
             expect(apiConfig).toMatchObject({ index });

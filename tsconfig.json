@@ -27,9 +27,6 @@
     "include": ["test"],
     "references": [
         {
-            "path": "packages/terafoundation_elasticsearch_connector"
-        },
-        {
             "path": "packages/elasticsearch-asset-apis"
         },
         {

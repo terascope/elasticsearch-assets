@@ -7,7 +7,7 @@ import {
     makeClient,
     populateIndex,
     waitForData,
-} from '../helpers/index.js';
+} from '../../dist/test/helpers/index.js';
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;

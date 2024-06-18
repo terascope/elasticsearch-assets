@@ -1,5 +1,6 @@
 import {
-    Fetcher, WorkerContext, ExecutionConfig, TSError, AnyObject
+    Fetcher, Context, ExecutionConfig,
+    TSError, AnyObject
 } from '@terascope/job-components';
 import mocker from 'mocker-data-generator';
 import path from 'node:path';
@@ -12,7 +13,7 @@ const isDeprecated = deprecate(() => {}, 'elasticsearch_data_generator is deprec
 export default class DataGeneratorFetcher extends Fetcher<DataGenerator> {
     dataSchema: any;
 
-    constructor(context: WorkerContext, opConfig: DataGenerator, exConfig: ExecutionConfig) {
+    constructor(context: Context, opConfig: DataGenerator, exConfig: ExecutionConfig) {
         super(context, opConfig, exConfig);
         this.dataSchema = parsedSchema(opConfig);
         isDeprecated();

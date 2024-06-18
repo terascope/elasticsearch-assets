@@ -3,7 +3,7 @@ import { isNil } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient,
     fetch, waitForData
-} from '../helpers/index.js';
+} from '../../dist/test/helpers/index.js';
 import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('elasticsearch sender api', () => {

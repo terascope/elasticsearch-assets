@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
+import { AnyObject, OpConfig } from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
@@ -27,7 +27,7 @@ describe('Elasticsearch Bulk Schema', () => {
         await harness.initialize();
 
         const validConfig = harness.executionContext.config.operations.find(
-            (testConfig) => testConfig._op === name
+            (testConfig: OpConfig) => testConfig._op === name
         );
 
         return validConfig as ElasticsearchBulkConfig;
