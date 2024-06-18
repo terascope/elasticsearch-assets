@@ -52,7 +52,9 @@ export class SpacesReaderClient implements ReaderClient {
             responseType: isJSONResponse ? 'json' : undefined,
             json,
             throwHttpErrors: false,
-            timeout: this.config.timeout,
+            timeout: {
+                request: this.config.timeout,
+            },
             retry: {
                 limit: this.retry,
                 methods: ['POST', 'GET'],
