@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
+import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-components';
 import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
@@ -15,7 +15,7 @@ import {
 describe('id_reader fetcher', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
-
+    const logger = debugLogger('test-logger');
     const docType = '_doc';
     // in es5 this should be ignored
     const id_field_name = 'uuid';
@@ -28,7 +28,7 @@ describe('id_reader fetcher', () => {
     const evenIndex = makeIndex('even_spread');
 
     let harness: JobTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let esClient: any;
     let hasTypedDoc = true;
 
@@ -51,14 +51,16 @@ describe('id_reader fetcher', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];

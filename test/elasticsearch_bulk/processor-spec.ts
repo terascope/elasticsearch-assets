@@ -1,7 +1,10 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
-import { DataEntity, OpConfig } from '@terascope/job-components';
+import {
+    DataEntity, OpConfig, debugLogger,
+    TestClientConfig
+} from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
     upload, waitForData, TEST_INDEX_PREFIX,
@@ -14,9 +17,10 @@ interface ClientCalls {
 describe('elasticsearch_bulk', () => {
     const bulkIndex = `${TEST_INDEX_PREFIX}_bulk_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let clientCalls: ClientCalls = {};
     let esClient: any;
 
@@ -58,14 +62,16 @@ describe('elasticsearch_bulk', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: defaultClient
+                    client: defaultClient,
+                    logger
                 }),
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
                 createClient: async () => ({
-                    client: otherClient
+                    client: otherClient,
+                    logger
                 }),
             }
         ];

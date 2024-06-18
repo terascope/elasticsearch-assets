@@ -1,5 +1,5 @@
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { isNil } from '@terascope/job-components';
+import { isNil, debugLogger, TestClientConfig } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX, cleanupIndex, makeClient,
     fetch, waitForData
@@ -9,10 +9,11 @@ import { ElasticSenderAPI } from '../../asset/src/elasticsearch_sender_api/inter
 describe('elasticsearch sender api', () => {
     const apiSendIndex = `${TEST_INDEX_PREFIX}_send_api_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -21,7 +22,9 @@ describe('elasticsearch sender api', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
+
                 }),
             }
         ];

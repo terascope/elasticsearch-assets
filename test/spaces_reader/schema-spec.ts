@@ -1,5 +1,8 @@
 import 'jest-extended';
-import { newTestJobConfig, AnyObject, APIConfig } from '@terascope/job-components';
+import {
+    newTestJobConfig, AnyObject, APIConfig,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { makeClient } from '../helpers/index.js';
 import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces.js';
@@ -8,11 +11,11 @@ describe('spaces-reader schema', () => {
     let harness: WorkerTestHarness;
     const index = 'some_index';
     const name = 'spaces_reader';
-
+    const logger = debugLogger('test-logger');
     const docType = '_doc';
 
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -22,7 +25,8 @@ describe('spaces-reader schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];

@@ -1,7 +1,10 @@
 import 'jest-extended';
-import path from 'path';
+import path from 'node:path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { TestContext, APIConfig, Context } from '@terascope/job-components';
+import {
+    TestContext, APIConfig, Context,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
@@ -9,10 +12,11 @@ import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -22,7 +26,8 @@ describe('elasticsearch sender api schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];
@@ -101,24 +106,27 @@ describe('elasticsearch sender api schema', () => {
 describe('elasticsearch sender api schema for routed sender jobs', () => {
     let harness: WorkerTestHarness;
     let context: TestContext;
+    const logger = debugLogger('test-logger2');
 
     beforeAll(async () => {
         // need this to create valid context to remove the default es connection
         const esClient = await makeClient();
 
-        const clients = [
+        const clients: TestClientConfig[] = [
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es1',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];

@@ -1,26 +1,28 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, OpConfig } from '@terascope/job-components';
+import { debugLogger, OpConfig, TestClientConfig } from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('Elasticsearch Bulk Schema', () => {
     const index = 'some_index';
     const name = 'elasticsearch_bulk';
+    const logger = debugLogger('test-logger');
 
-    const clients = [
+    const clients: TestClientConfig[] = [
         {
             type: 'elasticsearch-next',
             endpoint: 'default',
             createClient: async () => ({
-                client: {}
+                client: {},
+                logger
             }),
         },
     ];
 
     let harness: WorkerTestHarness;
 
-    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchBulkConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchBulkConfig> {
         const opConfig = Object.assign({}, { _op: name, index }, config);
         harness = WorkerTestHarness.testProcessor(opConfig, { clients });
 

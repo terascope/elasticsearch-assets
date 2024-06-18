@@ -1,7 +1,10 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
-import { ValidatedJobConfig, OpConfig, APIConfig } from '@terascope/job-components';
+import {
+    ValidatedJobConfig, OpConfig, APIConfig,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
@@ -14,6 +17,7 @@ import {
 describe('id_reader Schema', () => {
     const name = 'id_reader';
     const id_field_name = 'someField';
+    const logger = debugLogger('test-logger');
 
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_id_reader_schema`;
 
@@ -31,7 +35,7 @@ describe('id_reader Schema', () => {
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
         const base: Record<string, any> = {};
@@ -60,7 +64,8 @@ describe('id_reader Schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             },
         ];

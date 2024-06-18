@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { DataEntity } from '@terascope/job-components';
+import { DataEntity, TestClientConfig, debugLogger } from '@terascope/job-components';
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
 import {
     TEST_INDEX_PREFIX,
@@ -14,6 +14,7 @@ describe('elasticsearch state storage api', () => {
     const idField = '_key';
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     let api: ESCachedStateStorage;
 
@@ -61,7 +62,7 @@ describe('elasticsearch state storage api', () => {
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -71,7 +72,8 @@ describe('elasticsearch state storage api', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];

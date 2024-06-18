@@ -1,5 +1,6 @@
 import 'jest-extended';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { TestClientConfig, debugLogger } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
@@ -14,6 +15,7 @@ import {
 describe('id_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
     // in es5 this should be ignored
     const id_field_name = 'uuid';
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
@@ -27,7 +29,7 @@ describe('id_reader job', () => {
     const evenIndex = makeIndex('even_data');
 
     let harness: JobTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let esClient: any;
 
     beforeAll(async () => {
@@ -46,14 +48,16 @@ describe('id_reader job', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];

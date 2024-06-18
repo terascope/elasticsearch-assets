@@ -1,5 +1,8 @@
 import 'jest-extended';
-import { newTestJobConfig, OpConfig, APIConfig } from '@terascope/job-components';
+import {
+    newTestJobConfig, OpConfig, APIConfig,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
@@ -15,6 +18,7 @@ import {
 describe('elasticsearch_reader schema', () => {
     const name = 'elasticsearch_reader';
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_schema`;
+    const logger = debugLogger('test-logger');
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -25,7 +29,7 @@ describe('elasticsearch_reader schema', () => {
     const index = makeIndex('even_spread');
     const evenBulkData = evenSpread.data;
 
-    let clients: any;
+    let clients: TestClientConfig[];
     let harness: WorkerTestHarness;
     let esClient: any;
 
@@ -36,7 +40,8 @@ describe('elasticsearch_reader schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];
