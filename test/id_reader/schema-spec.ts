@@ -122,7 +122,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('should not throw if base api is created but opConfig has index set to another value', async () => {
@@ -161,7 +164,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('should throw if number of slicers are greater than key_type length', async () => {
@@ -173,7 +179,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
 
             const job2 = newTestJobConfig({
                 slicers: 17,
@@ -183,7 +192,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job2, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job2, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('can validateJob to make sure its configured correctly', async () => {

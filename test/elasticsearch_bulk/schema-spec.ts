@@ -36,7 +36,9 @@ describe('Elasticsearch Bulk Schema', () => {
     }
 
     afterEach(async () => {
-        if (harness) await harness.shutdown();
+        if (harness) {
+            await harness.shutdown();
+        }
     });
 
     describe('when validating the schema', () => {

@@ -198,7 +198,10 @@ describe('elasticsearch_reader schema', () => {
             ]
         });
 
-        expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+        await expect(async () => {
+            const test = new WorkerTestHarness(job, { clients });
+            await test.initialize();
+        }).rejects.toThrow();
     });
 
     it('should not throw if base api is created but opConfig has index set to another value', async () => {

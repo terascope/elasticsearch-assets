@@ -63,6 +63,8 @@ describe('elasticsearch sender api', () => {
 
         harness = new WorkerTestHarness(job, { clients });
 
+        await harness.initialize();
+
         const processor = harness.getOperation('noop');
         // @ts-expect-error\
         processor.onBatch = async function test(data: DataEntity[]) {
@@ -74,8 +76,6 @@ describe('elasticsearch sender api', () => {
             await api.send(data);
             return data;
         };
-
-        await harness.initialize();
 
         return harness;
     }

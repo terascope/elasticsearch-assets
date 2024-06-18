@@ -1,5 +1,6 @@
 import 'jest-extended';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import {
     TestContext, APIConfig, Context,
@@ -8,6 +9,8 @@ import {
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
@@ -69,7 +72,9 @@ describe('elasticsearch sender api schema', () => {
     }
 
     afterEach(async () => {
-        await harness.shutdown();
+        if (harness) {
+            await harness.shutdown();
+        }
     });
 
     it('should have defaults', async () => {
@@ -131,7 +136,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             }
         ];
 
-        const testAsset = path.join(__dirname, '..', 'fixtures');
+        const testAsset = path.join(dirname, '..', 'fixtures');
 
         const initialJob = newTestJobConfig({
             max_retries: 3,
