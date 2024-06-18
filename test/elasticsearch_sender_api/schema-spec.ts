@@ -2,7 +2,7 @@ import 'jest-extended';
 import path from 'path';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { TestContext, APIConfig, Context } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../../dist/test/helpers/index.js';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
 

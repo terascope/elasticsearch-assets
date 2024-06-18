@@ -5,7 +5,7 @@ import { DataEntity, OpConfig } from '@terascope/job-components';
 import {
     makeClient, cleanupIndex, fetch,
     upload, waitForData, TEST_INDEX_PREFIX,
-} from '../../dist/test/helpers/index.js';
+} from '../helpers/index.js';
 
 interface ClientCalls {
     [key: string]: ClientParams.BulkParams

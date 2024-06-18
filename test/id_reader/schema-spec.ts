@@ -9,7 +9,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../../dist/test/helpers/index.js';
+} from '../helpers/index.js';
 
 describe('id_reader Schema', () => {
     const name = 'id_reader';

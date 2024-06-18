@@ -26,18 +26,15 @@
         "test:watch": "NODE_OPTIONS='--experimental-vm-modules' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "^0.56.2",
-        "@terascope/data-types": "^0.50.1",
-        "@terascope/elasticsearch-api": "^3.20.2",
-        "@terascope/utils": "^0.59.1",
+        "@terascope/data-mate": "^0.56.3",
+        "@terascope/data-types": "^0.50.3",
+        "@terascope/elasticsearch-api": "^3.20.3",
+        "@terascope/utils": "^0.59.3",
         "datemath-parser": "^1.0.6",
         "got": "^11.8.3",
         "moment": "^2.30.1"
     },
-    "devDependencies": {
-        "@types/elasticsearch": "^5.0.40",
-        "elasticsearch": "^15.4.1"
-    },
+    "devDependencies": {},
     "engines": {
         "node": ">=18.0.0",
         "yarn": ">=1.22.19"

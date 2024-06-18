@@ -10,7 +10,7 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../../dist/test/helpers/index.js';
+} from '../helpers/index.js';
 
 describe('elasticsearch_reader schema', () => {
     const name = 'elasticsearch_reader';

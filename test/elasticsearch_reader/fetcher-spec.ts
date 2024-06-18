@@ -5,7 +5,7 @@ import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from 'elast
 import {
     TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex, addToIndex
-} from '../../dist/test/helpers/index.js';
+} from '../helpers/index.js';
 import evenSpreadExtra1 from '../fixtures/data/even-spread-extra1.js';
 
 describe('elasticsearch_reader fetcher', () => {

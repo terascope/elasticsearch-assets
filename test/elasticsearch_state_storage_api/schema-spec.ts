@@ -1,7 +1,7 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { AnyObject, APIConfig } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../../dist/test/helpers/index.js';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces.js';
 
 describe('elasticsearch state storage api schema', () => {
