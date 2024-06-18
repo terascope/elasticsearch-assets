@@ -1,12 +1,5 @@
-// TODO: types are wrong for AssetRepository
-// import { AssetRepository } from '@terascope/job-components';
-
 import ESBulkSender from '../src/elasticsearch_bulk/processor.js';
 import ESBulkSenderSchema from '../src/elasticsearch_bulk/schema.js';
-
-import ESDataGenFetcher from '../src/elasticsearch_data_generator/fetcher.js';
-import ESDataGenSlicer from '../src/elasticsearch_data_generator/slicer.js';
-import ESDataGenSchema from '../src/elasticsearch_data_generator/schema.js';
 
 import ESDateFetcher from '../src/elasticsearch_reader/fetcher.js';
 import ESDateSlicer from '../src/elasticsearch_reader/slicer.js';
@@ -38,11 +31,6 @@ export const ASSETS = {
     elasticsearch_bulk: {
         Processor: ESBulkSender,
         Schema: ESBulkSenderSchema
-    },
-    elasticsearch_data_generator: {
-        Fetcher: ESDataGenFetcher,
-        Slicer: ESDataGenSlicer,
-        Schema: ESDataGenSchema
     },
     elasticsearch_reader: {
         Fetcher: ESDateFetcher,
