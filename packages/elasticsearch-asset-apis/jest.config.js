@@ -14,7 +14,13 @@ export default {
         '^(\\.{1,2}/.*)\\.js$': '$1',
     },
     transform: {
-        '^.+\\.(t|j)sx?$': 'ts-jest'
+        '\\.[jt]sx?$': ['ts-jest', {
+            isolatedModules: true,
+            tsconfig: './tsconfig.json',
+            diagnostics: true,
+            pretty: true,
+            useESM: true
+        }]
     },
     testTimeout: 60 * 1000
 };
