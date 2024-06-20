@@ -18,12 +18,12 @@
         "build:watch": "yarn build --watch",
         "test": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test . --",
         "test:debug": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test --debug . --",
-        "test:elasticsearch6": "NODE_OPTIONS='--experimental-vm-modules'TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:elasticsearch6": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test . --",
         "test:elasticsearch7": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='7.9.3' ts-scripts test . --",
         "test:elasticsearch8": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='8.1.2' ts-scripts test . --",
         "test:opensearch1": "NODE_OPTIONS='--experimental-vm-modules' TEST_OPENSEARCH='true' ts-scripts test . --",
         "test:opensearch2": "NODE_OPTIONS='--experimental-vm-modules' TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test . --",
-        "test:watch": "NODE_OPTIONS='--experimental-vm-modules' ts-scripts test --watch . --"
+        "test:watch": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
         "@terascope/data-mate": "^0.56.3",
