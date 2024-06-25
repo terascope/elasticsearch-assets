@@ -1,40 +1,44 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
-import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces';
-import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
+import { debugLogger, OpConfig, TestClientConfig } from '@terascope/job-components';
+import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('Elasticsearch Bulk Schema', () => {
     const index = 'some_index';
     const name = 'elasticsearch_bulk';
+    const logger = debugLogger('test-logger');
 
-    const clients = [
+    const clients: TestClientConfig[] = [
         {
             type: 'elasticsearch-next',
             endpoint: 'default',
             createClient: async () => ({
-                client: {}
+                client: {},
+                logger
             }),
         },
     ];
 
     let harness: WorkerTestHarness;
 
-    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchBulkConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchBulkConfig> {
         const opConfig = Object.assign({}, { _op: name, index }, config);
         harness = WorkerTestHarness.testProcessor(opConfig, { clients });
 
         await harness.initialize();
 
         const validConfig = harness.executionContext.config.operations.find(
-            (testConfig) => testConfig._op === name
+            (testConfig: OpConfig) => testConfig._op === name
         );
 
         return validConfig as ElasticsearchBulkConfig;
     }
 
     afterEach(async () => {
-        if (harness) await harness.shutdown();
+        if (harness) {
+            await harness.shutdown();
+        }
     });
 
     describe('when validating the schema', () => {

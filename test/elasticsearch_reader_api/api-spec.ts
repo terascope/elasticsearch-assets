@@ -1,23 +1,24 @@
 import 'jest-extended';
-import { DataEntity } from '@terascope/job-components';
+import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
     makeClient,
     upload,
     waitForData
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
+    const logger = debugLogger('test-logger');
 
     const docType = '_doc';
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -27,7 +28,8 @@ describe('elasticsearch reader api', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];

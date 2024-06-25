@@ -1,18 +1,19 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
-import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { TestClientConfig, APIConfig, debugLogger } from '@terascope/job-components';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
 describe('elasticsearch reader api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_api_schema_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     const apiName = DEFAULT_API_NAME;
     const harnesses: WorkerTestHarness[] = [];
 
     let harness: WorkerTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let esClient: any;
 
     beforeAll(async () => {
@@ -22,13 +23,16 @@ describe('elasticsearch reader api schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];
     });
 
-    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchReaderAPIConfig> {
+    async function makeSchema(
+        config: Record<string, any> = {}
+    ): Promise<ElasticsearchReaderAPIConfig> {
         const defaults = {
             _name: apiName,
             type: docType,
@@ -56,7 +60,10 @@ describe('elasticsearch reader api schema', () => {
         harnesses.push(harness);
 
         const { apis } = harness.executionContext.config;
-        return apis.find((settings) => settings._name === apiName) as ElasticsearchReaderAPIConfig;
+
+        return apis.find(
+            (settings: APIConfig) => settings._name === apiName
+        ) as ElasticsearchReaderAPIConfig;
     }
 
     afterEach(async () => {

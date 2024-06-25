@@ -1,8 +1,8 @@
 import { TSError } from '@terascope/utils';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults
-} from '../interfaces';
-import { generateCountQueryForKeys } from './id-helpers';
+} from '../interfaces.js';
+import { generateCountQueryForKeys } from './id-helpers.js';
 
 export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {

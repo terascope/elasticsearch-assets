@@ -1,19 +1,23 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
-import { AnyObject, ValidatedJobConfig } from '@terascope/job-components';
-import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces';
-import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import {
+    ValidatedJobConfig, OpConfig, APIConfig,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
+import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
     TEST_INDEX_PREFIX,
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('id_reader Schema', () => {
     const name = 'id_reader';
     const id_field_name = 'someField';
+    const logger = debugLogger('test-logger');
 
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_id_reader_schema`;
 
@@ -31,17 +35,17 @@ describe('id_reader Schema', () => {
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
-    async function makeSchema(config: AnyObject = {}): Promise<ESIDReaderConfig> {
-        const base: AnyObject = {};
+    async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
+        const base: Record<string, any> = {};
         const opConfig = Object.assign(base, { _op: name, index, id_field_name }, config);
         harness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
         await harness.initialize();
 
         const validConfig = harness.executionContext.config.operations.find(
-            (testConfig) => testConfig._op === name
+            (testConfig: OpConfig) => testConfig._op === name
         );
 
         return validConfig as ESIDReaderConfig;
@@ -60,7 +64,8 @@ describe('id_reader Schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             },
         ];
@@ -117,7 +122,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('should not throw if base api is created but opConfig has index set to another value', async () => {
@@ -136,7 +144,7 @@ describe('id_reader Schema', () => {
             await harness.initialize();
 
             const apiConfig = harness.executionContext.config.apis.find(
-                (api) => api._name === 'elasticsearch_reader_api:id_reader-0'
+                (api: APIConfig) => api._name === 'elasticsearch_reader_api:id_reader-0'
             );
 
             expect(apiConfig).toMatchObject({ index });
@@ -156,7 +164,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('should throw if number of slicers are greater than key_type length', async () => {
@@ -168,7 +179,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
 
             const job2 = newTestJobConfig({
                 slicers: 17,
@@ -178,7 +192,10 @@ describe('id_reader Schema', () => {
                 ]
             });
 
-            expect(() => new WorkerTestHarness(job2, { clients })).toThrow();
+            await expect(async () => {
+                const test = new WorkerTestHarness(job2, { clients });
+                await test.initialize();
+            }).rejects.toThrow();
         });
 
         it('can validateJob to make sure its configured correctly', async () => {

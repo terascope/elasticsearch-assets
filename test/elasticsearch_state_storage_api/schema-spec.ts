@@ -1,17 +1,18 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
-import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces';
+import { APIConfig, debugLogger, TestClientConfig } from '@terascope/job-components';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces.js';
 
 describe('elasticsearch state storage api schema', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
     const docType = '_doc';
     const apiName = 'elasticsearch_state_storage';
+    const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -21,14 +22,15 @@ describe('elasticsearch state storage api schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];
     });
 
-    async function makeSchema(config: AnyObject = {}): Promise<ESStateStorageConfig> {
-        const base: AnyObject = {
+    async function makeSchema(config: Record<string, any> = {}): Promise<ESStateStorageConfig> {
+        const base: Record<string, any> = {
             _name: apiName,
             index: apiReaderIndex,
             type: docType,
@@ -56,7 +58,9 @@ describe('elasticsearch state storage api schema', () => {
         await harness.initialize();
 
         const { apis } = harness.executionContext.config;
-        return apis.find((settings) => settings._name === apiName) as ESStateStorageConfig;
+        return apis.find(
+            (settings: APIConfig) => settings._name === apiName
+        ) as ESStateStorageConfig;
     }
 
     afterEach(async () => {

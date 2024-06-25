@@ -2,9 +2,9 @@ import {
     ConvictSchema, AnyObject, cloneDeep,
     ValidatedJobConfig, APIConfig, getOpConfig,
 } from '@terascope/job-components';
-import { ElasticsearchAPISenderConfig, DEFAULT_API_NAME } from './interfaces';
-import { isValidIndex } from '../__lib/schema';
-import { schema } from '../elasticsearch_bulk/schema';
+import { ElasticsearchAPISenderConfig, DEFAULT_API_NAME } from './interfaces.js';
+import { isValidIndex } from '../__lib/schema.js';
+import { schema } from '../elasticsearch_bulk/schema.js';
 
 const newSchema: AnyObject = cloneDeep(schema);
 

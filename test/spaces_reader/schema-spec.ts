@@ -1,20 +1,21 @@
 import 'jest-extended';
 import {
-    newTestJobConfig, AnyObject
+    newTestJobConfig, AnyObject, APIConfig,
+    debugLogger, TestClientConfig
 } from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { makeClient } from '../helpers';
-import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces';
+import { makeClient } from '../helpers/index.js';
+import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces.js';
 
 describe('spaces-reader schema', () => {
     let harness: WorkerTestHarness;
     const index = 'some_index';
     const name = 'spaces_reader';
-
+    const logger = debugLogger('test-logger');
     const docType = '_doc';
 
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -24,7 +25,8 @@ describe('spaces-reader schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];
@@ -107,7 +109,10 @@ describe('spaces-reader schema', () => {
             ]
         });
 
-        expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+        await expect(async () => {
+            const test = new WorkerTestHarness(job, { clients });
+            await test.initialize();
+        }).rejects.toThrow();
     });
 
     it('should not throw if base api is created but opConfig has index set to another value', async () => {
@@ -138,7 +143,7 @@ describe('spaces-reader schema', () => {
         await harness.initialize();
 
         const apiConfig = harness.executionContext.config.apis.find(
-            (api) => api._name === 'spaces_reader_api:spaces_reader-0'
+            (api: APIConfig) => api._name === 'spaces_reader_api:spaces_reader-0'
         );
 
         expect(apiConfig).toMatchObject({ index });

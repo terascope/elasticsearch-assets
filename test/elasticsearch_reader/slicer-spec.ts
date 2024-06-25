@@ -1,7 +1,8 @@
 import 'jest-extended';
 import {
     pDelay, LifeCycle, SlicerRecoveryData,
-    AnyObject, sortBy, SliceRequest
+    AnyObject, sortBy, SliceRequest, debugLogger,
+    TestClientConfig
 } from '@terascope/job-components';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import moment from 'moment';
@@ -12,10 +13,11 @@ import {
     makeClient,
     cleanupIndex,
     populateIndex,
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch_reader slicer', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_slicer_`;
+    const logger = debugLogger('test-logger');
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -53,7 +55,7 @@ describe('elasticsearch_reader slicer', () => {
 
     let harness: SlicerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -63,7 +65,8 @@ describe('elasticsearch_reader slicer', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];

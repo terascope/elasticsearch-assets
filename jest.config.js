@@ -1,16 +1,18 @@
-'use strict';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const path = require('path');
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
-module.exports = {
+export default {
     verbose: true,
     testEnvironment: 'node',
-    setupFilesAfterEnv: ['jest-extended/all', '<rootDir>/test/test.setup.js'],
+    setupFilesAfterEnv: ['jest-extended/all'],
     collectCoverage: true,
     coverageReporters: ['json', 'lcov', 'text', 'html'],
     coverageDirectory: 'coverage',
     maxConcurrency: 4,
     workerIdleMemoryLimit: '400MB',
+    testTimeout: 60 * 1000,
     collectCoverageFrom: [
         '<rootDir>/asset/**/*.ts',
         '!<rootDir>/packages/*/**/*.ts',
@@ -25,10 +27,11 @@ module.exports = {
         '<rootDir>/test/*-spec.{ts,js}',
     ],
     moduleNameMapper: {
-        '^@terascope/elasticsearch-asset-apis$': path.join(__dirname, '/packages/elasticsearch-asset-apis/src/index.ts'),
-        '^terafoundation_elasticsearch_connector$': path.join(__dirname, '/packages/terafoundation_elasticsearch_connector/src/index.ts'),
+        '^@terascope/elasticsearch-asset-apis$': path.join(dirname, '/packages/elasticsearch-asset-apis/src/index.ts'),
+        '^(\\.{1,2}/.*)\\.js$': '$1',
     },
     preset: 'ts-jest',
+    extensionsToTreatAsEsm: ['.ts'],
     transform: {
         '\\.[jt]sx?$': ['ts-jest', {
             isolatedModules: true,
@@ -40,6 +43,6 @@ module.exports = {
     },
     globals: {
         ignoreDirectories: ['dist'],
-        availableExtensions: ['.js', '.ts']
+        availableExtensions: ['.js', '.ts', '.mjs']
     }
 };

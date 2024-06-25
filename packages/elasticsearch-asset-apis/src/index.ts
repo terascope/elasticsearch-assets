@@ -1,2 +1,2 @@
-export * from './elasticsearch-reader-api';
-export * from './elasticsearch-bulk-sender';
+export * from './elasticsearch-reader-api/index.js';
+export * from './elasticsearch-bulk-sender/index.js';

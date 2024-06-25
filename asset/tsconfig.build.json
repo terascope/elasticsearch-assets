@@ -3,9 +3,9 @@
     "compilerOptions": {
         "rootDir": "src",
         "outDir": "dist",
-        "module": "commonjs",
+        "target": "ESNext",
+        "module": "ESNext",
         "moduleResolution": "node",
-        "target": "es2019",
         "skipLibCheck": true,
         "experimentalDecorators": true,
         "strict": true,

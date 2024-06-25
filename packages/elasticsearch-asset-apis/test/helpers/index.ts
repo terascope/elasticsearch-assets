@@ -1,3 +1,3 @@
-export * from './mock-client';
-export * from './elasticsearch';
-export * from './utils';
+export * from './mock-client.js';
+export * from './elasticsearch.js';
+export * from './utils.js';

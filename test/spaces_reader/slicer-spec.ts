@@ -1,19 +1,26 @@
 import 'jest-extended';
 import nock from 'nock';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import moment from 'moment';
-import { newTestJobConfig, SlicerRecoveryData } from '@terascope/job-components';
+import {
+    newTestJobConfig, SlicerRecoveryData, debugLogger,
+    TestClientConfig
+} from '@terascope/job-components';
 import { SlicerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client';
+import MockClient from '../helpers/mock_client.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('spaces_reader slicer', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
-    const assetDir = path.join(__dirname, '../..');
+    const assetDir = path.join(dirname, '../..');
     const maxSize = 100000;
     const token = 'test-token';
+    const logger = debugLogger('test-logger');
 
-    let clients: any;
+    let clients: TestClientConfig[];
     let defaultClient: MockClient;
 
     interface EventHook {
@@ -28,7 +35,8 @@ describe('spaces_reader slicer', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: defaultClient
+                    client: defaultClient,
+                    logger
                 }),
             }
         ];

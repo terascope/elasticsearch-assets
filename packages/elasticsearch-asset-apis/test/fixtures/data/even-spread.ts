@@ -10014,8 +10014,8 @@ const types: DataTypeFields = {
     bytes: { type: 'Integer' }
 };
 
-export = {
+export default {
     data,
     types,
     index: 'even_spread'
-}
+};

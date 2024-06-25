@@ -1,20 +1,24 @@
 import 'jest-extended';
-import { AnyObject, newTestJobConfig } from '@terascope/job-components';
+import {
+    newTestJobConfig, OpConfig, APIConfig,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces';
-import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema';
-import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces';
+import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
+import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema.js';
+import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
     TEST_INDEX_PREFIX,
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('elasticsearch_reader schema', () => {
     const name = 'elasticsearch_reader';
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_schema`;
+    const logger = debugLogger('test-logger');
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -25,7 +29,7 @@ describe('elasticsearch_reader schema', () => {
     const index = makeIndex('even_spread');
     const evenBulkData = evenSpread.data;
 
-    let clients: any;
+    let clients: TestClientConfig[];
     let harness: WorkerTestHarness;
     let esClient: any;
 
@@ -36,7 +40,8 @@ describe('elasticsearch_reader schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];
@@ -56,7 +61,7 @@ describe('elasticsearch_reader schema', () => {
         }
     });
 
-    async function makeSchema(config: AnyObject = {}): Promise<ESReaderConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<ESReaderConfig> {
         const opConfig = Object.assign({}, {
             _op: name,
             index,
@@ -68,7 +73,7 @@ describe('elasticsearch_reader schema', () => {
         await harness.initialize();
 
         const validConfig = harness.executionContext.config.operations.find(
-            (testConfig) => testConfig._op === name
+            (testConfig: OpConfig) => testConfig._op === name
         );
 
         return validConfig as ESReaderConfig;
@@ -193,7 +198,10 @@ describe('elasticsearch_reader schema', () => {
             ]
         });
 
-        expect(() => new WorkerTestHarness(job, { clients })).toThrow();
+        await expect(async () => {
+            const test = new WorkerTestHarness(job, { clients });
+            await test.initialize();
+        }).rejects.toThrow();
     });
 
     it('should not throw if base api is created but opConfig has index set to another value', async () => {
@@ -222,7 +230,7 @@ describe('elasticsearch_reader schema', () => {
         await harness.initialize();
 
         const apiConfig = harness.executionContext.config.apis.find(
-            (api) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
+            (api: APIConfig) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
         );
 
         expect(apiConfig).toMatchObject({ index });

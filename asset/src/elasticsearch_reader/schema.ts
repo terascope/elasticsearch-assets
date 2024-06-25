@@ -2,9 +2,9 @@ import {
     ConvictSchema, ValidatedJobConfig, AnyObject,
     getTypeOf, isNil
 } from '@terascope/job-components';
-import { opSchema } from '../__lib/schema';
-import { ESReaderConfig } from './interfaces';
-import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces';
+import { opSchema } from '../__lib/schema.js';
+import { ESReaderConfig } from './interfaces.js';
+import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces.js';
 
 export default class Schema extends ConvictSchema<ESReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {

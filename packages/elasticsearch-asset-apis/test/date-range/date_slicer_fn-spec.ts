@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import {
     AnyObject,
     debugLogger,
@@ -12,8 +12,8 @@ import {
     SlicerDateConfig, DateSegments,
     ReaderSlice, dateSlicer,
     dateFormatSeconds, dateFormat, divideRange
-} from '../../src';
-import { MockClient } from '../helpers';
+} from '../../src/index.js';
+import { MockClient } from '../helpers/index.js';
 
 interface TestConfig {
     slicers?: number;

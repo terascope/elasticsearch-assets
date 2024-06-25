@@ -1,14 +1,14 @@
 import { times, toIntegerOrThrow } from '@terascope/utils';
 import moment from 'moment';
-import fs from 'fs';
+import fs from 'node:fs';
 // @ts-expect-error
 import dateMath from 'datemath-parser';
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import {
     StartPointConfig, SlicerDates, InputDateSegments,
     DateSegments, ReaderSlice, ParsedInterval,
     DateConfig, DateSlicerRanges, DateSlicerRange,
-} from '../interfaces';
+} from '../interfaces.js';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
     const options = {

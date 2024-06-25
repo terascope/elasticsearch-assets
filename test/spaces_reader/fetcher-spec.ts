@@ -1,14 +1,18 @@
 import 'jest-extended';
 import nock from 'nock';
-import { DataEntity, newTestJobConfig } from '@terascope/job-components';
+import {
+    DataEntity, newTestJobConfig, TestClientConfig,
+    debugLogger
+} from '@terascope/job-components';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client';
+import MockClient from '../helpers/mock_client.js';
 
 describe('spaces_reader fetcher', () => {
     const baseUri = 'http://test.dev';
     const testIndex = 'details-subset';
+    const logger = debugLogger('test-logger');
 
-    let clients: any;
+    let clients: TestClientConfig[];
     let defaultClient: MockClient;
 
     const maxSize = 100000;
@@ -21,7 +25,8 @@ describe('spaces_reader fetcher', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: defaultClient
+                    client: defaultClient,
+                    logger
                 }),
             }
         ];

@@ -1,11 +1,11 @@
 import type { DataFrame } from '@terascope/data-mate';
 import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
-import type { EventEmitter } from 'events';
+import type { EventEmitter } from 'node:events';
 import type {
     DataTypeConfig, xLuceneVariables, ClientParams,
     ClientResponse
 } from '@terascope/types';
-import type { WindowState } from './WindowState';
+import type { WindowState } from './WindowState.js';
 
 /**
  * This is used for as the internal elasticsearch

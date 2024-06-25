@@ -1,13 +1,14 @@
 import 'jest-extended';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
+import { debugLogger, TestClientConfig } from '@terascope/job-components';
 import {
     TEST_INDEX_PREFIX,
     getTotalSliceCounts,
     makeClient,
     cleanupIndex,
     populateIndex
-} from '../helpers';
+} from '../helpers/index.js';
 
 describe('date_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
@@ -15,6 +16,7 @@ describe('date_reader job', () => {
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const docType = '_doc';
     const bulkData = evenSpread.data;
+    const logger = debugLogger('test-logger');
 
     function makeIndex(str: string) {
         return `${idIndex}_${str}`;
@@ -23,7 +25,7 @@ describe('date_reader job', () => {
     const evenIndex = makeIndex('even_spread-2020.0.1');
 
     let harness: JobTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let esClient: any;
 
     beforeAll(async () => {
@@ -42,14 +44,16 @@ describe('date_reader job', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'otherConnection',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];

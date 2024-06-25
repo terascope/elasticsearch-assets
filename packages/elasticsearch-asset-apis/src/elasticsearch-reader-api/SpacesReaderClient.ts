@@ -5,13 +5,15 @@ import {
 } from '@terascope/utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
-import got, { OptionsOfJSONResponseBody, Response } from 'got';
+import got, {
+    OptionsOfJSONResponseBody, Response, TimeoutError, RequestError
+} from 'got';
 import { DataFrame } from '@terascope/data-mate';
-import { inspect } from 'util';
+import { inspect } from 'node:util';
 import {
     SpacesAPIConfig, ReaderClient, FetchResponseType
-} from './interfaces';
-import { throwRequestError } from './throwRequestError';
+} from './interfaces.js';
+import { throwRequestError } from './throwRequestError.js';
 
 export class SpacesReaderClient implements ReaderClient {
     // NOTE: currently we are not supporting id based reader queries
@@ -65,7 +67,9 @@ export class SpacesReaderClient implements ReaderClient {
             responseType: isJSONResponse ? 'json' : undefined,
             json,
             throwHttpErrors: false,
-            timeout: this.config.timeout,
+            timeout: {
+                request: this.config.timeout,
+            },
             retry: {
                 limit: this.retry,
                 methods: ['POST', 'GET'],
@@ -94,7 +98,7 @@ export class SpacesReaderClient implements ReaderClient {
                 this.uri, this.getRequestOptions(query, format)
             );
         } catch (err) {
-            if (err instanceof got.TimeoutError) {
+            if (err instanceof TimeoutError) {
                 throw new TSError('HTTP request timed out connecting to API endpoint.', {
                     statusCode: 408,
                     context: {
@@ -103,13 +107,15 @@ export class SpacesReaderClient implements ReaderClient {
                     }
                 });
             }
-            if (err instanceof got.RequestError && err.response) {
+
+            if (err instanceof RequestError && err.response) {
                 throwRequestError(
                     this.uri,
                     err.response?.statusCode ?? 500,
                     err.response?.body
                 );
             }
+
             throw new TSError(err, {
                 reason: 'Failure making search request',
                 context: {
@@ -357,7 +363,9 @@ export class SpacesReaderClient implements ReaderClient {
             const response = await got<ClientResponse.IndicesGetSettingsResponse>(uri, {
                 searchParams: { token },
                 responseType: 'json',
-                timeout: 1000000,
+                timeout: {
+                    request: 1000000
+                },
                 retry: {
                     limit: this.retry,
                     methods: ['POST', 'GET'],
@@ -379,7 +387,7 @@ export class SpacesReaderClient implements ReaderClient {
                 }
             };
         } catch (err) {
-            if (err instanceof got.TimeoutError) {
+            if (err instanceof TimeoutError) {
                 throw new TSError('HTTP request timed out connecting to API endpoint.', {
                     statusCode: 408,
                     context: {

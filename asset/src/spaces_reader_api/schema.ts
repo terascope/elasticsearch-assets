@@ -4,8 +4,8 @@ import {
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
-import { schema } from '../elasticsearch_reader_api/schema';
-import { DEFAULT_API_NAME } from './interfaces';
+import { schema } from '../elasticsearch_reader_api/schema.js';
+import { DEFAULT_API_NAME } from './interfaces.js';
 
 const clone = cloneDeep(schema);
 

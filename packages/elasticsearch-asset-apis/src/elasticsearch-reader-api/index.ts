@@ -1,18 +1,18 @@
 import { debugLogger, Logger } from '@terascope/utils';
-import { EventEmitter } from 'events';
-import { ElasticsearchReaderAPI } from './ElasticsearchReaderAPI';
+import { EventEmitter } from 'node:events';
+import { ElasticsearchReaderAPI } from './ElasticsearchReaderAPI.js';
 import {
     ESReaderOptions, FetchResponseType, ReaderClient, SpacesAPIConfig
-} from './interfaces';
-import { SpacesReaderClient } from './SpacesReaderClient';
+} from './interfaces.js';
+import { SpacesReaderClient } from './SpacesReaderClient.js';
 
-export * from './ElasticsearchReaderAPI';
-export * from './SpacesReaderClient';
-export * from './ElasticsearchReaderClient';
-export * from './interfaces';
-export * from './WindowState';
-export * from './algorithms';
-export * from './utils';
+export * from './ElasticsearchReaderAPI.js';
+export * from './SpacesReaderClient.js';
+export * from './ElasticsearchReaderClient.js';
+export * from './interfaces.js';
+export * from './WindowState.js';
+export * from './algorithms/index.js';
+export * from './utils.js';
 
 export interface ElasticsearchAPIArgs {
     config: ESReaderOptions,

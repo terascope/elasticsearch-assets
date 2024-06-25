@@ -3,8 +3,8 @@ import {
     AnyObject, isString, getTypeOf, cloneDeep,
     isNumber, isNotNil
 } from '@terascope/job-components';
-import { ElasticsearchBulkConfig } from './interfaces';
-import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces';
+import { ElasticsearchBulkConfig } from './interfaces.js';
+import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces.js';
 
 export const schema: AnyObject = {
     size: {

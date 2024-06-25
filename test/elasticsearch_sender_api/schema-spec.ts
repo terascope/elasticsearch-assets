@@ -1,18 +1,25 @@
 import 'jest-extended';
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { AnyObject, TestContext } from '@terascope/job-components';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers';
-import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces';
-import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema';
+import {
+    TestContext, APIConfig, Context,
+    debugLogger, TestClientConfig
+} from '@terascope/job-components';
+import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
+import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
+
+const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
     const docType = '_doc';
+    const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
 
     beforeAll(async () => {
         esClient = await makeClient();
@@ -22,7 +29,8 @@ describe('elasticsearch sender api schema', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];
@@ -30,7 +38,7 @@ describe('elasticsearch sender api schema', () => {
 
     const apiName = DEFAULT_API_NAME;
 
-    async function makeSchema(config: AnyObject = {}): Promise<ElasticsearchSenderAPI> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchSenderAPI> {
         const defaults = {
             _name: apiName,
             type: docType,
@@ -58,11 +66,15 @@ describe('elasticsearch sender api schema', () => {
         await harness.initialize();
 
         const { apis } = harness.executionContext.config;
-        return apis.find((settings) => settings._name === apiName) as ElasticsearchSenderAPI;
+        return apis.find(
+            (settings: APIConfig) => settings._name === apiName
+        ) as ElasticsearchSenderAPI;
     }
 
     afterEach(async () => {
-        await harness.shutdown();
+        if (harness) {
+            await harness.shutdown();
+        }
     });
 
     it('should have defaults', async () => {
@@ -99,29 +111,32 @@ describe('elasticsearch sender api schema', () => {
 describe('elasticsearch sender api schema for routed sender jobs', () => {
     let harness: WorkerTestHarness;
     let context: TestContext;
+    const logger = debugLogger('test-logger2');
 
     beforeAll(async () => {
         // need this to create valid context to remove the default es connection
         const esClient = await makeClient();
 
-        const clients = [
+        const clients: TestClientConfig[] = [
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             },
             {
                 type: 'elasticsearch-next',
                 endpoint: 'test-es1',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             }
         ];
 
-        const testAsset = path.join(__dirname, '..', 'fixtures');
+        const testAsset = path.join(dirname, '..', 'fixtures');
 
         const initialJob = newTestJobConfig({
             max_retries: 3,
@@ -162,7 +177,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
     });
 
     it('should not throw if default is not an es endpoint and routed sender is an operation', async () => {
-        const schema = new SenderSchema(context);
+        const schema = new SenderSchema(context as unknown as Context);
 
         const job = newTestJobConfig({
             max_retries: 3,
@@ -192,7 +207,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
     });
 
     it('should not throw if default is not an es endpoint and multiple routed sender operations', async () => {
-        const schema = new SenderSchema(context);
+        const schema = new SenderSchema(context as unknown as Context);
 
         const job = newTestJobConfig({
             max_retries: 3,
@@ -266,7 +281,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             ],
         });
 
-        const schema = new SenderSchema(context);
+        const schema = new SenderSchema(context as unknown as Context);
 
         expect(() => schema.validateJob(job2)).toThrow();
     });

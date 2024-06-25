@@ -1,13 +1,14 @@
 {
     "name": "@terascope/elasticsearch-asset-apis",
     "displayName": "Elasticsearch Asset Apis",
-    "version": "0.12.1",
+    "version": "1.0.0",
     "description": "Elasticsearch reader and sender apis",
     "homepage": "https://github.com/terascope/elasticsearch-assets",
     "repository": "git@github.com:terascope/elasticsearch-assets.git",
     "license": "MIT",
     "author": "Terascope, LLC <info@terascope.io>",
     "main": "dist/src/index.js",
+    "type": "module",
     "typings": "dist/src/index.d.ts",
     "files": [
         "dist/src/**/*"
@@ -15,29 +16,25 @@
     "scripts": {
         "build": "tsc --project tsconfig.json",
         "build:watch": "yarn build --watch",
-        "test": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
-        "test:debug": "TEST_ELASTICSEARCH='true' ts-scripts test --debug . --",
-        "test:elasticsearch6": "TEST_ELASTICSEARCH='true' ts-scripts test . --",
-        "test:elasticsearch7": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='7.9.3' ts-scripts test . --",
-        "test:elasticsearch8": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='8.1.2' ts-scripts test . --",
-        "test:legacy": "TEST_ELASTICSEARCH='true' LEGACY_CLIENT=true ts-scripts test . --",
-        "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test . --",
-        "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test . --",
-        "test:watch": "ts-scripts test --watch . --"
+        "test": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:debug": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test --debug . --",
+        "test:elasticsearch6": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test . --",
+        "test:elasticsearch7": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='7.9.3' ts-scripts test . --",
+        "test:elasticsearch8": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='8.1.2' ts-scripts test . --",
+        "test:opensearch1": "NODE_OPTIONS='--experimental-vm-modules' TEST_OPENSEARCH='true' ts-scripts test . --",
+        "test:opensearch2": "NODE_OPTIONS='--experimental-vm-modules' TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test . --",
+        "test:watch": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "^0.56.2",
-        "@terascope/data-types": "^0.50.1",
-        "@terascope/elasticsearch-api": "^3.20.2",
-        "@terascope/utils": "^0.59.1",
+        "@terascope/data-mate": "^0.56.3",
+        "@terascope/data-types": "^0.50.3",
+        "@terascope/elasticsearch-api": "^3.20.3",
+        "@terascope/utils": "^0.59.3",
         "datemath-parser": "^1.0.6",
-        "got": "^11.8.3",
+        "got": "^13.0.0",
         "moment": "^2.30.1"
     },
-    "devDependencies": {
-        "@types/elasticsearch": "^5.0.40",
-        "elasticsearch": "^15.4.1"
-    },
+    "devDependencies": {},
     "engines": {
         "node": ">=18.0.0",
         "yarn": ">=1.22.19"

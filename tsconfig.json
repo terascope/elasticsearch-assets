@@ -2,9 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         "outDir": "dist",
-        "module": "commonjs",
         "moduleResolution": "node",
-        "target": "es2019",
+        "target": "ESNext",
+        "module": "ESNext",
         "skipLibCheck": true,
         "experimentalDecorators": true,
         "strict": true,
@@ -26,9 +26,6 @@
     },
     "include": ["test"],
     "references": [
-        {
-            "path": "packages/terafoundation_elasticsearch_connector"
-        },
         {
             "path": "packages/elasticsearch-asset-apis"
         },

@@ -64,8 +64,8 @@ const types: DataTypeFields = {
     bytes: { type: FieldType.Integer }
 };
 
-export = {
+export default {
     data: cloneDeep(data),
     types,
     index: 'even_spread'
-}
+};

@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import {
     TEST_INDEX_PREFIX,
@@ -8,7 +8,7 @@ import {
     waitForData,
     makeClient
 } from './helpers';
-import condensedData from './fixtures/data/condensed-spread';
+import condensedData from './fixtures/data/condensed-spread.js';
 import {
     createElasticsearchReaderAPI,
     ESReaderOptions,
@@ -18,7 +18,7 @@ import {
     ElasticsearchReaderClient,
     ReaderSlice,
     FetchResponseType
-} from '../src';
+} from '../src/index.js';
 
 describe('ReaderAPI with condensed time data', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_condensed_`;

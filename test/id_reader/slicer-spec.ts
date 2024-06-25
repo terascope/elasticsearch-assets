@@ -1,5 +1,5 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SlicerRecoveryData, AnyObject } from '@terascope/job-components';
+import { SlicerRecoveryData, debugLogger, TestClientConfig } from '@terascope/job-components';
 import { ElasticsearchTestHelpers } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX,
@@ -7,22 +7,20 @@ import {
     makeClient,
     populateIndex,
     waitForData,
-} from '../helpers';
-
-jest.setTimeout(30 * 1000);
+} from '../helpers/index.js';
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
     const docType = '_doc';
     const field = 'uuid';
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
-
+    const logger = debugLogger('test-logger');
     // for compatibility tests for older elasticsearch version,
     // we make the _id of the record the same as its uuid field
     const bulkData = evenSpread.data;
 
     let harness: SlicerTestHarness;
-    let clients: any;
+    let clients: TestClientConfig[];
     let esClient: any;
 
     beforeAll(async () => {
@@ -42,7 +40,8 @@ describe('id_reader slicer', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 })
             }
         ];
@@ -60,7 +59,7 @@ describe('id_reader slicer', () => {
     };
 
     async function makeSlicerTest(
-        opConfig: AnyObject = {},
+        opConfig: Record<string, any> = {},
         numOfSlicers = 1,
         recoveryData: SlicerRecoveryData[]|undefined = undefined
     ) {

@@ -9,7 +9,7 @@ import {
     IDType,
     SpacesAPIConfig,
     SpacesReaderClient
-} from '../../src';
+} from '../../src/index.js';
 
 describe('Spaces Reader Client', () => {
     const baseUri = 'http://test.dev';

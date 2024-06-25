@@ -8,7 +8,7 @@ import {
     createElasticsearchBulkSender,
     ElasticsearchBulkSender
 } from '@terascope/elasticsearch-asset-apis';
-import { ElasticsearchAPISenderConfig } from './interfaces';
+import { ElasticsearchAPISenderConfig } from './interfaces.js';
 
 export default class ElasticsearchSenderAPI extends APIFactory
     <ElasticsearchBulkSender, ElasticsearchAPISenderConfig> {

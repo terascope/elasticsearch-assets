@@ -1,15 +1,16 @@
 import 'jest-extended';
-import { DataEntity, AnyObject } from '@terascope/job-components';
+import { DataEntity, TestClientConfig, debugLogger } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
 import {
     TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex, addToIndex
-} from '../helpers';
-import evenSpreadExtra1 from '../fixtures/data/even-spread-extra1';
+} from '../helpers/index.js';
+import evenSpreadExtra1 from '../fixtures/data/even-spread-extra1.js';
 
 describe('elasticsearch_reader fetcher', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher_`;
+    const logger = debugLogger('test-logger');
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -23,7 +24,7 @@ describe('elasticsearch_reader fetcher', () => {
     let workerHarness: WorkerTestHarness;
     let jobHarness: JobTestHarness;
     let esClient: any;
-    let clients: any;
+    let clients: TestClientConfig[];
     let hasTypedDoc = true;
 
     beforeAll(async () => {
@@ -38,7 +39,8 @@ describe('elasticsearch_reader fetcher', () => {
                 type: 'elasticsearch-next',
                 endpoint: 'default',
                 createClient: async () => ({
-                    client: esClient
+                    client: esClient,
+                    logger
                 }),
             },
 
@@ -69,7 +71,7 @@ describe('elasticsearch_reader fetcher', () => {
         type: docType
     };
 
-    async function makeFetcherTest(config: AnyObject = {}) {
+    async function makeFetcherTest(config: Record<string, any> = {}) {
         const opConfig = Object.assign({}, defaults, config);
         workerHarness = WorkerTestHarness.testFetcher(opConfig, { clients });
 
@@ -78,7 +80,7 @@ describe('elasticsearch_reader fetcher', () => {
         return workerHarness;
     }
 
-    async function makeJobTest(config: AnyObject = {}) {
+    async function makeJobTest(config: Record<string, any> = {}) {
         const opConfig = Object.assign({}, defaults, config);
         const job = newTestJobConfig({
             operations: [
