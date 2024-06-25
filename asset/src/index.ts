@@ -1,29 +1,29 @@
-import ESBulkSender from '../src/elasticsearch_bulk/processor.js';
-import ESBulkSenderSchema from '../src/elasticsearch_bulk/schema.js';
+import ESBulkSender from './elasticsearch_bulk/processor.js';
+import ESBulkSenderSchema from './elasticsearch_bulk/schema.js';
 
-import ESDateFetcher from '../src/elasticsearch_reader/fetcher.js';
-import ESDateSlicer from '../src/elasticsearch_reader/slicer.js';
-import ESDateSchema from '../src/elasticsearch_reader/schema.js';
+import ESDateFetcher from './elasticsearch_reader/fetcher.js';
+import ESDateSlicer from './elasticsearch_reader/slicer.js';
+import ESDateSchema from './elasticsearch_reader/schema.js';
 
-import ESReaderAPI from '../src/elasticsearch_reader_api/api.js';
-import ESReaderAPISchema from '../src/elasticsearch_reader_api/schema.js';
+import ESReaderAPI from './elasticsearch_reader_api/api.js';
+import ESReaderAPISchema from './elasticsearch_reader_api/schema.js';
 
-import ESSenderAPI from '../src/elasticsearch_sender_api/api.js';
-import ESSenderAPISchema from '../src/elasticsearch_sender_api/schema.js';
+import ESSenderAPI from './elasticsearch_sender_api/api.js';
+import ESSenderAPISchema from './elasticsearch_sender_api/schema.js';
 
-import SpacesReaderAPI from '../src/spaces_reader_api/api.js';
-import SpacesReaderAPISchema from '../src/spaces_reader_api/schema.js';
+import SpacesReaderAPI from './spaces_reader_api/api.js';
+import SpacesReaderAPISchema from './spaces_reader_api/schema.js';
 
-import SpacesFetcher from '../src/spaces_reader/fetcher.js';
-import SpacesSlicer from '../src/spaces_reader/slicer.js';
-import SpacesSchema from '../src/spaces_reader/schema.js';
+import SpacesFetcher from './spaces_reader/fetcher.js';
+import SpacesSlicer from './spaces_reader/slicer.js';
+import SpacesSchema from './spaces_reader/schema.js';
 
-import IDFetcher from '../src/id_reader/fetcher.js';
-import IDSlicer from '../src/id_reader/slicer.js';
-import IDSchema from '../src/id_reader/schema.js';
+import IDFetcher from './id_reader/fetcher.js';
+import IDSlicer from './id_reader/slicer.js';
+import IDSchema from './id_reader/schema.js';
 
-import ESStateStorageAPI from '../src/elasticsearch_state_storage/api.js';
-import ESStateStorageSchema from '../src/elasticsearch_state_storage/schema.js';
+import ESStateStorageAPI from './elasticsearch_state_storage/api.js';
+import ESStateStorageSchema from './elasticsearch_state_storage/schema.js';
 
 // Teraslice Asset Registry
 // This was added to enable esbuild based bundled assets.
