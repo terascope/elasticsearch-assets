@@ -1,3 +1,4 @@
+import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
     AnyObject, withoutNil, DataEntity,
@@ -19,12 +20,24 @@ export class SpacesReaderClient implements ReaderClient {
     logger: Logger;
     protected uri: string;
     private retry: number;
+    caCerts: string[];
 
     constructor(config: SpacesAPIConfig, logger: Logger) {
         this.config = config;
         this.logger = logger;
         this.uri = `${config.endpoint}/${config.index}`;
         this.retry = config.retry ?? 3;
+        this.caCerts = this.createCertsArray();
+    }
+
+    createCertsArray(): string[] {
+        const opCerts: string[] = [];
+        if (this.config.caCertificate) {
+            opCerts.push(this.config.caCertificate);
+        }
+        const allCerts: string[] = opCerts.concat(tls.rootCertificates);
+
+        return allCerts;
     }
 
     getRequestOptions(
@@ -58,6 +71,7 @@ export class SpacesReaderClient implements ReaderClient {
                 methods: ['POST', 'GET'],
             },
             headers: this.config.headers || {},
+            https: { certificateAuthority: this.caCerts }
         };
     }
 
@@ -347,7 +361,8 @@ export class SpacesReaderClient implements ReaderClient {
                 retry: {
                     limit: this.retry,
                     methods: ['POST', 'GET'],
-                }
+                },
+                https: { certificateAuthority: this.caCerts }
             });
             const max = get(response, 'body.params.size.max', null) ?? get(response, 'params.size.max', null);
 
