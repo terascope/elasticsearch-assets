@@ -38,7 +38,12 @@ const apiSchema = {
         doc: 'The number of times that the spaces client will try to retry a request',
         default: 3,
         format: Number
-    }
+    },
+    caCertificate: {
+        doc: 'CA certificate used to validate https endpoint',
+        default: undefined,
+        format: String
+    },
 };
 
 const spacesSchema = Object.assign({}, clone, apiSchema) as AnyObject;
