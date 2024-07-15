@@ -42,7 +42,7 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@terascope/data-types": "^0.50.3",
+        "@terascope/data-types": "^0.51.0",
         "@terascope/elasticsearch-api": "^3.20.3",
         "@terascope/elasticsearch-asset-apis": "^1.0.0",
         "@terascope/eslint-config": "^0.8.0",
