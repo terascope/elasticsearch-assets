@@ -49,19 +49,22 @@ jobs:
       - run: yarn lint
 
       - name: Create Docker Image List
-        id: step1
         run: |
           yarn docker:listImages
           cat ./images/image-list.txt
+
+      - name: Copy List to output
+        id: step1
+        run: |
           {
             echo 'LIST_CONTENTS<<EOF'
             cat ./images/image-list.txt
             echo EOF
           } >> "$GITHUB_OUTPUT"
-          echo $GITHUB_OUTPUT
 
       - run: echo ${{ steps.step1.outputs.LIST_CONTENTS }}
       - run: echo ${{ steps.step1.outputs }}
+
       - name: Restore Docker image cache
         id: docker-cache
         uses: actions/cache@v4
