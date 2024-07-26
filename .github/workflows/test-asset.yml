@@ -52,6 +52,12 @@ jobs:
         run: |
           yarn docker:listImages
           cat ./images/image-list.txt
+          {
+            echo 'LIST_CONTENTS<<EOF'
+            cat ./images/image-list.txt >> $GITHUB_OUTPUT
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+          echo $GITHUB_OUTPUT
 
       - name: Restore Docker image cache
         id: docker-cache
