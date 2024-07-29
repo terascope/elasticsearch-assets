@@ -73,7 +73,7 @@ jobs:
 
   check-docker-limit-after:
     needs: test-elasticsearch-assets
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@fbd0c1372ed26dffeff757a94b3615cf370b866f
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
     secrets: inherit
 
 # TODO:
