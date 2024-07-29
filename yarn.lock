@@ -723,10 +723,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@terascope/data-mate@^0.57.0":
-  version "0.57.0"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.57.0.tgz#e9ee1f9bbb553db1f367829a91da0d69a58141f5"
-  integrity sha512-afRzUl3lpYMxZJ9+ae0GoZAn0plKmH1/jZ/vKizSkk6i3MXmb5SaOX3xEI3wLKxE/yvA2/6ApYh5WLTPFjI/WQ==
+"@terascope/data-mate@^0.57.0", "@terascope/data-mate@^0.57.1":
+  version "0.57.1"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.57.1.tgz#ca149e056180b5643d59d0b21a5ca0d4b7f1665f"
+  integrity sha512-xK8pAWLR7CDeMXwX1YO1IhY5dOxVGSFnX+CQLtHtMYb9W1lmFDKkqYMzGWDlO3saZkUyKc9Fe8ibGKP/6nAuRA==
   dependencies:
     "@terascope/data-types" "^0.51.0"
     "@terascope/types" "^0.18.0"
@@ -6464,15 +6464,10 @@ valid-url@^1.0.9:
   resolved "https://registry.yarnpkg.com/valid-url/-/valid-url-1.0.9.tgz#1c14479b40f1397a75782f115e4086447433a200"
   integrity sha512-QQDsV8OnSf5Uc30CKSwG9lnhMPe6exHtTXLRYX8uMwKENy640pU+2BgBL0LRbDh/eYRahNCS7aewCx0wf3NYVA==
 
-validator@^13.12.0:
+validator@^13.12.0, validator@^13.6.0:
   version "13.12.0"
   resolved "https://registry.yarnpkg.com/validator/-/validator-13.12.0.tgz#7d78e76ba85504da3fee4fd1922b385914d4b35f"
   integrity sha512-c1Q0mCiPlgdTVVVIJIrBuxNicYE+t/7oKeI9MWLj3fh/uq2Pxh/3eeWbVZ4OcGW1TUf53At0njHw5SMdA3tmMg==
-
-validator@^13.6.0:
-  version "13.11.0"
-  resolved "https://registry.yarnpkg.com/validator/-/validator-13.11.0.tgz#23ab3fd59290c61248364eabf4067f04955fbb1b"
-  integrity sha512-Ii+sehpSfZy+At5nPdnyMhx78fEoPDkR2XW/zimHEL3MyGJQOCQ7WeP20jPYRz7ZCpcKLB21NxuXHF3bxjStBQ==
 
 verror@1.10.0:
   version "1.10.0"
