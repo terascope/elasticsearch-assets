@@ -9,13 +9,13 @@ on:
 
 jobs:
   check-docker-limit-before:
-   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@fbd0c1372ed26dffeff757a94b3615cf370b866f
+   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
    secrets: inherit
 
-  # cache-docker-images:
-  #   needs: check-docker-limit-before
-  #   uses: terascope/workflows/.github/workflows/cache-docker-images.yml@fbd0c1372ed26dffeff757a94b3615cf370b866f
-  #   secrets: inherit
+  cache-docker-images:
+    needs: check-docker-limit-before
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@f5e098fa861fe7744fa61842e82124f806364be9
+    secrets: inherit
 
   test-elasticsearch-assets:
     runs-on: ubuntu-latest
@@ -27,8 +27,8 @@ jobs:
       fail-fast: false
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [18] #, 20, 22]
-        search-version: [elasticsearch6] #, elasticsearch7, opensearch1, opensearch2]
+        node-version: [18, 20, 22]
+        search-version: [elasticsearch6, elasticsearch7, opensearch1, opensearch2]
     steps:
       - uses: actions/checkout@v4
 
@@ -52,18 +52,6 @@ jobs:
         run: |
           yarn docker:listImages
           cat ./images/image-list.txt
-
-      - name: Copy List to output
-        id: step1
-        run: |
-          {
-            echo 'LIST_CONTENTS<<EOF'
-            cat ./images/image-list.txt
-            echo EOF
-          } >> "$GITHUB_OUTPUT"
-
-      - run: echo ${{ steps.step1.outputs.LIST_CONTENTS }}
-      - run: echo ${{ steps.step1.outputs }}
 
       - name: Restore Docker image cache
         id: docker-cache
