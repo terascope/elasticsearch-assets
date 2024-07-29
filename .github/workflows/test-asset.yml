@@ -8,8 +8,18 @@ on:
     branches: [ master ]
 
 jobs:
+  check-docker-limit-before:
+   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
+   secrets: inherit
+
+  cache-docker-images:
+    needs: check-docker-limit-before
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@f5e098fa861fe7744fa61842e82124f806364be9
+    secrets: inherit
+
   test-elasticsearch-assets:
     runs-on: ubuntu-latest
+    needs: cache-docker-images
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
@@ -17,26 +27,38 @@ jobs:
       fail-fast: false
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [18.19.1, 20.11.1, 22.2.0]
+        node-version: [18, 20, 22]
         search-version: [elasticsearch6, elasticsearch7, opensearch1, opensearch2]
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'yarn'
 
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
-        uses: docker/login-action@v2
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - run: yarn setup
       - run: yarn lint
+
+      - name: Create Docker Image List
+        run: |
+          yarn docker:listImages
+          cat ./images/image-list.txt
+
+      - name: Restore Docker image cache
+        id: docker-cache
+        uses: actions/cache@v4
+        with:
+          path: /tmp/docker_cache
+          key: docker-images-${{ hashFiles('./images/image-list.txt') }}
 
       - name: Test asset for ${{ matrix.search-version }}
         run: yarn --silent test:${{ matrix.search-version }}
@@ -49,6 +71,10 @@ jobs:
       - run: teraslice-cli assets build
       - run: ls -l build/
 
+  check-docker-limit-after:
+    needs: test-elasticsearch-assets
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
+    secrets: inherit
 
 # TODO:
 # - Add Macos Test

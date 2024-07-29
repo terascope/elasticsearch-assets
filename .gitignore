@@ -70,3 +70,6 @@ asset/dist
 dist/
 
 tsconfig.tsbuildinfo
+
+# CI test files
+images/*
