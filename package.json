@@ -63,7 +63,7 @@
         "node-notifier": "^10.0.1",
         "teraslice-test-harness": "^1.1.0",
         "ts-jest": "^29.2.3",
-        "typescript": "~5.2.2"
+        "typescript": "~5.4.5"
     },
     "engines": {
         "node": ">=18.0.0",
