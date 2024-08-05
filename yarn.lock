@@ -723,7 +723,7 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@terascope/data-mate@^0.57.0", "@terascope/data-mate@^0.57.1":
+"@terascope/data-mate@^0.57.1":
   version "0.57.1"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-0.57.1.tgz#ca149e056180b5643d59d0b21a5ca0d4b7f1665f"
   integrity sha512-xK8pAWLR7CDeMXwX1YO1IhY5dOxVGSFnX+CQLtHtMYb9W1lmFDKkqYMzGWDlO3saZkUyKc9Fe8ibGKP/6nAuRA==
@@ -6228,10 +6228,10 @@ tr46@~0.0.3:
   resolved "https://registry.yarnpkg.com/tr46/-/tr46-0.0.3.tgz#8184fd347dac9cdc185992f3a6622e14b9d9ab6a"
   integrity sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==
 
-ts-jest@^29.2.3:
-  version "29.2.3"
-  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.2.3.tgz#3d226ac36b8b820151a38f164414f9f6b412131f"
-  integrity sha512-yCcfVdiBFngVz9/keHin9EnsrQtQtEu3nRykNy9RVp+FiPFFbPJ3Sg6Qg4+TkmH0vMP5qsTKgXSsk80HRwvdgQ==
+ts-jest@^29.2.4:
+  version "29.2.4"
+  resolved "https://registry.yarnpkg.com/ts-jest/-/ts-jest-29.2.4.tgz#38ccf487407d7a63054a72689f6f99b075e296e5"
+  integrity sha512-3d6tgDyhCI29HlpwIq87sNuI+3Q6GLTTCeYRHCs7vDz+/3GCMwEtV9jezLyl4ZtnBgx00I7hm8PCP8cTksMGrw==
   dependencies:
     bs-logger "0.x"
     ejs "^3.1.10"
