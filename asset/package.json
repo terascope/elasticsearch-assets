@@ -18,7 +18,7 @@
         "test": "yarn --cwd ../ test"
     },
     "dependencies": {
-        "@terascope/data-mate": "^0.57.1",
+        "@terascope/data-mate": "^1.0.0",
         "@terascope/elasticsearch-api": "^3.21.0",
         "@terascope/elasticsearch-asset-apis": "^1.0.0",
         "@terascope/job-components": "^1.1.0",
