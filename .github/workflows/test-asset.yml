@@ -9,12 +9,12 @@ on:
 
 jobs:
   check-docker-limit-before:
-   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
+   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
    secrets: inherit
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@f5e098fa861fe7744fa61842e82124f806364be9
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
     secrets: inherit
 
   test-elasticsearch-assets:
@@ -73,7 +73,7 @@ jobs:
 
   check-docker-limit-after:
     needs: test-elasticsearch-assets
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f5e098fa861fe7744fa61842e82124f806364be9
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
     secrets: inherit
 
 # TODO:
