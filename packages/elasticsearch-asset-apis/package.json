@@ -26,10 +26,10 @@
         "test:watch": "NODE_OPTIONS='--experimental-vm-modules' TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "^0.57.1",
-        "@terascope/data-types": "^0.51.0",
-        "@terascope/elasticsearch-api": "^3.21.0",
-        "@terascope/utils": "^0.60.0",
+        "@terascope/data-mate": "^1.0.3",
+        "@terascope/data-types": "^1.0.0",
+        "@terascope/elasticsearch-api": "^4.0.0",
+        "@terascope/utils": "^1.0.0",
         "datemath-parser": "^1.0.6",
         "got": "^13.0.0",
         "moment": "^2.30.1"
