@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "displayName": "Elasticsearch Assets",
-    "version": "4.0.1",
+    "version": "4.0.2",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
