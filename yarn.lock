@@ -765,10 +765,10 @@
     lodash "^4.17.21"
     yargs "^17.7.2"
 
-"@terascope/elasticsearch-api@^4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-4.0.0.tgz#f2d96e07641147fb1fd749f3a720f8428611680a"
-  integrity sha512-tsNLzCckv4s/lCAfYi5ezNXKafITiVHN1Ika3/CgsR8gI8C9i9AR3a0MC9hOdAaNM/MHkNoxZBrET56SUywKcw==
+"@terascope/elasticsearch-api@^4.0.1":
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-4.0.1.tgz#f127ef74267ce2111e90e3c6878c9fbb61681c3d"
+  integrity sha512-zkWjQ3XALhfXpaHS08fEp4DPbhGtlQAOYefDGfBvUyNZqJxXRKaY5HWqUuQqsQAK7EKJjGpO0kTkludt6Cw7Dw==
   dependencies:
     "@terascope/types" "^1.0.0"
     "@terascope/utils" "^1.0.0"
@@ -845,12 +845,12 @@
     typedoc-plugin-markdown "~4.0.3"
     yargs "^17.7.2"
 
-"@terascope/teraslice-state-storage@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-1.0.0.tgz#7b85b6b4e29945c765b55756a6bbac8684dd6e21"
-  integrity sha512-M/Oq+q7czSxsujaqAWBLDJ8Cc5pWieiD22PDyNzKvYu0t3IENnNqwRMBYUGrQvs7zQ6lhVVN6PerFH9DaAuZyw==
+"@terascope/teraslice-state-storage@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-1.0.1.tgz#13de8bbd318ba11ec96cb494be18e639c3fda52c"
+  integrity sha512-9rNBfiVFa7gILi7TXHNHalV4sutsdAbPPBhCWIzPVoV3ZQSEJp7it/e0VjEmgtrV3uAeVhy0f90BWDhW+/gK7g==
   dependencies:
-    "@terascope/elasticsearch-api" "^4.0.0"
+    "@terascope/elasticsearch-api" "^4.0.1"
     "@terascope/utils" "^1.0.0"
 
 "@terascope/types@^1.0.0":

@@ -2,7 +2,7 @@ import {
     RouteSenderAPI, DataEntity, isString,
     set, pMap
 } from '@terascope/utils';
-import elasticAPI, { BulkActionMetadata, BulkRecord } from '@terascope/elasticsearch-api';
+import elasticAPI from '@terascope/elasticsearch-api';
 import {
     ElasticsearchSenderConfig, UpdateConfig
 } from './interfaces.js';
@@ -56,7 +56,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return '_doc';
     }
 
-    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<BulkRecord> {
+    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<elasticAPI.BulkRecord> {
         for (const record of input) {
             yield this.createEsActionMeta(record);
 
@@ -72,7 +72,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         }
     }
 
-    private createEsActionMeta(record: DataEntity): BulkRecord {
+    private createEsActionMeta(record: DataEntity): elasticAPI.BulkRecord {
         const meta = this.buildMetadata(record);
 
         if (this.config.update || this.config.upsert) {
@@ -90,8 +90,8 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return { action: { index: meta }, data: record };
     }
 
-    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkActionMetadata> {
-        const meta: Partial<BulkActionMetadata> = {
+    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<elasticAPI.BulkActionMetadata> {
+        const meta: Partial<elasticAPI.BulkActionMetadata> = {
             _index: this.createRoute(record),
             _type: this.getType()
         };
@@ -107,7 +107,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return meta;
     }
 
-    update(meta: Partial<BulkActionMetadata>, record: DataEntity): BulkRecord {
+    update(meta: Partial<elasticAPI.BulkActionMetadata>, record: DataEntity):elasticAPI.BulkRecord {
         const data = this.addUpdateMethod(record);
 
         if (this.config.upsert) {
@@ -158,9 +158,9 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    * chunkRequests(dataArray: Iterable<BulkRecord>): Iterable<BulkRecord[]> {
+    * chunkRequests(dataArray: Iterable<elasticAPI.BulkRecord>): Iterable<elasticAPI.BulkRecord[]> {
         let i = 0;
-        let bulkChunk: BulkRecord[] = [];
+        let bulkChunk: elasticAPI.BulkRecord[] = [];
 
         for (const item of dataArray) {
             bulkChunk.push(item);
