@@ -730,10 +730,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@terascope/data-mate@^1.0.3":
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.0.3.tgz#0132b919c9b2ae8784b3cb3859222ef17551c565"
-  integrity sha512-NyLJtQdWPkpfrmciK4EXbE2+HEGwedtiksEs8+f2RV0luVPU2EsBCYD04WsYoVCHvemwgavzhsoMcJ3ztvH8Sg==
+"@terascope/data-mate@^1.0.3", "@terascope/data-mate@^1.0.4":
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.0.4.tgz#1d45321b6ea9253ace588a97305ddc5fdc700210"
+  integrity sha512-VTXrulcCzCTHTkWJMkxjCRIyPPTTa0mqx5NoQeJh5DTahwpPnX7xMBFyaMxY9Pbpqpyoe3PoQwRdInVwsTha6w==
   dependencies:
     "@terascope/data-types" "^1.0.0"
     "@terascope/types" "^1.0.0"
@@ -2411,12 +2411,12 @@ ejs@^3.1.10:
   dependencies:
     jake "^10.8.5"
 
-elasticsearch-store@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.0.3.tgz#e94dcd721bacb8b057a8834d81d5cf5ef4989547"
-  integrity sha512-2oMa5FlH4T6ygnZ5yGjUjHxp4CtmQTzN6tKdyCdxXLYA1nS0ilhYzzASGlUPByEfuLSIRxcLoBI5Y2xCJf4S+g==
+elasticsearch-store@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.0.4.tgz#3390e807231cf50e15ddd4e5e35227e74ca52c1d"
+  integrity sha512-KBX/dIoYz/3z+FX2epab3FVS57czkyZeWmcoQUGyiqZN4Mn1YXEbVrCsB7GjjaOR6vhGqocGdCdU/E8p7zP98A==
   dependencies:
-    "@terascope/data-mate" "^1.0.3"
+    "@terascope/data-mate" "^1.0.4"
     "@terascope/data-types" "^1.0.0"
     "@terascope/types" "^1.0.0"
     "@terascope/utils" "^1.0.0"
