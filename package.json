@@ -50,7 +50,7 @@
         "@terascope/elasticsearch-asset-apis": "^1.0.2",
         "@terascope/eslint-config": "^0.8.0",
         "@terascope/job-components": "^1.2.0",
-        "@terascope/scripts": "1.0.1",
+        "@terascope/scripts": "1.0.2",
         "@terascope/teraslice-state-storage": "^1.0.1",
         "@terascope/types": "^1.0.0",
         "@types/bluebird": "^3.5.38",
