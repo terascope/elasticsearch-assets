@@ -736,7 +736,7 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@terascope/data-mate@^1.1.0", "@terascope/data-mate@^1.1.1":
+"@terascope/data-mate@^1.1.1":
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.1.1.tgz#bf7ca129bf7ffa01e4ce05799a241118890046f3"
   integrity sha512-jmCbRPOqkHpAcixhcx01i85JujYzVvsX0FPrW8yoOqUTbH9435obC1JseFFknRhdCbs5jkVgtnp9ojurk3YhWA==
@@ -2563,13 +2563,13 @@ ejs@^3.1.10:
   dependencies:
     jake "^10.8.5"
 
-elasticsearch-store@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.1.0.tgz#df12fe6562f4675b93181884f86ffb5a9f1c898d"
-  integrity sha512-DqkPEd0vUJHLsi26VCDCZhBibxOFkcfuuypXmzByZjBpPdX694oSkDKCIS+cgdwmtSMfoiK+e6oLgg71kXeySQ==
+elasticsearch-store@^1.1.1:
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.1.1.tgz#e50a6fdd597d1a61d2306fd7c618100b765f63eb"
+  integrity sha512-M9Yj2mSigyEegeoKkB4E/qi3QrjTRrfT9sJ/SRlYvU+ENMl4nfaZnN1MkYZawMYY1Nxm4V9kvYOD034ucmO1Pg==
   dependencies:
-    "@terascope/data-mate" "^1.1.0"
-    "@terascope/data-types" "^1.1.0"
+    "@terascope/data-mate" "^1.1.1"
+    "@terascope/data-types" "^1.1.1"
     "@terascope/types" "^1.1.0"
     "@terascope/utils" "^1.1.0"
     ajv "^6.12.6"
