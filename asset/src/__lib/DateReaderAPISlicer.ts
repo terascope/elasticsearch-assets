@@ -13,7 +13,7 @@ export class DateReaderAPISlicer extends ParallelSlicer<ESDateConfig> {
     protected api!: ElasticsearchReaderAPI;
     protected hasUpdated = false;
     protected startTime = moment().toISOString();
-    slicerRanges!: DateSlicerRanges|undefined;
+    slicerRanges!: DateSlicerRanges | undefined;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         // NOTE ORDER MATTERS

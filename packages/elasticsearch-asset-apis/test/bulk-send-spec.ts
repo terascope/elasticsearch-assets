@@ -17,7 +17,7 @@ describe('elasticsearch bulk sender module', () => {
     let apiClient: elasticAPI.Client;
     let harness: WorkerTestHarness;
     let client: any;
-    let type: string|undefined;
+    let type: string | undefined;
 
     beforeAll(async () => {
         client = await makeClient();

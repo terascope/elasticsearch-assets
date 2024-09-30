@@ -44,7 +44,7 @@ export class SpacesReaderClient implements ReaderClient {
 
     getRequestOptions(
         query: AnyObject,
-        format?: 'json'|'dfjson'
+        format?: 'json' | 'dfjson'
     ): OptionsOfJSONResponseBody {
         const {
             token,
@@ -82,16 +82,16 @@ export class SpacesReaderClient implements ReaderClient {
     protected async makeRequest(
         query: AnyObject,
         format?: 'json'
-    ): Promise<SearchResult>
+    ): Promise<SearchResult>;
     protected async makeRequest(
         query: AnyObject,
         format: 'dfjson'
-    ): Promise<Buffer>
+    ): Promise<Buffer>;
     protected async makeRequest(
         query: AnyObject,
-        format?: 'json'|'dfjson'
-    ): Promise<SearchResult|Buffer> {
-        let response: Response<SearchResult|Buffer>;
+        format?: 'json' | 'dfjson'
+    ): Promise<SearchResult | Buffer> {
+        let response: Response<SearchResult | Buffer>;
 
         try {
             response = await got.post<SearchResult>(
@@ -134,7 +134,7 @@ export class SpacesReaderClient implements ReaderClient {
     protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
         const { config } = this;
 
-        const fields = get(queryConfig, '_source', null) as string[]|null;
+        const fields = get(queryConfig, '_source', null) as string[] | null;
 
         const dateFieldName = this.config.date_field_name;
         // put in the dateFieldName into fields so date reader can work
@@ -294,7 +294,7 @@ export class SpacesReaderClient implements ReaderClient {
     async search(
         query: ClientParams.SearchParams,
         responseType: FetchResponseType,
-    ): Promise<DataEntity[]|DataFrame|Buffer> {
+    ): Promise<DataEntity[] | DataFrame | Buffer> {
         if (responseType === FetchResponseType.data_entities) {
             return this._searchRequest(query, false);
         }
@@ -319,13 +319,13 @@ export class SpacesReaderClient implements ReaderClient {
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true,
-        format?: 'json'|'dfjson'
+        format?: 'json' | 'dfjson'
     ): Promise<SearchResult>;
     async _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean,
-        format?: 'json'|'dfjson'
-    ): Promise<DataEntity[]|SearchResult|Buffer> {
+        format?: 'json' | 'dfjson'
+    ): Promise<DataEntity[] | SearchResult | Buffer> {
         const searchQuery = this.translateSearchQuery(query);
         if (fullResponse) {
             if (format === 'dfjson') {

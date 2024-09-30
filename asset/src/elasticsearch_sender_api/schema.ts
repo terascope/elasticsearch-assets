@@ -10,7 +10,7 @@ const newSchema: AnyObject = cloneDeep(schema);
 
 newSchema.size = {
     doc: 'the maximum number of docs it will take at a time, anything past it will be split up and sent'
-    + 'note that the value should be even, the first doc will be the index data and then the next is the data',
+        + 'note that the value should be even, the first doc will be the index data and then the next is the data',
     default: 500,
     format(val: any) {
         if (isNaN(val)) {
@@ -56,7 +56,9 @@ export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> 
         job.operations.forEach((op) => {
             if (op._op === 'routed_sender') {
                 apiConfigs.filter((config) => config._name === op.api_name && config.connection === 'default')
-                    .forEach((config) => { [config.connection] = Object.values(op.routing); });
+                    .forEach((config) => {
+                        [config.connection] = Object.values(op.routing);
+                    });
             }
         });
     }

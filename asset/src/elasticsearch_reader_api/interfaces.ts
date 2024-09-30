@@ -4,5 +4,5 @@ import { ESReaderOptions, ElasticsearchReaderAPI } from '@terascope/elasticsearc
 export const DEFAULT_API_NAME = 'elasticsearch_reader_api';
 export interface ElasticsearchReaderAPIConfig extends ESReaderOptions, APIConfig {}
 export type ElasticReaderFactoryAPI = APIFactoryRegistry<
-ElasticsearchReaderAPI, ElasticsearchReaderAPIConfig
->
+    ElasticsearchReaderAPI, ElasticsearchReaderAPIConfig
+>;

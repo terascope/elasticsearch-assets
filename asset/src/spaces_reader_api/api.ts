@@ -32,7 +32,7 @@ export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, 
 
     async create(
         _name: string, overrideConfigs: Partial<SpacesAPIConfig>
-    ): Promise<{ client: ElasticsearchReaderAPI, config: SpacesAPIConfig }> {
+    ): Promise<{ client: ElasticsearchReaderAPI; config: SpacesAPIConfig }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         const emitter = this.context.apis.foundation.getSystemEvents();
         const spacesArgs = { config, logger: this.logger, emitter };

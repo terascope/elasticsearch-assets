@@ -203,37 +203,43 @@ describe('id_reader Schema', () => {
                 slicers: 1,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_range: ['a', 'b']
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
             const job2 = newTestJobConfig({
                 slicers: 2,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_range: ['a']
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
             const job3 = newTestJobConfig({
                 slicers: 4,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
             const job4 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
             const job5 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_type: 'base64url'
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
             const job6 = newTestJobConfig({
                 slicers: 70,
                 operations: [{
                     _op: 'id_reader', type: docType, index, key_type: 'base64url'
-                }, { _op: 'noop' }]
+                },
+                { _op: 'noop' }]
             });
 
             await expect(testValidation(job1)).toResolve();

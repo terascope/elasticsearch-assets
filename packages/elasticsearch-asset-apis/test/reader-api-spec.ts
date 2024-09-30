@@ -38,7 +38,7 @@ describe('Reader API', () => {
 
     const evenIndex = makeIndex('even_spread');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
-    let docType: string|undefined;
+    let docType: string | undefined;
 
     let client: any;
     let readerClient: ElasticsearchReaderClient;
@@ -210,7 +210,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            let warnMessage: undefined|string;
+            let warnMessage: undefined | string;
 
             const testLogger = {
                 info: () => {},
@@ -400,7 +400,7 @@ describe('Reader API', () => {
                 ...defaultConfig
             };
 
-            let warnMessage: undefined|string;
+            let warnMessage: undefined | string;
 
             const testLogger = {
                 info: () => {},
@@ -579,7 +579,7 @@ describe('Reader API', () => {
 
         // TODO this is badly named method, might need to change in the future
         it('can verify index', async () => {
-            let warnMessage: undefined|string;
+            let warnMessage: undefined | string;
 
             const testLogger = {
                 info: () => {},
@@ -668,57 +668,100 @@ describe('Reader API', () => {
             expect(results).toEqual([
                 {
                     keys: [
-                        'a', 'h', 'o', 'v',
-                        'C', 'J', 'Q', 'X',
-                        '4', '_'
+                        'a',
+                        'h',
+                        'o',
+                        'v',
+                        'C',
+                        'J',
+                        'Q',
+                        'X',
+                        '4',
+                        '_'
                     ],
                     count: 126
                 },
                 {
                     keys: [
-                        'b', 'i', 'p',
-                        'w', 'D', 'K',
-                        'R', 'Y', '5'
+                        'b',
+                        'i',
+                        'p',
+                        'w',
+                        'D',
+                        'K',
+                        'R',
+                        'Y',
+                        '5'
                     ],
                     count: 146
                 },
                 {
                     keys: [
-                        'c', 'j', 'q',
-                        'x', 'E', 'L',
-                        'S', 'Z', '6'
+                        'c',
+                        'j',
+                        'q',
+                        'x',
+                        'E',
+                        'L',
+                        'S',
+                        'Z',
+                        '6'
                     ],
                     count: 116
                 },
                 {
                     keys: [
-                        'd', 'k', 'r',
-                        'y', 'F', 'M',
-                        'T', '0', '7'
+                        'd',
+                        'k',
+                        'r',
+                        'y',
+                        'F',
+                        'M',
+                        'T',
+                        '0',
+                        '7'
                     ],
                     count: 199
                 },
                 {
                     keys: [
-                        'e', 'l', 's',
-                        'z', 'G', 'N',
-                        'U', '1', '8'
+                        'e',
+                        'l',
+                        's',
+                        'z',
+                        'G',
+                        'N',
+                        'U',
+                        '1',
+                        '8'
                     ],
                     count: 189
                 },
                 {
                     keys: [
-                        'f', 'm', 't',
-                        'A', 'H', 'O',
-                        'V', '2', '9'
+                        'f',
+                        'm',
+                        't',
+                        'A',
+                        'H',
+                        'O',
+                        'V',
+                        '2',
+                        '9'
                     ],
                     count: 170
                 },
                 {
                     keys: [
-                        'g', 'n', 'u',
-                        'B', 'I', 'P',
-                        'W', '3', '-'
+                        'g',
+                        'n',
+                        'u',
+                        'B',
+                        'I',
+                        'P',
+                        'W',
+                        '3',
+                        '-'
                     ],
                     count: 54
                 }

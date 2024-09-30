@@ -107,7 +107,10 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return meta;
     }
 
-    update(meta: Partial<elasticAPI.BulkActionMetadata>, record: DataEntity):elasticAPI.BulkRecord {
+    update(
+        meta: Partial<elasticAPI.BulkActionMetadata>,
+        record: DataEntity
+    ): elasticAPI.BulkRecord {
         const data = this.addUpdateMethod(record);
 
         if (this.config.upsert) {

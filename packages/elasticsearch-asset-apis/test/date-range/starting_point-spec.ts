@@ -127,8 +127,10 @@ describe('determineDateSlicerRanges', () => {
             const recoveryStart = moment.utc(halfWay).subtract(30, 's');
             const recoveryEnd = moment.utc(recoveryStart).add(interval[0], interval[1]);
 
-            const holeStart = moment.utc(recoveryEnd).add(10, 's').format(dateFormatSeconds);
-            const holeEnd = moment.utc(holeStart).add(10, 's').format(dateFormatSeconds);
+            const holeStart = moment.utc(recoveryEnd).add(10, 's')
+                .format(dateFormatSeconds);
+            const holeEnd = moment.utc(holeStart).add(10, 's')
+                .format(dateFormatSeconds);
             const holes = [{ start: holeStart, end: holeEnd }];
 
             const config: StartPointConfig = {
@@ -171,7 +173,8 @@ describe('determineDateSlicerRanges', () => {
             const recoveryEnd = moment.utc(recoveryStart).add(interval[0], interval[1]);
 
             const holeStart = moment.utc(recoveryEnd).format(dateFormatSeconds);
-            const holeEnd = moment.utc(holeStart).add(10, 's').format(dateFormatSeconds);
+            const holeEnd = moment.utc(holeStart).add(10, 's')
+                .format(dateFormatSeconds);
             const holes = [{ start: holeStart, end: holeEnd }];
 
             const config: StartPointConfig = {
@@ -213,9 +216,11 @@ describe('determineDateSlicerRanges', () => {
             const recoveryStart = moment.utc(halfWay).subtract(30, 's');
             const recoveryEnd = moment.utc(recoveryStart).add(interval[0], interval[1]);
 
-            const holeStart = moment.utc(recoveryEnd).add(10, 's').format(dateFormatSeconds);
+            const holeStart = moment.utc(recoveryEnd).add(10, 's')
+                .format(dateFormatSeconds);
             // hole jumps past limit
-            const holeEnd = moment.utc(holeStart).add(5, 'm').format(dateFormatSeconds);
+            const holeEnd = moment.utc(holeStart).add(5, 'm')
+                .format(dateFormatSeconds);
             const holes = [{ start: holeStart, end: holeEnd }];
 
             const config: StartPointConfig = {
@@ -258,7 +263,8 @@ describe('determineDateSlicerRanges', () => {
             const recoveryStart = moment.utc(halfWay).subtract(30, 's');
             const recoveryEnd = moment.utc(recoveryStart).add(interval[0], interval[1]);
 
-            const holeStart = moment.utc(recoveryEnd).add(10, 's').format(dateFormatSeconds);
+            const holeStart = moment.utc(recoveryEnd).add(10, 's')
+                .format(dateFormatSeconds);
             // hole jumps past limit
             const holeEnd = moment.utc(limit).format(dateFormatSeconds);
             const holes = [{ start: holeStart, end: holeEnd }];
@@ -408,7 +414,8 @@ describe('determineDateSlicerRanges', () => {
                     limit: moment.utc(firstSegmentLimit).format(dateFormatSeconds),
                     holes: [],
                     count: 100
-                }, {
+                },
+                {
                     start: recoveryStartSlicerTwo.format(dateFormatSeconds),
                     end: recoveryEndSlicerTwo.format(dateFormatSeconds),
                     limit: moment.utc(endLimit).format(dateFormatSeconds),

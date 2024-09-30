@@ -15,8 +15,8 @@ export class ElasticsearchReaderClient implements ReaderClient {
     constructor(
         elasticsearchClient: Client,
         clientConfig: {
-            connection?: string
-            index: string
+            connection?: string;
+            index: string;
         },
         logger: Logger,
     ) {
@@ -56,7 +56,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
         query: ClientParams.SearchParams,
         responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
-    ): Promise<DataEntity[]|DataFrame|Buffer> {
+    ): Promise<DataEntity[] | DataFrame | Buffer> {
         if (responseType === FetchResponseType.data_entities) {
             return this._searchRequest(query, false);
         }
@@ -95,7 +95,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
     async _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean
-    ): Promise<DataEntity[]|ClientResponse.SearchResponse<AnyObject>> {
+    ): Promise<DataEntity[] | ClientResponse.SearchResponse<AnyObject>> {
         if (fullResponse) {
             return this.fullResponseClient.search(
                 query as any

@@ -31,7 +31,7 @@ export default class ElasticsearchSenderAPI extends APIFactory
 
     async create(
         _name: string, overrideConfig: Partial<ElasticsearchAPISenderConfig>
-    ): Promise<{ client: ElasticsearchBulkSender, config: ElasticsearchAPISenderConfig }> {
+    ): Promise<{ client: ElasticsearchBulkSender; config: ElasticsearchAPISenderConfig }> {
         const apiConfig = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
         const { api_name, ...config } = apiConfig;
 
