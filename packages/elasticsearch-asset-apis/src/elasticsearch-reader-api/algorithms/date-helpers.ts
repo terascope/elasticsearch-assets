@@ -265,10 +265,10 @@ export function divideRange(
 
 // used by stream processing
 export function delayedStreamSegment(
-    startTime: moment.Moment | Date | string|undefined,
+    startTime: moment.Moment | Date | string | undefined,
     processingInterval: ParsedInterval,
     latencyInterval: ParsedInterval
-): { start: moment.Moment, limit: moment.Moment } {
+): { start: moment.Moment; limit: moment.Moment } {
     const now = moment.utc(startTime);
 
     const delayedLimit = moment.utc(now).subtract(
@@ -395,7 +395,7 @@ interface DateRanges {
     holes?: DateConfig[];
 }
 
-type RDate = ReaderSlice|undefined;
+type RDate = ReaderSlice | undefined;
 
 export async function determineDateSlicerRange(
     {
@@ -405,7 +405,7 @@ export async function determineDateSlicerRange(
         getInterval
     }: StartPointConfig,
     id: number,
-): Promise<DateSlicerRange|null> {
+): Promise<DateSlicerRange | null> {
     let newDates: DateRanges;
     // we are running in recovery
     if (recoveryData && recoveryData.length > 0) {

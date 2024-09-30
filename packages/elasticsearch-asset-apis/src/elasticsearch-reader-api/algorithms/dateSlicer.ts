@@ -44,7 +44,8 @@ function splitTime(
 ) {
     let diff = Math.floor(end.diff(start) / 2);
 
-    if (moment.utc(start).add(diff, 'ms').isAfter(limit)) {
+    if (moment.utc(start).add(diff, 'ms')
+        .isAfter(limit)) {
         diff = moment.utc(limit).diff(start);
     }
 

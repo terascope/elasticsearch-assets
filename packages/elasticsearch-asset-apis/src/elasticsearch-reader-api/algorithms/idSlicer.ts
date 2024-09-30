@@ -112,7 +112,7 @@ function compareKeys(key: string, retryKey: string): boolean {
     return false;
 }
 
-type KeyGenerator = Generator<string, null, boolean|undefined>;
+type KeyGenerator = Generator<string, null, boolean | undefined>;
 
 function* recurse(baseArray: readonly string[], str: string): KeyGenerator {
     for (const key of baseArray) {
@@ -120,7 +120,7 @@ function* recurse(baseArray: readonly string[], str: string): KeyGenerator {
         const resp = yield newStr;
 
         if (!resp) {
-            yield* recurse(baseArray, newStr);
+            yield * recurse(baseArray, newStr);
         }
     }
     return null;
@@ -138,10 +138,10 @@ function* recurseDepth(
             const resp = yield newStr;
 
             if (!resp) {
-                yield* recurse(baseArray, newStr);
+                yield * recurse(baseArray, newStr);
             }
         } else {
-            yield* recurse(baseArray, newStr);
+            yield * recurse(baseArray, newStr);
         }
     }
     return null;
@@ -155,7 +155,7 @@ function* generateKeys(
         const processKey = yield startKey;
 
         if (!processKey) {
-            yield* recurse(baseArray, startKey);
+            yield * recurse(baseArray, startKey);
         }
     }
 
@@ -168,7 +168,7 @@ function* generateKeyDepth(
     startingKeyDepth: number
 ): KeyGenerator {
     for (const startKey of keysArray) {
-        yield* recurseDepth(baseArray, startKey, startingKeyDepth);
+        yield * recurseDepth(baseArray, startKey, startingKeyDepth);
     }
 
     return null;

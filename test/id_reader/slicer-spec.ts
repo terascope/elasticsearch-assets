@@ -61,7 +61,7 @@ describe('id_reader slicer', () => {
     async function makeSlicerTest(
         opConfig: Record<string, any> = {},
         numOfSlicers = 1,
-        recoveryData: SlicerRecoveryData[]|undefined = undefined
+        recoveryData: SlicerRecoveryData[] | undefined = undefined
     ) {
         const config = Object.assign({}, defaults, opConfig);
         const job = newTestJobConfig({

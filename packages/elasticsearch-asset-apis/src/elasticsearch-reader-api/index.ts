@@ -15,8 +15,8 @@ export * from './algorithms/index.js';
 export * from './utils.js';
 
 export interface ElasticsearchAPIArgs {
-    config: ESReaderOptions,
-    client: ReaderClient,
+    config: ESReaderOptions;
+    client: ReaderClient;
     logger?: Logger;
     emitter?: EventEmitter;
 }
@@ -34,7 +34,7 @@ export function createElasticsearchReaderAPI({
 }
 
 interface SpacesAPIArgs {
-    config: SpacesAPIConfig,
+    config: SpacesAPIConfig;
     logger?: Logger;
     emitter?: EventEmitter;
 }

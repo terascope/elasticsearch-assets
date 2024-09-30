@@ -11,7 +11,7 @@ import {
 } from '../helpers/index.js';
 
 interface ClientCalls {
-    [key: string]: ClientParams.BulkParams
+    [key: string]: ClientParams.BulkParams;
 }
 
 describe('elasticsearch_bulk', () => {

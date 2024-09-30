@@ -9,7 +9,7 @@ import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces.js';
 export const schema: AnyObject = {
     size: {
         doc: 'the maximum number of docs it will take at a time, anything past it will be split up and sent'
-        + 'note that the value should be even, the first doc will be the index data and then the next is the data',
+            + 'note that the value should be even, the first doc will be the index data and then the next is the data',
         default: 500,
         format(val: unknown): void {
             if (!isNumber(val)) throw new Error(`Invalid parameter size, it must be of type number, was given ${getTypeOf(val)}`);
@@ -59,7 +59,7 @@ export const schema: AnyObject = {
     },
     update_fields: {
         doc: 'if you are updating the documents, you can specify fields to update here (it should be an array '
-        + 'containing all the field names you want updated), it defaults to sending the entire document',
+            + 'containing all the field names you want updated), it defaults to sending the entire document',
         default: [],
         format: Array
     },

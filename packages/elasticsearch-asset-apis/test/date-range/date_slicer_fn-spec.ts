@@ -17,7 +17,7 @@ import { MockClient } from '../helpers/index.js';
 
 interface TestConfig {
     slicers?: number;
-    lifecycle?: 'once'|'persistent';
+    lifecycle?: 'once' | 'persistent';
     id?: number;
     config?: AnyObject;
     client?: MockClient;
@@ -181,7 +181,8 @@ describe('date slicer function', () => {
             };
             const expectedResults = {
                 start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
-                end: moment(moment.utc(end).add(1, 's').format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(end).add(1, 's')
+                    .format(dateFormatSeconds)).toISOString(),
                 limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 2000,
                 holes: []
@@ -212,7 +213,8 @@ describe('date slicer function', () => {
             };
             const expectedResults = {
                 start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
-                end: moment(moment.utc(start).add(1, 's').format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(start).add(1, 's')
+                    .format(dateFormatSeconds)).toISOString(),
                 limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 2000,
                 holes: []

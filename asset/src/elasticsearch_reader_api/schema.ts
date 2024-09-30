@@ -303,7 +303,7 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
     }
 }
 
-function geoPointValidation(point: string | null):void {
+function geoPointValidation(point: string | null): void {
     if (!point) return;
 
     if (typeof point !== 'string') throw new Error('Invalid geo_point, must be a string IF specified');
@@ -317,7 +317,7 @@ function geoPointValidation(point: string | null):void {
     if (longitude > 180 || longitude < -180) throw new Error(`Invalid longitude parameter, was given ${longitude}, should be >= -180 and <= 180`);
 }
 
-function checkUnits(unit: string | null):void {
+function checkUnits(unit: string | null): void {
     if (!unit) return;
     if (!isString(unit)) throw new Error('Invalid parameter, must be a string IF specified');
 
@@ -332,7 +332,7 @@ function checkUnits(unit: string | null):void {
     if (!has(unitOptions, unit)) throw new Error('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
 }
 
-function validGeoDistance(distance: string | null):void {
+function validGeoDistance(distance: string | null): void {
     if (!distance) return;
 
     if (typeof distance !== 'string') throw new Error('Invalid geo_distance parameter, must be a string IF specified');

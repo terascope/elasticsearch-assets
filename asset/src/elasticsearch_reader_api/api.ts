@@ -9,7 +9,7 @@ import {
 } from '@terascope/elasticsearch-asset-apis';
 
 export default class ElasticsearchReaderAPIFactory extends APIFactory<
-ElasticsearchReaderAPI, Partial<ESReaderOptions>
+    ElasticsearchReaderAPI, Partial<ESReaderOptions>
 > {
     // TODO: this needs more validation
     validateConfig(config: unknown): ESReaderOptions {
@@ -30,7 +30,7 @@ ElasticsearchReaderAPI, Partial<ESReaderOptions>
 
     async create(
         _name: string, overrideConfigs: Partial<ESReaderOptions>
-    ): Promise<{ client: ElasticsearchReaderAPI, config: AnyObject }> {
+    ): Promise<{ client: ElasticsearchReaderAPI; config: AnyObject }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
         const { connection } = config;
         const { client: esClient } = await this.context.apis.foundation.createClient({

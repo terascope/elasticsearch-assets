@@ -22,7 +22,7 @@ interface BulkData {
     body: AnyObject[];
 }
 
-function getMeta(meta: AnyObject|undefined) {
+function getMeta(meta: AnyObject | undefined) {
     if (meta == null) return false;
     if (meta.index) return 'index';
     if (meta.create) return 'create';
@@ -133,7 +133,6 @@ export default class MockClient {
         );
     }
 
-    // eslint-disable-next-line class-methods-use-this
     async bulk(data: BulkData): Promise<BulkData> {
         validateBulk(data);
         return data;

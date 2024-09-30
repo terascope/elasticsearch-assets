@@ -7,7 +7,7 @@ export * from './ElasticsearchBulkSender.js';
 export * from './interfaces.js';
 
 interface BulkAPIArgs {
-    config: ElasticsearchSenderConfig,
+    config: ElasticsearchSenderConfig;
     client: elasticAPI.Client;
 }
 

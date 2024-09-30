@@ -14,7 +14,7 @@ export interface ElasticsearchSenderConfig {
     script_file?: string;
     script?: string;
     script_params?: AnyObject;
-    _key?: string
+    _key?: string;
 }
 
 export interface ScriptConfig {

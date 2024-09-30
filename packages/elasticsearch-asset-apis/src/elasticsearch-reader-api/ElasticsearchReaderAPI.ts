@@ -47,7 +47,7 @@ export class ElasticsearchReaderAPI {
      * we should expose this because in some cases
      * it might be an optimization to set this externally
     */
-    windowSize: number|undefined = undefined;
+    windowSize: number | undefined = undefined;
     protected readonly dateFormat: string;
     protected readonly emitter: EventEmitter;
     recordsFetched = 0;
@@ -95,7 +95,7 @@ export class ElasticsearchReaderAPI {
      * slow ES queries down significantly, refs:
      *   https://github.com/terascope/elasticsearch-assets/issues/948
      */
-    async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame|Buffer> {
+    async fetch(queryParams: ReaderSlice = {}): Promise<DataEntity[] | DataFrame | Buffer> {
         if (this.config.useSimpleFetch) {
             return this.simpleFetch(queryParams);
         }
@@ -120,7 +120,7 @@ export class ElasticsearchReaderAPI {
         }
 
         const _fetch = async ():
-        Promise<DataEntity[]|DataFrame|Buffer> => {
+        Promise<DataEntity[] | DataFrame | Buffer> => {
             const query = buildQuery(this.config, {
                 ...queryParams, count: querySize
             });
@@ -169,7 +169,7 @@ export class ElasticsearchReaderAPI {
         return result;
     }
 
-    async simpleFetch(queryParams: ReaderSlice = {}): Promise<DataEntity[]|DataFrame|Buffer> {
+    async simpleFetch(queryParams: ReaderSlice = {}): Promise<DataEntity[] | DataFrame | Buffer> {
         // attempt to get window if not set
         if (!this.windowSize) await this.setWindowSize();
 
@@ -190,7 +190,7 @@ export class ElasticsearchReaderAPI {
      * @param result the object returned that contains the search results
      * @returns the number of records returned by the search
      */
-    _getResultSize(result: DataEntity[]|DataFrame|Buffer): number {
+    _getResultSize(result: DataEntity[] | DataFrame | Buffer): number {
         let resultSize;
         if (Buffer.isBuffer(result)) {
             const json = result.toJSON();
@@ -207,7 +207,7 @@ export class ElasticsearchReaderAPI {
     _searchRequest(query: ClientParams.SearchParams, fullResponse: true): Promise<unknown>;
     async _searchRequest(
         query: ClientParams.SearchParams, fullResponse?: boolean
-    ): Promise<DataEntity[]|unknown> {
+    ): Promise<DataEntity[] | unknown> {
         return this.client._searchRequest(
             query,
             fullResponse
@@ -409,8 +409,8 @@ export class ElasticsearchReaderAPI {
         if (recoveryData && recoveryData.length > 0) {
             // TODO: verify what retryData is
             // real retry of executionContext here, need to reformat retry data
-            const parsedRetry: (string|undefined)[] = recoveryData.map((obj) => {
-                const slice = (obj.lastSlice as ReaderSlice|undefined);
+            const parsedRetry: (string | undefined)[] = recoveryData.map((obj) => {
+                const slice = obj.lastSlice as ReaderSlice | undefined;
                 // when we get here there should only be one key
                 if (slice?.keys?.length === 1) {
                     return slice.keys[0];
@@ -459,7 +459,7 @@ export class ElasticsearchReaderAPI {
      * slicer instance, then each "range" should be passed into
      * {@link ElasticsearchReaderAPI.makeDateSlicerFromRange}
     */
-    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID'|'windowState'>): Promise<DateSlicerRanges|undefined> {
+    async makeDateSlicerRanges(config: Omit<DateSlicerArgs, 'slicerID' | 'windowState'>): Promise<DateSlicerRanges | undefined> {
         this.validateDateSlicerConfig(config);
         const {
             lifecycle,
@@ -472,7 +472,7 @@ export class ElasticsearchReaderAPI {
 
         const recoveryData = config.recoveryData?.map(
             (slice) => slice.lastSlice
-        ).filter(Boolean) as ReaderSlice[]|undefined || [];
+        ).filter(Boolean) as ReaderSlice[] | undefined || [];
 
         if (isPersistent) {
             // we need to interval to get starting dates
@@ -613,7 +613,7 @@ export class ElasticsearchReaderAPI {
         };
 
         if (isPersistent) {
-            const windowState = config.windowState as WindowState|undefined;
+            const windowState = config.windowState as WindowState | undefined;
             if (!windowState || !windowState.checkin) {
                 throw new Error(`Invalid parameter windowState, must provide a valid windowState in "persistent" mode, got ${getTypeOf(windowState)}`);
             }
@@ -651,7 +651,7 @@ export class ElasticsearchReaderAPI {
         });
     }
 
-    async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate; }> {
+    async determineDateRanges(): Promise<{ start: FetchDate; limit: FetchDate }> {
         const [start, limit] = await Promise.all([
             this.getIndexDate(this.config.start, 'start'),
             this.getIndexDate(this.config.end, 'end')
@@ -659,7 +659,7 @@ export class ElasticsearchReaderAPI {
         return { start, limit };
     }
 
-    private async getIndexDate(date: string|null|undefined, order: string): Promise<FetchDate> {
+    private async getIndexDate(date: string | null | undefined, order: string): Promise<FetchDate> {
         // we have a date, parse and return it
         if (date) return parseDate(date);
         // we are in auto, so we determine each part

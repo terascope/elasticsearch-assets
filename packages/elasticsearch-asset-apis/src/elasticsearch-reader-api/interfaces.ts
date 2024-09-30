@@ -41,7 +41,7 @@ export interface ReaderClient {
         query: ClientParams.SearchParams,
         responseType: FetchResponseType,
         typeConfig?: DataTypeConfig
-    ): Promise<DataEntity[]|DataFrame|Buffer>;
+    ): Promise<DataEntity[] | DataFrame | Buffer>;
 
     /**
      * Used to make a custom search request
@@ -56,7 +56,7 @@ export interface ReaderClient {
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean
-    ): Promise<DataEntity[]|unknown>;
+    ): Promise<DataEntity[] | unknown>;
 
     /**
      * Gets the elasticsearch major server version,
@@ -107,14 +107,14 @@ export interface DateSlicerRange {
     /**
      * This may be null sometimes
     */
-    readonly count: number|null;
+    readonly count: number | null;
 }
 
 /**
  * This used a list of all of the Date slicer ranges, the
  * index of the range will correlate with the slicer instance
 */
-export type DateSlicerRanges = readonly (DateSlicerRange|null)[];
+export type DateSlicerRanges = readonly (DateSlicerRange | null)[];
 
 export interface DateSegments {
     start: moment.Moment;
@@ -174,7 +174,7 @@ export interface ReaderSlice extends ReaderSliceMetadata {
 }
 
 export interface CountFn {
-    (args: Pick<ReaderSlice, 'start'|'end'|'keys'>) : Promise<number>;
+    (args: Pick<ReaderSlice, 'start' | 'end' | 'keys'>): Promise<number>;
 }
 
 /**
@@ -201,13 +201,13 @@ export type RecoveryData = {
         request_worker?: string;
         /** The slice request can contain any metadata */
         [prop: string]: any;
-    }
-}
+    };
+};
 
 export interface IDSlicerConfig {
-    slicerID: number,
-    numOfSlicers: number,
-    recoveryData?: RecoveryData[],
+    slicerID: number;
+    numOfSlicers: number;
+    recoveryData?: RecoveryData[];
 }
 
 export interface DateConfig {
@@ -220,9 +220,9 @@ export interface SlicerArgs {
     size: number;
     subsliceByKey?: boolean;
     subsliceKeyThreshold?: number;
-    idFieldName?: string,
+    idFieldName?: string;
     keyType?: IDType;
-    startingKeyDepth?: number,
+    startingKeyDepth?: number;
     interval?: ParsedInterval;
     latencyInterval?: ParsedInterval;
     lifecycle: LifeCycle;
@@ -256,7 +256,7 @@ export interface SlicerDates extends DateSegments {
 
 /** What a date slicer fn will return */
 export type DateSlicerResults = ReaderSlice | (readonly ReaderSlice[]) | null;
-export type IDSlicerResults = ReaderSlice|null;
+export type IDSlicerResults = ReaderSlice | null;
 
 export type ParsedInterval = readonly [step: number, unit: moment.unitOfTime.Base];
 
@@ -266,25 +266,25 @@ export type DateSlicerMetadata = Record<number, {
 } & GetIntervalResult>;
 export type DateSlicerMetadataHook = (metadata: DateSlicerMetadata) => Promise<void>;
 
-export type LifeCycle = 'once'|'persistent';
+export type LifeCycle = 'once' | 'persistent';
 
 export interface DateSlicerArgs {
-    lifecycle: LifeCycle,
-    slicerID: number,
-    numOfSlicers: number,
+    lifecycle: LifeCycle;
+    slicerID: number;
+    numOfSlicers: number;
     recoveryData?: RecoveryData[];
-    windowState?: WindowState,
-    startTime?: Date | string
+    windowState?: WindowState;
+    startTime?: Date | string;
     hook?: DateSlicerMetadataHook;
 }
 
 export interface DateSlicerConfig {
-    lifecycle: LifeCycle,
-    slicerID: number,
-    numOfSlicers: number,
-    recoveryData?: RecoveryData[],
-    windowState?: WindowState,
-    startTime?: Date | string,
+    lifecycle: LifeCycle;
+    slicerID: number;
+    numOfSlicers: number;
+    recoveryData?: RecoveryData[];
+    windowState?: WindowState;
+    startTime?: Date | string;
     hook?: DateSlicerMetadataHook;
 }
 
@@ -293,19 +293,19 @@ export interface GetIntervalResult {
      * This is interval for the slicer, it will be null if
      * there is no data for this time period
     */
-    readonly interval: ParsedInterval|null;
+    readonly interval: ParsedInterval | null;
     /**
      * This is interval for the slicer, it will be null
      * when the interval in config is not set to auto
     */
-    readonly count: number|null;
+    readonly count: number | null;
 }
 
 /**
  * This function is used to determine the interval for each slicer,
 */
 export interface GetIntervalFn {
-    (dates: DateSegments, slicerId: number): GetIntervalResult|Promise<GetIntervalResult>;
+    (dates: DateSegments, slicerId: number): GetIntervalResult | Promise<GetIntervalResult>;
 }
 
 export interface StartPointConfig {
@@ -353,7 +353,7 @@ export interface ESReaderOptions {
     connection: string;
     starting_key_depth: number;
     response_type?: FetchResponseType;
-    type_config?: DataTypeConfig
+    type_config?: DataTypeConfig;
     useSimpleFetch?: boolean;
 }
 
@@ -363,7 +363,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     timeout: number;
     headers?: AnyObject;
     retry?: number;
-    variables?: xLuceneVariables
+    variables?: xLuceneVariables;
     caCertificate?: string;
 }
 
