@@ -5,7 +5,10 @@
         "module": "ESNext",
         "outDir": "dist",
         "rootDir": ".",
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "paths": {
+            "got": ["./node_modules/got/dist/source/index.d.ts"]
+        }
     },
     "include": ["src", "test"]
 }
