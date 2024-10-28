@@ -904,13 +904,13 @@
     progress "^2.0.3"
     yargs "^17.2.1"
 
-"@terascope/job-components@^1.5.1":
-  version "1.5.1"
-  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-1.5.1.tgz#a36e8b3a94ed389e16117d7500cdd3bdcfc40f97"
-  integrity sha512-rMHF/mJbv1K5SyJWQ1N+yuK6icntu+kHPyxcdcEvQ9F4Ci4NjJn8zUKdE305Rpdmz2aTx0bDiCXGQNNwVO2sVQ==
+"@terascope/job-components@^1.5.3":
+  version "1.5.3"
+  resolved "https://registry.yarnpkg.com/@terascope/job-components/-/job-components-1.5.3.tgz#f8d180dd08b6fe955b4501ca96f2a629473a434f"
+  integrity sha512-H0OycdzTJTwLqoZBlT8q9xgiCk+NDs9ZtND6EpxRdiLBXDN3zmhnPPALHPLMO3Wz/DZU0Ip4AsKJ+jNOArOG9w==
   dependencies:
     "@terascope/types" "^1.2.0"
-    "@terascope/utils" "^1.3.1"
+    "@terascope/utils" "^1.3.2"
     convict "^6.2.4"
     convict-format-with-moment "^6.2.0"
     convict-format-with-validator "^6.2.0"
