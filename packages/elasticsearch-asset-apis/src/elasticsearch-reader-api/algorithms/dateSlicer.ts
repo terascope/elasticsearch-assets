@@ -216,7 +216,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
 
     async function getIdData(slicerFn: any): Promise<ReaderSlice[]> {
         const list: ReaderSlice[] = [];
-        return new Promise(((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const slicer = slicerFn;
             function iterate() {
                 Promise.resolve(slicer())
@@ -236,7 +236,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             }
 
             iterate();
-        }));
+        });
     }
 
     async function makeKeyList(data: DetermineSliceResults, limit: string) {
