@@ -238,7 +238,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.25.9"
 
-"@babel/runtime@^7.16.3":
+"@babel/runtime@^7.10.2", "@babel/runtime@^7.16.3":
   version "7.26.0"
   resolved "https://registry.yarnpkg.com/@babel/runtime/-/runtime-7.26.0.tgz#8600c2f595f277c60815256418b85356a65173c1"
   integrity sha512-FDSOghenHTiToteC/QRlv2q3DhPZ/oOXTBoirfWNx1Cx3TMVcGWQtMMmQcSvb/JjpNeGzx8Pq/b4fKEJuWm1sw==
@@ -741,10 +741,10 @@
   resolved "https://registry.yarnpkg.com/@opentelemetry/api/-/api-1.9.0.tgz#d03eba68273dc0f7509e2a3d5cba21eae10379fe"
   integrity sha512-3giAOQvZiH5F9bMlMiv8+GSPMeqg0dbaeo58/0SlA9sxSqZhnUtxzX9/2FzyhS9sWQf5S0GJE0AKBrFqjpeYcg==
 
-"@peggyjs/from-mem@1.3.4":
-  version "1.3.4"
-  resolved "https://registry.yarnpkg.com/@peggyjs/from-mem/-/from-mem-1.3.4.tgz#430ebc635b2f8ebeeadbc796937bab89e15be2cf"
-  integrity sha512-6DqaCO73ihyM2AJ2Vl4QQGmmU3MoD4hFh0RFRzxPdLkSLfE0QMEyDfaojE/R3KbsL1UP4VQyJA2clwX4agSTBw==
+"@peggyjs/from-mem@1.3.5":
+  version "1.3.5"
+  resolved "https://registry.yarnpkg.com/@peggyjs/from-mem/-/from-mem-1.3.5.tgz#d6294c588517728f73cc6c091706e147f8824be0"
+  integrity sha512-oRyzXE7nirAn+5yYjCdWQHg3EG2XXcYRoYNOK8Quqnmm+9FyK/2YWVunwudlYl++M3xY+gIAdf0vAYS+p0nKfQ==
   dependencies:
     semver "7.6.3"
 
@@ -848,10 +848,10 @@
   dependencies:
     defer-to-connect "^2.0.1"
 
-"@terascope/data-mate@~1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.4.1.tgz#ce4f7aaab80b9600d2cdad727d8878caecfc039f"
-  integrity sha512-uvHkQg23pkahkNL6UGEdreDT9ugpwt/n/H/3IVrTIuGMkYu84XXP+nYj/3H8WkgXm4D1n1lUQa1Ui29ZK+DK8w==
+"@terascope/data-mate@~1.4.1", "@terascope/data-mate@~1.4.2":
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.4.2.tgz#5ef5394bc1c63c27d967bc02184d76b5d13c34be"
+  integrity sha512-g8bZ6XDeFALHHRtv6yfaU1X8Mq0/puM7iQy5nTR8q5SUK5EQjFJHkiE+cS3qDwGFvfb3KqaOF8ryxtV2r6aPiA==
   dependencies:
     "@terascope/data-types" "~1.4.1"
     "@terascope/types" "~1.3.1"
@@ -863,13 +863,13 @@
     ip6addr "~0.2.5"
     ipaddr.js "~2.2.0"
     is-cidr "~5.1.0"
-    jexl "~2.2.2"
+    jexl "~2.3.0"
     lodash "~4.17.21"
     mnemonist "~0.39.8"
-    uuid "~10.0.0"
+    uuid "~11.0.3"
     valid-url "~1.0.9"
     validator "~13.12.0"
-    xlucene-parser "~1.4.1"
+    xlucene-parser "~1.4.2"
 
 "@terascope/data-types@~1.4.1":
   version "1.4.1"
@@ -2657,12 +2657,12 @@ ejs@^3.1.10:
   dependencies:
     jake "^10.8.5"
 
-elasticsearch-store@~1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.4.1.tgz#a8920659fd092cb2e69fc5fd77d6eb83d5656900"
-  integrity sha512-Jz4jrg3MgyOOrK1f1XvWfowQqhuqCr+8tc0zUgrtxqBZdVPzDA7MHxynxWl4me5nndkMZP1jSaORQHuPWNF4bQ==
+elasticsearch-store@~1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.4.2.tgz#839bd79b9c358cf698c05c64e3844d32ef1c5310"
+  integrity sha512-Lr6dzXZKFKryGWr7gTULG2OFBNXSCKujIixQuqKhmAh9FI95xrHUKmvfDGR3yxJ8pF7LsR/9GA99gYt5jvGdBg==
   dependencies:
-    "@terascope/data-mate" "~1.4.1"
+    "@terascope/data-mate" "~1.4.2"
     "@terascope/data-types" "~1.4.1"
     "@terascope/types" "~1.3.1"
     "@terascope/utils" "~1.4.1"
@@ -2674,8 +2674,8 @@ elasticsearch-store@~1.4.1:
     opensearch1 "npm:@opensearch-project/opensearch@~1.2.0"
     opensearch2 "npm:@opensearch-project/opensearch@~2.12.0"
     setimmediate "~1.0.5"
-    uuid "~10.0.0"
-    xlucene-translator "~1.4.1"
+    uuid "~11.0.3"
+    xlucene-translator "~1.4.2"
 
 "elasticsearch6@npm:@elastic/elasticsearch@~6.8.0":
   version "6.8.8"
@@ -4703,10 +4703,12 @@ jest@~29.7.0:
     import-local "^3.0.2"
     jest-cli "^29.7.0"
 
-jexl@~2.2.2:
-  version "2.2.2"
-  resolved "https://registry.yarnpkg.com/jexl/-/jexl-2.2.2.tgz#eb06cd84684a52b6408be94604c5529f416ccd2f"
-  integrity sha512-HYDGbiZtGLbaxp1b0S7Nqbtegu5zhxaUBzsrMIpoEJDNr1M8lSuowpO7ziXldc/+wGGvwkZYQSS8mW2cPpiGgA==
+jexl@~2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/jexl/-/jexl-2.3.0.tgz#73e0694d86ca917ac24fed753f201c1db59a46c5"
+  integrity sha512-ecqln4kTWNkMwbFvTukOMDq1jy1GcPzvshhMp/s4pxU86xdLDq7HbDRa87DfMfbSAOS8V6EwvCdfs0S+w/iycA==
+  dependencies:
+    "@babel/runtime" "^7.10.2"
 
 jose@^5.9.6:
   version "5.9.6"
@@ -5585,12 +5587,12 @@ pbf@^3.2.1:
     ieee754 "^1.1.12"
     resolve-protobuf-schema "^2.1.0"
 
-peggy@~4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/peggy/-/peggy-4.1.1.tgz#654cd0fe07856172896cca33ae51aefc57cc3db7"
-  integrity sha512-2emciJQKahHJpT7f1asizGSnJ8bq0TKgWMXnCrtAaSH1NIXaGifYxL5m5KMrCdlaqaQJz3SVexNkx+I+Vz66VA==
+peggy@~4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/peggy/-/peggy-4.2.0.tgz#9ce13fef2710357e881b57c41d426dbe90e9a001"
+  integrity sha512-ZjzyJYY8NqW8JOZr2PbS/J0UH/hnfGALxSDsBUVQg5Y/I+ZaPuGeBJ7EclUX2RvWjhlsi4pnuL1C/K/3u+cDeg==
   dependencies:
-    "@peggyjs/from-mem" "1.3.4"
+    "@peggyjs/from-mem" "1.3.5"
     commander "^12.1.0"
     source-map-generator "0.8.0"
 
@@ -6853,6 +6855,11 @@ uuid@~10.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-10.0.0.tgz#5a95aa454e6e002725c79055fd42aaba30ca6294"
   integrity sha512-8XkAphELsDnEGrDxUOHB3RGvXz6TeuYSGEZBOjtTtPm2lwhGBjLgOzLHB63IUWfBpNucQjND6d3AOudO+H3RWQ==
 
+uuid@~11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.3.tgz#248451cac9d1a4a4128033e765d137e2b2c49a3d"
+  integrity sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg==
+
 v8-to-istanbul@^9.0.1:
   version "9.3.0"
   resolved "https://registry.yarnpkg.com/v8-to-istanbul/-/v8-to-istanbul-9.3.0.tgz#b9572abfa62bd556c16d75fdebc1a411d5ff3175"
@@ -7018,25 +7025,25 @@ ws@^8.18.0:
   resolved "https://registry.yarnpkg.com/ws/-/ws-8.18.0.tgz#0d7505a6eafe2b0e712d232b42279f53bc289bbc"
   integrity sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==
 
-xlucene-parser@~1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-1.4.1.tgz#20475d696c7e5f251a9cfa4314346c449065bfb4"
-  integrity sha512-ch0rfGTPcWVZ9JABGsFtHVeO0/qcq8qVViXRZrsWMxwGQ5LfXpOIr1vsC0BlTtwpsFkpatdZ1/ICizKel8DXNA==
+xlucene-parser@~1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-1.4.2.tgz#131f29e96ae37f2481858a60436606c338fc2552"
+  integrity sha512-KEVzGNlcQ488odaB/Rmd4cS9TuohV5UhEnSC5U6B7T46ofFnLBRCgsfl4nHxCvTKHvQPSvZpjfLZvrWdHWxoeg==
   dependencies:
     "@terascope/types" "~1.3.1"
     "@terascope/utils" "~1.4.1"
-    peggy "~4.1.1"
+    peggy "~4.2.0"
     ts-pegjs "~4.2.1"
 
-xlucene-translator@~1.4.1:
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-1.4.1.tgz#f826a1cbf5f18b85338dbb330b35b36a92b57a25"
-  integrity sha512-hMhOIMbcuIjdTYcKtYZtYt+qv/nqLDEoK8fkW3CffNE4aORD4PSlWdj8414b9f9pQvUcyjbOQfqVG3y57pFc1A==
+xlucene-translator@~1.4.2:
+  version "1.4.2"
+  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-1.4.2.tgz#de0f3331bbeb948ca50b14160eb647a96f1a6023"
+  integrity sha512-RL34cXdLHDZld/+J8mPZFf0q4DS1If3T5UCbBn3E1LrXkUk2/WJXLrqoy1wCJ47s3L30qsYj1Qg67as4olDylg==
   dependencies:
     "@terascope/types" "~1.3.1"
     "@terascope/utils" "~1.4.1"
     "@types/elasticsearch" "~5.0.43"
-    xlucene-parser "~1.4.1"
+    xlucene-parser "~1.4.2"
 
 xtend@^4.0.0:
   version "4.0.2"
