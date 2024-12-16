@@ -837,6 +837,28 @@
     validator "~13.12.0"
     xlucene-parser "~1.4.2"
 
+"@terascope/data-mate@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-mate/-/data-mate-1.5.0.tgz#e2bea2027be7c54948022ffb6a7f7a942ecab02f"
+  integrity sha512-gAx+GQOq93ZDzUI7wBOJ0ifpUuMhb8p1fXhEzHQ55AmjglA/2K2TLiGXDaAqxc353YrDWH3Z843gMXdzxci0VA==
+  dependencies:
+    "@terascope/data-types" "~1.5.0"
+    "@terascope/types" "~1.3.1"
+    "@terascope/utils" "~1.5.0"
+    "@types/validator" "~13.12.2"
+    awesome-phonenumber "~7.2.0"
+    date-fns "~4.1.0"
+    ip-bigint "~8.2.0"
+    ip6addr "~0.2.5"
+    ipaddr.js "~2.2.0"
+    is-cidr "~5.1.0"
+    jexl "~2.3.0"
+    mnemonist "~0.39.8"
+    uuid "~11.0.3"
+    valid-url "~1.0.9"
+    validator "~13.12.0"
+    xlucene-parser "~1.5.0"
+
 "@terascope/data-types@~1.4.1":
   version "1.4.1"
   resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-1.4.1.tgz#f82ad97bf4ebd87be086a2bb7d908699b753407e"
@@ -846,6 +868,16 @@
     "@terascope/utils" "~1.4.1"
     graphql "~16.9.0"
     lodash "~4.17.21"
+    yargs "~17.7.2"
+
+"@terascope/data-types@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/data-types/-/data-types-1.5.0.tgz#3621d32cba7cd7bfb3f3c9bd884d7acbf24b13d2"
+  integrity sha512-PAUxJVS2dZGbGIgdN/qoS8UAzTOmko2JWgh/6glN1lB1zlp0RbBTs4kX9+waYde6A8KhnXw+PbqbSyO9PbF81Q==
+  dependencies:
+    "@terascope/types" "~1.3.1"
+    "@terascope/utils" "~1.5.0"
+    graphql "~16.9.0"
     yargs "~17.7.2"
 
 "@terascope/elasticsearch-api@~4.4.1":
@@ -990,6 +1022,48 @@
     lodash-es "~4.17.21"
     mnemonist "~0.39.8"
     p-map "~7.0.2"
+    shallow-clone "~3.0.1"
+    validator "~13.12.0"
+
+"@terascope/utils@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-1.5.0.tgz#b490a25b4670d7755323d3650a761f814e97fb8b"
+  integrity sha512-m1IBEB1Dh9SBBL//jlh9jeCSaxCQ4PGcdzNncBT5KPVnhDZoM/KgNOthB2TDtNJ+goZZjzhjaR4KVvY1Eljfzw==
+  dependencies:
+    "@chainsafe/is-ip" "~2.0.2"
+    "@terascope/types" "~1.3.1"
+    "@turf/bbox" "~7.1.0"
+    "@turf/bbox-polygon" "~7.1.0"
+    "@turf/boolean-contains" "~7.1.0"
+    "@turf/boolean-disjoint" "~7.1.0"
+    "@turf/boolean-equal" "~7.1.0"
+    "@turf/boolean-intersects" "~7.1.0"
+    "@turf/boolean-point-in-polygon" "~7.1.0"
+    "@turf/boolean-within" "~7.1.0"
+    "@turf/circle" "~7.1.0"
+    "@turf/helpers" "~7.1.0"
+    "@turf/invariant" "~7.1.0"
+    "@turf/line-to-polygon" "~7.1.0"
+    "@types/lodash-es" "~4.17.12"
+    "@types/validator" "~13.12.2"
+    awesome-phonenumber "~7.2.0"
+    date-fns "~4.1.0"
+    date-fns-tz "~3.2.0"
+    datemath-parser "~1.0.6"
+    debug "~4.4.0"
+    geo-tz "~8.1.1"
+    ip-bigint "~8.2.0"
+    ip-cidr "~4.0.2"
+    ip6addr "~0.2.5"
+    ipaddr.js "~2.2.0"
+    is-cidr "~5.1.0"
+    is-plain-object "~5.0.0"
+    js-string-escape "~1.0.1"
+    kind-of "~6.0.3"
+    latlon-geohash "~2.0.0"
+    lodash-es "~4.17.21"
+    mnemonist "~0.39.8"
+    p-map "~7.0.3"
     shallow-clone "~3.0.1"
     validator "~13.12.0"
 
@@ -2396,6 +2470,13 @@ debug@^3.2.7:
   dependencies:
     ms "^2.1.1"
 
+debug@~4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.4.0.tgz#2b3f2aea2ffeb776477460267377dc8710faba8a"
+  integrity sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==
+  dependencies:
+    ms "^2.1.3"
+
 decompress-response@^4.2.0:
   version "4.2.1"
   resolved "https://registry.yarnpkg.com/decompress-response/-/decompress-response-4.2.1.tgz#414023cc7a302da25ce2ec82d0d5238ccafd8986"
@@ -2558,15 +2639,15 @@ ejs@^3.1.10:
   dependencies:
     jake "^10.8.5"
 
-elasticsearch-store@~1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.4.2.tgz#839bd79b9c358cf698c05c64e3844d32ef1c5310"
-  integrity sha512-Lr6dzXZKFKryGWr7gTULG2OFBNXSCKujIixQuqKhmAh9FI95xrHUKmvfDGR3yxJ8pF7LsR/9GA99gYt5jvGdBg==
+elasticsearch-store@~1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/elasticsearch-store/-/elasticsearch-store-1.5.0.tgz#c8ff2e0781d8964142607dc938d33363efa8544e"
+  integrity sha512-Qb7H3nQcey+QvqpHDhbeI6bhr9EpIduKQpFLVqXwMjW3v4aLsqSu+L8vmsX8d2qIF/bufD2xkn2oG3TbWW+Omg==
   dependencies:
-    "@terascope/data-mate" "~1.4.2"
-    "@terascope/data-types" "~1.4.1"
+    "@terascope/data-mate" "~1.5.0"
+    "@terascope/data-types" "~1.5.0"
     "@terascope/types" "~1.3.1"
-    "@terascope/utils" "~1.4.1"
+    "@terascope/utils" "~1.5.0"
     ajv "~8.17.1"
     ajv-formats "~3.0.1"
     elasticsearch6 "npm:@elastic/elasticsearch@~6.8.0"
@@ -2576,7 +2657,7 @@ elasticsearch-store@~1.4.2:
     opensearch2 "npm:@opensearch-project/opensearch@~2.12.0"
     setimmediate "~1.0.5"
     uuid "~11.0.3"
-    xlucene-translator "~1.4.2"
+    xlucene-translator "~1.5.0"
 
 "elasticsearch6@npm:@elastic/elasticsearch@~6.8.0":
   version "6.8.8"
@@ -5326,6 +5407,11 @@ p-map@~7.0.2:
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-7.0.2.tgz#7c5119fada4755660f70199a66aa3fe2f85a1fe8"
   integrity sha512-z4cYYMMdKHzw4O5UkWJImbZynVIo0lSGTXc7bzB1e/rrDqkgGUNysK/o4bTr+0+xKvvLoTyGqYC4Fgljy9qe1Q==
 
+p-map@~7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-7.0.3.tgz#7ac210a2d36f81ec28b736134810f7ba4418cdb6"
+  integrity sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==
+
 p-try@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
@@ -6144,7 +6230,16 @@ string-length@^4.0.1:
     char-regex "^1.0.2"
     strip-ansi "^6.0.0"
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -6239,7 +6334,14 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -6810,7 +6912,16 @@ word-wrap@^1.2.5:
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.5.tgz#d2c45c6dd4fbce621a66f136cbe328afd0410b34"
   integrity sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
@@ -6856,15 +6967,25 @@ xlucene-parser@~1.4.2:
     peggy "~4.2.0"
     ts-pegjs "~4.2.1"
 
-xlucene-translator@~1.4.2:
-  version "1.4.2"
-  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-1.4.2.tgz#de0f3331bbeb948ca50b14160eb647a96f1a6023"
-  integrity sha512-RL34cXdLHDZld/+J8mPZFf0q4DS1If3T5UCbBn3E1LrXkUk2/WJXLrqoy1wCJ47s3L30qsYj1Qg67as4olDylg==
+xlucene-parser@~1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/xlucene-parser/-/xlucene-parser-1.5.0.tgz#155435b0c2c413f14a9df4f2fde02ca51ef910f4"
+  integrity sha512-rMpHORzeNEztmX2gJTlR0uJ7dw6qMjWjK43xYdOOwURRqXLYBqiFg3EFGyeQY+IZjE6s7iKiVAcVwp067ac+Yw==
   dependencies:
     "@terascope/types" "~1.3.1"
-    "@terascope/utils" "~1.4.1"
+    "@terascope/utils" "~1.5.0"
+    peggy "~4.2.0"
+    ts-pegjs "~4.2.1"
+
+xlucene-translator@~1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/xlucene-translator/-/xlucene-translator-1.5.0.tgz#d0d62e2aec63c8ffdac04254cec204bc777a02bf"
+  integrity sha512-p3VLpdmwKGVikNtLdW62y/ZD+yUcpLmdQ6Afv4NlLrWmS4pRhYmrbfoja1T8SbONDGI3VELwUTgDDyXzIhPnGg==
+  dependencies:
+    "@terascope/types" "~1.3.1"
+    "@terascope/utils" "~1.5.0"
     "@types/elasticsearch" "~5.0.43"
-    xlucene-parser "~1.4.2"
+    xlucene-parser "~1.5.0"
 
 xtend@^4.0.0:
   version "4.0.2"
