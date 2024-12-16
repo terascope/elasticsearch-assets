@@ -858,6 +858,16 @@
     bluebird "~3.7.2"
     setimmediate "~1.0.5"
 
+"@terascope/elasticsearch-api@~4.5.0":
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/elasticsearch-api/-/elasticsearch-api-4.5.0.tgz#0da5e61476c567c8a65a7ee5d5092ac323d24786"
+  integrity sha512-wtDB0kXi6Gwqze0oIJJUoJd9eye6fcNMZ3eZVc/gK934hirgyjTMkVBfPLqhEghZEGsjtm4GQ1TUI2bStdM8VQ==
+  dependencies:
+    "@terascope/types" "~1.3.1"
+    "@terascope/utils" "~1.5.0"
+    bluebird "~3.7.2"
+    setimmediate "~1.0.5"
+
 "@terascope/eslint-config@~1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@terascope/eslint-config/-/eslint-config-1.1.2.tgz#0605592cceb97bf77c39966e1cf17a063cb65566"
@@ -936,13 +946,13 @@
     typedoc-plugin-markdown "~4.0.3"
     yargs "~17.7.2"
 
-"@terascope/teraslice-state-storage@~1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-1.4.1.tgz#caee92acf5680664a0769a5f15f1093ab5b111a9"
-  integrity sha512-2X8nvrQ/faxJJtVvANP8YJ+tOdTbJxTbVjHIb+gnebDBJwyCeSoNylsYQnss07rXSIN3iqztqXqAkmFQ/qBgQg==
+"@terascope/teraslice-state-storage@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/teraslice-state-storage/-/teraslice-state-storage-1.5.0.tgz#9830cfdd1fc879463210498ece5c181df0ee3603"
+  integrity sha512-kYAbkoAxOz/WSt3MHEohAjQzRt3IV5e12kMZg8lFVOZvwy/xdnFDMJvJ0dvwSXzMoiUO217TbCPu+WjY881xgQ==
   dependencies:
-    "@terascope/elasticsearch-api" "~4.4.1"
-    "@terascope/utils" "~1.4.1"
+    "@terascope/elasticsearch-api" "~4.5.0"
+    "@terascope/utils" "~1.5.0"
 
 "@terascope/types@~1.3.1":
   version "1.3.1"
@@ -990,6 +1000,48 @@
     lodash-es "~4.17.21"
     mnemonist "~0.39.8"
     p-map "~7.0.2"
+    shallow-clone "~3.0.1"
+    validator "~13.12.0"
+
+"@terascope/utils@~1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@terascope/utils/-/utils-1.5.0.tgz#b490a25b4670d7755323d3650a761f814e97fb8b"
+  integrity sha512-m1IBEB1Dh9SBBL//jlh9jeCSaxCQ4PGcdzNncBT5KPVnhDZoM/KgNOthB2TDtNJ+goZZjzhjaR4KVvY1Eljfzw==
+  dependencies:
+    "@chainsafe/is-ip" "~2.0.2"
+    "@terascope/types" "~1.3.1"
+    "@turf/bbox" "~7.1.0"
+    "@turf/bbox-polygon" "~7.1.0"
+    "@turf/boolean-contains" "~7.1.0"
+    "@turf/boolean-disjoint" "~7.1.0"
+    "@turf/boolean-equal" "~7.1.0"
+    "@turf/boolean-intersects" "~7.1.0"
+    "@turf/boolean-point-in-polygon" "~7.1.0"
+    "@turf/boolean-within" "~7.1.0"
+    "@turf/circle" "~7.1.0"
+    "@turf/helpers" "~7.1.0"
+    "@turf/invariant" "~7.1.0"
+    "@turf/line-to-polygon" "~7.1.0"
+    "@types/lodash-es" "~4.17.12"
+    "@types/validator" "~13.12.2"
+    awesome-phonenumber "~7.2.0"
+    date-fns "~4.1.0"
+    date-fns-tz "~3.2.0"
+    datemath-parser "~1.0.6"
+    debug "~4.4.0"
+    geo-tz "~8.1.1"
+    ip-bigint "~8.2.0"
+    ip-cidr "~4.0.2"
+    ip6addr "~0.2.5"
+    ipaddr.js "~2.2.0"
+    is-cidr "~5.1.0"
+    is-plain-object "~5.0.0"
+    js-string-escape "~1.0.1"
+    kind-of "~6.0.3"
+    latlon-geohash "~2.0.0"
+    lodash-es "~4.17.21"
+    mnemonist "~0.39.8"
+    p-map "~7.0.3"
     shallow-clone "~3.0.1"
     validator "~13.12.0"
 
@@ -2395,6 +2447,13 @@ debug@^3.2.7:
   integrity sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==
   dependencies:
     ms "^2.1.1"
+
+debug@~4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.4.0.tgz#2b3f2aea2ffeb776477460267377dc8710faba8a"
+  integrity sha512-6WTZ/IxCY/T6BALoZHaE4ctp9xm+Z5kY/pzYaCHRFeyVhojxlrm+46y68HA6hr0TcwEssoxNiDEUJQjfPZ/RYA==
+  dependencies:
+    ms "^2.1.3"
 
 decompress-response@^4.2.0:
   version "4.2.1"
@@ -5326,6 +5385,11 @@ p-map@~7.0.2:
   resolved "https://registry.yarnpkg.com/p-map/-/p-map-7.0.2.tgz#7c5119fada4755660f70199a66aa3fe2f85a1fe8"
   integrity sha512-z4cYYMMdKHzw4O5UkWJImbZynVIo0lSGTXc7bzB1e/rrDqkgGUNysK/o4bTr+0+xKvvLoTyGqYC4Fgljy9qe1Q==
 
+p-map@~7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/p-map/-/p-map-7.0.3.tgz#7ac210a2d36f81ec28b736134810f7ba4418cdb6"
+  integrity sha512-VkndIv2fIB99swvQoA65bm+fsmt6UNdGeIB0oxBs+WhAhdh08QA04JXpI7rbB9r08/nkbysKoya9rtDERYOYMA==
+
 p-try@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/p-try/-/p-try-1.0.0.tgz#cbc79cdbaf8fd4228e13f621f2b1a237c1b207b3"
@@ -6144,7 +6208,16 @@ string-length@^4.0.1:
     char-regex "^1.0.2"
     strip-ansi "^6.0.0"
 
-"string-width-cjs@npm:string-width@^4.2.0", string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
+"string-width-cjs@npm:string-width@^4.2.0":
+  version "4.2.3"
+  resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
+  integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
+  dependencies:
+    emoji-regex "^8.0.0"
+    is-fullwidth-code-point "^3.0.0"
+    strip-ansi "^6.0.1"
+
+string-width@^4.1.0, string-width@^4.2.0, string-width@^4.2.3:
   version "4.2.3"
   resolved "https://registry.yarnpkg.com/string-width/-/string-width-4.2.3.tgz#269c7117d27b05ad2e536830a8ec895ef9c6d010"
   integrity sha512-wKyQRQpjJ0sIp62ErSZdGsjMJWsap5oRNihHhu6G7JVO/9jIB6UyevL+tXuOqrng8j/cxKTWyWUwvSTriiZz/g==
@@ -6239,7 +6312,14 @@ string_decoder@~1.1.1:
   dependencies:
     safe-buffer "~5.1.0"
 
-"strip-ansi-cjs@npm:strip-ansi@^6.0.1", strip-ansi@^6.0.0, strip-ansi@^6.0.1:
+"strip-ansi-cjs@npm:strip-ansi@^6.0.1":
+  version "6.0.1"
+  resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
+  integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
+  dependencies:
+    ansi-regex "^5.0.1"
+
+strip-ansi@^6.0.0, strip-ansi@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/strip-ansi/-/strip-ansi-6.0.1.tgz#9e26c63d30f53443e9489495b2105d37b67a85d9"
   integrity sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A==
@@ -6810,7 +6890,16 @@ word-wrap@^1.2.5:
   resolved "https://registry.yarnpkg.com/word-wrap/-/word-wrap-1.2.5.tgz#d2c45c6dd4fbce621a66f136cbe328afd0410b34"
   integrity sha512-BN22B5eaMMI9UMtjrGd5g5eCYPpCPDUy0FJXbYsaT5zYxjFOckS53SQDE3pWkVoWpHXVb3BrYcEN4Twa55B5cA==
 
-"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0", wrap-ansi@^7.0.0:
+"wrap-ansi-cjs@npm:wrap-ansi@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
+  integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
+  dependencies:
+    ansi-styles "^4.0.0"
+    string-width "^4.1.0"
+    strip-ansi "^6.0.0"
+
+wrap-ansi@^7.0.0:
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/wrap-ansi/-/wrap-ansi-7.0.0.tgz#67e145cff510a6a6984bdf1152911d69d2eb9e43"
   integrity sha512-YVGIj2kamLSTxw6NsZjoBxfSwsn0ycdesmc4p+Q21c5zPuZ1pl+NfxVdxPtdHvmNVOQ6XSYG4AUtyt/Fi7D16Q==
