@@ -43,7 +43,6 @@
         "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.8.0' ts-scripts test asset --",
         "test:watch": "ts-scripts test --watch asset --"
     },
-    "dependencies": {},
     "devDependencies": {
         "@terascope/data-types": "~1.6.0",
         "@terascope/elasticsearch-api": "~4.6.0",
@@ -89,5 +88,6 @@
         "npm": {
             "registry": "https://registry.npmjs.org/"
         }
-    }
+    },
+    "packageManager": "yarn@4.6.0"
 }
