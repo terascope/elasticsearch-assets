@@ -9,12 +9,12 @@ on:
 
 jobs:
   check-docker-limit-before:
-   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
+   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f86f716e47d989b939d978befa7721c1f5b10134
    secrets: inherit
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@f86f716e47d989b939d978befa7721c1f5b10134
     secrets: inherit
 
   test-elasticsearch-assets:
@@ -45,7 +45,7 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: yarn setup
+      - run: yarn && yarn setup
       - run: yarn lint
 
       - name: Create Docker Image List
@@ -64,16 +64,15 @@ jobs:
         run: SKIP_IMAGE_DELETION='true' yarn --silent test:${{ matrix.search-version }}
 
       - name: Test apis for ${{ matrix.search-version }}
-        run: yarn --silent test:${{ matrix.search-version }}
+        run: yarn test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
-      - run: yarn global add teraslice-cli
-      - run: teraslice-cli -v
-      - run: teraslice-cli assets build
+      - run: yarn dlx teraslice-cli -v
+      - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
 
   check-docker-limit-after:
     needs: test-elasticsearch-assets
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@2a097b4af7eb81cebc7d602ad9ab2f1ef7b979cc
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@f86f716e47d989b939d978befa7721c1f5b10134
     secrets: inherit
 
 # TODO:
