@@ -61,7 +61,7 @@ jobs:
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}
 
       - name: Test asset for ${{ matrix.search-version }}
-        run: SKIP_IMAGE_DELETION='true' yarn --silent test:${{ matrix.search-version }}
+        run: SKIP_IMAGE_DELETION='true' yarn test:${{ matrix.search-version }}
 
       - name: Test apis for ${{ matrix.search-version }}
         run: yarn test:${{ matrix.search-version }}
