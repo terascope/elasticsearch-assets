@@ -365,9 +365,11 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
-    track_totals?: boolean | 'number';
-    searchVersion?: number;
-    searchDistribution?: ElasticsearchDistribution;
+    include_totals?: boolean | 'number';
+    clientMetadata?: {
+        version: number;
+        distribution: ElasticsearchDistribution;
+    };
 }
 
 export interface DetermineSliceResults {

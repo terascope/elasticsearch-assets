@@ -6,6 +6,7 @@ import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
 import { schema } from '../elasticsearch_reader_api/schema.js';
 import { DEFAULT_API_NAME } from './interfaces.js';
+import { ElasticsearchDistribution } from '@terascope/types';
 
 const clone = cloneDeep(schema);
 
@@ -43,6 +44,18 @@ const apiSchema = {
         doc: 'CA certificate used to validate https endpoint',
         default: undefined,
         format: String
+    },
+    include_total: {
+        doc: `Fetch total count in queries. Setting to 'false' will turn off calculation. `
+            + `Some clients support setting to a fixed integer limit which will count up to `
+            + `that size and then stop. This can be used to achieve faster query execution.`,
+        default: true,
+        format: Boolean || 'number'
+    },
+    clientMetadata: {
+        doc: 'Additional information if not using Elasticsearch 6',
+        default: { version: 6, distribution: ElasticsearchDistribution.elasticsearch },
+        format: { version: Number, distribution: String }
     },
 };
 

@@ -1,5 +1,6 @@
 import 'jest-extended';
 import nock from 'nock';
+import { SearchParams } from '@terascope/types';
 import {
     DataEntity, newTestJobConfig, TestClientConfig,
     debugLogger
@@ -198,7 +199,7 @@ describe('spaces_reader fetcher', () => {
             // query size are overridden for unbounded fetches
             query.size = maxSize;
 
-            (query as any).trackTotalHits = true;
+            (query as SearchParams).track_total_hits = true;
 
             let results: DataEntity[];
 
@@ -272,7 +273,7 @@ describe('spaces_reader fetcher', () => {
                 scope.post(`/${testIndex}?token=${token}`, {
                     q: '(test:query)',
                     size: 100000,
-                    trackTotalHits: true
+                    track_total_hits: true
                 })
                     .delay(500)
                     .reply(200, {

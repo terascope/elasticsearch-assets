@@ -259,8 +259,8 @@ export class SpacesReaderClient implements ReaderClient {
         }
 
         let trackTotalHits: boolean | number = true;
-        if (isBoolean(config.track_totals)) trackTotalHits = config.track_totals;
-        if (config.track_totals === 'number') {
+        if (isBoolean(config.include_totals)) trackTotalHits = config.include_totals;
+        if (config.include_totals === 'number') {
             if (
                 this.getESDistribution() === ElasticsearchDistribution.elasticsearch
                 && this.getESVersion() <= 6
@@ -362,11 +362,11 @@ export class SpacesReaderClient implements ReaderClient {
     async verify(): Promise<void> {}
 
     getESVersion(): number {
-        return this.config.searchVersion ?? 6;
+        return this.config.clientMetadata?.version ?? 6;
     }
 
     getESDistribution() {
-        return this.config.searchDistribution || ElasticsearchDistribution.elasticsearch;
+        return this.config.clientMetadata?.distribution || ElasticsearchDistribution.elasticsearch;
     }
 
     async getSettings(_index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {
