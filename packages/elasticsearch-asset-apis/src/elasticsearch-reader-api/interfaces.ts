@@ -367,8 +367,8 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     caCertificate?: string;
     include_totals?: boolean | 'number';
     clientMetadata?: {
-        version: number;
-        distribution: ElasticsearchDistribution;
+        version?: number;
+        distribution?: ElasticsearchDistribution;
     };
 }
 
