@@ -2,8 +2,9 @@ import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
     AnyObject, withoutNil, DataEntity,
+    isBoolean,
 } from '@terascope/utils';
-import { ClientParams, ClientResponse } from '@terascope/types';
+import { ClientParams, ClientResponse, ElasticsearchDistribution } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
 import got, {
     OptionsOfJSONResponseBody, Response, TimeoutError, RequestError
@@ -134,6 +135,8 @@ export class SpacesReaderClient implements ReaderClient {
     protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
         const { config } = this;
 
+        const size = queryConfig?.size ?? config.size;
+
         const fields = get(queryConfig, '_source', null) as string[] | null;
 
         const dateFieldName = this.config.date_field_name;
@@ -145,8 +148,8 @@ export class SpacesReaderClient implements ReaderClient {
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray: null | any[]): AnyObject {
-            const queryOptions = {
+        function parseQueryConfig(mustArray: null | any[], trackTotalHits?: any): AnyObject {
+            const queryOptions: Record<string, (op: any) => string> = {
                 query_string: _parseEsQ,
                 range: _parseDate,
                 wildcard: _parseWildCard,
@@ -187,17 +190,11 @@ export class SpacesReaderClient implements ReaderClient {
                 });
             }
 
-            let { size } = queryConfig;
-
-            if (size == null) {
-                ({ size } = config);
-            }
-
             return Object.assign({}, geoQuery, sortQuery, fieldsQuery, {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                trackTotalHits: true
+                track_total_hits: trackTotalHits
             });
         }
 
@@ -261,7 +258,20 @@ export class SpacesReaderClient implements ReaderClient {
             return `(${terms.join(' OR ')})`;
         }
 
-        return parseQueryConfig(mustQuery);
+        let trackTotalHits: boolean | number = true;
+        if (isBoolean(config.track_totals)) trackTotalHits = config.track_totals;
+        if (config.track_totals === 'number') {
+            if (
+                this.getESDistribution() === ElasticsearchDistribution.elasticsearch
+                && this.getESVersion() <= 6
+            ) {
+                this.logger.debug(`Unable to optimize total hits as integer on ${this.config.index}, keeping true`);
+            } else {
+                trackTotalHits = size + 1;
+            }
+        }
+
+        return parseQueryConfig(mustQuery, trackTotalHits);
     }
 
     async getDataType(): Promise<DataTypeConfig> {
@@ -352,7 +362,11 @@ export class SpacesReaderClient implements ReaderClient {
     async verify(): Promise<void> {}
 
     getESVersion(): number {
-        return 6;
+        return this.config.searchVersion ?? 6;
+    }
+
+    getESDistribution() {
+        return this.config.searchDistribution || ElasticsearchDistribution.elasticsearch;
     }
 
     async getSettings(_index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {

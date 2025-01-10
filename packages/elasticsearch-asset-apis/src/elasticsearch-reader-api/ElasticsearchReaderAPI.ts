@@ -78,7 +78,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
-        return this.client.count(query as any);
+        return this.client.count(query);
     }
 
     /**
@@ -663,8 +663,10 @@ export class ElasticsearchReaderAPI {
         // we have a date, parse and return it
         if (date) return parseDate(date);
         // we are in auto, so we determine each part
-        const sortObj = {};
         const sortOrder = order === 'start' ? 'asc' : 'desc';
+        const sortObj = {
+            [this.config.date_field_name]: { order: sortOrder }
+        };
 
         sortObj[this.config.date_field_name] = { order: sortOrder };
 

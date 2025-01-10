@@ -3,7 +3,7 @@ import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
 import type { EventEmitter } from 'node:events';
 import type {
     DataTypeConfig, xLuceneVariables, ClientParams,
-    ClientResponse
+    ClientResponse, ElasticsearchDistribution
 } from '@terascope/types';
 import type { WindowState } from './WindowState.js';
 
@@ -365,6 +365,9 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
+    track_totals?: boolean | 'number';
+    searchVersion?: number;
+    searchDistribution?: ElasticsearchDistribution;
 }
 
 export interface DetermineSliceResults {
