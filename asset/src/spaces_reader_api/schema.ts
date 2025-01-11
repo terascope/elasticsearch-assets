@@ -47,15 +47,19 @@ const apiSchema = {
     },
     include_total: {
         doc: `Fetch total count in queries. Setting to 'false' will turn off calculation. `
-            + `Some clients support setting to a fixed integer limit which will count up to `
-            + `that size and then stop. This can be used to achieve faster query execution.`,
+            + `Some clients support setting to a fixed integer to limit the count up to that number `
+            + `then stop... set to 'number' to count up to the slice size then stop. `
+            + 'This can be used to achieve faster query execution.',
         default: true,
-        format: Boolean || 'number'
+        format(val: unknown) {
+            if (val === 'number' || typeof val !== 'number') return;
+            throw new Error(`Invalid parameter include_total, must be a boolean or string 'number', got ${getTypeOf(val)}`);
+        }
     },
     clientMetadata: {
         doc: 'Additional information if not using Elasticsearch 6',
         default: { version: 6, distribution: ElasticsearchDistribution.elasticsearch },
-        format: { version: Number, distribution: String }
+        format: Object
     },
 };
 
