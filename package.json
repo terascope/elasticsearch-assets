@@ -44,7 +44,7 @@
         "test:watch": "ts-scripts test --watch asset --"
     },
     "devDependencies": {
-        "@terascope/data-types": "~1.6.0",
+        "@terascope/data-types": "~1.7.1",
         "@terascope/elasticsearch-api": "~4.6.0",
         "@terascope/elasticsearch-asset-apis": "~1.0.5",
         "@terascope/eslint-config": "~1.1.3",
