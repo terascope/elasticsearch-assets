@@ -73,3 +73,6 @@ tsconfig.tsbuildinfo
 
 # CI test files
 images/*
+
+# .yarn
+.yarn/install-state.gz
