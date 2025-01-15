@@ -36,8 +36,8 @@ export class WindowState {
 
         if (allDone) {
             for (const key of Object.keys(this._windowState)) {
-                this._windowState[key].canRestart = true;
-                this._windowState[key].hasCalled = false;
+                this._windowState[Number(key)].canRestart = true;
+                this._windowState[Number(key)].hasCalled = false;
             }
         }
 

@@ -3,7 +3,7 @@ import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
 import type { EventEmitter } from 'node:events';
 import type {
     DataTypeConfig, xLuceneVariables, ClientParams,
-    ClientResponse
+    ClientResponse, GeoPoint
 } from '@terascope/types';
 import type { WindowState } from './WindowState.js';
 
@@ -377,4 +377,20 @@ export interface DetermineSliceResults {
 export interface SlicerDateConfig extends DateSegments {
     end: moment.Moment;
     holes?: readonly DateConfig[];
+}
+
+export interface GeoBoundingBoxQuery {
+    geo_bounding_box: {
+        [key: string]: {
+            top_left: GeoPoint;
+            bottom_right: GeoPoint;
+        };
+    };
+}
+
+export interface GeoDistanceQuery {
+    geo_distance: {
+        distance: string;
+        [key: string]: GeoPoint | string;
+    };
 }

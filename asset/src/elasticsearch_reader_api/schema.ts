@@ -1,7 +1,7 @@
 import {
     ConvictSchema, AnyObject, ValidatedJobConfig,
     toNumber, isString, isNumber, getTypeOf,
-    isNotNil, has
+    isNotNil, has, isKey
 } from '@terascope/job-components';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
@@ -151,7 +151,7 @@ export const schema = {
                 ms: 'ms'
             };
             if (!isString(val)) throw new Error(`Invalid parameter time_resolution, it must be of type string, was given ${getTypeOf(val)}`);
-            if (!obj[val]) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
+            if (!isKey(obj, val)) throw new Error('Invalid time_resolution,  must be set in either "s"[seconds] or "ms"[milliseconds]');
 
             return obj[val];
         }
@@ -193,7 +193,7 @@ export const schema = {
             if (val) {
                 const options = { asc: true, desc: true };
                 if (typeof val !== 'string') throw new Error('Invalid geo_sort_order parameter, must be a string IF specified');
-                if (!options[val]) throw new Error('If geo_sort_order is specified it must be either "asc" or "desc"');
+                if (!isKey(options, val)) throw new Error('If geo_sort_order is specified it must be either "asc" or "desc"');
             }
         }
     },

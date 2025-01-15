@@ -1,6 +1,9 @@
 import { AnyObject, GeoPoint, ClientParams } from '@terascope/types';
 import { isString, parseGeoPoint } from '@terascope/utils';
-import { ESReaderOptions, ReaderSlice } from './interfaces.js';
+import {
+    ESReaderOptions, GeoBoundingBoxQuery,
+    GeoDistanceQuery, ReaderSlice
+} from './interfaces.js';
 
 /**
  * Build the elasticsearch DSL query
@@ -36,7 +39,7 @@ function _buildRangeQuery(
     };
     // is a range type query
     if (params.start && params.end) {
-        const dateObj = {};
+        const dateObj: Record<string, { gte: string; lt: string }> = {};
         const { date_field_name: dateFieldName } = opConfig;
         dateObj[dateFieldName] = {
             gte: params.start,
@@ -155,8 +158,8 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
     function createGeoSortQuery(location: GeoPoint) {
         const sortedSearch: AnyObject = { _geo_distance: {} };
         sortedSearch._geo_distance[opConfig.geo_field as string] = {
-            lat: location[0],
-            lon: location[1],
+            lat: location.lat,
+            lon: location.lon,
         };
         sortedSearch._geo_distance.order = geoSortOrder;
         sortedSearch._geo_distance.unit = geoSortUnit;
@@ -174,18 +177,18 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
         const topLeft = parseGeoPoint(geoBoxTopLeft);
         const bottomRight = parseGeoPoint(geoBoxBottomRight as string);
 
-        const searchQuery = {
+        const searchQuery: GeoBoundingBoxQuery = {
             geo_bounding_box: {},
         };
 
         searchQuery.geo_bounding_box[opConfig.geo_field as string] = {
             top_left: {
-                lat: topLeft[0],
-                lon: topLeft[1],
+                lat: topLeft.lat,
+                lon: topLeft.lon,
             },
             bottom_right: {
-                lat: bottomRight[0],
-                lon: bottomRight[1],
+                lat: bottomRight.lat,
+                lon: bottomRight.lon,
             },
         };
 
@@ -200,15 +203,15 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
 
     if (geoDistance) {
         const location = parseGeoPoint(geoPoint as string);
-        const searchQuery = {
+        const searchQuery: GeoDistanceQuery = {
             geo_distance: {
                 distance: geoDistance,
             },
         };
 
         searchQuery.geo_distance[opConfig.geo_field as string] = {
-            lat: location[0],
-            lon: location[1],
+            lat: location.lat,
+            lon: location.lon,
         };
 
         queryResults.query = searchQuery;
