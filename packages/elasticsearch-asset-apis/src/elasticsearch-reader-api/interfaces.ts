@@ -365,7 +365,8 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
-    include_totals?: boolean | 'number';
+    optimizeCount?: boolean;
+    includeTotals?: boolean | 'number';
     clientMetadata?: {
         version?: number;
         distribution?: ElasticsearchDistribution;

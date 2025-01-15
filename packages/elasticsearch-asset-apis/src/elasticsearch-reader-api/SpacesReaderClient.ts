@@ -132,7 +132,10 @@ export class SpacesReaderClient implements ReaderClient {
         return response.body;
     }
 
-    protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
+    protected translateSearchQuery(
+        queryConfig: ClientParams.SearchParams,
+        optimizeCount?: boolean
+    ): AnyObject {
         const { config } = this;
 
         const size = queryConfig?.size ?? config.size;
@@ -194,7 +197,8 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                track_total_hits: trackTotalHits
+                track_total_hits: trackTotalHits,
+                ...optimizeCount && { __is_count: optimizeCount }
             });
         }
 
@@ -258,17 +262,21 @@ export class SpacesReaderClient implements ReaderClient {
             return `(${terms.join(' OR ')})`;
         }
 
-        let trackTotalHits: boolean | number = true;
-        if (isBoolean(config.include_totals)) trackTotalHits = config.include_totals;
-        if (config.include_totals === 'number') {
-            if (
-                this.getESDistribution() === ElasticsearchDistribution.elasticsearch
-                && this.getESVersion() <= 6
-            ) {
-                this.logger.debug(`Unable to optimize total hits as integer on ${this.config.index}, keeping true`);
+        let trackTotalHits: boolean | number = false;
+
+        if (isBoolean(config.includeTotals)) {
+            trackTotalHits = config.includeTotals;
+        }
+        if (config.includeTotals === 'number') {
+            if (this.getESDistribution() === ElasticsearchDistribution.elasticsearch
+                && this.getESVersion() <= 6) {
+                this.logger.info(`Unable to optimize total hits as integer on ${this.config.index}, keeping true`);
             } else {
                 trackTotalHits = size + 1;
             }
+        }
+        if (size === 0 && !optimizeCount) {
+            trackTotalHits = true;
         }
 
         return parseQueryConfig(mustQuery, trackTotalHits);
@@ -324,19 +332,22 @@ export class SpacesReaderClient implements ReaderClient {
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true,
-        format: 'dfjson'
+        format: 'dfjson',
+        optimizeCount?: boolean
     ): Promise<Buffer>;
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true,
-        format?: 'json' | 'dfjson'
+        format?: 'json' | 'dfjson',
+        optimizeCount?: boolean
     ): Promise<SearchResult>;
     async _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean,
-        format?: 'json' | 'dfjson'
+        format?: 'json' | 'dfjson',
+        optimizeCount?: boolean
     ): Promise<DataEntity[] | SearchResult | Buffer> {
-        const searchQuery = this.translateSearchQuery(query);
+        const searchQuery = this.translateSearchQuery(query, optimizeCount);
         if (fullResponse) {
             if (format === 'dfjson') {
                 return this.makeRequest(searchQuery, format);
@@ -352,7 +363,9 @@ export class SpacesReaderClient implements ReaderClient {
 
     async count(queryConfig: ClientParams.SearchParams): Promise<number> {
         queryConfig.size = 0;
-        const spaceResults = await this._searchRequest(queryConfig, true);
+        const spaceResults = await this._searchRequest(
+            queryConfig, true, undefined, this.config.optimizeCount
+        );
         return spaceResults.total;
     }
 

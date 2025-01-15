@@ -68,7 +68,8 @@ describe('Spaces Reader Client', () => {
 
     describe('when given a simple request', () => {
         const client = newClient({
-            query: 'foo:bar'
+            query: 'foo:bar',
+            includeTotals: true
         });
         let query: ClientParams.SearchParams;
 
