@@ -365,7 +365,6 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
-    optimizeCount?: boolean;
     includeTotals?: boolean | 'number';
 }
 
