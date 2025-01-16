@@ -367,10 +367,6 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     caCertificate?: string;
     optimizeCount?: boolean;
     includeTotals?: boolean | 'number';
-    clientMetadata?: {
-        version?: number;
-        distribution?: ElasticsearchDistribution;
-    };
 }
 
 export interface DetermineSliceResults {

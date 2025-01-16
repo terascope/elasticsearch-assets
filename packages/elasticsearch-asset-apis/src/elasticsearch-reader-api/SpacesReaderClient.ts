@@ -361,10 +361,6 @@ export class SpacesReaderClient implements ReaderClient {
     */
     async verify(): Promise<void> {}
 
-    getESDistribution() {
-        return this.config.clientMetadata?.distribution || ElasticsearchDistribution.elasticsearch;
-    }
-
     async getSettings(_index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {
         const { index, endpoint, token } = this.config;
         const uri = `${endpoint}/${index}/_info`;

@@ -50,11 +50,7 @@ describe('Spaces Reader Client', () => {
             connection: 'default',
             interval: '1m',
             delay: '30s',
-            ...overrides,
-            clientMetadata: {
-                version: 6,
-                distribution: ElasticsearchDistribution.elasticsearch
-            }
+            ...overrides
         }, logger);
     }
 
