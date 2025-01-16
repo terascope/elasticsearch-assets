@@ -160,7 +160,7 @@ export class SpacesReaderClient implements ReaderClient {
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
                     for (const [key, qConfig] of Object.entries(queryAction)) {
-                        if (isKey(queryOptions, key)) {
+                        if (isKey(queryOptions, key) && queryOptions[key]) {
                             const queryFn = queryOptions[key];
                             let queryStr = queryFn(qConfig as Record<string, string>);
                             if (key !== 'range') queryStr = `(${queryStr})`;
