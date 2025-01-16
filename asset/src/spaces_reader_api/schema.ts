@@ -6,7 +6,6 @@ import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
 import { schema } from '../elasticsearch_reader_api/schema.js';
 import { DEFAULT_API_NAME } from './interfaces.js';
-import { ElasticsearchDistribution } from '@terascope/types';
 
 const clone = cloneDeep(schema);
 
@@ -46,10 +45,10 @@ const apiSchema = {
         format: String
     },
     includeTotals: {
-        doc: `Fetch total count in queries. The to 'false' will turn off calculation. `
-            + `Some clients support setting to a fixed integer to limit the count up to that number `
-            + `then stop... set to 'number' to count up to the slice size then stop. `
-            + 'This can be used to achieve faster query execution.',
+        doc: 'By default, data fetching is optimized by disabling total count calculation to achieve '
+            + 'faster query execution. If you require total counts in your queries set this value to true '
+            + `Some endpoints support setting to a fixed integer to limit the count up to that number then `
+            + `stop... set to 'number' to count up to the query or slice size then stop. `,
         default: false,
         format(val: unknown) {
             if (val === 'number' || typeof val !== 'number') return;
@@ -60,11 +59,6 @@ const apiSchema = {
         doc: 'Whether to direct the request to an optimized API',
         default: undefined,
         format: Boolean
-    },
-    clientMetadata: {
-        doc: 'Additional information if not using Elasticsearch 6',
-        default: { version: 6, distribution: ElasticsearchDistribution.elasticsearch },
-        format: Object
     },
 };
 

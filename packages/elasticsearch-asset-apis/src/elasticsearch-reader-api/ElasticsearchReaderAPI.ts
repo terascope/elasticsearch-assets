@@ -6,7 +6,7 @@ import {
     isString, isWildCardString, matchWildcard,
     pRetry, toIntegerOrThrow,
 } from '@terascope/utils';
-import { ClientParams, ClientResponse } from '@terascope/types';
+import { ClientParams, ClientResponse, IndicesIndexSettings } from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
@@ -662,21 +662,17 @@ export class ElasticsearchReaderAPI {
     private async getIndexDate(date: string | null | undefined, order: string): Promise<FetchDate> {
         // we have a date, parse and return it
         if (date) return parseDate(date);
+
         // we are in auto, so we determine each part
-        const sortOrder = order === 'start' ? 'asc' : 'desc';
-        const sortObj = {
-            [this.config.date_field_name]: { order: sortOrder }
-        };
-
-        sortObj[this.config.date_field_name] = { order: sortOrder };
-
         const query: AnyObject = {
             index: this.config.index,
             size: 1,
             body: {
-                sort: [
-                    sortObj
-                ]
+                sort: [{
+                    [this.config.date_field_name]: {
+                        order: order === 'start' ? 'asc' : 'desc'
+                    }
+                }]
             }
         };
 
@@ -726,8 +722,8 @@ export class ElasticsearchReaderAPI {
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
-                const defaultPath = configs.defaults![window];
-                const configPath = configs.settings![window];
+                const defaultPath = (configs.defaults as IndicesIndexSettings)[window];
+                const configPath = (configs.settings as IndicesIndexSettings)[window];
                 // config goes first as it overrides an defaults
                 if (configPath) return toIntegerOrThrow(configPath);
                 if (defaultPath) return toIntegerOrThrow(defaultPath);
@@ -737,8 +733,8 @@ export class ElasticsearchReaderAPI {
         return this.config.size;
     }
 
-    get version(): number {
-        return this.client.getESVersion();
+    get version(): number | undefined {
+        return this.client.getESVersion?.();
     }
 
     async verifyIndex(): Promise<void> {

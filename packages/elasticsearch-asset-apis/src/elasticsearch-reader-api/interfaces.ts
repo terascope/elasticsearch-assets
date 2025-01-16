@@ -62,7 +62,7 @@ export interface ReaderClient {
      * Gets the elasticsearch major server version,
      * this will be used to format the search parameters
     */
-    getESVersion(): number;
+    getESVersion?(): number;
 
     /**
      * Verify that the cluster is up,

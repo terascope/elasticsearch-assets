@@ -132,10 +132,7 @@ export class SpacesReaderClient implements ReaderClient {
         return response.body;
     }
 
-    protected translateSearchQuery(
-        queryConfig: ClientParams.SearchParams,
-        optimizeCount?: boolean
-    ): AnyObject {
+    protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
         const { config } = this;
 
         const size = queryConfig?.size ?? config.size;
@@ -197,8 +194,7 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                track_total_hits: trackTotalHits,
-                ...optimizeCount && { __is_count: optimizeCount }
+                track_total_hits: trackTotalHits
             });
         }
 
@@ -268,14 +264,10 @@ export class SpacesReaderClient implements ReaderClient {
             trackTotalHits = config.includeTotals;
         }
         if (config.includeTotals === 'number') {
-            if (this.getESDistribution() === ElasticsearchDistribution.elasticsearch
-                && this.getESVersion() <= 6) {
-                this.logger.info(`Unable to optimize total hits as integer on ${this.config.index}, keeping true`);
-            } else {
-                trackTotalHits = size + 1;
-            }
+            trackTotalHits = size + 1;
         }
-        if (size === 0 && !optimizeCount) {
+        if (size === 0) {
+            // in case client uses a search API instead of count API
             trackTotalHits = true;
         }
 
@@ -332,22 +324,19 @@ export class SpacesReaderClient implements ReaderClient {
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true,
-        format: 'dfjson',
-        optimizeCount?: boolean
+        format: 'dfjson'
     ): Promise<Buffer>;
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true,
-        format?: 'json' | 'dfjson',
-        optimizeCount?: boolean
+        format?: 'json' | 'dfjson'
     ): Promise<SearchResult>;
     async _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean,
-        format?: 'json' | 'dfjson',
-        optimizeCount?: boolean
+        format?: 'json' | 'dfjson'
     ): Promise<DataEntity[] | SearchResult | Buffer> {
-        const searchQuery = this.translateSearchQuery(query, optimizeCount);
+        const searchQuery = this.translateSearchQuery(query);
         if (fullResponse) {
             if (format === 'dfjson') {
                 return this.makeRequest(searchQuery, format);
@@ -363,9 +352,7 @@ export class SpacesReaderClient implements ReaderClient {
 
     async count(queryConfig: ClientParams.SearchParams): Promise<number> {
         queryConfig.size = 0;
-        const spaceResults = await this._searchRequest(
-            queryConfig, true, undefined, this.config.optimizeCount
-        );
+        const spaceResults = await this._searchRequest(queryConfig, true);
         return spaceResults.total;
     }
 
@@ -373,10 +360,6 @@ export class SpacesReaderClient implements ReaderClient {
      * @todo this should verify the endpoint is valid
     */
     async verify(): Promise<void> {}
-
-    getESVersion(): number {
-        return this.config.clientMetadata?.version ?? 6;
-    }
 
     getESDistribution() {
         return this.config.clientMetadata?.distribution || ElasticsearchDistribution.elasticsearch;
