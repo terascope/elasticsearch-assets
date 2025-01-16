@@ -2,6 +2,7 @@ import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
     AnyObject, withoutNil, DataEntity,
+    isKey,
 } from '@terascope/utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -159,9 +160,9 @@ export class SpacesReaderClient implements ReaderClient {
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
                     for (const [key, qConfig] of Object.entries(queryAction)) {
-                        const queryFn = queryOptions[key];
-                        if (queryFn) {
-                            let queryStr = queryFn(qConfig);
+                        if (isKey(queryOptions, key) && queryOptions[key]) {
+                            const queryFn = queryOptions[key];
+                            let queryStr = queryFn(qConfig as Record<string, string>);
                             if (key !== 'range') queryStr = `(${queryStr})`;
 
                             if (luceneQuery.length) {

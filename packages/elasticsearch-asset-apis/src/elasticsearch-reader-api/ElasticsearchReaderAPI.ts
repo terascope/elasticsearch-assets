@@ -4,9 +4,13 @@ import {
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow,
+    pRetry, toIntegerOrThrow, isKey,
 } from '@terascope/utils';
-import { ClientParams, ClientResponse } from '@terascope/types';
+import {
+    ClientParams, ClientResponse,
+    IndicesIndexSettings,
+    IndicesIndexStatePrefixedSettings
+} from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
 import { DataTypeConfig } from '@terascope/data-types';
 import moment from 'moment';
@@ -663,7 +667,7 @@ export class ElasticsearchReaderAPI {
         // we have a date, parse and return it
         if (date) return parseDate(date);
         // we are in auto, so we determine each part
-        const sortObj = {};
+        const sortObj: Record<string, { order: 'asc' | 'desc' }> = {};
         const sortOrder = order === 'start' ? 'asc' : 'desc';
 
         sortObj[this.config.date_field_name] = { order: sortOrder };
@@ -711,12 +715,39 @@ export class ElasticsearchReaderAPI {
     }
 
     /**
+     * Typeguard to differentiate IndicesIndexSettings
+     * from IndicesIndexStatePrefixedSettings
+     */
+    private _isIndicesIndexStatePrefixedSettings(
+        input: unknown
+    ): input is IndicesIndexStatePrefixedSettings {
+        if (!isObject(input)) return false;
+        if (isKey(input as object, 'index')) return true;
+
+        return false;
+    }
+
+    private _getMaxResultWindowFromSettings(
+        settings: IndicesIndexSettings | IndicesIndexStatePrefixedSettings | undefined
+    ) {
+        const window = 'index.max_result_window';
+        let windowSize;
+        if (settings) {
+            if (!this._isIndicesIndexStatePrefixedSettings(settings)) {
+                windowSize = settings[window];
+            } else {
+                windowSize = settings.index[window];
+            }
+        }
+        return windowSize;
+    }
+
+    /**
      * This used verify the index.max_result_window size
      * will be big enough to fix the within the requested
      * slice size
     */
     async getWindowSize(): Promise<number> {
-        const window = 'index.max_result_window';
         const { index } = this.config;
 
         const settings = await this.getSettings(index);
@@ -724,8 +755,9 @@ export class ElasticsearchReaderAPI {
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
-                const defaultPath = configs.defaults![window];
-                const configPath = configs.settings![window];
+                const defaultPath = this._getMaxResultWindowFromSettings(configs.defaults);
+                const configPath = this._getMaxResultWindowFromSettings(configs.settings);
+
                 // config goes first as it overrides an defaults
                 if (configPath) return toIntegerOrThrow(configPath);
                 if (defaultPath) return toIntegerOrThrow(defaultPath);

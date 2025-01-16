@@ -1,4 +1,4 @@
-import { times, toIntegerOrThrow } from '@terascope/utils';
+import { isKey, times, toIntegerOrThrow } from '@terascope/utils';
 import moment from 'moment';
 import fs from 'node:fs';
 // @ts-expect-error
@@ -11,7 +11,7 @@ import {
 } from '../interfaces.js';
 
 export function dateOptions(value: string): moment.unitOfTime.Base {
-    const options = {
+    const options: Record<string, moment.unitOfTime.Base> = {
         year: 'y',
         years: 'y',
         y: 'y',
@@ -46,7 +46,7 @@ export function dateOptions(value: string): moment.unitOfTime.Base {
         ms: 'ms'
     };
 
-    if (options[value]) {
+    if (isKey(options, value)) {
         return options[value];
     }
 
@@ -120,7 +120,7 @@ export function existsSync(filename: string): boolean {
     }
 }
 
-export function getMilliseconds(interval: any[]): number {
+export function getMilliseconds(interval: [number, string]): number {
     const conversions = {
         d: 86400000,
         h: 3600000,
@@ -129,7 +129,7 @@ export function getMilliseconds(interval: any[]): number {
         ms: 1
     };
 
-    return interval[0] * conversions[interval[1]];
+    return interval[0] * conversions[interval[1] as keyof typeof conversions];
 }
 
 export function parseDate(date: string): moment.Moment {
