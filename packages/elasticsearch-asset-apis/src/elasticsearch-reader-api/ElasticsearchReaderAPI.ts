@@ -752,7 +752,6 @@ export class ElasticsearchReaderAPI {
 
         const settings = await this.getSettings(index);
         const matcher = indexMatcher(index);
-        console.log('@@@@ settings: ', settings);
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
