@@ -18,7 +18,7 @@ export class WindowState {
     }
 
     private _checkState(value: boolean) {
-        return this._windowState.values().every((meta) => meta.hasCalled === value);
+        return Array.from(this._windowState.values()).every((meta) => meta.hasCalled === value);
     }
 
     /**
