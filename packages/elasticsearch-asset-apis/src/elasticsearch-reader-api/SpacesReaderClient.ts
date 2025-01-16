@@ -4,7 +4,7 @@ import {
     AnyObject, withoutNil, DataEntity,
     isBoolean, isKey,
 } from '@terascope/utils';
-import { ClientParams, ClientResponse, ElasticsearchDistribution } from '@terascope/types';
+import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
 import got, {
     OptionsOfJSONResponseBody, Response, TimeoutError, RequestError

@@ -3,7 +3,7 @@ import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
 import type { EventEmitter } from 'node:events';
 import type {
     DataTypeConfig, xLuceneVariables, ClientParams,
-    ClientResponse, ElasticsearchDistribution
+    ClientResponse
 } from '@terascope/types';
 import type { WindowState } from './WindowState.js';
 

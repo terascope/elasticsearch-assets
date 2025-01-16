@@ -1,6 +1,6 @@
 import { DataFrame } from '@terascope/data-mate';
 import {
-    DataTypeConfig, ElasticsearchDistribution, FieldType,
+    DataTypeConfig, FieldType,
     ClientParams, SearchParams
 } from '@terascope/types';
 import { debugLogger } from '@terascope/utils';
