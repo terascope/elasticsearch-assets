@@ -1,9 +1,6 @@
-import { AnyObject, GeoPoint, ClientParams } from '@terascope/types';
+import { AnyObject, GeoPoint, ClientParams, GeoQuery } from '@terascope/types';
 import { isString, parseGeoPoint } from '@terascope/utils';
-import {
-    ESReaderOptions, GeoBoundingBoxQuery,
-    GeoDistanceQuery, ReaderSlice
-} from './interfaces.js';
+import { ESReaderOptions, ReaderSlice } from './interfaces.js';
 
 /**
  * Build the elasticsearch DSL query
@@ -177,11 +174,11 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
         const topLeft = parseGeoPoint(geoBoxTopLeft);
         const bottomRight = parseGeoPoint(geoBoxBottomRight as string);
 
-        const searchQuery: GeoBoundingBoxQuery = {
+        const searchQuery: GeoQuery = {
             geo_bounding_box: {},
         };
 
-        searchQuery.geo_bounding_box[opConfig.geo_field as string] = {
+        searchQuery.geo_bounding_box![opConfig.geo_field as string] = {
             top_left: {
                 lat: topLeft.lat,
                 lon: topLeft.lon,
@@ -203,13 +200,13 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
 
     if (geoDistance) {
         const location = parseGeoPoint(geoPoint as string);
-        const searchQuery: GeoDistanceQuery = {
+        const searchQuery: GeoQuery = {
             geo_distance: {
                 distance: geoDistance,
             },
         };
 
-        searchQuery.geo_distance[opConfig.geo_field as string] = {
+        searchQuery.geo_distance![opConfig.geo_field as string] = {
             lat: location.lat,
             lon: location.lon,
         };
