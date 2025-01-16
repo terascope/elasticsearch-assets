@@ -4,11 +4,11 @@ import {
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow, isPlainObject,
-    isKey,
+    pRetry, toIntegerOrThrow, isKey,
 } from '@terascope/utils';
 import {
     ClientParams, ClientResponse,
+    IndicesIndexSettings,
     IndicesIndexStatePrefixedSettings
 } from '@terascope/types';
 import { DataFrame } from '@terascope/data-mate';
@@ -721,10 +721,25 @@ export class ElasticsearchReaderAPI {
     private _isIndicesIndexStatePrefixedSettings(
         input: unknown
     ): input is IndicesIndexStatePrefixedSettings {
-        if (!isPlainObject(input)) return false;
+        if (!isObject(input)) return false;
         if (isKey(input as object, 'index')) return true;
 
         return false;
+    }
+
+    private _getMaxResultWindowFromSettings(
+        settings: IndicesIndexSettings | IndicesIndexStatePrefixedSettings | undefined
+    ) {
+        const window = 'index.max_result_window';
+        let windowSize;
+        if (settings) {
+            if (!this._isIndicesIndexStatePrefixedSettings(settings)) {
+                windowSize = settings[window];
+            } else {
+                windowSize = settings.index[window];
+            }
+        }
+        return windowSize;
     }
 
     /**
@@ -733,28 +748,16 @@ export class ElasticsearchReaderAPI {
      * slice size
     */
     async getWindowSize(): Promise<number> {
-        const window = 'index.max_result_window';
         const { index } = this.config;
 
         const settings = await this.getSettings(index);
         const matcher = indexMatcher(index);
+        console.log('@@@@ settings: ', settings);
 
         for (const [key, configs] of Object.entries(settings)) {
             if (matcher(key)) {
-                let defaultPath: number | undefined = undefined;
-                let configPath: number | undefined = undefined;
-
-                if (configs.defaults
-                    && !this._isIndicesIndexStatePrefixedSettings(configs.defaults)
-                ) {
-                    defaultPath = configs.defaults[window];
-                }
-
-                if (configs.settings
-                    && !this._isIndicesIndexStatePrefixedSettings(configs.settings)
-                ) {
-                    configPath = configs.settings![window];
-                }
+                const defaultPath = this._getMaxResultWindowFromSettings(configs.defaults);
+                const configPath = this._getMaxResultWindowFromSettings(configs.settings);
 
                 // config goes first as it overrides an defaults
                 if (configPath) return toIntegerOrThrow(configPath);
