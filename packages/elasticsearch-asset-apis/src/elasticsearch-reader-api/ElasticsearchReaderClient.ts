@@ -31,11 +31,10 @@ export class ElasticsearchReaderClient implements ReaderClient {
         });
     }
 
-    async count(query: ClientParams.SearchParams | ClientParams.CountParams): Promise<number> {
-        // this internally could do a search request with size=0 or
-        // a count request depending on the client
+    async count(query: ClientParams.SearchParams): Promise<number> {
+        // this internally does a search request with size=0
         // I think the types a wrong
-        return this.client.count(query);
+        return this.client.count(query as any);
     }
 
     search(
@@ -110,7 +109,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
     }
 
     async verify(): Promise<void> {
-        // this method in api is badly named
+        // this is method in api is badly named
         await this.client.version();
     }
 
