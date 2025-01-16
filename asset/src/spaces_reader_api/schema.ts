@@ -54,12 +54,7 @@ const apiSchema = {
             if (val === 'number' || typeof val !== 'number') return;
             throw new Error(`Invalid parameter includeTotals, must be a boolean or string 'number', got ${getTypeOf(val)}`);
         }
-    },
-    optimizeCount: {
-        doc: 'Whether to direct the request to an optimized API',
-        default: undefined,
-        format: Boolean
-    },
+    }
 };
 
 const spacesSchema = Object.assign({}, clone, apiSchema) as AnyObject;

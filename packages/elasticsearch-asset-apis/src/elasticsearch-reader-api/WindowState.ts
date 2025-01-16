@@ -9,16 +9,16 @@ interface WindowMeta {
  * This is used track the slicer state when running persistent mode
 */
 export class WindowState {
-    _windowState: Record<number, WindowMeta> = {};
+    _windowState = new Map<number, WindowMeta>();
 
     constructor(numOfSlicers: number) {
         times(numOfSlicers, (id) => {
-            this._windowState[id] = { hasCalled: false, canRestart: false };
+            this._windowState.set(id, { hasCalled: false, canRestart: false });
         });
     }
 
     private _checkState(value: boolean) {
-        return Object.values(this._windowState).every((meta) => meta.hasCalled === value);
+        return Array.from(this._windowState.values()).every((meta) => meta.hasCalled === value);
     }
 
     /**
@@ -28,16 +28,19 @@ export class WindowState {
      * processing
     */
     checkin(id: number): boolean {
-        const meta = this._windowState[id];
+        const meta = this._windowState.get(id);
+        if (!meta) {
+            throw new Error(`Window metadata for id ${id} is not defined`);
+        }
         let bool = false;
         meta.hasCalled = true;
 
         const allDone = this._checkState(true);
 
         if (allDone) {
-            for (const key of Object.keys(this._windowState)) {
-                this._windowState[key].canRestart = true;
-                this._windowState[key].hasCalled = false;
+            for (const value of this._windowState.values()) {
+                value.canRestart = true;
+                value.hasCalled = false;
             }
         }
 

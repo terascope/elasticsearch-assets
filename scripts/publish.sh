@@ -9,7 +9,7 @@ check_deps() {
 
 publish() {
     local dryRun="$1"
-    local name tag targetVersion currentVersion isPrivate
+    local name targetVersion currentVersion isPrivate
 
     name="$(jq -r '.name' package.json)"
     isPrivate="$(jq -r '.private' package.json)"
@@ -26,8 +26,7 @@ publish() {
         echo "$name@$currentVersion -> $targetVersion"
 
         if [ "$dryRun" == "false" ]; then
-            yarn npm publish \
-                --tag "$tag"
+            yarn npm publish
         fi
     else
         echo "Not publishing:"
