@@ -19,7 +19,7 @@ export class DateReaderAPISlicer extends ParallelSlicer<ESDateConfig> {
         // NOTE ORDER MATTERS
         // a parallel slicer initialize calls newSlicer multiple times
         // need to make api before newSlicer is called
-        const apiName = this.opConfig.api_name;
+        const apiName = this.opConfig.api_name as string;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
 

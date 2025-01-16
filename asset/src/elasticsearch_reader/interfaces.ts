@@ -3,6 +3,7 @@ import { ESReaderOptions, SpacesAPIConfig } from '@terascope/elasticsearch-asset
 
 export interface ESReaderConfig extends ESReaderOptions, OpConfig {
     api_name: string;
+    connection: string;
 }
 
 export type ESDateConfig = ESReaderConfig | SpacesAPIConfig;

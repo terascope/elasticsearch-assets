@@ -8,7 +8,7 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
     api!: ElasticsearchReaderAPI;
 
     async initialize(): Promise<void> {
-        const apiName = this.opConfig.api_name;
+        const apiName = this.opConfig.api_name as string;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
         await super.initialize();
