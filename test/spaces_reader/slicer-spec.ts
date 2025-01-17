@@ -188,7 +188,7 @@ describe('spaces_reader slicer', () => {
                 q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
                 size: 0,
                 variables,
-                trackTotalHits: true
+                track_total_hits: true
             };
 
             scope.get(`/${testIndex}/_info?token=${token}`)

@@ -666,19 +666,17 @@ export class ElasticsearchReaderAPI {
     private async getIndexDate(date: string | null | undefined, order: string): Promise<FetchDate> {
         // we have a date, parse and return it
         if (date) return parseDate(date);
+
         // we are in auto, so we determine each part
-        const sortObj: Record<string, { order: 'asc' | 'desc' }> = {};
-        const sortOrder = order === 'start' ? 'asc' : 'desc';
-
-        sortObj[this.config.date_field_name] = { order: sortOrder };
-
         const query: AnyObject = {
             index: this.config.index,
             size: 1,
             body: {
-                sort: [
-                    sortObj
-                ]
+                sort: [{
+                    [this.config.date_field_name]: {
+                        order: order === 'start' ? 'asc' : 'desc'
+                    }
+                }]
             }
         };
 
@@ -767,8 +765,8 @@ export class ElasticsearchReaderAPI {
         return this.config.size;
     }
 
-    get version(): number {
-        return this.client.getESVersion();
+    get version(): number | undefined {
+        return this.client.getESVersion?.();
     }
 
     async verifyIndex(): Promise<void> {
