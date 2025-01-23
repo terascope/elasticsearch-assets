@@ -6,8 +6,8 @@ import elasticAPI from '@terascope/elasticsearch-api';
 import {
     TEST_INDEX_PREFIX, waitForData, cleanupIndex,
     fetch, makeClient
-} from '../test/helpers/index.js';
-import { createElasticsearchBulkSender } from '../src/elasticsearch-bulk-sender/index.js';
+} from '../helpers/index.js';
+import { createElasticsearchBulkSender } from '../../src/elasticsearch-bulk-sender/index.js';
 
 describe('elasticsearch bulk sender module', () => {
     const META_ROUTE = 'standard:route';

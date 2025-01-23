@@ -1,11 +1,6 @@
 import 'jest-extended';
 import { EventEmitter } from 'node:events';
-import {
-    AnyObject,
-    debugLogger,
-    times,
-    pDelay,
-} from '@terascope/utils';
+import { debugLogger, times, pDelay } from '@terascope/utils';
 import moment from 'moment';
 import {
     WindowState, SlicerArgs, ParsedInterval,
@@ -19,7 +14,7 @@ interface TestConfig {
     slicers?: number;
     lifecycle?: 'once' | 'persistent';
     id?: number;
-    config?: AnyObject;
+    config?: Record<string, any>;
     client?: MockClient;
     interval: ParsedInterval;
     latencyInterval?: ParsedInterval;
@@ -60,6 +55,7 @@ describe('date slicer function', () => {
         if (lifecycle === 'persistent') {
             if (!primaryRange || !latencyInterval) throw new Error('Invalid test config');
         }
+
         const readerConfig = {
             time_resolution: timeResolution,
             size: 1000,

@@ -403,7 +403,8 @@ export class ElasticsearchReaderAPI {
             baseKeyArray,
             startingKeyDepth: this.config.starting_key_depth,
             countFn: this.count,
-            size
+            size,
+            keyType: this.config.key_type
         };
 
         if (recoveryData && recoveryData.length > 0) {

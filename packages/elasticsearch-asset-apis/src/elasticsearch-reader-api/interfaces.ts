@@ -192,6 +192,7 @@ export interface IDSlicerArgs {
     startingKeyDepth: number;
     countFn: CountFn;
     size: number;
+    keyType: IDType;
 }
 
 export type RecoveryData = {

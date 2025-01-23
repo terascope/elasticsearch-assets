@@ -261,7 +261,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             baseKeyArray: keyArray,
             countFn,
             size: querySize,
-            startingKeyDepth
+            startingKeyDepth,
+            keyType
         };
 
         const idSlicers = idSlicer(idSlicerArs);
