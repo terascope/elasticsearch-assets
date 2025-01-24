@@ -3,4 +3,5 @@ import { ElasticsearchAPISenderConfig } from '../elasticsearch_sender_api/interf
 
 export interface ElasticsearchBulkConfig extends ElasticsearchAPISenderConfig, Omit<OpConfig, 'connection'> {
     api_name: string;
+    connection: string;
 }

@@ -1,8 +1,11 @@
 import { DataFrame } from '@terascope/data-mate';
-import { DataTypeConfig, FieldType, ClientParams } from '@terascope/types';
+import {
+    DataTypeConfig, FieldType,
+    ClientParams, SearchParams
+} from '@terascope/types';
 import { debugLogger } from '@terascope/utils';
 import 'jest-extended';
-import nock from 'nock';
+import nock, { RequestBodyMatcher } from 'nock';
 import {
     buildQuery,
     FetchResponseType,
@@ -47,7 +50,7 @@ describe('Spaces Reader Client', () => {
             connection: 'default',
             interval: '1m',
             delay: '30s',
-            ...overrides,
+            ...overrides
         }, logger);
     }
 
@@ -61,7 +64,8 @@ describe('Spaces Reader Client', () => {
 
     describe('when given a simple request', () => {
         const client = newClient({
-            query: 'foo:bar'
+            query: 'foo:bar',
+            includeTotals: true
         });
         let query: ClientParams.SearchParams;
 
@@ -72,15 +76,20 @@ describe('Spaces Reader Client', () => {
         });
 
         it('should be able to make a search request without use data frames', async () => {
-            scope.post(`/${index}?token=${token}`, {
+            const params: SearchParams = {
                 q: '(foo:bar)',
                 size: 100,
-                trackTotalHits: true
-            }).reply(200, {
-                results: [{ foo: 'foo', bar: 'bar', byte: 10 }],
-                returning: 1,
-                total: 1000
-            });
+                track_total_hits: true
+            };
+            scope.post(
+                `/${index}?token=${token}`,
+                params as RequestBodyMatcher
+            ).reply(
+                200, {
+                    results: [{ foo: 'foo', bar: 'bar', byte: 10 }],
+                    returning: 1,
+                    total: 1000
+                });
 
             const result = await client.search(query, FetchResponseType.data_entities);
             expect(result).toEqual([
@@ -101,11 +110,17 @@ describe('Spaces Reader Client', () => {
                 }
             );
 
-            scope.post(`/${index}?token=${token}&format=dfjson`, {
+            const params: SearchParams = {
                 q: '(foo:bar)',
                 size: 100,
-                trackTotalHits: true
-            }).reply(200, frame.serialize());
+                track_total_hits: true
+            };
+            scope.post(
+                `/${index}?token=${token}&format=dfjson`,
+                params as RequestBodyMatcher
+            ).reply(
+                200, frame.serialize()
+            );
 
             const result = await client.search(
                 query,

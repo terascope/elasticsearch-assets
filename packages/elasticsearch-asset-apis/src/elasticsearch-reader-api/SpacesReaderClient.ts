@@ -2,6 +2,7 @@ import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
     AnyObject, withoutNil, DataEntity,
+    isBoolean, isKey,
 } from '@terascope/utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -134,6 +135,8 @@ export class SpacesReaderClient implements ReaderClient {
     protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
         const { config } = this;
 
+        const size = queryConfig?.size ?? config.size;
+
         const fields = get(queryConfig, '_source', null) as string[] | null;
 
         const dateFieldName = this.config.date_field_name;
@@ -145,8 +148,8 @@ export class SpacesReaderClient implements ReaderClient {
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray: null | any[]): AnyObject {
-            const queryOptions = {
+        function parseQueryConfig(mustArray: null | any[], trackTotalHits?: any): AnyObject {
+            const queryOptions: Record<string, (op: any) => string> = {
                 query_string: _parseEsQ,
                 range: _parseDate,
                 wildcard: _parseWildCard,
@@ -159,9 +162,9 @@ export class SpacesReaderClient implements ReaderClient {
             if (mustArray) {
                 mustArray.forEach((queryAction) => {
                     for (const [key, qConfig] of Object.entries(queryAction)) {
-                        const queryFn = queryOptions[key];
-                        if (queryFn) {
-                            let queryStr = queryFn(qConfig);
+                        if (isKey(queryOptions, key) && queryOptions[key]) {
+                            const queryFn = queryOptions[key];
+                            let queryStr = queryFn(qConfig as Record<string, string>);
                             if (key !== 'range') queryStr = `(${queryStr})`;
 
                             if (luceneQuery.length) {
@@ -187,17 +190,11 @@ export class SpacesReaderClient implements ReaderClient {
                 });
             }
 
-            let { size } = queryConfig;
-
-            if (size == null) {
-                ({ size } = config);
-            }
-
             return Object.assign({}, geoQuery, sortQuery, fieldsQuery, {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                trackTotalHits: true
+                track_total_hits: trackTotalHits
             });
         }
 
@@ -261,7 +258,20 @@ export class SpacesReaderClient implements ReaderClient {
             return `(${terms.join(' OR ')})`;
         }
 
-        return parseQueryConfig(mustQuery);
+        let trackTotalHits: boolean | number = false;
+
+        if (isBoolean(config.includeTotals)) {
+            trackTotalHits = config.includeTotals;
+        }
+        if (config.includeTotals === 'number') {
+            trackTotalHits = size + 1;
+        }
+        if (size === 0) {
+            // in case client uses a search API instead of count API
+            trackTotalHits = true;
+        }
+
+        return parseQueryConfig(mustQuery, trackTotalHits);
     }
 
     async getDataType(): Promise<DataTypeConfig> {
@@ -350,10 +360,6 @@ export class SpacesReaderClient implements ReaderClient {
      * @todo this should verify the endpoint is valid
     */
     async verify(): Promise<void> {}
-
-    getESVersion(): number {
-        return 6;
-    }
 
     async getSettings(_index: string): Promise<ClientResponse.IndicesGetSettingsResponse> {
         const { index, endpoint, token } = this.config;

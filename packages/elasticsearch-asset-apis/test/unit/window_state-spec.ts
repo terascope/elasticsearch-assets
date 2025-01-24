@@ -6,7 +6,7 @@ describe('WindowState', () => {
         const numOfSlicers = 3;
         const state = new WindowState(numOfSlicers);
 
-        expect(Object.keys(state._windowState)).toBeArrayOfSize(numOfSlicers);
+        expect(state._windowState.size).toBe(numOfSlicers);
         expect(state.checkin).toBeFunction();
     });
 

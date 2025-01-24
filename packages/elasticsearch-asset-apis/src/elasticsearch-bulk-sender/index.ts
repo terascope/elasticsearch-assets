@@ -1,5 +1,5 @@
 import elasticAPI from '@terascope/elasticsearch-api';
-import { isNil, isPlainObject, isString } from '@terascope/utils';
+import { isKey, isNil, isPlainObject, isString } from '@terascope/utils';
 import { ElasticsearchBulkSender } from './ElasticsearchBulkSender.js';
 import { ElasticsearchSenderConfig } from './interfaces.js';
 
@@ -33,7 +33,7 @@ function validateConfig(input: unknown): ElasticsearchSenderConfig {
     const actionSet = new Set();
     // only one of these should be set to true at a time
     ['delete', 'create', 'update', 'index', 'upsert'].forEach((key: string) => {
-        if (config[key] === true) actionSet.add(key);
+        if (isKey(config, key) && config[key] === true) actionSet.add(key);
         if (actionSet.size > 1) {
             const actions = Array.from(actionSet).join(', ');
             const msg = `Invalid parameters, only one of "${actions}" may be set at a time`;
