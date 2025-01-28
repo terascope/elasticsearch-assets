@@ -44,17 +44,11 @@ const apiSchema = {
         default: undefined,
         format: String
     },
-    includeTotals: {
-        doc: 'By default, data fetching is optimized by disabling total count calculation to achieve '
-            + 'faster query execution. If you require total counts in your queries set this value to true '
-            + `Some endpoints support setting to a fixed integer to limit the count up to that number then `
-            + `stop... set to 'number' to count up to the query or slice size then stop. `,
-        default: false,
-        format(val: unknown) {
-            if (val === 'number' || typeof val !== 'number') return;
-            throw new Error(`Invalid parameter includeTotals, must be a boolean or string 'number', got ${getTypeOf(val)}`);
-        }
-    }
+    total_optimization: {
+        doc: 'Setting to true will change the readers and slicers to stop tracking total hits for counts and fetches',
+        default: true,
+        format: Boolean
+    },
 };
 
 const spacesSchema = Object.assign({}, clone, apiSchema) as AnyObject;

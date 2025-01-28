@@ -25,18 +25,15 @@ export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerRes
         genResponse: boolean | number,
         rangeObj?: ReaderSlice
     ): Promise<IDSlicerResults> {
-        console.log('what is going in', genResponse)
         const data = generator.next(genResponse);
-        console.log('what is data coming out', data)
         if (data.done) return null;
 
         async function getKeySlice(esQuery: ReaderSlice): Promise<IDSlicerResults> {
             const count = await countFn(esQuery);
-            console.log('check', count > size, count, size)
+
             if (count > size) {
                 events.emit('slicer:slice:recursion');
                 const ratio = createRatio(count);
-                console.log('what is ratio', ratio)
                 return determineKeySlice(generator, ratio, rangeObj);
             }
 
@@ -132,7 +129,7 @@ export function* recurse(
     for (const key of baseArray) {
         const newStr = str + key;
         const resp = yield newStr;
-        console.log('resp recurse', resp)
+
         // false == go deeper, true == all done, number = split keys
         if (resp === false) {
             yield * recurse(baseArray, newStr, keyType);
@@ -150,15 +147,12 @@ export function* splitKeys(
     keyType: IDType,
     ratio: number
 ): KeyGenerator {
-    console.log('should be in splitKeys')
-
     let isLimitOfSplitting = false;
     const tracker = new SplitKeyTracker(keyType);
     let isDone = false;
 
     while (!isDone) {
         const split = tracker.split(ratio);
-        console.log('should be in splitKeys 2', split)
 
         if (split.length === 0) {
             isDone = true;
@@ -170,7 +164,6 @@ export function* splitKeys(
         }
 
         const response = yield `${str}[${split}]`;
-        console.log('should be in splitKeys 3', response)
 
         if (isNumber(response)) {
             if (isLimitOfSplitting) {
@@ -253,7 +246,6 @@ export function createRatioFP(size: number, arrayLength: number) {
             return false;
         }
         const ratio = Math.floor(arrayLength * (size / count));
-        console.log('computed ratio', (size / count), ratio, limit)
         // if we cant even group by two then there is nothing to be gained
         // over the regular recurse calling
         if (ratio <= 1) {

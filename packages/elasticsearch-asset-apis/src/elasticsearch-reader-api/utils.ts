@@ -4,8 +4,6 @@ import { ESReaderOptions, ReaderSlice } from './interfaces.js';
 
 /**
  * Build the elasticsearch DSL query
- *
- * @todo this should be switch to return an xLucene query
 */
 export function buildQuery(
     opConfig: ESReaderOptions, params: ReaderSlice
@@ -18,6 +16,20 @@ export function buildQuery(
         size: params.count,
         body: _buildRangeQuery(opConfig, params),
     };
+
+    if (opConfig.total_optimization) {
+        // let trackCount = countIsLimit ? opConfig.size : params.count;
+        let trackCount: number | boolean = false;
+
+        if (params.count === 0) {
+            trackCount = opConfig.size + 1;
+        }
+
+        query.track_total_hits = trackCount;
+    } else {
+        query.track_total_hits = true;
+    }
+
     // TODO: fix _source reference in @terascope/types
     if (opConfig.fields) query._source = opConfig.fields as any;
 

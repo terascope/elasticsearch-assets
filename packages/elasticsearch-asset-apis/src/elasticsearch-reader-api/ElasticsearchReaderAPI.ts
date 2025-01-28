@@ -82,6 +82,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
+        // TODO: change this to search probably
         return this.client.count(query as any);
     }
 
@@ -596,7 +597,8 @@ export class ElasticsearchReaderAPI {
             subslice_key_threshold: subsliceKeyThreshold,
             key_type: keyType,
             id_field_name: idFieldName,
-            starting_key_depth: startingKeyDepth
+            starting_key_depth: startingKeyDepth,
+            recurse_optimization = false
         } = this.config;
 
         if (!this.windowSize) await this.setWindowSize();
@@ -614,7 +616,8 @@ export class ElasticsearchReaderAPI {
             subsliceKeyThreshold,
             keyType,
             idFieldName,
-            startingKeyDepth
+            startingKeyDepth,
+            recurse_optimization
         };
 
         if (isPersistent) {

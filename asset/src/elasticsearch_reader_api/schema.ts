@@ -240,6 +240,16 @@ export const schema = {
         doc: 'Use the original fetch algorithm, that sets query size to windowSize without extra retry logic',
         default: false,
         format: Boolean
+    },
+    total_optimization: {
+        doc: 'Setting to true will change the readers and slicers to stop tracking total hits for counts and fetches',
+        default: false,
+        format: Boolean
+    },
+    recurse_optimization: {
+        doc: 'Setting to true will change the recursive behavior of slicers to better match ratios of counts and size instead of just splitting in half or into individual keys',
+        default: false,
+        format: Boolean
     }
 };
 
