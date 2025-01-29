@@ -20,6 +20,7 @@ import {
     dateOptions, processInterval, dateFormat,
     dateFormatSeconds, parseDate, delayedStreamSegment,
     determineIDSlicerRanges, determineDateSlicerRanges,
+    idSlicerOptimized
 } from './algorithms/index.js';
 import {
     ESReaderOptions, DateSegments, InputDateSegments,
@@ -426,6 +427,10 @@ export class ElasticsearchReaderAPI {
             });
 
             slicerConfig.retryData = parsedRetry[slicerID];
+        }
+
+        if (this.config.recurse_optimization) {
+            return idSlicerOptimized(slicerConfig);
         }
 
         return idSlicer(slicerConfig);

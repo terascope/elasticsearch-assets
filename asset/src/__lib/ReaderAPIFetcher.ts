@@ -31,6 +31,7 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
     }
 
     async fetch(slice: ReaderSlice): Promise<DataEntity[] | DataFrame | Buffer> {
+        // @ts-expect-error
         return this.api.fetch(slice);
     }
 }

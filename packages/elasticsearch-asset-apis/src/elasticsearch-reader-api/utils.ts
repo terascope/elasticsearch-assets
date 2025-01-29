@@ -63,13 +63,24 @@ function _buildRangeQuery(
         if (!isString(idFieldName)) {
             throw new Error('Missing id_field_name for id slicer');
         }
-        body.query.bool.must.push({
-            bool: {
-                should: params.keys.map((key) => ({
-                    wildcard: { [idFieldName]: `${key}*` }
-                }))
-            }
-        });
+
+        if (opConfig.recurse_optimization) {
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ({
+                        regexp: { [idFieldName]: `${key}.*` }
+                    }))
+                }
+            });
+        } else {
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ({
+                        wildcard: { [idFieldName]: `${key}*` }
+                    }))
+                }
+            });
+        }
     }
 
     // elasticsearch lucene based query

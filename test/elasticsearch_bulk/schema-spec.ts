@@ -32,7 +32,7 @@ describe('Elasticsearch Bulk Schema', () => {
             (testConfig: OpConfig) => testConfig._op === name
         );
 
-        return validConfig as ElasticsearchBulkConfig;
+        return validConfig as unknown as ElasticsearchBulkConfig;
     }
 
     afterEach(async () => {

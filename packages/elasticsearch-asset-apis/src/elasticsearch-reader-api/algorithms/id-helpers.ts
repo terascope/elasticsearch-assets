@@ -125,7 +125,9 @@ export class SplitKeyTracker {
     private keyList: (string | number)[][] = [];
     private totalKeys: number;
 
-    constructor(type: keyof typeof IDType) {
+    constructor(
+        type: keyof typeof IDType,
+    ) {
         if (type === IDType.base64url) {
             const specialChars = [...base64URLSpecialChars].reverse();
             // @ts-expect-error
@@ -163,6 +165,36 @@ export class SplitKeyTracker {
             this.totalKeys = HEXADECIMAL.length;
         } else {
             throw new Error(`Unsupported key type ${type}`);
+        }
+    }
+
+    forward(str: string) {
+        const char = str[0];
+        if (!base64.includes(char)) {
+            throw new Error(`Input ${str} does not contain valid characters`);
+        }
+
+        for (let list of this.keyList) {
+            const keyFound = list.includes(char);
+
+            if (keyFound) {
+                let correctSpot = false;
+
+                while (!correctSpot) {
+                    const key = list.pop();
+                    this.ind += 1;
+                    // we found it, put it back in for next slice
+                    if (key === char) {
+                        correctSpot = true;
+                        list.push(key);
+                        this.ind -= 1;
+                    }
+                }
+            } else {
+                // we empty out and move the marker
+                this.ind += list.length;
+                list = [];
+            }
         }
     }
 

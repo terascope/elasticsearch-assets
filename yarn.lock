@@ -1158,15 +1158,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@terascope/elasticsearch-api@npm:~4.7.2":
-  version: 4.7.2
-  resolution: "@terascope/elasticsearch-api@npm:4.7.2"
+"@terascope/elasticsearch-api@npm:~4.8.0":
+  version: 4.8.0
+  resolution: "@terascope/elasticsearch-api@npm:4.8.0"
   dependencies:
     "@terascope/types": "npm:~1.4.1"
     "@terascope/utils": "npm:~1.7.2"
     bluebird: "npm:~3.7.2"
     setimmediate: "npm:~1.0.5"
-  checksum: 10c0/1454de09caed91e07d5d84e2e20495011d419139416d9eb92157cab924c989c0d15defbd10827f4e0bd35e14cc79cec0cf52569f27734a2ebe450db1fe927022
+  checksum: 10c0/3b43584ea7dca94130dfa2ebcb80b1df2049957f452110869b6a551a18e02ae6585c50542bf645752172b4fc7efa4900b7a8bb721c5f29ca57ed377eb01ec58b
   languageName: node
   linkType: hard
 
@@ -1176,7 +1176,7 @@ __metadata:
   dependencies:
     "@terascope/data-mate": "npm:~1.7.3"
     "@terascope/data-types": "npm:~1.7.2"
-    "@terascope/elasticsearch-api": "npm:~4.7.2"
+    "@terascope/elasticsearch-api": "npm:~4.8.0"
     "@terascope/scripts": "npm:^1.9.2"
     "@terascope/types": "npm:~1.4.1"
     "@terascope/utils": "npm:~1.7.2"
@@ -1283,13 +1283,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@terascope/teraslice-state-storage@npm:~1.7.2":
-  version: 1.7.2
-  resolution: "@terascope/teraslice-state-storage@npm:1.7.2"
+"@terascope/teraslice-state-storage@npm:~1.8.0":
+  version: 1.8.0
+  resolution: "@terascope/teraslice-state-storage@npm:1.8.0"
   dependencies:
-    "@terascope/elasticsearch-api": "npm:~4.7.2"
+    "@terascope/elasticsearch-api": "npm:~4.8.0"
     "@terascope/utils": "npm:~1.7.2"
-  checksum: 10c0/35a59e281cca41596184cce9a1a39c48c9830aaba3b8bc74738871e34a0ed5de0d65347af1770ab1bcb8a65a55cf978772044c56263650be0a142a221d7f5fdc
+  checksum: 10c0/4d9ce685926be7d038ae56c69e48f200889c111e95de33ff413462c1439dd22ad2caf8ac8ff981d884bbb1c6e821ffc98f91597e0f06db0a05c80208ee413880
   languageName: node
   linkType: hard
 
@@ -2500,10 +2500,10 @@ __metadata:
   resolution: "asset@workspace:asset"
   dependencies:
     "@terascope/data-mate": "npm:~1.7.3"
-    "@terascope/elasticsearch-api": "npm:~4.7.2"
+    "@terascope/elasticsearch-api": "npm:~4.8.0"
     "@terascope/elasticsearch-asset-apis": "npm:~1.1.0"
     "@terascope/job-components": "npm:~1.9.2"
-    "@terascope/teraslice-state-storage": "npm:~1.7.2"
+    "@terascope/teraslice-state-storage": "npm:~1.8.0"
     "@terascope/utils": "npm:~1.7.2"
     datemath-parser: "npm:~1.0.6"
     got: "npm:~13.0.0"
@@ -3576,12 +3576,12 @@ __metadata:
   resolution: "elasticsearch-assets@workspace:."
   dependencies:
     "@terascope/data-types": "npm:~1.7.2"
-    "@terascope/elasticsearch-api": "npm:~4.7.2"
+    "@terascope/elasticsearch-api": "npm:~4.8.0"
     "@terascope/elasticsearch-asset-apis": "npm:~1.1.0"
     "@terascope/eslint-config": "npm:~1.1.5"
     "@terascope/job-components": "npm:~1.9.2"
     "@terascope/scripts": "npm:~1.9.2"
-    "@terascope/teraslice-state-storage": "npm:~1.7.2"
+    "@terascope/teraslice-state-storage": "npm:~1.8.0"
     "@terascope/types": "npm:~1.4.1"
     "@types/bluebird": "npm:~3.5.42"
     "@types/fs-extra": "npm:~11.0.4"
@@ -3589,7 +3589,7 @@ __metadata:
     "@types/jest": "npm:~29.5.14"
     "@types/node": "npm:~22.10.10"
     "@types/semver": "npm:~7.5.8"
-    elasticsearch-store: "npm:~1.7.3"
+    elasticsearch-store: "npm:~1.8.0"
     eslint: "npm:~9.18.0"
     fs-extra: "npm:~11.3.0"
     jest: "npm:~29.7.0"
@@ -3604,9 +3604,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"elasticsearch-store@npm:~1.7.3":
-  version: 1.7.3
-  resolution: "elasticsearch-store@npm:1.7.3"
+"elasticsearch-store@npm:~1.8.0":
+  version: 1.8.0
+  resolution: "elasticsearch-store@npm:1.8.0"
   dependencies:
     "@terascope/data-mate": "npm:~1.7.3"
     "@terascope/data-types": "npm:~1.7.2"
@@ -3622,7 +3622,7 @@ __metadata:
     setimmediate: "npm:~1.0.5"
     uuid: "npm:~11.0.5"
     xlucene-translator: "npm:~1.7.3"
-  checksum: 10c0/842ed83302b8ea7565a8476bb0ce5a802d5e7c35825bd1ec3ee52febc4c92db49481d1c6f75e45adfba4e60aec523751cee515b38aab1718c07cf4ca9e7b0009
+  checksum: 10c0/f73a99ecaed006a92d193a57fa2d0d9c29d6da4eede671a9d67d432ee6c201cfd996c979ff9abefe4b26ff1408d584cd9ae9b532bf7dfd8517fdda99b81bbe49
   languageName: node
   linkType: hard
 

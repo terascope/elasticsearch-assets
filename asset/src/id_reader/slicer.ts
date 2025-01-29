@@ -20,6 +20,8 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         this.api = await apiManager.create(apiName, {});
 
         const apiConfig = apiManager.getConfig(apiName);
+        console.dir({ apiConfig }, { depth: 40 })
+
         if (!apiConfig) throw new Error(`Could not find api config for api_name ${apiName}`);
         this.config = apiConfig;
 
@@ -30,6 +32,7 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         this.slicerRanges = await this.api.makeIDSlicerRanges({
             numOfSlicers: this.executionConfig.slicers,
         });
+
         await super.initialize(recoveryData);
     }
 

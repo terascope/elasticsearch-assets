@@ -34,6 +34,7 @@ export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerRes
             if (count > size) {
                 events.emit('slicer:slice:recursion');
                 const ratio = createRatio(count);
+
                 return determineKeySlice(generator, ratio, rangeObj);
             }
 
@@ -145,10 +146,16 @@ export function* splitKeys(
     baseArray: readonly string[],
     str: string,
     keyType: IDType,
-    ratio: number
+    ratio: number,
+    forwardTo?: string
 ): KeyGenerator {
     let isLimitOfSplitting = false;
     const tracker = new SplitKeyTracker(keyType);
+
+    if (forwardTo) {
+        tracker.forward(forwardTo);
+    }
+
     let isDone = false;
 
     while (!isDone) {
@@ -172,7 +179,11 @@ export function* splitKeys(
                 yield * recurse(baseArray, `${str}${split}`, keyType);
                 isDone = true;
             } else {
-                yield * splitKeys(baseArray, str, keyType, response);
+                const newRatio = Math.max(
+                    Math.floor(ratio * (response / baseArray.length)),
+                    1
+                );
+                yield * splitKeys(baseArray, str, keyType, newRatio, split);
                 isDone = true;
             }
         }

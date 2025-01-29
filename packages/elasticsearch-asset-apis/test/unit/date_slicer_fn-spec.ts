@@ -5,7 +5,7 @@ import moment from 'moment';
 import {
     WindowState, SlicerArgs, ParsedInterval,
     SlicerDateConfig, DateSegments,
-    ReaderSlice, dateSlicer,
+    ReaderSlice, dateSlicer, splitTime,
     dateFormatSeconds, dateFormat, divideRange
 } from '../../src/index.js';
 import { MockClient } from '../helpers/index.js';
@@ -22,6 +22,8 @@ interface TestConfig {
     primaryRange?: DateSegments;
     timeResolution?: string;
     windowState?: WindowState;
+    recurse_optimization?: boolean;
+    size?: number;
 }
 
 describe('date slicer function', () => {
@@ -43,7 +45,9 @@ describe('date slicer function', () => {
         primaryRange,
         config,
         timeResolution = 's',
-        windowState
+        windowState,
+        recurse_optimization = false,
+        size = 1000
     }: TestConfig) {
         let client = _client;
 
@@ -58,7 +62,7 @@ describe('date slicer function', () => {
 
         const readerConfig = {
             time_resolution: timeResolution,
-            size: 1000,
+            size,
         };
 
         async function countFn() {
@@ -71,12 +75,11 @@ describe('date slicer function', () => {
 
         const {
             time_resolution: timeResolutionParam,
-            size,
             subslice_by_key: subsliceByKey,
             subslice_key_threshold: subsliceKeyThreshold,
             key_type: keyType,
             id_field_name: idFieldName,
-            starting_key_depth: startingKeyDepth
+            starting_key_depth: startingKeyDepth,
         } = opConfig;
 
         const slicerArgs: SlicerArgs = {
@@ -98,6 +101,7 @@ describe('date slicer function', () => {
             primaryRange,
             windowState: _windowState,
             countFn,
+            recurse_optimization
         };
 
         return dateSlicer(slicerArgs);
@@ -213,6 +217,47 @@ describe('date slicer function', () => {
                     .format(dateFormatSeconds)).toISOString(),
                 limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
                 count: 2000,
+                holes: []
+            };
+
+            const slicer = makeSlicer(testConfig);
+            const results = await slicer();
+
+            expect(results).toEqual(expectedResults);
+        });
+
+        it('with recursive optimization', async () => {
+            const timeResolution = 's';
+            const recursiveCount = 800;
+            const largeCount = 1300;
+            const size = 1000;
+            const ratio = size / largeCount;
+            const interval: ParsedInterval = [5, 'm'];
+            const start = makeDate(dateFormatSeconds);
+            const end = moment.utc(start).add(2, 'm');
+            const limit = moment.utc(start).add(interval[0], interval[1]);
+            const diff = splitTime(start, end, limit, timeResolution, ratio);
+            const client = new MockClient([{ count: largeCount }], recursiveCount);
+
+            const testConfig: TestConfig = {
+                interval,
+                dates: {
+                    start,
+                    end,
+                    limit
+                },
+                client,
+                size,
+                timeResolution,
+                recurse_optimization: true
+            };
+
+            const expectedResults = {
+                start: moment(moment.utc(start).format(dateFormatSeconds)).toISOString(),
+                end: moment(moment.utc(start).add(diff, 's')
+                    .format(dateFormatSeconds)).toISOString(),
+                limit: moment(moment.utc(limit).format(dateFormatSeconds)).toISOString(),
+                count: 800,
                 holes: []
             };
 

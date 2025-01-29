@@ -31,7 +31,7 @@ describe('id_reader slicer', () => {
     });
 
     afterAll(async () => {
-        await cleanupIndex(esClient, `${apiReaderIndex}*`);
+        // await cleanupIndex(esClient, `${apiReaderIndex}*`);
     });
 
     beforeEach(() => {
@@ -173,6 +173,36 @@ describe('id_reader slicer', () => {
             { keys: ['ae'], count: 4 },
             { keys: ['af'], count: 1 },
         ];
+
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
+        });
+    });
+
+    it('can fit slices down to size with recursive optimizations', async () => {
+        const opConfig = {
+            _op: 'id_reader',
+            key_type: 'hexadecimal',
+            key_range: ['a'],
+            field,
+            index: apiReaderIndex,
+            size: 20,
+            recurse_optimization: true
+        };
+
+        const test = await makeSlicerTest(opConfig);
+        const results = await test.getAllSlices();
+
+        expect(results.pop()).toBeNull();
+
+        // this double recurses, first it takes 5 keys, then switches to taking 4 keys
+        const expectedResults = [
+            { keys: ['a[0-4]'], count: 17 },
+            { keys: ['a[5-8]'], count: 15 },
+            { keys: ['a[9]'], count: 8 },
+        ];
+
+        expect(results.length).toBeGreaterThan(1);
 
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);

@@ -173,6 +173,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             dateParams.prevEnd = moment.utc(end);
 
             let newEnd = moment.utc(dateParams.end).add(step, unit);
+
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;

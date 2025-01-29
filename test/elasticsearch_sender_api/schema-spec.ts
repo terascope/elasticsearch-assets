@@ -3,8 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import {
-    TestContext, APIConfig, Context,
-    debugLogger, TestClientConfig
+    APIConfig, Context, debugLogger, TestClientConfig
 } from '@terascope/job-components';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
@@ -110,7 +109,7 @@ describe('elasticsearch sender api schema', () => {
 
 describe('elasticsearch sender api schema for routed sender jobs', () => {
     let harness: WorkerTestHarness;
-    let context: TestContext;
+    let context: Context;
     const logger = debugLogger('test-logger2');
 
     beforeAll(async () => {
@@ -177,7 +176,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
     });
 
     it('should not throw if default is not an es endpoint and routed sender is an operation', async () => {
-        const schema = new SenderSchema(context as unknown as Context);
+        const schema = new SenderSchema(context as any);
 
         const job = newTestJobConfig({
             max_retries: 3,
@@ -207,7 +206,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
     });
 
     it('should not throw if default is not an es endpoint and multiple routed sender operations', async () => {
-        const schema = new SenderSchema(context as unknown as Context);
+        const schema = new SenderSchema(context as any);
 
         const job = newTestJobConfig({
             max_retries: 3,
@@ -281,7 +280,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             ],
         });
 
-        const schema = new SenderSchema(context as unknown as Context);
+        const schema = new SenderSchema(context as any);
 
         expect(() => schema.validateJob(job2)).toThrow();
     });
