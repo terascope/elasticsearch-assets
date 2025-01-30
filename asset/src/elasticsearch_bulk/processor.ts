@@ -33,7 +33,7 @@ export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkC
 
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         if (data == null || data.length === 0) return data;
-        // @ts-expect-error
+
         await this.client.send(data);
 
         if (this.opConfig._dead_letter_action === 'kafka_dead_letter') {
