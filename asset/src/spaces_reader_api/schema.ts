@@ -49,6 +49,11 @@ const apiSchema = {
         default: true,
         format: Boolean
     },
+    recurse_optimization: {
+        doc: 'Setting to true will change the recursive behavior of slicers to better match ratios of counts and size instead of just splitting in half or into individual keys',
+        default: false,
+        format: Boolean
+    }
 };
 
 const spacesSchema = Object.assign({}, clone, apiSchema) as AnyObject;

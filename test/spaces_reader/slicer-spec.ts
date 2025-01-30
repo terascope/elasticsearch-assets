@@ -149,7 +149,7 @@ describe('spaces_reader slicer', () => {
         });
     });
 
-    describe('when connected to a spaces server', () => {
+    describe.only('when connected to a spaces server', () => {
         const start = moment('2012-12-12T00:00:00.000Z');
         const end = moment(start.toISOString()).add(1, 'minute');
         const variables = {
@@ -188,7 +188,7 @@ describe('spaces_reader slicer', () => {
                 q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
                 size: 0,
                 variables,
-                track_total_hits: true
+                track_total_hits: 3
             };
 
             scope.get(`/${testIndex}/_info?token=${token}`)
@@ -214,6 +214,9 @@ describe('spaces_reader slicer', () => {
         });
 
         it('should be able to generate slices', async () => {
+            const body = JSON.parse('{"q":"created:[2012-12-12T00:00:00.000Z TO 2012-12-12T00:01:00.000Z} AND (slicer:query)","size":0,"track_total_hits":3,"variables":{"@foo":"foo","$bar":"bar"}}');
+            console.dir({ body }, { depth: 40 })
+
             const slices = await harness.createSlices();
 
             expect(slices).toBeArrayOfSize(1);
@@ -224,3 +227,16 @@ describe('spaces_reader slicer', () => {
         });
     });
 });
+
+/*
+{
+      {
+        q: 'created:[2012-12-12T00:00:00.000Z TO 2012-12-12T00:01:00.000Z} AND (slicer:query)',
+        size: 0,
+        variables: { '@foo': 'foo', '$bar': 'bar' },
+        track_total_hits: true
+      },
+      start: '2012-12-12T00:00:00.000Z',
+      end: '2012-12-12T00:01:00.000Z'
+    }
+*/
