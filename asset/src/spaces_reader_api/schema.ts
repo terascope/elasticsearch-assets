@@ -45,7 +45,7 @@ const apiSchema = {
         format: String
     },
     total_optimization: {
-        doc: 'Setting to true will change the readers and slicers to stop tracking total hits for counts and fetches',
+        doc: 'Setting to true will optimize tracking total hits by turning off for fetches, and only track up to the config size for counts.',
         default: true,
         format: Boolean
     },
