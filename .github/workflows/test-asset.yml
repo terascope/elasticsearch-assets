@@ -93,9 +93,6 @@ jobs:
       - name: Test apis for ${{ matrix.search-version }}
         run: yarn test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
-      - run: yarn dlx teraslice-cli -v
-      - run: yarn dlx teraslice-cli assets build
-      - run: ls -l build/
 
   check-docker-limit-after:
     needs: test-elasticsearch-assets
