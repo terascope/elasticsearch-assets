@@ -677,7 +677,7 @@ export class ElasticsearchReaderAPI {
         if (date) return parseDate(date);
 
         // we are in auto, so we determine each part
-        const query: AnyObject = {
+        const query: ClientParams.SearchParams = {
             index: this.config.index,
             size: 1,
             body: {
@@ -686,7 +686,8 @@ export class ElasticsearchReaderAPI {
                         order: order === 'start' ? 'asc' : 'desc'
                     }
                 }]
-            }
+            },
+            track_total_hits: false
         };
 
         if (this.config.query) {
