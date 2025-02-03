@@ -1144,6 +1144,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@terascope/data-mate@npm:~1.7.4":
+  version: 1.7.4
+  resolution: "@terascope/data-mate@npm:1.7.4"
+  dependencies:
+    "@terascope/data-types": "npm:~1.7.3"
+    "@terascope/types": "npm:~1.4.1"
+    "@terascope/utils": "npm:~1.7.3"
+    "@types/validator": "npm:~13.12.2"
+    awesome-phonenumber: "npm:~7.2.0"
+    date-fns: "npm:~4.1.0"
+    ip-bigint: "npm:~8.2.0"
+    ip6addr: "npm:~0.2.5"
+    ipaddr.js: "npm:~2.2.0"
+    is-cidr: "npm:~5.1.0"
+    jexl: "npm:~2.3.0"
+    mnemonist: "npm:~0.39.8"
+    uuid: "npm:~11.0.5"
+    valid-url: "npm:~1.0.9"
+    validator: "npm:~13.12.0"
+    xlucene-parser: "npm:~1.7.4"
+  checksum: 10c0/83da00ea278ece2d4f38b49a0a1e12e099dca7ed3f57b9b3810cc79ec54a9b099f7db03b881afc9b37e5b2b4d6b3bf2862296a2d6b6553a4da13c7d5d1b6d5c2
+  languageName: node
+  linkType: hard
+
 "@terascope/data-types@npm:~1.7.2":
   version: 1.7.2
   resolution: "@terascope/data-types@npm:1.7.2"
@@ -1155,6 +1179,20 @@ __metadata:
   bin:
     data-types: ./bin/data-types.js
   checksum: 10c0/1865c8299f9172c67a91fcdc0d283f696d6d2653ece901206561433ea5c160fb9ee8d62c65afe00816340e1cb953e3f58b26eb6e06d1f0bd7a5cacba26f03c81
+  languageName: node
+  linkType: hard
+
+"@terascope/data-types@npm:~1.7.3":
+  version: 1.7.3
+  resolution: "@terascope/data-types@npm:1.7.3"
+  dependencies:
+    "@terascope/types": "npm:~1.4.1"
+    "@terascope/utils": "npm:~1.7.3"
+    graphql: "npm:~16.10.0"
+    yargs: "npm:~17.7.2"
+  bin:
+    data-types: ./bin/data-types.js
+  checksum: 10c0/e94a1f322f04f680779befab73c2135829a326b0dd32c6cfb0f6ecce1de614eb4ad6c8265a414a58e4fe87eb4785f2adf0ef0bd5dd1037930900a384e983f080
   languageName: node
   linkType: hard
 
@@ -1343,6 +1381,50 @@ __metadata:
     shallow-clone: "npm:~3.0.1"
     validator: "npm:~13.12.0"
   checksum: 10c0/712c416c3698d79bd3056458b25960740068612e1fc65a49c29e79b25a67ba573d2c06feb03e3e1b41c570ef4c9030d0d95c7be7ab243efb5b7b65ad55450b54
+  languageName: node
+  linkType: hard
+
+"@terascope/utils@npm:~1.7.3":
+  version: 1.7.3
+  resolution: "@terascope/utils@npm:1.7.3"
+  dependencies:
+    "@chainsafe/is-ip": "npm:~2.0.2"
+    "@terascope/types": "npm:~1.4.1"
+    "@turf/bbox": "npm:~7.2.0"
+    "@turf/bbox-polygon": "npm:~7.2.0"
+    "@turf/boolean-contains": "npm:~7.2.0"
+    "@turf/boolean-disjoint": "npm:~7.2.0"
+    "@turf/boolean-equal": "npm:~7.2.0"
+    "@turf/boolean-intersects": "npm:~7.2.0"
+    "@turf/boolean-point-in-polygon": "npm:~7.2.0"
+    "@turf/boolean-within": "npm:~7.2.0"
+    "@turf/circle": "npm:~7.2.0"
+    "@turf/helpers": "npm:~7.2.0"
+    "@turf/invariant": "npm:~7.2.0"
+    "@turf/line-to-polygon": "npm:~7.2.0"
+    "@types/lodash-es": "npm:~4.17.12"
+    "@types/validator": "npm:~13.12.2"
+    awesome-phonenumber: "npm:~7.2.0"
+    date-fns: "npm:~4.1.0"
+    date-fns-tz: "npm:~3.2.0"
+    datemath-parser: "npm:~1.0.6"
+    debug: "npm:~4.4.0"
+    geo-tz: "npm:~8.1.2"
+    ip-bigint: "npm:~8.2.0"
+    ip-cidr: "npm:~4.0.2"
+    ip6addr: "npm:~0.2.5"
+    ipaddr.js: "npm:~2.2.0"
+    is-cidr: "npm:~5.1.0"
+    is-plain-object: "npm:~5.0.0"
+    js-string-escape: "npm:~1.0.1"
+    kind-of: "npm:~6.0.3"
+    latlon-geohash: "npm:~2.0.0"
+    lodash-es: "npm:~4.17.21"
+    mnemonist: "npm:~0.39.8"
+    p-map: "npm:~7.0.3"
+    shallow-clone: "npm:~3.0.1"
+    validator: "npm:~13.12.0"
+  checksum: 10c0/4c8f1614bc6fad3d697ddfc94c0b7331cd66c833a36bf686ad7c25ca0cccb3ed31d2eac6c93b0327926dae57b26fb7f0eb23c60acccc8e1bfddeaeb7c570a84a
   languageName: node
   linkType: hard
 
@@ -3589,7 +3671,7 @@ __metadata:
     "@types/jest": "npm:~29.5.14"
     "@types/node": "npm:~22.10.10"
     "@types/semver": "npm:~7.5.8"
-    elasticsearch-store: "npm:~1.7.3"
+    elasticsearch-store: "npm:~1.8.1"
     eslint: "npm:~9.18.0"
     fs-extra: "npm:~11.3.0"
     jest: "npm:~29.7.0"
@@ -3604,14 +3686,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"elasticsearch-store@npm:~1.7.3":
-  version: 1.7.3
-  resolution: "elasticsearch-store@npm:1.7.3"
+"elasticsearch-store@npm:~1.8.1":
+  version: 1.8.1
+  resolution: "elasticsearch-store@npm:1.8.1"
   dependencies:
-    "@terascope/data-mate": "npm:~1.7.3"
-    "@terascope/data-types": "npm:~1.7.2"
+    "@terascope/data-mate": "npm:~1.7.4"
+    "@terascope/data-types": "npm:~1.7.3"
     "@terascope/types": "npm:~1.4.1"
-    "@terascope/utils": "npm:~1.7.2"
+    "@terascope/utils": "npm:~1.7.3"
     ajv: "npm:~8.17.1"
     ajv-formats: "npm:~3.0.1"
     elasticsearch6: "npm:@elastic/elasticsearch@~6.8.0"
@@ -3621,8 +3703,8 @@ __metadata:
     opensearch2: "npm:@opensearch-project/opensearch@~2.12.0"
     setimmediate: "npm:~1.0.5"
     uuid: "npm:~11.0.5"
-    xlucene-translator: "npm:~1.7.3"
-  checksum: 10c0/842ed83302b8ea7565a8476bb0ce5a802d5e7c35825bd1ec3ee52febc4c92db49481d1c6f75e45adfba4e60aec523751cee515b38aab1718c07cf4ca9e7b0009
+    xlucene-translator: "npm:~1.7.4"
+  checksum: 10c0/202b38976eea5f0ec547a8cbae2826ae122d7fa3b4c656f233f2409dbad79bd52e809051c089507ebd03e88234ae4c373d3832f7da1f5f79d4aafe377bf4beda
   languageName: node
   linkType: hard
 
@@ -10099,15 +10181,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xlucene-translator@npm:~1.7.3":
-  version: 1.7.3
-  resolution: "xlucene-translator@npm:1.7.3"
+"xlucene-parser@npm:~1.7.4":
+  version: 1.7.4
+  resolution: "xlucene-parser@npm:1.7.4"
   dependencies:
     "@terascope/types": "npm:~1.4.1"
-    "@terascope/utils": "npm:~1.7.2"
+    "@terascope/utils": "npm:~1.7.3"
+    peggy: "npm:~4.2.0"
+    ts-pegjs: "npm:~4.2.1"
+  checksum: 10c0/41eff0de30477833ac266eb37ee78bbbcdfc42881b1099b3b2651ededdfa67f5ecb828798dbf907532a4c12b99b7cd312b92afa040622ad9e52cdb34db6e7413
+  languageName: node
+  linkType: hard
+
+"xlucene-translator@npm:~1.7.4":
+  version: 1.7.4
+  resolution: "xlucene-translator@npm:1.7.4"
+  dependencies:
+    "@terascope/types": "npm:~1.4.1"
+    "@terascope/utils": "npm:~1.7.3"
     "@types/elasticsearch": "npm:~5.0.43"
-    xlucene-parser: "npm:~1.7.3"
-  checksum: 10c0/064514c887574cc48c99ac99f33b2c192fc352fcd1546d6134a0fe721f10b53f701c9cfd54d65ff2df9c9cd4e43d88bd9008cc5d42b62c5a62a9a31785555749
+    xlucene-parser: "npm:~1.7.4"
+  checksum: 10c0/9b0e0b85fae02a188b76446fc95074be9429d5de78240c0bf9402ce46ffebb364d7f272a871d68ee7a4f7c9add719912cce7e715f98ed874594692e80ccff7d4
   languageName: node
   linkType: hard
 
