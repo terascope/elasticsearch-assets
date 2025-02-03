@@ -360,12 +360,7 @@ export interface ESReaderOptions {
     total_optimization?: boolean;
     recurse_optimization?: boolean;
 }
-/*
 
-slicer: true, reader: false
-slicer: number (size), reader: number (size/count)
-
-*/
 export interface SpacesAPIConfig extends ESReaderOptions {
     endpoint: string;
     token: string;

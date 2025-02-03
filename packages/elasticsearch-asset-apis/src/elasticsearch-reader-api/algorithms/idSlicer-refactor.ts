@@ -18,7 +18,7 @@ export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerRes
         keyType
     } = args;
 
-    const createRatio = createRatioFP(size, baseKeyArray.length);
+    const createRatio = createRatioFN(size, baseKeyArray.length);
 
     async function determineKeySlice(
         generator: KeyGenerator,
@@ -248,7 +248,7 @@ function* generateKeyDepth(
     return null;
 }
 
-export function createRatioFP(size: number, arrayLength: number) {
+export function createRatioFN(size: number, arrayLength: number) {
     const limit = size * arrayLength;
 
     return function _createRatio(count: number): number | boolean {
