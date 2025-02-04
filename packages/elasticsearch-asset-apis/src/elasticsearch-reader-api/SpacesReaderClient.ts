@@ -266,7 +266,8 @@ export class SpacesReaderClient implements ReaderClient {
             token: this.config.token,
             q: '_exists_:_key',
             size: 0,
-            include_type_config: true
+            include_type_config: true,
+            track_total_hits: false
         };
 
         const spaceResults = await this.makeRequest(query);

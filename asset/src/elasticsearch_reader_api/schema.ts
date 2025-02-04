@@ -242,7 +242,7 @@ export const schema = {
         format: Boolean
     },
     total_optimization: {
-        doc: 'Setting to true will optimize tracking total hits by turning off for fetches, and only track up to the config size for counts.',
+        doc: 'Setting to true will disable tracking total hits for fetches, and only track up to the config size for counts, but will track totals if recurse_optimization is set to true for slicers.',
         default: false,
         format: Boolean
     },

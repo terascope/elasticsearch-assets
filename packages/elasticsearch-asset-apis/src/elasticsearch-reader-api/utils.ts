@@ -18,11 +18,14 @@ export function buildQuery(
     };
 
     if (opConfig.total_optimization) {
-        // let trackCount = countIsLimit ? opConfig.size : params.count;
         let trackCount: number | boolean = false;
 
         if (params.count === 0) {
-            trackCount = opConfig.size + 1;
+            if (opConfig.recurse_optimization) {
+                trackCount = true;
+            } else {
+                trackCount = opConfig.size + 1;
+            }
         }
 
         query.track_total_hits = trackCount;
@@ -30,8 +33,9 @@ export function buildQuery(
         query.track_total_hits = true;
     }
 
-    // TODO: fix _source reference in @terascope/types
-    if (opConfig.fields) query._source = opConfig.fields as any;
+    if (opConfig.fields) {
+        query._source = opConfig.fields;
+    }
 
     return query;
 }
