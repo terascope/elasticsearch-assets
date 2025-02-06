@@ -4,8 +4,6 @@ import { ESReaderOptions, ReaderSlice } from './interfaces.js';
 
 /**
  * Build the elasticsearch DSL query
- *
- * @todo this should be switch to return an xLucene query
 */
 export function buildQuery(
     opConfig: ESReaderOptions, params: ReaderSlice
@@ -18,8 +16,26 @@ export function buildQuery(
         size: params.count,
         body: _buildRangeQuery(opConfig, params),
     };
-    // TODO: fix _source reference in @terascope/types
-    if (opConfig.fields) query._source = opConfig.fields as any;
+
+    if (opConfig.total_optimization) {
+        let trackCount: number | boolean = false;
+
+        if (params.count === 0) {
+            if (opConfig.recurse_optimization) {
+                trackCount = true;
+            } else {
+                trackCount = opConfig.size + 1;
+            }
+        }
+
+        query.track_total_hits = trackCount;
+    } else {
+        query.track_total_hits = true;
+    }
+
+    if (opConfig.fields) {
+        query._source = opConfig.fields;
+    }
 
     return query;
 }
@@ -51,13 +67,24 @@ function _buildRangeQuery(
         if (!isString(idFieldName)) {
             throw new Error('Missing id_field_name for id slicer');
         }
-        body.query.bool.must.push({
-            bool: {
-                should: params.keys.map((key) => ({
-                    wildcard: { [idFieldName]: `${key}*` }
-                }))
-            }
-        });
+
+        if (opConfig.recurse_optimization) {
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ({
+                        regexp: { [idFieldName]: `${key}.*` }
+                    }))
+                }
+            });
+        } else {
+            body.query.bool.must.push({
+                bool: {
+                    should: params.keys.map((key) => ({
+                        wildcard: { [idFieldName]: `${key}*` }
+                    }))
+                }
+            });
+        }
     }
 
     // elasticsearch lucene based query

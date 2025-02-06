@@ -14,6 +14,7 @@ export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
         await super.initialize();
 
         const { context, api, opConfig } = this;
+
         if (isPromAvailable(context)) {
             await this.context.apis.foundation.promMetrics.addGauge(
                 'elasticsearch_records_read',

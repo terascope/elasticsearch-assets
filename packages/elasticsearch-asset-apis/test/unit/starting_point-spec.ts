@@ -1,11 +1,8 @@
 import 'jest-extended';
 import moment from 'moment';
 import {
-    determineDateSlicerRanges,
-    dateFormatSeconds,
-    divideRange,
-    StartPointConfig,
-    ParsedInterval
+    determineDateSlicerRanges, dateFormatSeconds, divideRange,
+    StartPointConfig, ParsedInterval
 } from '../../src/index.js';
 
 function makeDate(format: string) {

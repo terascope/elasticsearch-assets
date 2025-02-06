@@ -44,16 +44,15 @@ const apiSchema = {
         default: undefined,
         format: String
     },
-    includeTotals: {
-        doc: 'By default, data fetching is optimized by disabling total count calculation to achieve '
-            + 'faster query execution. If you require total counts in your queries set this value to true '
-            + `Some endpoints support setting to a fixed integer to limit the count up to that number then `
-            + `stop... set to 'number' to count up to the query or slice size then stop. `,
+    total_optimization: {
+        doc: 'Setting to true will optimize tracking total hits by turning off for fetches, and only track up to the config size for counts.',
+        default: true,
+        format: Boolean
+    },
+    recurse_optimization: {
+        doc: 'Setting to true will change the recursive behavior of slicers to better match ratios of counts and size instead of just splitting in half or into individual keys',
         default: false,
-        format(val: unknown) {
-            if (val === 'number' || typeof val !== 'number') return;
-            throw new Error(`Invalid parameter includeTotals, must be a boolean or string 'number', got ${getTypeOf(val)}`);
-        }
+        format: Boolean
     }
 };
 

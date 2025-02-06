@@ -466,3 +466,25 @@ export async function determineDateSlicerRanges(
         determineDateSlicerRange(config, id)
     )));
 }
+
+export function splitTime(
+    start: moment.Moment,
+    end: moment.Moment,
+    limit: moment.Moment,
+    timeResolution: string,
+    ratio: number
+) {
+    let diff = Math.floor(end.diff(start) * ratio);
+
+    if (moment.utc(start).add(diff, 'ms')
+        .isAfter(limit)) {
+        diff = moment.utc(limit).diff(start);
+    }
+
+    if (timeResolution === 'ms') {
+        return diff;
+    }
+
+    const secondDiff = Math.floor(diff / 1000);
+    return secondDiff;
+}

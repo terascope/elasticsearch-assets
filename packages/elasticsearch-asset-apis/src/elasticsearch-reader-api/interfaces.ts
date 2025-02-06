@@ -192,6 +192,7 @@ export interface IDSlicerArgs {
     startingKeyDepth: number;
     countFn: CountFn;
     size: number;
+    keyType: IDType;
 }
 
 export type RecoveryData = {
@@ -247,6 +248,7 @@ export interface SlicerArgs {
     */
     windowState?: WindowState;
     countFn: CountFn;
+    recurse_optimization: boolean;
 }
 
 export interface SlicerDates extends DateSegments {
@@ -355,6 +357,8 @@ export interface ESReaderOptions {
     response_type?: FetchResponseType;
     type_config?: DataTypeConfig;
     useSimpleFetch?: boolean;
+    total_optimization?: boolean;
+    recurse_optimization?: boolean;
 }
 
 export interface SpacesAPIConfig extends ESReaderOptions {
@@ -365,7 +369,6 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
-    includeTotals?: boolean | 'number';
 }
 
 export interface DetermineSliceResults {

@@ -23,6 +23,7 @@ import {
     dateFormatSeconds,
     dateOptions,
     determineDateSlicerRange,
+    splitTime
 } from './date-helpers.js';
 import { getKeyArray } from './id-helpers.js';
 
@@ -34,27 +35,6 @@ interface DateParams {
     holes: DateConfig[];
     interval: ParsedInterval;
     size: number;
-}
-
-function splitTime(
-    start: moment.Moment,
-    end: moment.Moment,
-    limit: moment.Moment,
-    timeResolution: string
-) {
-    let diff = Math.floor(end.diff(start) / 2);
-
-    if (moment.utc(start).add(diff, 'ms')
-        .isAfter(limit)) {
-        diff = moment.utc(limit).diff(start);
-    }
-
-    if (timeResolution === 'ms') {
-        return diff;
-    }
-
-    const secondDiff = Math.floor(diff / 1000);
-    return secondDiff;
 }
 
 export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
@@ -75,7 +55,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         subsliceKeyThreshold,
         idFieldName = null,
         startingKeyDepth = 0,
-        keyType = IDType.base64url
+        keyType = IDType.base64url,
+        recurse_optimization
     } = args;
 
     if (!args.interval) {
@@ -123,12 +104,16 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
         }
 
         if (count > size) {
+            // old way splits in half, new way create a ratio to try to get closer
+            // and minimize the amount of slicing
+            const ratio = recurse_optimization ? size / count : 0.5;
+
             // if size is to big after increasing slice, use alternative division behavior
             if (isExpandedSlice) {
                 // recurse down to the appropriate size
                 const newStart = moment.utc(dateParams.prevEnd);
                 // get diff from new start
-                const diff = splitTime(newStart, end, limit, timeResolution);
+                const diff = splitTime(newStart, end, limit, timeResolution, ratio);
                 const newEnd = moment.utc(newStart).add(diff, timeResolution);
 
                 if (!newEnd.isValid()) {
@@ -159,7 +144,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             }
 
             // find difference in milliseconds and divide in half
-            const diff = splitTime(start, end, limit, timeResolution);
+            const diff = splitTime(start, end, limit, timeResolution, ratio);
             const newEnd = moment.utc(start).add(diff, timeResolution);
             // prevent recursive call if difference is one millisecond
             if (diff <= 0) {
@@ -188,6 +173,7 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             dateParams.prevEnd = moment.utc(end);
 
             let newEnd = moment.utc(dateParams.end).add(step, unit);
+
             if (newEnd.isSameOrAfter(dateParams.limit)) {
                 // set to limit
                 makeLimitQuery = true;
@@ -261,7 +247,8 @@ export function dateSlicer(args: SlicerArgs): () => Promise<DateSlicerResults> {
             baseKeyArray: keyArray,
             countFn,
             size: querySize,
-            startingKeyDepth
+            startingKeyDepth,
+            keyType
         };
 
         const idSlicers = idSlicer(idSlicerArs);

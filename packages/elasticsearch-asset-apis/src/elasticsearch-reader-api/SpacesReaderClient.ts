@@ -2,7 +2,7 @@ import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
     AnyObject, withoutNil, DataEntity,
-    isBoolean, isKey,
+    isKey,
 } from '@terascope/utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
@@ -148,7 +148,7 @@ export class SpacesReaderClient implements ReaderClient {
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray: null | any[], trackTotalHits?: any): AnyObject {
+        function parseQueryConfig(mustArray: null | any[]): AnyObject {
             const queryOptions: Record<string, (op: any) => string> = {
                 query_string: _parseEsQ,
                 range: _parseDate,
@@ -194,7 +194,7 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                track_total_hits: trackTotalHits
+                track_total_hits: queryConfig.track_total_hits
             });
         }
 
@@ -258,20 +258,7 @@ export class SpacesReaderClient implements ReaderClient {
             return `(${terms.join(' OR ')})`;
         }
 
-        let trackTotalHits: boolean | number = false;
-
-        if (isBoolean(config.includeTotals)) {
-            trackTotalHits = config.includeTotals;
-        }
-        if (config.includeTotals === 'number') {
-            trackTotalHits = size + 1;
-        }
-        if (size === 0) {
-            // in case client uses a search API instead of count API
-            trackTotalHits = true;
-        }
-
-        return parseQueryConfig(mustQuery, trackTotalHits);
+        return parseQueryConfig(mustQuery);
     }
 
     async getDataType(): Promise<DataTypeConfig> {
@@ -279,7 +266,8 @@ export class SpacesReaderClient implements ReaderClient {
             token: this.config.token,
             q: '_exists_:_key',
             size: 0,
-            include_type_config: true
+            include_type_config: true,
+            track_total_hits: false
         };
 
         const spaceResults = await this.makeRequest(query);

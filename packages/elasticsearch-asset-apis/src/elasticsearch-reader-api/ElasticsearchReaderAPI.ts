@@ -20,6 +20,7 @@ import {
     dateOptions, processInterval, dateFormat,
     dateFormatSeconds, parseDate, delayedStreamSegment,
     determineIDSlicerRanges, determineDateSlicerRanges,
+    idSlicerOptimized
 } from './algorithms/index.js';
 import {
     ESReaderOptions, DateSegments, InputDateSegments,
@@ -82,6 +83,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
+        // TODO: change this to search probably
         return this.client.count(query as any);
     }
 
@@ -407,7 +409,8 @@ export class ElasticsearchReaderAPI {
             baseKeyArray,
             startingKeyDepth: this.config.starting_key_depth,
             countFn: this.count,
-            size
+            size,
+            keyType: this.config.key_type
         };
 
         if (recoveryData && recoveryData.length > 0) {
@@ -424,6 +427,10 @@ export class ElasticsearchReaderAPI {
             });
 
             slicerConfig.retryData = parsedRetry[slicerID];
+        }
+
+        if (this.config.recurse_optimization) {
+            return idSlicerOptimized(slicerConfig);
         }
 
         return idSlicer(slicerConfig);
@@ -595,7 +602,8 @@ export class ElasticsearchReaderAPI {
             subslice_key_threshold: subsliceKeyThreshold,
             key_type: keyType,
             id_field_name: idFieldName,
-            starting_key_depth: startingKeyDepth
+            starting_key_depth: startingKeyDepth,
+            recurse_optimization = false
         } = this.config;
 
         if (!this.windowSize) await this.setWindowSize();
@@ -613,7 +621,8 @@ export class ElasticsearchReaderAPI {
             subsliceKeyThreshold,
             keyType,
             idFieldName,
-            startingKeyDepth
+            startingKeyDepth,
+            recurse_optimization
         };
 
         if (isPersistent) {
@@ -668,7 +677,7 @@ export class ElasticsearchReaderAPI {
         if (date) return parseDate(date);
 
         // we are in auto, so we determine each part
-        const query: AnyObject = {
+        const query: ClientParams.SearchParams = {
             index: this.config.index,
             size: 1,
             body: {
@@ -677,7 +686,8 @@ export class ElasticsearchReaderAPI {
                         order: order === 'start' ? 'asc' : 'desc'
                     }
                 }]
-            }
+            },
+            track_total_hits: false
         };
 
         if (this.config.query) {

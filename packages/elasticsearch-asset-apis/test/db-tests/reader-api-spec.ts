@@ -12,7 +12,7 @@ import {
     populateIndex,
     waitForData,
     makeClient
-} from './helpers/index.js';
+} from '../helpers/index.js';
 import {
     createElasticsearchReaderAPI,
     DateSlicerRange,
@@ -22,7 +22,7 @@ import {
     IDType,
     InputDateSegments,
     ReaderSlice
-} from '../src/index.js';
+} from '../../src/index.js';
 
 describe('Reader API', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;

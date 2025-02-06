@@ -188,7 +188,7 @@ describe('spaces_reader slicer', () => {
                 q: `created:[${start.toISOString()} TO ${end.toISOString()}} AND (slicer:query)`,
                 size: 0,
                 variables,
-                track_total_hits: true
+                track_total_hits: 3
             };
 
             scope.get(`/${testIndex}/_info?token=${token}`)
@@ -224,3 +224,16 @@ describe('spaces_reader slicer', () => {
         });
     });
 });
+
+/*
+{
+      {
+        q: 'created:[2012-12-12T00:00:00.000Z TO 2012-12-12T00:01:00.000Z} AND (slicer:query)',
+        size: 0,
+        variables: { '@foo': 'foo', '$bar': 'bar' },
+        track_total_hits: true
+      },
+      start: '2012-12-12T00:00:00.000Z',
+      end: '2012-12-12T00:01:00.000Z'
+    }
+*/
