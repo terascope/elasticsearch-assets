@@ -5,7 +5,7 @@ import {
 } from '@terascope/utils';
 import { createSpacesReaderAPI, SpacesAPIConfig, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
 
-export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, SpacesAPIConfig > {
+export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, SpacesAPIConfig> {
     // TODO: this needs more validation
     validateConfig(config: unknown): SpacesAPIConfig {
         if (isNil(config)) {
