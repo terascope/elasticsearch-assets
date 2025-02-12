@@ -4,7 +4,7 @@ import {
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow, isKey,
+    pRetry, toIntegerOrThrow, isKey, TSError,
 } from '@terascope/utils';
 import {
     ClientParams, ClientResponse,
@@ -125,8 +125,7 @@ export class ElasticsearchReaderAPI {
             }
         }
 
-        const _fetch = async ():
-        Promise<DataEntity[] | DataFrame | Buffer> => {
+        const _fetch = async (): Promise<DataEntity[] | DataFrame | Buffer> => {
             const query = buildQuery(this.config, {
                 ...queryParams, count: querySize
             });
@@ -145,17 +144,22 @@ export class ElasticsearchReaderAPI {
                 // throw away these results, expand querySize and query again
                 // by relying on pRetry
                 const expandedSize = Math.ceil(querySize * countExpansionFactor);
+
                 if (this.windowSize) {
                     if (expandedSize >= this.windowSize) {
-                        throw new Error(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
+                        const myErr = new TSError(`The query size, ${expandedSize}, is greater than the index.max_result_window: ${this.windowSize}`);
+                        myErr.retryable = false;
+                        throw myErr;
                     } else {
                         querySize = expandedSize;
                     }
                 }
+
                 const msg = `The result set contained exactly ${resultSize} records, searching again with size: ${expandedSize}`;
                 this.logger.debug(msg);
                 throw new Error(msg); // throw for pRetry
             }
+
             this.recordsFetched += resultSize;
 
             return result;
@@ -166,7 +170,6 @@ export class ElasticsearchReaderAPI {
                 backoff: 1.1,
                 delay: 250,
                 retries: retryLimit,
-                matches: ['result set contained exactly']
                 // reason disable due to this bug:
                 // https://github.com/terascope/teraslice/issues/3286
                 // reason: `Retry limit (${retryLimit}) hit`
