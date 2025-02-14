@@ -31,7 +31,7 @@ describe('id_reader slicer', () => {
     });
 
     afterAll(async () => {
-        // await cleanupIndex(esClient, `${apiReaderIndex}*`);
+        await cleanupIndex(esClient, `${apiReaderIndex}*`);
     });
 
     beforeEach(() => {
@@ -199,7 +199,8 @@ describe('id_reader slicer', () => {
         const expectedResults = [
             { keys: ['a[0-4]'], count: 17 },
             { keys: ['a[5-8]'], count: 15 },
-            { keys: ['a[9]'], count: 8 },
+            { keys: ['a[9a-c]'], count: 17 },
+            { keys: ['a[d-f]'], count: 9 },
         ];
 
         expect(results.length).toBeGreaterThan(1);
@@ -207,6 +208,113 @@ describe('id_reader slicer', () => {
         results.forEach((result, index) => {
             expect(result).toMatchObject(expectedResults[index]);
         });
+    });
+
+    it('can fit slices down to size with recursive optimizations for the entire index', async () => {
+        const opConfig = {
+            _op: 'id_reader',
+            key_type: 'hexadecimal',
+            field,
+            index: apiReaderIndex,
+            size: 20,
+            recurse_optimization: true
+        };
+
+        const test = await makeSlicerTest(opConfig);
+        const results = await test.getAllSlices();
+
+        expect(results.pop()).toBeNull();
+
+        // this double recurses, first it takes 5 keys, then switches to taking 4 keys
+        const expectedResults = [
+            { keys: ['0[0-3]'], count: 16 },
+            { keys: ['0[4-7]'], count: 16 },
+            { keys: ['0[8-9a-b]'], count: 19 },
+            { keys: ['0[c-f]'], count: 19 },
+            { keys: ['1[0-3]'], count: 18 },
+            { keys: ['1[4-7]'], count: 10 },
+            { keys: ['1[8-9a-b]'], count: 11 },
+            { keys: ['1[c-f]'], count: 16 },
+            { keys: ['2[0-4]'], count: 20 },
+            { keys: ['2[5-9]'], count: 14 },
+            { keys: ['2[a-e]'], count: 17 },
+            { keys: ['2[f]'], count: 4 },
+            { keys: ['3[0-4]'], count: 5 },
+            { keys: ['3[5-8]'], count: 17 },
+            { keys: ['3[9a-b]'], count: 16 },
+            { keys: ['3[c-e]'], count: 12 },
+            { keys: ['3[f]'], count: 4 },
+            { keys: ['4[0-3]'], count: 14 },
+            { keys: ['4[4-7]'], count: 17 },
+            { keys: ['4[8-9]'], count: 12 },
+            { keys: ['4[a-b]'], count: 15 },
+            { keys: ['4[c-d]'], count: 5 },
+            { keys: ['4[e-f]'], count: 5 },
+            { keys: ['5[0-3]'], count: 18 },
+            { keys: ['5[4-7]'], count: 17 },
+            { keys: ['5[8-9a-b]'], count: 11 },
+            { keys: ['5[c-f]'], count: 18 },
+            { keys: ['6[0-5]'], count: 14 },
+            { keys: ['6[6-9a]'], count: 18 },
+            { keys: ['6[b-f]'], count: 20 },
+            { keys: ['7[0-3]'], count: 17 },
+            { keys: ['7[4-7]'], count: 20 },
+            { keys: ['7[8-9a]'], count: 15 },
+            { keys: ['7[b-d]'], count: 16 },
+            { keys: ['7[e-f]'], count: 12 },
+            { keys: ['8[0-3]'], count: 17 },
+            { keys: ['8[4-6]'], count: 19 },
+            { keys: ['8[7-8]'], count: 13 },
+            { keys: ['8[9a]'], count: 11 },
+            { keys: ['8[b-c]'], count: 5 },
+            { keys: ['8[d-e]'], count: 6 },
+            { keys: ['8[f]'], count: 4 },
+            { keys: ['9[0-2]'], count: 13 },
+            { keys: ['9[3-5]'], count: 16 },
+            { keys: ['9[6-8]'], count: 11 },
+            { keys: ['9[9a-b]'], count: 12 },
+            { keys: ['9[c-e]'], count: 8 },
+            { keys: ['9[f]'], count: 4 },
+            { keys: ['a[0-4]'], count: 17 },
+            { keys: ['a[5-8]'], count: 15 },
+            { keys: ['a[9a-c]'], count: 17 },
+            { keys: ['a[d-f]'], count: 9 },
+            { keys: ['b[0-2]'], count: 7 },
+            { keys: ['b[3-5]'], count: 15 },
+            { keys: ['b[6-8]'], count: 18 },
+            { keys: ['b[9a-b]'], count: 16 },
+            { keys: ['b[c-e]'], count: 20 },
+            { keys: ['b[f]'], count: 6 },
+            { keys: ['c[0-3]'], count: 18 },
+            { keys: ['c[4-5]'], count: 12 },
+            { keys: ['c[6-7]'], count: 10 },
+            { keys: ['c[8-9]'], count: 6 },
+            { keys: ['c[a-b]'], count: 7 },
+            { keys: ['c[c-d]'], count: 4 },
+            { keys: ['c[e-f]'], count: 7 },
+            { keys: ['d[0-5]'], count: 17 },
+            { keys: ['d[6-9a-b]'], count: 19 },
+            { keys: ['d[c-f]'], count: 13 },
+            { keys: ['e[0-3]'], count: 18 },
+            { keys: ['e[4-7]'], count: 15 },
+            { keys: ['e[8-9a-b]'], count: 14 },
+            { keys: ['e[c-f]'], count: 12 },
+            { keys: ['f[0-5]'], count: 15 },
+            { keys: ['f[6-9a]'], count: 18 },
+            { keys: ['f[b-f]'], count: 18 },
+        ];
+
+        const totalSlicedCount = expectedResults.reduce((prev, curr) => {
+            return curr.count + prev;
+        }, 0);
+
+        expect(results.length).toBeGreaterThan(1);
+
+        results.forEach((result, index) => {
+            expect(result).toMatchObject(expectedResults[index]);
+        });
+
+        expect(totalSlicedCount).toEqual(bulkData.length);
     });
 
     it('produces values starting at a specific depth', async () => {
