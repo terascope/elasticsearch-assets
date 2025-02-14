@@ -1,7 +1,7 @@
 {
     "name": "asset",
     "displayName": "Asset",
-    "version": "4.2.1",
+    "version": "4.2.2",
     "private": true,
     "description": "",
     "license": "MIT",
@@ -20,7 +20,7 @@
     "dependencies": {
         "@terascope/data-mate": "~1.7.5",
         "@terascope/elasticsearch-api": "~4.8.2",
-        "@terascope/elasticsearch-asset-apis": "~1.2.1",
+        "@terascope/elasticsearch-asset-apis": "~1.2.2",
         "@terascope/job-components": "~1.9.5",
         "@terascope/teraslice-state-storage": "~1.8.2",
         "@terascope/utils": "~1.7.4",
