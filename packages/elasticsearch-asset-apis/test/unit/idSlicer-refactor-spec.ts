@@ -160,6 +160,47 @@ describe('Refactored idSlicer', () => {
         expect(results).toEqual(expectedResults);
     });
 
+    it('should be able to optimize the recursive call back to back', async () => {
+        const client = new MockClient();
+        let hasRecursed = false;
+
+        client.setSequenceData([
+            { count: 50 },
+            { count: 110 },
+            { count: 50 },
+            { count: 50 },
+            { count: 110 },
+            { count: 50 },
+            { count: 50 },
+            { count: 50 },
+        ]);
+
+        events.on('slicer:slice:recursion', () => {
+            hasRecursed = true;
+        });
+
+        const slicer = makeIdSlicer({
+            size: 100,
+            startingKeyDepth: 0,
+            keySet: ['a', 'b', 'c', 'd'],
+            client,
+            baseKey: IDType.hexadecimal
+        });
+
+        const expectedResults = [
+            { keys: ['a'], count: 50 },
+            { keys: ['b[0-9a-d]'], count: 50 },
+            { keys: ['b[e-f]'], count: 50 },
+            { keys: ['c'], count: 50 },
+            null
+        ];
+
+        const results = await gatherSlices(slicer);
+
+        expect(hasRecursed).toBeTrue();
+        expect(results).toEqual(expectedResults);
+    });
+
     it('should be able to optimize the recursive call with special chars', async () => {
         const client = new MockClient([], 50);
         let hasRecursed = false;

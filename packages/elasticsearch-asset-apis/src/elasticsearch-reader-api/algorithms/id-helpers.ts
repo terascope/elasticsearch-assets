@@ -96,20 +96,22 @@ const base64SpecialChars = Object.freeze([
     '/'
 ]);
 
+// base64 based: upper, lower, numbers then special chars
 export const base64url = Object.freeze([
-    ...lowerCaseChars,
     ...upperCaseChars,
+    ...lowerCaseChars,
     ...numerics,
     ...base64URLSpecialChars
 ]);
 
 export const base64 = Object.freeze([
-    ...lowerCaseChars,
     ...upperCaseChars,
+    ...lowerCaseChars,
     ...numerics,
     ...base64SpecialChars
 ]);
 
+// hexadecimal: numbers first then chars
 export const hexadecimal = Object.freeze([
     ...numerics,
     ...lowerCaseHexChars
@@ -134,8 +136,8 @@ export class SplitKeyTracker {
             specialChars.__uniqueChars = true;
 
             this.keyList.push(
-                [...lowerCaseChars].reverse(),
                 [...upperCaseChars].reverse(),
+                [...lowerCaseChars].reverse(),
                 [...numerics].reverse(),
                 specialChars,
             );
@@ -145,8 +147,8 @@ export class SplitKeyTracker {
             // @ts-expect-error
             specialChars.__uniqueChars = true;
             this.keyList.push(
-                [...lowerCaseChars].reverse(),
                 [...upperCaseChars].reverse(),
+                [...lowerCaseChars].reverse(),
                 [...numerics].reverse(),
                 specialChars,
             );
@@ -174,10 +176,13 @@ export class SplitKeyTracker {
             throw new Error(`Input ${str} does not contain valid characters`);
         }
 
-        for (let list of this.keyList) {
-            const keyFound = list.includes(char);
+        let keyFound = false;
 
-            if (keyFound) {
+        for (let list of this.keyList) {
+            const keyInList = list.includes(char);
+            keyFound = true;
+
+            if (keyInList) {
                 let correctSpot = false;
 
                 while (!correctSpot) {
@@ -190,7 +195,8 @@ export class SplitKeyTracker {
                         this.ind -= 1;
                     }
                 }
-            } else {
+                // don't want to delete future lists, only earlier lists
+            } else if (!keyFound) {
                 // we empty out and move the marker
                 this.ind += list.length;
                 list = [];
