@@ -89,8 +89,8 @@ describe('id-helpers', () => {
                 const batch4 = tracker.split(2);
                 const batch5 = tracker.split(4);
 
-                expect(batch1).toEqual('a-z');
-                expect(batch2).toEqual('A-Z');
+                expect(batch1).toEqual('A-Z');
+                expect(batch2).toEqual('a-z');
                 expect(batch3).toEqual('0-9');
                 expect(batch4).toEqual('-_');
                 expect(batch5).toEqual('');
@@ -108,12 +108,12 @@ describe('id-helpers', () => {
                 const batch7 = tracker.split(10);
                 const batch8 = tracker.split(10);
 
-                expect(batch1).toEqual('a-j');
-                expect(batch2).toEqual('k-t');
-                expect(batch3).toEqual('u-zA-D');
-                expect(batch4).toEqual('E-N');
-                expect(batch5).toEqual('O-X');
-                expect(batch6).toEqual('Y-Z0-7');
+                expect(batch1).toEqual('A-J');
+                expect(batch2).toEqual('K-T');
+                expect(batch3).toEqual('U-Za-d');
+                expect(batch4).toEqual('e-n');
+                expect(batch5).toEqual('o-x');
+                expect(batch6).toEqual('y-z0-7');
                 expect(batch7).toEqual('8-9-_');
                 expect(batch8).toEqual('');
             });
@@ -129,8 +129,8 @@ describe('id-helpers', () => {
                 const batch4 = tracker.split(4);
                 const batch5 = tracker.split(4);
 
-                expect(batch1).toEqual('a-z');
-                expect(batch2).toEqual('A-Z');
+                expect(batch1).toEqual('A-Z');
+                expect(batch2).toEqual('a-z');
                 expect(batch3).toEqual('0-9');
                 expect(batch4).toEqual('-_+/');
                 expect(batch5).toEqual('');
@@ -148,12 +148,12 @@ describe('id-helpers', () => {
                 const batch7 = tracker.split(10);
                 const batch8 = tracker.split(10);
 
-                expect(batch1).toEqual('a-j');
-                expect(batch2).toEqual('k-t');
-                expect(batch3).toEqual('u-zA-D');
-                expect(batch4).toEqual('E-N');
-                expect(batch5).toEqual('O-X');
-                expect(batch6).toEqual('Y-Z0-7');
+                expect(batch1).toEqual('A-J');
+                expect(batch2).toEqual('K-T');
+                expect(batch3).toEqual('U-Za-d');
+                expect(batch4).toEqual('e-n');
+                expect(batch5).toEqual('o-x');
+                expect(batch6).toEqual('y-z0-7');
                 expect(batch7).toEqual('8-9-_+/');
                 expect(batch8).toEqual('');
             });
