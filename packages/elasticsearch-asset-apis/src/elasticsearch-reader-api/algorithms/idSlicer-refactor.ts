@@ -3,7 +3,7 @@ import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults,
     IDType
 } from '../interfaces.js';
-import { generateCountQueryForKeys, SplitKeyTracker } from './id-helpers.js';
+import { generateCountQueryForKeys, SplitKeyManager } from './id-utils/index.js';
 
 export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {
@@ -147,19 +147,15 @@ export function* splitKeys(
     str: string,
     keyType: IDType,
     ratio: number,
-    forwardTo?: string
 ): KeyGenerator {
+    const tracker = new SplitKeyManager(keyType);
+
+    let chunkSize = ratio;
     let isLimitOfSplitting = false;
-    const tracker = new SplitKeyTracker(keyType);
-
-    if (forwardTo) {
-        tracker.forward(forwardTo);
-    }
-
     let isDone = false;
 
     while (!isDone) {
-        const split = tracker.split(ratio);
+        const split = tracker.split(chunkSize);
 
         if (split.length === 0) {
             isDone = true;
@@ -170,22 +166,24 @@ export function* splitKeys(
             isLimitOfSplitting = true;
         }
 
-        const response = yield `${str}[${split}]`;
+        const response = yield `${str}${split}`;
 
+        // if its a number, the current split is too big
         if (isNumber(response)) {
             if (isLimitOfSplitting) {
                 // if we have to split further and we are at limit, do normal recursion
-                // on that key
+                // on that key, split is just a single char here
                 yield * recurse(baseArray, `${str}${split}`, keyType);
                 isDone = true;
             } else {
-                const newRatio = Math.max(
+                // change to chunk size, do not commit as we need to redo
+                chunkSize = Math.max(
                     Math.floor(ratio * (response / baseArray.length)),
                     1
                 );
-                yield * splitKeys(baseArray, str, keyType, newRatio, split);
-                isDone = true;
             }
+        } else {
+            tracker.commit();
         }
     }
 

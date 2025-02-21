@@ -242,6 +242,50 @@ describe('Refactored idSlicer', () => {
         expect(results).toEqual(expectedResults);
     });
 
+    it('should be able to work when the recursive size is to big as well', async () => {
+        const client = new MockClient();
+        let hasRecursed = false;
+
+        client.setSequenceData([
+            { count: 50 },
+            { count: 110 },
+            { count: 110 },
+            { count: 50 },
+            { count: 50 },
+            { count: 110 },
+            { count: 50 },
+            { count: 50 },
+            { count: 50 },
+        ]);
+
+        events.on('slicer:slice:recursion', () => {
+            hasRecursed = true;
+        });
+
+        const slicer = makeIdSlicer({
+            size: 100,
+            startingKeyDepth: 0,
+            keySet: ['a', 'b', 'c', 'd'],
+            client,
+            baseKey: IDType.hexadecimal
+        });
+
+        const expectedResults = [
+            { keys: ['a'], count: 50 },
+            { keys: ['b[0-9a-b]'], count: 50 },
+            { keys: ['b[c-f]'], count: 50 },
+            { keys: ['c[0-9a-d]'], count: 50 },
+            { keys: ['c[e-f]'], count: 50 },
+            { keys: ['d'], count: 50 },
+            null
+        ];
+
+        const results = await gatherSlices(slicer);
+
+        expect(hasRecursed).toBeTrue();
+        expect(results).toEqual(expectedResults);
+    });
+
     it('should be able to recurse correctly with startingDepth', async () => {
         const client = new MockClient([], 50);
         let hasRecursed = false;

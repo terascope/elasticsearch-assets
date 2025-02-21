@@ -25,7 +25,7 @@ import {
     determineDateSlicerRange,
     splitTime
 } from './date-helpers.js';
-import { getKeyArray } from './id-helpers.js';
+import { getKeyArray } from './id-utils/index.js';
 
 interface DateParams {
     start: moment.Moment;

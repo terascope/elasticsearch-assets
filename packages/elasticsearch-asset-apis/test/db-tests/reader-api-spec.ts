@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
 import {
     ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
     isElasticsearch8
@@ -7,21 +7,13 @@ import {
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient
+    TEST_INDEX_PREFIX, cleanupIndex, populateIndex,
+    waitForData, makeClient
 } from '../helpers/index.js';
 import {
-    createElasticsearchReaderAPI,
-    DateSlicerRange,
-    ElasticsearchReaderClient,
-    ESReaderOptions,
-    FetchResponseType,
-    IDType,
-    InputDateSegments,
-    ReaderSlice
+    createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
+    ESReaderOptions, FetchResponseType, IDType,
+    InputDateSegments, ReaderSlice
 } from '../../src/index.js';
 
 describe('Reader API', () => {
@@ -32,6 +24,21 @@ describe('Reader API', () => {
 
     function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
+    }
+
+    async function gatherSlices(fn: () => Promise<any>) {
+        const results: any[] = [];
+
+        await pWhile(async () => {
+            const slice = await fn();
+            results.push(slice);
+
+            if (slice == null) {
+                return true;
+            }
+        }, { timeoutMs: 100000 });
+
+        return results;
     }
 
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
@@ -622,6 +629,88 @@ describe('Reader API', () => {
                 keys: ['a'],
                 count: 58
             });
+        });
+
+        it.only('can make id slices with recurse_optimization', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const opConfig2 = {
+                ...defaultConfig,
+                size: 1000,
+                recurse_optimization: false
+            };
+    
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: readerClient, logger, emitter
+            });
+
+            const api2 = createElasticsearchReaderAPI({
+                config: opConfig2, client: readerClient, logger, emitter
+            });
+
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const idSlicer = await api2.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const [slices, slices2] = await Promise.all([
+                gatherSlices(slicer),
+                gatherSlices(idSlicer)
+            ]);
+
+            slices.pop();
+            slices2.pop();
+
+            console.dir(slices, { depth: 40 })
+            console.log('\n\n\n')
+            console.log('regular', '\n\n\n')
+            console.dir(slices2, { depth: 40 })
+            console.log('\n\n\n')
+
+            const tracker: Record<string, number> = {};
+            const myCount = slices.reduce((prev, curr) => {
+                const key = curr.keys[0][0];
+                if (key in tracker) {
+                    tracker[key] += curr.count;
+                } else {
+                    tracker[key] = curr.count;
+                }
+
+                return curr.count + prev;
+            }, 0);
+
+            const myCount2 = slices2.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            console.dir(tracker, { depth: 40 })
+            console.log('\n\n\n')
+            console.log('myCount', myCount)
+            console.log('myCount2', myCount2)
+            console.log('myCount2', myCount2)
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice);
+                // @ts-expect-error
+                return { slice, data, num: data.length };
+            });
+            console.log('\n\n\n')
+
+            console.dir(records, { depth: 40 })
+            console.log('\n\n\n')
+
         });
 
         it('will throw is size is beyond window_size of index', async () => {

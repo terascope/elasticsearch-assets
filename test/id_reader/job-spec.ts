@@ -230,4 +230,46 @@ describe('id_reader job', () => {
             expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
         });
     });
+
+    fit('can fetch all even-data with recursive optimizations set to true', async () => {
+        const apiConfig = {
+            _name: 'elasticsearch_reader_api',
+            type: docType,
+            field: id_field_name,
+            index: evenIndex,
+            key_type: IDType.base64url,
+            recurse_optimization: true,
+            size: 40
+        };
+
+        const job = newTestJobConfig({
+            slicers: 1,
+            max_retries: 0,
+            apis: [apiConfig],
+            operations: [
+                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'noop' }
+            ],
+        });
+
+        harness = new JobTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const keyList = getKeyArray(IDType.base64url);
+
+        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
+
+        const sliceResults = await harness.runToCompletion();
+
+        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
+
+        sliceResults.forEach((results) => {
+            const idChar = results.data[0][id_field_name].charAt(0);
+
+            expect(keyList).toContain(idChar);
+            expect(evenSpreadIds.has(idChar)).toEqual(true);
+            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
+        });
+    });
 });
