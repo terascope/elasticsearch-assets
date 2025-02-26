@@ -19,20 +19,19 @@ import {
     ReaderSlice
 } from '../../src/index.js';
 
-describe('Reader API', () => {
-    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_cross_cluster`;
+describe('id_reader tests', () => {
+    const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_id_reader`;
     const logger = debugLogger('api-dataFrame-test');
     const emitter = new EventEmitter();
     const idFieldName = 'uuid';
-    const baseIndex = 'es_d1-foo-v1-bar';
-    const queryIndex = 'es_d*-foo-v1-*';
+
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
     }
 
-    const crossClusterTestIndex = makeIndex(baseIndex);
+    const testIndex = makeIndex('id_refactored_tests');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const docType = '_doc';
@@ -44,14 +43,14 @@ describe('Reader API', () => {
 
         readerClient = new ElasticsearchReaderClient(
             client,
-            { index: crossClusterTestIndex },
+            { index: testIndex },
             logger,
         );
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(
-            client, crossClusterTestIndex, evenSpread.EvenDataType, evenBulkData, docType
+            client, testIndex, evenSpread.EvenDataType, evenBulkData, docType
         );
-        await waitForData(client, crossClusterTestIndex, evenBulkData.length);
+        await waitForData(client, testIndex, evenBulkData.length);
     });
 
     afterAll(async () => {
@@ -60,7 +59,7 @@ describe('Reader API', () => {
 
     describe('Cross cluster searching', () => {
         const defaultConfig: ESReaderOptions = Object.seal({
-            index: makeIndex(queryIndex),
+            index: testIndex,
             size: 1000,
             date_field_name: 'created',
             query: '*',
@@ -119,7 +118,6 @@ describe('Reader API', () => {
 
             const slice = await slicer() as ReaderSlice;
 
-            // it skips all the way to "a" because the uuids are hex based
             expect(slice).toEqual({
                 keys: ['a'], count: 58
             });

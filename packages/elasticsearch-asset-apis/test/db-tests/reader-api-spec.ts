@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
 import {
     ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
     isElasticsearch8
@@ -7,21 +7,13 @@ import {
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient
+    TEST_INDEX_PREFIX, cleanupIndex, populateIndex,
+    waitForData, makeClient
 } from '../helpers/index.js';
 import {
-    createElasticsearchReaderAPI,
-    DateSlicerRange,
-    ElasticsearchReaderClient,
-    ESReaderOptions,
-    FetchResponseType,
-    IDType,
-    InputDateSegments,
-    ReaderSlice
+    createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
+    ESReaderOptions, FetchResponseType, IDType,
+    InputDateSegments, ReaderSlice
 } from '../../src/index.js';
 
 describe('Reader API', () => {
@@ -32,6 +24,21 @@ describe('Reader API', () => {
 
     function makeIndex(str: string): string {
         return `${readerIndex}_${str}`;
+    }
+
+    async function gatherSlices(fn: () => Promise<any>) {
+        const results: any[] = [];
+
+        await pWhile(async () => {
+            const slice = await fn();
+            results.push(slice);
+
+            if (slice == null) {
+                return true;
+            }
+        }, { timeoutMs: 100000 });
+
+        return results;
     }
 
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
@@ -61,6 +68,7 @@ describe('Reader API', () => {
             { index: evenIndex },
             logger,
         );
+
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
         await waitForData(client, evenIndex, evenBulkData.length);
@@ -624,6 +632,92 @@ describe('Reader API', () => {
             });
         });
 
+        it('can make id slices with recurse_optimization', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['a[A-Za-r]'], count: 18 },
+                { keys: ['a[s-z0-9-_]'], count: 40 },
+                { keys: ['b[A-Za-e]'], count: 29 },
+                { keys: ['b[f-z0-1]'], count: 9 },
+                { keys: ['b[2-8]'], count: 37 },
+                { keys: ['b[9-_]'], count: 7 },
+                { keys: ['c[A-Za-n]'], count: 18 },
+                { keys: ['c[o-z0-7]'], count: 40 },
+                { keys: ['c[8-9-_]'], count: 6 },
+                { keys: ['d[A-Za-z]'], count: 17 },
+                { keys: ['d[0-9-_]'], count: 32 },
+                { keys: ['e[A-Za-q]'], count: 18 },
+                { keys: ['e[r-z0-8]'], count: 36 },
+                { keys: ['e[9-_]'], count: 5 },
+                { keys: ['f[A-Za-x]'], count: 21 },
+                { keys: ['f[y-z0-9-_]'], count: 30 },
+                { keys: ['0[A-Za-j]'], count: 33 },
+                { keys: ['0[k-z0-9-_]'], count: 37 },
+                { keys: ['1[A-Za-t]'], count: 25 },
+                { keys: ['1[u-z0-9-_]'], count: 30 },
+                { keys: ['2[A-Za-t]'], count: 21 },
+                { keys: ['2[u-z0-9-_]'], count: 34 },
+                { keys: ['3[A-Za-u]'], count: 25 },
+                { keys: ['3[v-z0-9-_]'], count: 29 },
+                { keys: ['4[A-Za-k]'], count: 25 },
+                { keys: ['4[l-z0-8]'], count: 34 },
+                { keys: ['4[9-_]'], count: 9 },
+                { keys: ['5[A-Za-n]'], count: 22 },
+                { keys: ['5[o-z0-8]'], count: 37 },
+                { keys: ['5[9-_]'], count: 5 },
+                { keys: ['6[A-Za-w]'], count: 24 },
+                { keys: ['6[x-z0-9-_]'], count: 28 },
+                { keys: ['7[A-Za-f]'], count: 35 },
+                { keys: ['7[g-z0-7]'], count: 37 },
+                { keys: ['7[8-9-_]'], count: 8 },
+                { keys: ['8[A-Za-h]'], count: 17 },
+                { keys: ['8[i-z0-4]'], count: 23 },
+                { keys: ['8[5-9-_]'], count: 35 },
+                { keys: ['9[A-Za-n]'], count: 23 },
+                { keys: ['9[o-z0-8]'], count: 40 },
+                { keys: ['9[9-_]'], count: 1 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            // get rid of the null
+            slices.pop();
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(evenBulkData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
         it('will throw is size is beyond window_size of index', async () => {
             const size = 1000000000;
 
@@ -668,102 +762,102 @@ describe('Reader API', () => {
             expect(results).toEqual([
                 {
                     keys: [
-                        'a',
-                        'h',
-                        'o',
-                        'v',
-                        'C',
-                        'J',
-                        'Q',
-                        'X',
-                        '4',
-                        '_'
-                    ],
-                    count: 126
-                },
-                {
-                    keys: [
-                        'b',
-                        'i',
-                        'p',
-                        'w',
-                        'D',
-                        'K',
-                        'R',
-                        'Y',
-                        '5'
-                    ],
-                    count: 146
-                },
-                {
-                    keys: [
-                        'c',
-                        'j',
-                        'q',
-                        'x',
-                        'E',
-                        'L',
-                        'S',
-                        'Z',
-                        '6'
-                    ],
-                    count: 116
-                },
-                {
-                    keys: [
-                        'd',
-                        'k',
-                        'r',
-                        'y',
-                        'F',
-                        'M',
-                        'T',
-                        '0',
-                        '7'
-                    ],
-                    count: 199
-                },
-                {
-                    keys: [
-                        'e',
-                        'l',
-                        's',
-                        'z',
-                        'G',
-                        'N',
-                        'U',
-                        '1',
-                        '8'
-                    ],
-                    count: 189
-                },
-                {
-                    keys: [
-                        'f',
-                        'm',
-                        't',
                         'A',
                         'H',
                         'O',
                         'V',
-                        '2',
-                        '9'
+                        'c',
+                        'j',
+                        'q',
+                        'x',
+                        '4',
+                        '_'
                     ],
-                    count: 170
+                    count: 132
                 },
                 {
                     keys: [
-                        'g',
-                        'n',
-                        'u',
                         'B',
                         'I',
                         'P',
                         'W',
+                        'd',
+                        'k',
+                        'r',
+                        'y',
+                        '5'
+                    ],
+                    count: 113
+                },
+                {
+                    keys: [
+                        'C',
+                        'J',
+                        'Q',
+                        'X',
+                        'e',
+                        'l',
+                        's',
+                        'z',
+                        '6'
+                    ],
+                    count: 111
+                },
+                {
+                    keys: [
+                        'D',
+                        'K',
+                        'R',
+                        'Y',
+                        'f',
+                        'm',
+                        't',
+                        '0',
+                        '7'
+                    ],
+                    count: 201
+                },
+                {
+                    keys: [
+                        'E',
+                        'L',
+                        'S',
+                        'Z',
+                        'g',
+                        'n',
+                        'u',
+                        '1',
+                        '8'
+                    ],
+                    count: 130
+                },
+                {
+                    keys: [
+                        'F',
+                        'M',
+                        'T',
+                        'a',
+                        'h',
+                        'o',
+                        'v',
+                        '2',
+                        '9'
+                    ],
+                    count: 177
+                },
+                {
+                    keys: [
+                        'G',
+                        'N',
+                        'U',
+                        'b',
+                        'i',
+                        'p',
+                        'w',
                         '3',
                         '-'
                     ],
-                    count: 54
+                    count: 136
                 }
             ]);
         });
