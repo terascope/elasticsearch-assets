@@ -119,6 +119,7 @@ describe('Reader API', () => {
 
             const slice = await slicer() as ReaderSlice;
 
+            // it skips all the way to "a" because the uuids are hex based
             expect(slice).toEqual({
                 keys: ['a'], count: 58
             });

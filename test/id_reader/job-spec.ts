@@ -231,7 +231,7 @@ describe('id_reader job', () => {
         });
     });
 
-    fit('can fetch all even-data with recursive optimizations set to true', async () => {
+    it('can fetch all even-data with recursive optimizations set to true', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
             type: docType,

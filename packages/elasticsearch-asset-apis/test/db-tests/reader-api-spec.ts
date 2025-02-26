@@ -68,6 +68,7 @@ describe('Reader API', () => {
             { index: evenIndex },
             logger,
         );
+
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
         await waitForData(client, evenIndex, evenBulkData.length);
@@ -631,27 +632,16 @@ describe('Reader API', () => {
             });
         });
 
-        it.only('can make id slices with recurse_optimization', async () => {
+        it('can make id slices with recurse_optimization', async () => {
             const opConfig = {
                 ...defaultConfig,
                 size: 40,
                 recurse_optimization: true
             };
 
-            const opConfig2 = {
-                ...defaultConfig,
-                size: 1000,
-                recurse_optimization: false
-            };
-    
             const api = createElasticsearchReaderAPI({
                 config: opConfig, client: readerClient, logger, emitter
             });
-
-            const api2 = createElasticsearchReaderAPI({
-                config: opConfig2, client: readerClient, logger, emitter
-            });
-
 
             const slicer = await api.makeIDSlicer({
                 slicerID: 0,
@@ -659,58 +649,73 @@ describe('Reader API', () => {
                 recoveryData: [],
             });
 
-            const idSlicer = await api2.makeIDSlicer({
-                slicerID: 0,
-                numOfSlicers: 1,
-                recoveryData: [],
-            });
+            const expectedSlices = [
+                { keys: ['a[A-Za-r]'], count: 18 },
+                { keys: ['a[s-z0-9-_]'], count: 40 },
+                { keys: ['b[A-Za-e]'], count: 29 },
+                { keys: ['b[f-z0-1]'], count: 9 },
+                { keys: ['b[2-8]'], count: 37 },
+                { keys: ['b[9-_]'], count: 7 },
+                { keys: ['c[A-Za-n]'], count: 18 },
+                { keys: ['c[o-z0-7]'], count: 40 },
+                { keys: ['c[8-9-_]'], count: 6 },
+                { keys: ['d[A-Za-z]'], count: 17 },
+                { keys: ['d[0-9-_]'], count: 32 },
+                { keys: ['e[A-Za-q]'], count: 18 },
+                { keys: ['e[r-z0-8]'], count: 36 },
+                { keys: ['e[9-_]'], count: 5 },
+                { keys: ['f[A-Za-x]'], count: 21 },
+                { keys: ['f[y-z0-9-_]'], count: 30 },
+                { keys: ['0[A-Za-j]'], count: 33 },
+                { keys: ['0[k-z0-9-_]'], count: 37 },
+                { keys: ['1[A-Za-t]'], count: 25 },
+                { keys: ['1[u-z0-9-_]'], count: 30 },
+                { keys: ['2[A-Za-t]'], count: 21 },
+                { keys: ['2[u-z0-9-_]'], count: 34 },
+                { keys: ['3[A-Za-u]'], count: 25 },
+                { keys: ['3[v-z0-9-_]'], count: 29 },
+                { keys: ['4[A-Za-k]'], count: 25 },
+                { keys: ['4[l-z0-8]'], count: 34 },
+                { keys: ['4[9-_]'], count: 9 },
+                { keys: ['5[A-Za-n]'], count: 22 },
+                { keys: ['5[o-z0-8]'], count: 37 },
+                { keys: ['5[9-_]'], count: 5 },
+                { keys: ['6[A-Za-w]'], count: 24 },
+                { keys: ['6[x-z0-9-_]'], count: 28 },
+                { keys: ['7[A-Za-f]'], count: 35 },
+                { keys: ['7[g-z0-7]'], count: 37 },
+                { keys: ['7[8-9-_]'], count: 8 },
+                { keys: ['8[A-Za-h]'], count: 17 },
+                { keys: ['8[i-z0-4]'], count: 23 },
+                { keys: ['8[5-9-_]'], count: 35 },
+                { keys: ['9[A-Za-n]'], count: 23 },
+                { keys: ['9[o-z0-8]'], count: 40 },
+                { keys: ['9[9-_]'], count: 1 },
+            ];
 
-            const [slices, slices2] = await Promise.all([
-                gatherSlices(slicer),
-                gatherSlices(idSlicer)
-            ]);
+            const slices = await gatherSlices(slicer);
 
+            // get rid of the null
             slices.pop();
-            slices2.pop();
 
-            console.dir(slices, { depth: 40 })
-            console.log('\n\n\n')
-            console.log('regular', '\n\n\n')
-            console.dir(slices2, { depth: 40 })
-            console.log('\n\n\n')
-
-            const tracker: Record<string, number> = {};
-            const myCount = slices.reduce((prev, curr) => {
-                const key = curr.keys[0][0];
-                if (key in tracker) {
-                    tracker[key] += curr.count;
-                } else {
-                    tracker[key] = curr.count;
-                }
-
+            const sliceCount = slices.reduce((prev, curr) => {
                 return curr.count + prev;
             }, 0);
 
-            const myCount2 = slices2.reduce((prev, curr) => {
-                return curr.count + prev;
-            }, 0);
-
-            console.dir(tracker, { depth: 40 })
-            console.log('\n\n\n')
-            console.log('myCount', myCount)
-            console.log('myCount2', myCount2)
-            console.log('myCount2', myCount2)
+            expect(sliceCount).toEqual(evenBulkData.length);
+            expect(slices).toEqual(expectedSlices);
 
             const records = await pMap(slices, async (slice) => {
-                const data = await api.fetch(slice);
-                // @ts-expect-error
-                return { slice, data, num: data.length };
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
             });
-            console.log('\n\n\n')
 
-            console.dir(records, { depth: 40 })
-            console.log('\n\n\n')
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
 
+            expect(recordCount).toEqual(evenBulkData.length);
         });
 
         it('will throw is size is beyond window_size of index', async () => {

@@ -42,6 +42,11 @@ export class KeyChunker extends BaseChunker {
 
         const end = this.keys[endIndex - 1];
 
+        if (start === end) {
+            this.took = 1;
+            return start;
+        }
+
         this.took = endIndex - this.index;
 
         return `${start}-${end}`;

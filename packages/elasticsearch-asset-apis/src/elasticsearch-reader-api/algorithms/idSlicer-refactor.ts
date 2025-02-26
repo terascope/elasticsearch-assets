@@ -177,10 +177,19 @@ export function* splitKeys(
                 isDone = true;
             } else {
                 // change to chunk size, do not commit as we need to redo
-                chunkSize = Math.max(
+                const newChunkSize = Math.max(
                     Math.floor(ratio * (response / baseArray.length)),
                     1
                 );
+
+                // if the old size is less or equal to last calculation, decrease further
+                // this could happen if count size and new ratio are two close together,
+                // the Math.floor will make it the same index number in the array
+                if (chunkSize <= newChunkSize) {
+                    chunkSize -= 1;
+                } else {
+                    chunkSize = newChunkSize;
+                }
             }
         } else {
             tracker.commit();

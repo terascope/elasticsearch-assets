@@ -8,6 +8,7 @@ import {
 
 export class SplitKeyManager {
     keyChunkers: Chunker[] = [];
+    indexCalled: number[] = [];
 
     constructor(type: keyof typeof IDType) {
         if (type === IDType.base64url) {
@@ -40,13 +41,22 @@ export class SplitKeyManager {
     }
 
     split(num: number): string {
+        this.indexCalled = [];
+
         let numOfChars = num;
         let results = '';
+        let index = -1;
 
         for (const chunker of this.keyChunkers) {
+            index += 1;
             if (chunker.isDone) continue;
 
             const { range, took } = chunker.split(numOfChars);
+
+            if (range.length) {
+                this.indexCalled.push(index);
+            }
+
             results += range;
             numOfChars -= took;
 
@@ -63,6 +73,8 @@ export class SplitKeyManager {
     }
 
     commit(): void {
-        this.keyChunkers.forEach((chunker) => chunker.commit());
+        this.indexCalled.forEach((index) => {
+            this.keyChunkers[index].commit();
+        });
     }
 }

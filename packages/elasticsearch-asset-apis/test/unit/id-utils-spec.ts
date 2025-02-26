@@ -85,6 +85,42 @@ describe('id-utils', () => {
                 expect(batch4).toEqual('[c-f]');
                 expect(batch5).toEqual('');
             });
+
+            it('can correctly split across alphanumeric types with a no commit call to shrink the chunk', () => {
+                const tracker = new SplitKeyManager(IDType.hexadecimal);
+
+                const batch1 = tracker.split(4);
+                tracker.commit();
+
+                const batch2 = tracker.split(4);
+                tracker.commit();
+
+                const batch3 = tracker.split(4);
+
+                const batch4 = tracker.split(2);
+                tracker.commit();
+
+                const batch5 = tracker.split(2);
+                tracker.commit();
+
+                const batch6 = tracker.split(2);
+                tracker.commit();
+
+                const batch7 = tracker.split(2);
+                tracker.commit();
+
+                const batch8 = tracker.split(2);
+                tracker.commit();
+
+                expect(batch1).toEqual('[0-3]');
+                expect(batch2).toEqual('[4-7]');
+                expect(batch3).toEqual('[8-9a-b]');
+                expect(batch4).toEqual('[8-9]');
+                expect(batch5).toEqual('[a-b]');
+                expect(batch6).toEqual('[c-d]');
+                expect(batch7).toEqual('[e-f]');
+                expect(batch8).toEqual('');
+            });
         });
 
         describe(`${IDType.HEXADECIMAL}`, () => {
@@ -261,6 +297,54 @@ describe('id-utils', () => {
                 expect(batch7).toEqual('[8-9-_+/]');
                 expect(batch8).toEqual('');
             });
+
+            it('can correctly split across alphanumeric types with a no commit call to shrink the chunk of special chars', () => {
+                const tracker = new SplitKeyManager(IDType.base64);
+
+                const batch1 = tracker.split(10);
+                tracker.commit();
+
+                const batch2 = tracker.split(10);
+                tracker.commit();
+
+                const batch3 = tracker.split(10);
+                tracker.commit();
+
+                const batch4 = tracker.split(10);
+                tracker.commit();
+
+                const batch5 = tracker.split(10);
+                tracker.commit();
+
+                const batch6 = tracker.split(10);
+                tracker.commit();
+
+                const batch7 = tracker.split(10);
+
+                const batch8 = tracker.split(2);
+                tracker.commit();
+
+                const batch9 = tracker.split(2);
+                tracker.commit();
+
+                const batch10 = tracker.split(2);
+                tracker.commit();
+
+                const batch11 = tracker.split(2);
+                tracker.commit();
+
+                expect(batch1).toEqual('[A-J]');
+                expect(batch2).toEqual('[K-T]');
+                expect(batch3).toEqual('[U-Za-d]');
+                expect(batch4).toEqual('[e-n]');
+                expect(batch5).toEqual('[o-x]');
+                expect(batch6).toEqual('[y-z0-7]');
+                expect(batch7).toEqual('[8-9-_+/]');
+                expect(batch8).toEqual('[8-9]');
+                expect(batch9).toEqual('[-_]');
+                expect(batch10).toEqual('[+/]');
+                expect(batch11).toEqual('');
+            });
         });
     });
 
@@ -341,6 +425,19 @@ describe('id-utils', () => {
             expect(chunk).toMatchObject({ range: 'a-z', took: 26 });
             expect(chunk2).toMatchObject({ range: '', took: 0 });
         });
+
+        it('can return a single key', () => {
+            const chunker = new KeyChunker(lowerCaseChars);
+
+            const chunk = chunker.split(25);
+            chunker.commit();
+
+            const chunk2 = chunker.split(25);
+            chunker.commit();
+
+            expect(chunk).toMatchObject({ range: 'a-y', took: 25 });
+            expect(chunk2).toMatchObject({ range: 'z', took: 1 });
+        });
     });
 
     describe('SpecialKeyChunker', () => {
@@ -410,6 +507,19 @@ describe('id-utils', () => {
 
             expect(chunk).toMatchObject({ range: '-_+/', took: 4 });
             expect(chunk2).toMatchObject({ range: '', took: 0 });
+        });
+
+        it('can return a single key', () => {
+            const chunker = new SpecialKeyChunker(base64SpecialChars);
+
+            const chunk = chunker.split(3);
+            chunker.commit();
+
+            const chunk2 = chunker.split(1);
+            chunker.commit();
+
+            expect(chunk).toMatchObject({ range: '-_+', took: 3 });
+            expect(chunk2).toMatchObject({ range: '/', took: 1 });
         });
     });
 });
