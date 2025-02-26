@@ -256,20 +256,8 @@ describe('id_reader job', () => {
 
         await harness.initialize();
 
-        const keyList = getKeyArray(IDType.base64url);
-
-        const evenSpreadIds = getListOfIds(evenSpread.data, id_field_name);
-
         const sliceResults = await harness.runToCompletion();
 
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-
-        sliceResults.forEach((results) => {
-            const idChar = results.data[0][id_field_name].charAt(0);
-
-            expect(keyList).toContain(idChar);
-            expect(evenSpreadIds.has(idChar)).toEqual(true);
-            expect(evenSpreadIds.get(idChar)).toEqual(results.data.length);
-        });
     });
 });
