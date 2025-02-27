@@ -4,6 +4,8 @@
 
 ## Getting Started
 
+TEST
+
 This asset bundle requires a running Teraslice cluster, you can find the documentation [here](https://github.com/terascope/teraslice/blob/master/README.md).
 
 ```bash
