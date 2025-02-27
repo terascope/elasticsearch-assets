@@ -37,10 +37,17 @@ jobs:
       - run: yarn dlx teraslice-cli -v
       - run: yarn dlx teraslice-cli assets build
       - run: ls -l build/
+
+      - name: Get Commit Short SHA
+        id: get-short-sha
+        run: |
+          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
+
       - name: Archive test build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: teraslice-test-asset-${{ matrix.node-version }}
+          name: teraslice-test-asset-${{ matrix.node-version }}-dev-${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}
           path: ./build
           retention-days: 7
 
