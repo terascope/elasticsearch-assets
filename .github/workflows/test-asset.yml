@@ -37,7 +37,7 @@ jobs:
       - name: Get Commit Short SHA
         id: get-short-sha
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha }})
+          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
 
       - name: Append dev tag to version
