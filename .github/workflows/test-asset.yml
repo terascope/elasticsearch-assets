@@ -129,7 +129,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           ARTIFACT_IDS='${{ steps.artifacts-list.outputs.artifact-ids }}'
-          LIST=$(echo "$ARTIFACT_IDS" | jq -r '.[] | "\(.name): https://github.com/"${{ github.repository }}"/actions/runs/"${{ github.run_id }}"/artifacts/\(.id)"')
+          LIST=$(echo "$ARTIFACT_IDS" | jq -r '.[] | "\(.name): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/\(.id)"')
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
           gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
 
