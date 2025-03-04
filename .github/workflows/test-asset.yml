@@ -107,6 +107,8 @@ jobs:
         working-directory: ./packages/elasticsearch-asset-apis
 
   comment-artifact-urls:
+    # skip comment on push event (merge to master)
+    if: github.event_name != 'push'
     needs: test-elasticsearch-assets
     runs-on: ubuntu-latest
     steps:
