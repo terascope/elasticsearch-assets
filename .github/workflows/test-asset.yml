@@ -129,7 +129,7 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           ARTIFACT_URLS='${{ steps.artifacts-list.outputs.artifact-urls }}'
-          LIST=$(echo "$ARTIFACT_URLS" | jq -r '.[] | "\(.name): \(.url)"')
+          LIST=$(echo "$ARTIFACT_URLS" | jq -r '.[] | "\(.name): [Download](\(.url))"')
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
           gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
 
