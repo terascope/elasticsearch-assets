@@ -119,17 +119,17 @@ jobs:
         run: |
           ARTIFACTS_JSON=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
           echo $ARTIFACTS_JSON
-          URL_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, url:.archive_download_url}]')
-          echo $URL_LIST
-          echo "artifact-urls=$URL_LIST" >> "$GITHUB_OUTPUT"
+          ID_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, id:.id}]')
+          echo $ID_LIST
+          echo "artifact-ids=$ID_LIST" >> "$GITHUB_OUTPUT"
           
       - name: Comment on PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
-          ARTIFACT_URLS='${{ steps.artifacts-list.outputs.artifact-urls }}'
-          LIST=$(echo "$ARTIFACT_URLS" | jq -r '.[] | "\(.name): [Download](\(.url))"')
+          ARTIFACT_IDS='${{ steps.artifacts-list.outputs.artifact-ids }}'
+          LIST=$(echo "$ARTIFACT_IDS" | jq -r '.[] | "\(.name): https://github.com/"${{ github.repository }}"/actions/runs/"${{ github.run_id }}"/artifacts/\(.id)"')
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
           gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
 
