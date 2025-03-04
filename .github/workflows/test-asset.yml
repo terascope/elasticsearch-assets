@@ -37,7 +37,7 @@ jobs:
       - name: Get Commit Short SHA
         id: get-short-sha
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.sha }})
+          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
 
       - name: Append dev tag to version
@@ -105,6 +105,31 @@ jobs:
       - name: Test apis for ${{ matrix.search-version }}
         run: yarn test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
+
+  comment-artifact-urls:
+    needs: test-elasticsearch-assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Artifacts List
+        id: artifacts-list
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ARTIFACTS_JSON=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
+          echo $ARTIFACTS_JSON
+          URL_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, url:.archive_download_url}]')
+          echo $URL_LIST
+          echo "artifact-urls=$URL_LIST" >> "$GITHUB_OUTPUT"
+          
+      - name: Comment on PR
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          ARTIFACT_URLS='${{ steps.artifacts-list.outputs.artifact-urls }}'
+          LIST=$(echo "$ARTIFACT_URLS" | jq -r '.[] | "\(.name): \(.url)"')
+          COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
+          gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
 
   check-docker-limit-after:
     needs: test-elasticsearch-assets
