@@ -6,6 +6,13 @@ import {
     lowerCaseHexChars, upperCaseHexChars
 } from '../keys.js';
 
+// for splitting keys we do a regex expression, + has a special meaning
+// so we escape it so it knows that we are looking for the actual char +
+const escapedBase64 = base64SpecialChars.map((char) => {
+    if (char === '+') return '\\+';
+    return char;
+});
+
 export class SplitKeyManager {
     keyChunkers: Chunker[] = [];
     indexCalled: number[] = [];
@@ -23,7 +30,7 @@ export class SplitKeyManager {
                 new KeyChunker([...upperCaseChars]),
                 new KeyChunker([...lowerCaseChars]),
                 new KeyChunker([...numerics]),
-                new SpecialKeyChunker([...base64SpecialChars]),
+                new SpecialKeyChunker([...escapedBase64]),
             );
         } else if (type === IDType.hexadecimal) {
             this.keyChunkers.push(

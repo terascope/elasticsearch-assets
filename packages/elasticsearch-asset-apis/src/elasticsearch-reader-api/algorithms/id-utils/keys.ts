@@ -86,7 +86,7 @@ export const base64URLSpecialChars = Object.freeze([
 
 export const base64SpecialChars = Object.freeze([
     ...base64URLSpecialChars,
-    '+',
+    '\\+',
     '/'
 ]);
 
