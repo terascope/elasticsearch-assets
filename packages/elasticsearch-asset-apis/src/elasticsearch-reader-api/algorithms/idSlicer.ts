@@ -2,7 +2,7 @@ import { TSError } from '@terascope/utils';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults
 } from '../interfaces.js';
-import { generateCountQueryForKeys } from './id-helpers.js';
+import { generateCountQueryForKeys } from './id-utils/index.js';
 
 export function idSlicer(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {

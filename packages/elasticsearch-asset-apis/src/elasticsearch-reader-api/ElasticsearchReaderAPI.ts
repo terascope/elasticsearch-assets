@@ -83,7 +83,6 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
-        // TODO: change this to search probably
         return this.client.count(query as any);
     }
 
