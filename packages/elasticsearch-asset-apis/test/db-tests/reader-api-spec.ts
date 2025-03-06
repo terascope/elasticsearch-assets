@@ -13,7 +13,7 @@ import {
 import {
     createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
     ESReaderOptions, FetchResponseType, IDType,
-    InputDateSegments, ReaderSlice
+    InputDateSegments, ReaderSlice, base64SpecialChars
 } from '../../src/index.js';
 
 describe('Reader API', () => {
@@ -45,10 +45,34 @@ describe('Reader API', () => {
 
     const evenIndex = makeIndex('even_spread');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+
+    const base64Index = makeIndex('base64');
+
+    let keyIndex = 0;
+    const base64Data = evenSpread.data.map(
+        (obj) => {
+            const newKey = obj.uuid.split('');
+            newKey[1] = base64SpecialChars[keyIndex];
+            keyIndex += 1;
+
+            if (keyIndex > 3) {
+                keyIndex = 0;
+            }
+
+            const finalKey = newKey.join('');
+            const data = {
+                ...obj,
+                uuid: finalKey
+            };
+            return DataEntity.make(data, { _key: finalKey });
+        }
+    );
+
     let docType: string | undefined;
 
     let client: any;
     let readerClient: ElasticsearchReaderClient;
+    let base64Client: ElasticsearchReaderClient;
     let majorVersion: number;
 
     beforeAll(async () => {
@@ -69,13 +93,26 @@ describe('Reader API', () => {
             logger,
         );
 
+        base64Client = new ElasticsearchReaderClient(
+            client,
+            { index: base64Index },
+            logger
+        );
+
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
-        await waitForData(client, evenIndex, evenBulkData.length);
+        await Promise.all([
+            populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType),
+            populateIndex(client, base64Index, evenSpread.EvenDataType, base64Data, docType),
+        ]);
+
+        await Promise.all([
+            waitForData(client, evenIndex, evenBulkData.length),
+            waitForData(client, base64Index, base64Data.length),
+        ]);
     });
 
     afterAll(async () => {
-        await cleanupIndex(client, makeIndex('*'));
+        // await cleanupIndex(client, makeIndex('*'));
     });
 
     describe('returning data frames', () => {
@@ -1012,7 +1049,7 @@ describe('Reader API', () => {
             expect(recordCount).toEqual(evenBulkData.length);
         });
 
-        it('can make id slices with recurse_optimization with base64URL', async () => {
+        it('can make id slices with recurse_optimization with base64URL, no special key data', async () => {
             const opConfig = {
                 ...defaultConfig,
                 key_type: IDType.base64url,
@@ -1307,6 +1344,118 @@ describe('Reader API', () => {
             }, 0);
 
             expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64, with base64 keys', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                index: base64Index,
+                key_type: IDType.base64,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: base64Client, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['a-'], count: 13 },
+                { keys: ['a_'], count: 15 },
+                { keys: ['a+'], count: 14 },
+                { keys: ['a/'], count: 16 },
+                { keys: ['b-'], count: 22 },
+                { keys: ['b_'], count: 21 },
+                { keys: ['b+'], count: 20 },
+                { keys: ['b/'], count: 19 },
+                { keys: ['c-'], count: 16 },
+                { keys: ['c_'], count: 16 },
+                { keys: ['c+'], count: 17 },
+                { keys: ['c/'], count: 15 },
+                { keys: ['d-'], count: 12 },
+                { keys: ['d_'], count: 12 },
+                { keys: ['d+'], count: 13 },
+                { keys: ['d/'], count: 12 },
+                { keys: ['e-'], count: 16 },
+                { keys: ['e_'], count: 16 },
+                { keys: ['e+'], count: 12 },
+                { keys: ['e/'], count: 15 },
+                { keys: ['f-'], count: 12 },
+                { keys: ['f_'], count: 11 },
+                { keys: ['f+'], count: 15 },
+                { keys: ['f/'], count: 13 },
+                { keys: ['0-'], count: 18 },
+                { keys: ['0_'], count: 18 },
+                { keys: ['0+'], count: 18 },
+                { keys: ['0/'], count: 16 },
+                { keys: ['1-'], count: 13 },
+                { keys: ['1_'], count: 14 },
+                { keys: ['1+'], count: 13 },
+                { keys: ['1/'], count: 15 },
+                { keys: ['2-'], count: 16 },
+                { keys: ['2_'], count: 13 },
+                { keys: ['2+'], count: 12 },
+                { keys: ['2/'], count: 14 },
+                { keys: ['3-'], count: 13 },
+                { keys: ['3_'], count: 14 },
+                { keys: ['3+'], count: 14 },
+                { keys: ['3/'], count: 13 },
+                { keys: ['4-'], count: 17 },
+                { keys: ['4_'], count: 17 },
+                { keys: ['4+'], count: 17 },
+                { keys: ['4/'], count: 17 },
+                { keys: ['5-'], count: 16 },
+                { keys: ['5_'], count: 16 },
+                { keys: ['5+'], count: 16 },
+                { keys: ['5/'], count: 16 },
+                { keys: ['6-'], count: 12 },
+                { keys: ['6_'], count: 13 },
+                { keys: ['6+'], count: 13 },
+                { keys: ['6/'], count: 14 },
+                { keys: ['7-'], count: 21 },
+                { keys: ['7_'], count: 19 },
+                { keys: ['7+'], count: 20 },
+                { keys: ['7/'], count: 20 },
+                { keys: ['8-'], count: 18 },
+                { keys: ['8_'], count: 20 },
+                { keys: ['8+'], count: 19 },
+                { keys: ['8/'], count: 18 },
+                { keys: ['9-'], count: 15 },
+                { keys: ['9_'], count: 15 },
+                { keys: ['9+'], count: 17 },
+                { keys: ['9/'], count: 17 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            // get rid of the null
+            slices.pop();
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(base64Data.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(base64Data.length);
         });
 
         it('will throw is size is beyond window_size of index', async () => {
