@@ -107,8 +107,8 @@ jobs:
         working-directory: ./packages/elasticsearch-asset-apis
 
   comment-artifact-urls:
-    # skip comment on push event (merge to master)
-    if: github.event_name != 'push'
+    # skip comment on push event (merge to master) and dependabot PRs
+    if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
     needs: test-elasticsearch-assets
     runs-on: ubuntu-latest
     steps:
