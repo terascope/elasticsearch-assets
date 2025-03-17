@@ -133,9 +133,9 @@ export function* recurse(
 
         // false == go deeper, true == all done, number = split keys
         if (resp === false) {
-            yield * recurse(baseArray, newStr, keyType);
+            yield* recurse(baseArray, newStr, keyType);
         } else if (isNumber(resp)) {
-            yield * splitKeys(baseArray, newStr, keyType, resp);
+            yield* splitKeys(baseArray, newStr, keyType, resp);
         }
     }
 
@@ -176,14 +176,14 @@ export function* splitKeys(
             if (isLimitOfSplitting) {
                 // if we have to split further and we are at limit, do normal recursion
                 // on that key
-                yield * recurse(baseArray, `${str}${split}`, keyType);
+                yield* recurse(baseArray, `${str}${split}`, keyType);
                 isDone = true;
             } else {
                 const newRatio = Math.max(
                     Math.floor(ratio * (response / baseArray.length)),
                     1
                 );
-                yield * splitKeys(baseArray, str, keyType, newRatio, split);
+                yield* splitKeys(baseArray, str, keyType, newRatio, split);
                 isDone = true;
             }
         }
@@ -205,12 +205,12 @@ function* recurseDepth(
             const response = yield newStr;
 
             if (response === false) {
-                yield * recurse(baseArray, newStr, keyType);
+                yield* recurse(baseArray, newStr, keyType);
             } else if (isNumber(response)) {
-                yield * splitKeys(baseArray, newStr, keyType, response);
+                yield* splitKeys(baseArray, newStr, keyType, response);
             }
         } else {
-            yield * recurse(baseArray, newStr, keyType);
+            yield* recurse(baseArray, newStr, keyType);
         }
     }
 
@@ -226,9 +226,9 @@ export function* generateKeys(
         const response = yield startKey;
         // false == go deeper, true == all done, number = split keys
         if (response === false) {
-            yield * recurse(baseArray, startKey, keyType);
+            yield* recurse(baseArray, startKey, keyType);
         } else if (isNumber(response)) {
-            yield * splitKeys(baseArray, startKey, keyType, response);
+            yield* splitKeys(baseArray, startKey, keyType, response);
         }
     }
 
@@ -242,7 +242,7 @@ function* generateKeyDepth(
     keyType: IDType
 ): KeyGenerator {
     for (const startKey of keysArray) {
-        yield * recurseDepth(baseArray, startKey, startingKeyDepth, keyType);
+        yield* recurseDepth(baseArray, startKey, startingKeyDepth, keyType);
     }
 
     return null;
