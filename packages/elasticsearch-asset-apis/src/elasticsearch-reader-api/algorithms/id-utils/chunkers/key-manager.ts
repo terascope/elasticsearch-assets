@@ -3,8 +3,8 @@ import { Chunker, KeyChunker, SpecialKeyChunker } from './key-chunkers.js';
 import {
     upperCaseChars, lowerCaseChars, numerics,
     base64SpecialChars, base64URLSpecialChars,
-    lowerCaseHexChars, upperCaseHexChars
-} from '../keys.js';
+    lowerCaseHexChars, upperCaseHexChars, safeRegexChars
+} from '../index.js';
 
 export class SplitKeyManager {
     keyChunkers: Chunker[] = [];
@@ -16,14 +16,14 @@ export class SplitKeyManager {
                 new KeyChunker([...upperCaseChars]),
                 new KeyChunker([...lowerCaseChars]),
                 new KeyChunker([...numerics]),
-                new SpecialKeyChunker([...base64URLSpecialChars]),
+                new SpecialKeyChunker([...base64URLSpecialChars].map(safeRegexChars)),
             );
         } else if (type === IDType.base64) {
             this.keyChunkers.push(
                 new KeyChunker([...upperCaseChars]),
                 new KeyChunker([...lowerCaseChars]),
                 new KeyChunker([...numerics]),
-                new SpecialKeyChunker([...base64SpecialChars]),
+                new SpecialKeyChunker([...base64SpecialChars].map(safeRegexChars)),
             );
         } else if (type === IDType.hexadecimal) {
             this.keyChunkers.push(

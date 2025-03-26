@@ -231,7 +231,7 @@ describe('Refactored idSlicer', () => {
         const expectedResults = [
             { keys: ['a'], count: 50 },
             { keys: ['b[A-Za-z0-7]'], count: 50 },
-            { keys: ['b[8-9-_+/]'], count: 50 },
+            { keys: ['b[8-9\\-_\\+/]'], count: 50 },
             { keys: ['c'], count: 50 },
             null
         ];

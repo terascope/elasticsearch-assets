@@ -1,7 +1,10 @@
-import { pMap } from '@terascope/utils';
-import {
-    CountFn, IDSlicerRanges, ReaderSlice
-} from '../../interfaces.js';
+import { IDSlicerRanges, ReaderSlice } from '../../interfaces.js';
+
+export function safeRegexChars(char: string) {
+    if (char === '+') return '\\+';
+    if (char === '-') return '\\-';
+    return char;
+}
 
 export function generateCountQueryForKeys(
     keys: readonly string[],
@@ -22,7 +25,6 @@ export function generateCountQueryForKeys(
 export async function determineIDSlicerRanges(
     keysArray: readonly string[],
     num: number,
-    getCount: CountFn
 ): Promise<IDSlicerRanges> {
     const arrayLength = keysArray.length;
     const list: string[][] = [];
@@ -42,14 +44,9 @@ export async function determineIDSlicerRanges(
         }
     }
 
-    return pMap(list, async (keys) => {
-        const count = await getCount(
-            generateCountQueryForKeys(keys)
-        );
-
+    return list.map((keys) => {
         return {
             keys,
-            count
         };
     });
 }

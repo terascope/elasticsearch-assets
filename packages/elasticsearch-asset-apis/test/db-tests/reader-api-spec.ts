@@ -12,7 +12,7 @@ import {
 } from '../helpers/index.js';
 import {
     createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
-    ESReaderOptions, FetchResponseType, IDType,
+    ESReaderOptions, FetchResponseType, IDType, base64URLSpecialChars,
     InputDateSegments, ReaderSlice, base64SpecialChars
 } from '../../src/index.js';
 
@@ -31,12 +31,13 @@ describe('Reader API', () => {
 
         await pWhile(async () => {
             const slice = await fn();
-            results.push(slice);
 
             if (slice == null) {
                 return true;
             }
-        }, { timeoutMs: 100000 });
+
+            results.push(slice);
+        }, { timeoutMs: 100000000000 });
 
         return results;
     }
@@ -47,6 +48,7 @@ describe('Reader API', () => {
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
     const base64Index = makeIndex('base64');
+    const baseURLIndex = makeIndex('base_url');
 
     let keyIndex = 0;
     const base64Data = evenSpread.data.map(
@@ -68,12 +70,38 @@ describe('Reader API', () => {
         }
     );
 
+    let urlKey = 0;
+    const baseURLData = evenSpread.data.map(
+        (obj) => {
+            const newKey = obj.uuid.split('');
+            newKey[0] = 'U';
+            newKey[1] = '9';
+
+            const newChar = newKey[2];
+            newKey[2] = base64URLSpecialChars[urlKey] ?? newChar;
+            urlKey += 1;
+
+            if (urlKey > 1) {
+                urlKey = 0;
+            }
+
+            const finalKey = newKey.join('');
+            const data = {
+                ...obj,
+                uuid: finalKey
+            };
+            return DataEntity.make(data, { _key: finalKey });
+        }
+    );
+
     let docType: string | undefined;
 
-    let client: any;
     let readerClient: ElasticsearchReaderClient;
     let base64Client: ElasticsearchReaderClient;
+    let baseURLClient: ElasticsearchReaderClient;
+
     let majorVersion: number;
+    let client: any;
 
     beforeAll(async () => {
         client = await makeClient();
@@ -99,15 +127,24 @@ describe('Reader API', () => {
             logger
         );
 
+        baseURLClient = new ElasticsearchReaderClient(
+            client,
+            { index: baseURLIndex },
+            logger
+        );
+
         await cleanupIndex(client, makeIndex('*'));
         await Promise.all([
             populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType),
             populateIndex(client, base64Index, evenSpread.EvenDataType, base64Data, docType),
+            populateIndex(client, baseURLIndex, evenSpread.EvenDataType, baseURLData, docType),
+
         ]);
 
         await Promise.all([
             waitForData(client, evenIndex, evenBulkData.length),
             waitForData(client, base64Index, base64Data.length),
+            waitForData(client, baseURLIndex, baseURLData.length),
         ]);
     });
 
@@ -685,52 +722,49 @@ describe('Reader API', () => {
 
             const expectedSlices = [
                 { keys: ['a[A-Za-r]'], count: 18 },
-                { keys: ['a[s-z0-9-_]'], count: 40 },
+                { keys: ['a[s-z0-9\\-_]'], count: 40 },
                 { keys: ['b[A-Za-e]'], count: 29 },
                 { keys: ['b[f-z0-1]'], count: 9 },
                 { keys: ['b[2-8]'], count: 37 },
-                { keys: ['b[9-_]'], count: 7 },
+                { keys: ['b[9\\-_]'], count: 7 },
                 { keys: ['c[A-Za-n]'], count: 18 },
                 { keys: ['c[o-z0-7]'], count: 40 },
-                { keys: ['c[8-9-_]'], count: 6 },
+                { keys: ['c[8-9\\-_]'], count: 6 },
                 { keys: ['d[A-Za-z]'], count: 17 },
-                { keys: ['d[0-9-_]'], count: 32 },
+                { keys: ['d[0-9\\-_]'], count: 32 },
                 { keys: ['e[A-Za-q]'], count: 18 },
                 { keys: ['e[r-z0-8]'], count: 36 },
-                { keys: ['e[9-_]'], count: 5 },
+                { keys: ['e[9\\-_]'], count: 5 },
                 { keys: ['f[A-Za-x]'], count: 21 },
-                { keys: ['f[y-z0-9-_]'], count: 30 },
+                { keys: ['f[y-z0-9\\-_]'], count: 30 },
                 { keys: ['0[A-Za-j]'], count: 33 },
-                { keys: ['0[k-z0-9-_]'], count: 37 },
+                { keys: ['0[k-z0-9\\-_]'], count: 37 },
                 { keys: ['1[A-Za-t]'], count: 25 },
-                { keys: ['1[u-z0-9-_]'], count: 30 },
+                { keys: ['1[u-z0-9\\-_]'], count: 30 },
                 { keys: ['2[A-Za-t]'], count: 21 },
-                { keys: ['2[u-z0-9-_]'], count: 34 },
+                { keys: ['2[u-z0-9\\-_]'], count: 34 },
                 { keys: ['3[A-Za-u]'], count: 25 },
-                { keys: ['3[v-z0-9-_]'], count: 29 },
+                { keys: ['3[v-z0-9\\-_]'], count: 29 },
                 { keys: ['4[A-Za-k]'], count: 25 },
                 { keys: ['4[l-z0-8]'], count: 34 },
-                { keys: ['4[9-_]'], count: 9 },
+                { keys: ['4[9\\-_]'], count: 9 },
                 { keys: ['5[A-Za-n]'], count: 22 },
                 { keys: ['5[o-z0-8]'], count: 37 },
-                { keys: ['5[9-_]'], count: 5 },
+                { keys: ['5[9\\-_]'], count: 5 },
                 { keys: ['6[A-Za-w]'], count: 24 },
-                { keys: ['6[x-z0-9-_]'], count: 28 },
+                { keys: ['6[x-z0-9\\-_]'], count: 28 },
                 { keys: ['7[A-Za-f]'], count: 35 },
                 { keys: ['7[g-z0-7]'], count: 37 },
-                { keys: ['7[8-9-_]'], count: 8 },
+                { keys: ['7[8-9\\-_]'], count: 8 },
                 { keys: ['8[A-Za-h]'], count: 17 },
                 { keys: ['8[i-z0-4]'], count: 23 },
-                { keys: ['8[5-9-_]'], count: 35 },
+                { keys: ['8[5-9\\-_]'], count: 35 },
                 { keys: ['9[A-Za-n]'], count: 23 },
                 { keys: ['9[o-z0-8]'], count: 40 },
-                { keys: ['9[9-_]'], count: 1 },
+                { keys: ['9[9\\-_]'], count: 1 },
             ];
 
             const slices = await gatherSlices(slicer);
-
-            // get rid of the null
-            slices.pop();
 
             const sliceCount = slices.reduce((prev, curr) => {
                 return curr.count + prev;
@@ -1026,9 +1060,6 @@ describe('Reader API', () => {
 
             const slices = await gatherSlices(slicer);
 
-            // get rid of the null
-            slices.pop();
-
             const sliceCount = slices.reduce((prev, curr) => {
                 return curr.count + prev;
             }, 0);
@@ -1323,14 +1354,89 @@ describe('Reader API', () => {
 
             const slices = await gatherSlices(slicer);
 
-            // get rid of the null
-            slices.pop();
-
             const sliceCount = slices.reduce((prev, curr) => {
                 return curr.count + prev;
             }, 0);
 
-            expect(sliceCount).toEqual(evenBulkData.length);
+            expect(sliceCount).toEqual(baseURLData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64URL, bug fix with - escaping', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                index: baseURLIndex,
+                key_type: IDType.base64url,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: baseURLClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['U9-a'], count: 34 },
+                { keys: ['U9-b'], count: 40 },
+                { keys: ['U9-c'], count: 34 },
+                { keys: ['U9-d'], count: 27 },
+                { keys: ['U9-e'], count: 39 },
+                { keys: ['U9-f'], count: 32 },
+                { keys: ['U9-0'], count: 32 },
+                { keys: ['U9-1'], count: 18 },
+                { keys: ['U9-2'], count: 32 },
+                { keys: ['U9-3'], count: 27 },
+                { keys: ['U9-4'], count: 34 },
+                { keys: ['U9-5'], count: 26 },
+                { keys: ['U9-6'], count: 32 },
+                { keys: ['U9-7[A-Za-z0-7]'], count: 31 },
+                { keys: ['U9-7[8-9\\-_]'], count: 10 },
+                { keys: ['U9-8'], count: 29 },
+                { keys: ['U9-9'], count: 23 },
+                { keys: ['U9_a'], count: 31 },
+                { keys: ['U9_b'], count: 37 },
+                { keys: ['U9_c'], count: 34 },
+                { keys: ['U9_d'], count: 28 },
+                { keys: ['U9_e'], count: 31 },
+                { keys: ['U9_f'], count: 27 },
+                { keys: ['U9_0'], count: 20 },
+                { keys: ['U9_1'], count: 26 },
+                { keys: ['U9_2'], count: 32 },
+                { keys: ['U9_3'], count: 37 },
+                { keys: ['U9_4'], count: 31 },
+                { keys: ['U9_5'], count: 37 },
+                { keys: ['U9_6'], count: 28 },
+                { keys: ['U9_7[A-Za-z0-6]'], count: 35 },
+                { keys: ['U9_7[7-9\\-_]'], count: 8 },
+                { keys: ['U9_8'], count: 33 },
+                { keys: ['U9_9'], count: 25 }
+            ];
+
+            const slices = await gatherSlices(slicer);
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(baseURLData.length);
             expect(slices).toEqual(expectedSlices);
 
             const records = await pMap(slices, async (slice) => {
@@ -1367,76 +1473,73 @@ describe('Reader API', () => {
             });
 
             const expectedSlices = [
-                { keys: ['a-'], count: 13 },
+                { keys: ['a\\-'], count: 13 },
                 { keys: ['a_'], count: 15 },
-                { keys: ['a+'], count: 14 },
+                { keys: ['a\\+'], count: 14 },
                 { keys: ['a/'], count: 16 },
-                { keys: ['b-'], count: 22 },
+                { keys: ['b\\-'], count: 22 },
                 { keys: ['b_'], count: 21 },
-                { keys: ['b+'], count: 20 },
+                { keys: ['b\\+'], count: 20 },
                 { keys: ['b/'], count: 19 },
-                { keys: ['c-'], count: 16 },
+                { keys: ['c\\-'], count: 16 },
                 { keys: ['c_'], count: 16 },
-                { keys: ['c+'], count: 17 },
+                { keys: ['c\\+'], count: 17 },
                 { keys: ['c/'], count: 15 },
-                { keys: ['d-'], count: 12 },
+                { keys: ['d\\-'], count: 12 },
                 { keys: ['d_'], count: 12 },
-                { keys: ['d+'], count: 13 },
+                { keys: ['d\\+'], count: 13 },
                 { keys: ['d/'], count: 12 },
-                { keys: ['e-'], count: 16 },
+                { keys: ['e\\-'], count: 16 },
                 { keys: ['e_'], count: 16 },
-                { keys: ['e+'], count: 12 },
+                { keys: ['e\\+'], count: 12 },
                 { keys: ['e/'], count: 15 },
-                { keys: ['f-'], count: 12 },
+                { keys: ['f\\-'], count: 12 },
                 { keys: ['f_'], count: 11 },
-                { keys: ['f+'], count: 15 },
+                { keys: ['f\\+'], count: 15 },
                 { keys: ['f/'], count: 13 },
-                { keys: ['0-'], count: 18 },
+                { keys: ['0\\-'], count: 18 },
                 { keys: ['0_'], count: 18 },
-                { keys: ['0+'], count: 18 },
+                { keys: ['0\\+'], count: 18 },
                 { keys: ['0/'], count: 16 },
-                { keys: ['1-'], count: 13 },
+                { keys: ['1\\-'], count: 13 },
                 { keys: ['1_'], count: 14 },
-                { keys: ['1+'], count: 13 },
+                { keys: ['1\\+'], count: 13 },
                 { keys: ['1/'], count: 15 },
-                { keys: ['2-'], count: 16 },
+                { keys: ['2\\-'], count: 16 },
                 { keys: ['2_'], count: 13 },
-                { keys: ['2+'], count: 12 },
+                { keys: ['2\\+'], count: 12 },
                 { keys: ['2/'], count: 14 },
-                { keys: ['3-'], count: 13 },
+                { keys: ['3\\-'], count: 13 },
                 { keys: ['3_'], count: 14 },
-                { keys: ['3+'], count: 14 },
+                { keys: ['3\\+'], count: 14 },
                 { keys: ['3/'], count: 13 },
-                { keys: ['4-'], count: 17 },
+                { keys: ['4\\-'], count: 17 },
                 { keys: ['4_'], count: 17 },
-                { keys: ['4+'], count: 17 },
+                { keys: ['4\\+'], count: 17 },
                 { keys: ['4/'], count: 17 },
-                { keys: ['5-'], count: 16 },
+                { keys: ['5\\-'], count: 16 },
                 { keys: ['5_'], count: 16 },
-                { keys: ['5+'], count: 16 },
+                { keys: ['5\\+'], count: 16 },
                 { keys: ['5/'], count: 16 },
-                { keys: ['6-'], count: 12 },
+                { keys: ['6\\-'], count: 12 },
                 { keys: ['6_'], count: 13 },
-                { keys: ['6+'], count: 13 },
+                { keys: ['6\\+'], count: 13 },
                 { keys: ['6/'], count: 14 },
-                { keys: ['7-'], count: 21 },
+                { keys: ['7\\-'], count: 21 },
                 { keys: ['7_'], count: 19 },
-                { keys: ['7+'], count: 20 },
+                { keys: ['7\\+'], count: 20 },
                 { keys: ['7/'], count: 20 },
-                { keys: ['8-'], count: 18 },
+                { keys: ['8\\-'], count: 18 },
                 { keys: ['8_'], count: 20 },
-                { keys: ['8+'], count: 19 },
+                { keys: ['8\\+'], count: 19 },
                 { keys: ['8/'], count: 18 },
-                { keys: ['9-'], count: 15 },
+                { keys: ['9\\-'], count: 15 },
                 { keys: ['9_'], count: 15 },
-                { keys: ['9+'], count: 17 },
+                { keys: ['9\\+'], count: 17 },
                 { keys: ['9/'], count: 17 },
             ];
 
             const slices = await gatherSlices(slicer);
-
-            // get rid of the null
-            slices.pop();
 
             const sliceCount = slices.reduce((prev, curr) => {
                 return curr.count + prev;
@@ -1500,13 +1603,13 @@ describe('Reader API', () => {
             });
 
             expect(results).toEqual([
-                { keys: ['A', 'H', 'O', 'V', 'c', 'j', 'q', 'x', '4', '_'], count: 132 },
-                { keys: ['B', 'I', 'P', 'W', 'd', 'k', 'r', 'y', '5'], count: 113 },
-                { keys: ['C', 'J', 'Q', 'X', 'e', 'l', 's', 'z', '6'], count: 111 },
-                { keys: ['D', 'K', 'R', 'Y', 'f', 'm', 't', '0', '7'], count: 201 },
-                { keys: ['E', 'L', 'S', 'Z', 'g', 'n', 'u', '1', '8'], count: 130 },
-                { keys: ['F', 'M', 'T', 'a', 'h', 'o', 'v', '2', '9'], count: 177 },
-                { keys: ['G', 'N', 'U', 'b', 'i', 'p', 'w', '3', '-'], count: 136 }
+                { keys: ['A', 'H', 'O', 'V', 'c', 'j', 'q', 'x', '4', '_'] },
+                { keys: ['B', 'I', 'P', 'W', 'd', 'k', 'r', 'y', '5'] },
+                { keys: ['C', 'J', 'Q', 'X', 'e', 'l', 's', 'z', '6'] },
+                { keys: ['D', 'K', 'R', 'Y', 'f', 'm', 't', '0', '7'] },
+                { keys: ['E', 'L', 'S', 'Z', 'g', 'n', 'u', '1', '8'] },
+                { keys: ['F', 'M', 'T', 'a', 'h', 'o', 'v', '2', '9'] },
+                { keys: ['G', 'N', 'U', 'b', 'i', 'p', 'w', '3', '-'] }
             ]);
         });
 

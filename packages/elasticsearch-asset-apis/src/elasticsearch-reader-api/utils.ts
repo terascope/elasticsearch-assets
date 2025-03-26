@@ -72,9 +72,8 @@ function _buildRangeQuery(
             body.query.bool.must.push({
                 bool: {
                     should: params.keys.map((key) => {
-                        const safeKey = key.replace(/\+/g, '\\+');
                         return {
-                            regexp: { [idFieldName]: `${safeKey}.*` }
+                            regexp: { [idFieldName]: `${key}.*` }
                         };
                     })
                 }

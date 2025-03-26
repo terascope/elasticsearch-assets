@@ -79,6 +79,8 @@ export const numerics = Object.freeze([
     '9',
 ]);
 
+// we do not escape the special chars here to not mess with the wildcard queries
+// we escape in the refactored id slicer that uses regex queries
 export const base64URLSpecialChars = Object.freeze([
     '-',
     '_'

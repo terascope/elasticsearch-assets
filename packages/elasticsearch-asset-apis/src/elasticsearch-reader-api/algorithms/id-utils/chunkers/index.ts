@@ -1,2 +1,2 @@
 export * from './key-chunkers.js';
-export * from './key-manager';
+export * from './key-manager.js';

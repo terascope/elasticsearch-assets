@@ -83,7 +83,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
-        return this.client.count(query as any);
+        return this.client.count(query);
     }
 
     /**
@@ -361,7 +361,7 @@ export class ElasticsearchReaderAPI {
         }
 
         return determineIDSlicerRanges(
-            keyArray, numOfSlicers, this.count
+            keyArray, numOfSlicers
         );
     }
 
@@ -372,7 +372,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicer(config: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
         const ranges = await this.makeIDSlicerRanges(config);
-        return this.makeIDSlicerFromRange(config, ranges[config.slicerID]);
+        return this.makeIDSlicerFromRange(config, ranges[config.slicerID] as any);
     }
 
     /**

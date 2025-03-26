@@ -1,4 +1,5 @@
 import { TSError, isNumber } from '@terascope/utils';
+import { safeRegexChars } from './id-utils/index.js';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults,
     IDType
@@ -10,13 +11,16 @@ export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerRes
         events,
         retryData,
         range,
-        baseKeyArray,
-        keySet,
+        baseKeyArray: unsafeKeyArray,
+        keySet: unsafeKeySet,
         countFn,
         startingKeyDepth,
         size,
         keyType
     } = args;
+
+    const baseKeyArray = unsafeKeyArray.map(safeRegexChars);
+    const keySet = unsafeKeySet.map(safeRegexChars);
 
     const createRatio = createRatioFN(size, baseKeyArray.length);
 
@@ -131,11 +135,11 @@ export function* recurse(
         const newStr = str + key;
         const resp = yield newStr;
 
-        // false == go deeper, true == all done, number = split keys
+        // false => recurse deeper, true => all done, number => split keys
         if (resp === false) {
-            yield * recurse(baseArray, newStr, keyType);
+            yield* recurse(baseArray, newStr, keyType);
         } else if (isNumber(resp)) {
-            yield * splitKeys(baseArray, newStr, keyType, resp);
+            yield* splitKeys(baseArray, newStr, keyType, resp);
         }
     }
 
@@ -153,6 +157,7 @@ export function* splitKeys(
     let chunkSize = ratio;
     let isLimitOfSplitting = false;
     let isDone = false;
+    let nextKey = '';
 
     while (!isDone) {
         const split = tracker.split(chunkSize);
@@ -162,8 +167,13 @@ export function* splitKeys(
             return null;
         }
 
-        if (split.length === 1) {
+        // it has the [] chars so thats two, third if only a single key
+        if (split.length === 3) {
             isLimitOfSplitting = true;
+            nextKey = split.charAt(1);
+        } else if (split.length === 4 && split.includes('\\')) {
+            isLimitOfSplitting = true;
+            nextKey = split.charAt(2);
         }
 
         const response = yield `${str}${split}`;
@@ -173,8 +183,9 @@ export function* splitKeys(
             if (isLimitOfSplitting) {
                 // if we have to split further and we are at limit, do normal recursion
                 // on that key, split is just a single char here
-                yield * recurse(baseArray, `${str}${split}`, keyType);
-                isDone = true;
+                yield* recurse(baseArray, `${str}${nextKey}`, keyType);
+                // we are done with that key split using recurse so commit the split
+                tracker.commit();
             } else {
                 // change to chunk size, do not commit as we need to redo
                 const newChunkSize = Math.max(
@@ -212,12 +223,12 @@ function* recurseDepth(
             const response = yield newStr;
 
             if (response === false) {
-                yield * recurse(baseArray, newStr, keyType);
+                yield* recurse(baseArray, newStr, keyType);
             } else if (isNumber(response)) {
-                yield * splitKeys(baseArray, newStr, keyType, response);
+                yield* splitKeys(baseArray, newStr, keyType, response);
             }
         } else {
-            yield * recurse(baseArray, newStr, keyType);
+            yield* recurse(baseArray, newStr, keyType);
         }
     }
 
@@ -233,9 +244,9 @@ export function* generateKeys(
         const response = yield startKey;
         // false == go deeper, true == all done, number = split keys
         if (response === false) {
-            yield * recurse(baseArray, startKey, keyType);
+            yield* recurse(baseArray, startKey, keyType);
         } else if (isNumber(response)) {
-            yield * splitKeys(baseArray, startKey, keyType, response);
+            yield* splitKeys(baseArray, startKey, keyType, response);
         }
     }
 
@@ -249,7 +260,7 @@ function* generateKeyDepth(
     keyType: IDType
 ): KeyGenerator {
     for (const startKey of keysArray) {
-        yield * recurseDepth(baseArray, startKey, startingKeyDepth, keyType);
+        yield* recurseDepth(baseArray, startKey, startingKeyDepth, keyType);
     }
 
     return null;
