@@ -87,7 +87,8 @@ export interface IDSlicerRange {
  * This used a list of all of the ID slicer ranges, the
  * index of the range will correlate with the slicer instance
 */
-export type IDSlicerRanges = readonly Pick<IDSlicerRange, 'keys'>[];
+export type IDStartingRange = Pick<IDSlicerRange, 'keys'>;
+export type IDStartingRanges = IDStartingRange[];
 
 export enum IDType {
     base64url = 'base64url',

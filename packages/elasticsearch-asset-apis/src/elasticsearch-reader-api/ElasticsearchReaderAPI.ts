@@ -26,8 +26,8 @@ import {
     ESReaderOptions, DateSegments, InputDateSegments,
     SlicerArgs, IDType, DateSlicerArgs,
     IDSlicerArgs, IDSlicerConfig, DateSlicerResults,
-    ReaderClient, IDSlicerRanges, DateSlicerRanges,
-    DateSlicerRange, IDSlicerRange, DateSlicerMetadata,
+    ReaderClient, IDStartingRanges, DateSlicerRanges,
+    DateSlicerRange, IDStartingRange, DateSlicerMetadata,
     GetIntervalResult, ReaderSlice, IDSlicerResults,
     FetchResponseType
 } from './interfaces.js';
@@ -328,7 +328,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicerRanges(
         config: Pick<IDSlicerConfig, 'numOfSlicers'>
-    ): Promise<IDSlicerRanges> {
+    ): Promise<IDStartingRanges> {
         const {
             numOfSlicers,
         } = config;
@@ -382,7 +382,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicerFromRange(
         config: IDSlicerConfig,
-        range: IDSlicerRange
+        range: IDStartingRange
     ): Promise<() => Promise<IDSlicerResults>> {
         this.validateIDSlicerConfig(config);
 

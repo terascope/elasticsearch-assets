@@ -1,14 +1,14 @@
 import {
     ParallelSlicer, SlicerFn, SlicerRecoveryData
 } from '@terascope/job-components';
-import { ElasticsearchReaderAPI, IDSlicerRanges } from '@terascope/elasticsearch-asset-apis';
+import { ElasticsearchReaderAPI, IDStartingRanges } from '@terascope/elasticsearch-asset-apis';
 import { ESIDReaderConfig } from './interfaces.js';
 import { ElasticReaderFactoryAPI, ElasticsearchReaderAPIConfig } from '../elasticsearch_reader_api/interfaces.js';
 
 export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
     api!: ElasticsearchReaderAPI;
     config!: ElasticsearchReaderAPIConfig;
-    slicerRanges!: IDSlicerRanges;
+    slicerRanges!: IDStartingRanges;
 
     async initialize(recoveryData: SlicerRecoveryData[]): Promise<void> {
         // NOTE ORDER MATTERS

@@ -1,4 +1,4 @@
-import { IDSlicerRanges, ReaderSlice } from '../../interfaces.js';
+import { IDStartingRanges, ReaderSlice } from '../../interfaces.js';
 
 export function safeRegexChars(char: string) {
     if (char === '+') return '\\+';
@@ -25,7 +25,7 @@ export function generateCountQueryForKeys(
 export async function determineIDSlicerRanges(
     keysArray: readonly string[],
     num: number,
-): Promise<IDSlicerRanges> {
+): Promise<IDStartingRanges> {
     const arrayLength = keysArray.length;
     const list: string[][] = [];
 
