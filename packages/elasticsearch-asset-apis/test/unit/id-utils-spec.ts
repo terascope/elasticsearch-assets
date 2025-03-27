@@ -339,7 +339,7 @@ describe('id-utils', () => {
                 expect(batch4).toEqual('[e-n]');
                 expect(batch5).toEqual('[o-x]');
                 expect(batch6).toEqual('[y-z0-7]');
-                expect(batch7).toEqual('[8-9\\-_\\+]');
+                expect(batch7).toEqual('[8-9\\-_\\+/]');
                 expect(batch8).toEqual('[8-9]');
                 expect(batch9).toEqual('[\\-_]');
                 expect(batch10).toEqual('[\\+]');
@@ -473,7 +473,7 @@ describe('id-utils', () => {
             chunker.commit();
 
             expect(chunker.isDone).toBeTrue();
-            expect(chunk2).toMatchObject({ range: '+', took: 2 });
+            expect(chunk2).toMatchObject({ range: '+/', took: 2 });
         });
 
         it('can handle oversized chunk values', () => {
@@ -505,7 +505,7 @@ describe('id-utils', () => {
             const chunk2 = chunker.split(10);
             chunker.commit();
 
-            expect(chunk).toMatchObject({ range: '-_+', took: 4 });
+            expect(chunk).toMatchObject({ range: '-_+/', took: 4 });
             expect(chunk2).toMatchObject({ range: '', took: 0 });
         });
 
