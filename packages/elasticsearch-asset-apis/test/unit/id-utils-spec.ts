@@ -342,7 +342,7 @@ describe('id-utils', () => {
                 expect(batch7).toEqual('[8-9\\-_\\+/]');
                 expect(batch8).toEqual('[8-9]');
                 expect(batch9).toEqual('[\\-_]');
-                expect(batch10).toEqual('[\\+]');
+                expect(batch10).toEqual('[\\+/]');
                 expect(batch11).toEqual('');
             });
         });
