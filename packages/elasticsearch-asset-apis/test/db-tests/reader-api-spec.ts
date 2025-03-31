@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
 import {
     ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
     isElasticsearch8
@@ -7,21 +7,13 @@ import {
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient
+    TEST_INDEX_PREFIX, cleanupIndex, populateIndex,
+    waitForData, makeClient
 } from '../helpers/index.js';
 import {
-    createElasticsearchReaderAPI,
-    DateSlicerRange,
-    ElasticsearchReaderClient,
-    ESReaderOptions,
-    FetchResponseType,
-    IDType,
-    InputDateSegments,
-    ReaderSlice
+    createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
+    ESReaderOptions, FetchResponseType, IDType, base64URLSpecialChars,
+    InputDateSegments, ReaderSlice, base64SpecialChars
 } from '../../src/index.js';
 
 describe('Reader API', () => {
@@ -34,15 +26,82 @@ describe('Reader API', () => {
         return `${readerIndex}_${str}`;
     }
 
+    async function gatherSlices(fn: () => Promise<any>) {
+        const results: any[] = [];
+
+        await pWhile(async () => {
+            const slice = await fn();
+
+            if (slice == null) {
+                return true;
+            }
+
+            results.push(slice);
+        }, { timeoutMs: 100000000000 });
+
+        return results;
+    }
+
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     const evenIndex = makeIndex('even_spread');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
+
+    const base64Index = makeIndex('base64');
+    const baseURLIndex = makeIndex('base_url');
+
+    let keyIndex = 0;
+    const base64Data = evenSpread.data.map(
+        (obj) => {
+            const newKey = obj.uuid.split('');
+            newKey[1] = base64SpecialChars[keyIndex];
+            keyIndex += 1;
+
+            if (keyIndex > 3) {
+                keyIndex = 0;
+            }
+
+            const finalKey = newKey.join('');
+            const data = {
+                ...obj,
+                uuid: finalKey
+            };
+            return DataEntity.make(data, { _key: finalKey });
+        }
+    );
+
+    let urlKey = 0;
+    const baseURLData = evenSpread.data.map(
+        (obj) => {
+            const newKey = obj.uuid.split('');
+            newKey[0] = 'U';
+            newKey[1] = '9';
+
+            const newChar = newKey[2];
+            newKey[2] = base64URLSpecialChars[urlKey] ?? newChar;
+            urlKey += 1;
+
+            if (urlKey > 1) {
+                urlKey = 0;
+            }
+
+            const finalKey = newKey.join('');
+            const data = {
+                ...obj,
+                uuid: finalKey
+            };
+            return DataEntity.make(data, { _key: finalKey });
+        }
+    );
+
     let docType: string | undefined;
 
-    let client: any;
     let readerClient: ElasticsearchReaderClient;
+    let base64Client: ElasticsearchReaderClient;
+    let baseURLClient: ElasticsearchReaderClient;
+
     let majorVersion: number;
+    let client: any;
 
     beforeAll(async () => {
         client = await makeClient();
@@ -61,13 +120,36 @@ describe('Reader API', () => {
             { index: evenIndex },
             logger,
         );
+
+        base64Client = new ElasticsearchReaderClient(
+            client,
+            { index: base64Index },
+            logger
+        );
+
+        baseURLClient = new ElasticsearchReaderClient(
+            client,
+            { index: baseURLIndex },
+            logger
+        );
+
         await cleanupIndex(client, makeIndex('*'));
-        await populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
-        await waitForData(client, evenIndex, evenBulkData.length);
+        await Promise.all([
+            populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType),
+            populateIndex(client, base64Index, evenSpread.EvenDataType, base64Data, docType),
+            populateIndex(client, baseURLIndex, evenSpread.EvenDataType, baseURLData, docType),
+
+        ]);
+
+        await Promise.all([
+            waitForData(client, evenIndex, evenBulkData.length),
+            waitForData(client, base64Index, base64Data.length),
+            waitForData(client, baseURLIndex, baseURLData.length),
+        ]);
     });
 
     afterAll(async () => {
-        await cleanupIndex(client, makeIndex('*'));
+        // await cleanupIndex(client, makeIndex('*'));
     });
 
     describe('returning data frames', () => {
@@ -88,7 +170,7 @@ describe('Reader API', () => {
             key_type: IDType.base64url,
             time_resolution: 'ms',
             connection: 'default',
-            starting_key_depth: 0
+            starting_key_depth: 0,
         });
 
         it('can determine date ranges', async () => {
@@ -222,10 +304,7 @@ describe('Reader API', () => {
 
             const api = createElasticsearchReaderAPI({
                 config,
-                client: new ElasticsearchReaderClient(
-                    client,
-                    { index: evenIndex },
-                    testLogger
+                client: new ElasticsearchReaderClient(client, { index: evenIndex }, testLogger
                 ),
                 logger: testLogger,
                 emitter
@@ -624,6 +703,864 @@ describe('Reader API', () => {
             });
         });
 
+        it('can make id slices with recurse_optimization', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['a[A-Za-r]'], count: 18 },
+                { keys: ['a[s-z0-9\\-_]'], count: 40 },
+                { keys: ['b[A-Za-e]'], count: 29 },
+                { keys: ['b[f-z0-1]'], count: 9 },
+                { keys: ['b[2-8]'], count: 37 },
+                { keys: ['b[9\\-_]'], count: 7 },
+                { keys: ['c[A-Za-n]'], count: 18 },
+                { keys: ['c[o-z0-7]'], count: 40 },
+                { keys: ['c[8-9\\-_]'], count: 6 },
+                { keys: ['d[A-Za-z]'], count: 17 },
+                { keys: ['d[0-9\\-_]'], count: 32 },
+                { keys: ['e[A-Za-q]'], count: 18 },
+                { keys: ['e[r-z0-8]'], count: 36 },
+                { keys: ['e[9\\-_]'], count: 5 },
+                { keys: ['f[A-Za-x]'], count: 21 },
+                { keys: ['f[y-z0-9\\-_]'], count: 30 },
+                { keys: ['0[A-Za-j]'], count: 33 },
+                { keys: ['0[k-z0-9\\-_]'], count: 37 },
+                { keys: ['1[A-Za-t]'], count: 25 },
+                { keys: ['1[u-z0-9\\-_]'], count: 30 },
+                { keys: ['2[A-Za-t]'], count: 21 },
+                { keys: ['2[u-z0-9\\-_]'], count: 34 },
+                { keys: ['3[A-Za-u]'], count: 25 },
+                { keys: ['3[v-z0-9\\-_]'], count: 29 },
+                { keys: ['4[A-Za-k]'], count: 25 },
+                { keys: ['4[l-z0-8]'], count: 34 },
+                { keys: ['4[9\\-_]'], count: 9 },
+                { keys: ['5[A-Za-n]'], count: 22 },
+                { keys: ['5[o-z0-8]'], count: 37 },
+                { keys: ['5[9\\-_]'], count: 5 },
+                { keys: ['6[A-Za-w]'], count: 24 },
+                { keys: ['6[x-z0-9\\-_]'], count: 28 },
+                { keys: ['7[A-Za-f]'], count: 35 },
+                { keys: ['7[g-z0-7]'], count: 37 },
+                { keys: ['7[8-9\\-_]'], count: 8 },
+                { keys: ['8[A-Za-h]'], count: 17 },
+                { keys: ['8[i-z0-4]'], count: 23 },
+                { keys: ['8[5-9\\-_]'], count: 35 },
+                { keys: ['9[A-Za-n]'], count: 23 },
+                { keys: ['9[o-z0-8]'], count: 40 },
+                { keys: ['9[9\\-_]'], count: 1 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(evenBulkData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64 "+" symbol', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                key_type: IDType.base64,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['aa'], count: 3 },
+                { keys: ['ab'], count: 3 },
+                { keys: ['ac'], count: 3 },
+                { keys: ['ad'], count: 4 },
+                { keys: ['ae'], count: 4 },
+                { keys: ['af'], count: 1 },
+                { keys: ['a0'], count: 5 },
+                { keys: ['a1'], count: 7 },
+                { keys: ['a3'], count: 2 },
+                { keys: ['a4'], count: 3 },
+                { keys: ['a5'], count: 3 },
+                { keys: ['a6'], count: 3 },
+                { keys: ['a7'], count: 4 },
+                { keys: ['a8'], count: 5 },
+                { keys: ['a9'], count: 8 },
+                { keys: ['ba'], count: 7 },
+                { keys: ['bb'], count: 2 },
+                { keys: ['bc'], count: 6 },
+                { keys: ['bd'], count: 8 },
+                { keys: ['be'], count: 6 },
+                { keys: ['bf'], count: 6 },
+                { keys: ['b0'], count: 2 },
+                { keys: ['b1'], count: 1 },
+                { keys: ['b2'], count: 4 },
+                { keys: ['b3'], count: 5 },
+                { keys: ['b4'], count: 5 },
+                { keys: ['b5'], count: 5 },
+                { keys: ['b6'], count: 5 },
+                { keys: ['b7'], count: 7 },
+                { keys: ['b8'], count: 6 },
+                { keys: ['b9'], count: 7 },
+                { keys: ['ca'], count: 4 },
+                { keys: ['cb'], count: 3 },
+                { keys: ['cc'], count: 2 },
+                { keys: ['cd'], count: 2 },
+                { keys: ['ce'], count: 2 },
+                { keys: ['cf'], count: 5 },
+                { keys: ['c0'], count: 1 },
+                { keys: ['c1'], count: 2 },
+                { keys: ['c2'], count: 6 },
+                { keys: ['c3'], count: 9 },
+                { keys: ['c4'], count: 6 },
+                { keys: ['c5'], count: 6 },
+                { keys: ['c6'], count: 9 },
+                { keys: ['c7'], count: 1 },
+                { keys: ['c8'], count: 3 },
+                { keys: ['c9'], count: 3 },
+                { keys: ['da'], count: 1 },
+                { keys: ['db'], count: 3 },
+                { keys: ['dc'], count: 3 },
+                { keys: ['dd'], count: 1 },
+                { keys: ['de'], count: 4 },
+                { keys: ['df'], count: 5 },
+                { keys: ['d0'], count: 3 },
+                { keys: ['d1'], count: 1 },
+                { keys: ['d2'], count: 3 },
+                { keys: ['d3'], count: 3 },
+                { keys: ['d4'], count: 6 },
+                { keys: ['d5'], count: 1 },
+                { keys: ['d6'], count: 5 },
+                { keys: ['d7'], count: 7 },
+                { keys: ['d8'], count: 1 },
+                { keys: ['d9'], count: 2 },
+                { keys: ['ea'], count: 2 },
+                { keys: ['eb'], count: 4 },
+                { keys: ['ec'], count: 1 },
+                { keys: ['ed'], count: 5 },
+                { keys: ['ee'], count: 1 },
+                { keys: ['ef'], count: 5 },
+                { keys: ['e0'], count: 7 },
+                { keys: ['e2'], count: 6 },
+                { keys: ['e3'], count: 5 },
+                { keys: ['e4'], count: 3 },
+                { keys: ['e5'], count: 6 },
+                { keys: ['e6'], count: 4 },
+                { keys: ['e7'], count: 2 },
+                { keys: ['e8'], count: 3 },
+                { keys: ['e9'], count: 5 },
+                { keys: ['fa'], count: 3 },
+                { keys: ['fb'], count: 4 },
+                { keys: ['fc'], count: 3 },
+                { keys: ['fd'], count: 6 },
+                { keys: ['fe'], count: 1 },
+                { keys: ['ff'], count: 4 },
+                { keys: ['f1'], count: 1 },
+                { keys: ['f2'], count: 2 },
+                { keys: ['f3'], count: 4 },
+                { keys: ['f4'], count: 2 },
+                { keys: ['f5'], count: 6 },
+                { keys: ['f6'], count: 1 },
+                { keys: ['f7'], count: 3 },
+                { keys: ['f8'], count: 4 },
+                { keys: ['f9'], count: 7 },
+                { keys: ['0a'], count: 8 },
+                { keys: ['0b'], count: 6 },
+                { keys: ['0c'], count: 6 },
+                { keys: ['0d'], count: 3 },
+                { keys: ['0e'], count: 3 },
+                { keys: ['0f'], count: 7 },
+                { keys: ['00'], count: 8 },
+                { keys: ['01'], count: 4 },
+                { keys: ['02'], count: 3 },
+                { keys: ['03'], count: 1 },
+                { keys: ['04'], count: 5 },
+                { keys: ['05'], count: 2 },
+                { keys: ['06'], count: 4 },
+                { keys: ['07'], count: 5 },
+                { keys: ['08'], count: 1 },
+                { keys: ['09'], count: 4 },
+                { keys: ['1a'], count: 7 },
+                { keys: ['1b'], count: 2 },
+                { keys: ['1c'], count: 7 },
+                { keys: ['1d'], count: 2 },
+                { keys: ['1e'], count: 6 },
+                { keys: ['1f'], count: 1 },
+                { keys: ['10'], count: 2 },
+                { keys: ['11'], count: 3 },
+                { keys: ['12'], count: 6 },
+                { keys: ['13'], count: 7 },
+                { keys: ['14'], count: 4 },
+                { keys: ['15'], count: 1 },
+                { keys: ['16'], count: 2 },
+                { keys: ['17'], count: 3 },
+                { keys: ['18'], count: 1 },
+                { keys: ['19'], count: 1 },
+                { keys: ['2a'], count: 3 },
+                { keys: ['2b'], count: 5 },
+                { keys: ['2c'], count: 3 },
+                { keys: ['2d'], count: 1 },
+                { keys: ['2e'], count: 5 },
+                { keys: ['2f'], count: 4 },
+                { keys: ['20'], count: 2 },
+                { keys: ['21'], count: 6 },
+                { keys: ['22'], count: 2 },
+                { keys: ['23'], count: 4 },
+                { keys: ['24'], count: 6 },
+                { keys: ['25'], count: 4 },
+                { keys: ['26'], count: 2 },
+                { keys: ['27'], count: 3 },
+                { keys: ['28'], count: 2 },
+                { keys: ['29'], count: 3 },
+                { keys: ['3a'], count: 5 },
+                { keys: ['3b'], count: 4 },
+                { keys: ['3c'], count: 8 },
+                { keys: ['3d'], count: 2 },
+                { keys: ['3e'], count: 2 },
+                { keys: ['3f'], count: 4 },
+                { keys: ['31'], count: 2 },
+                { keys: ['32'], count: 2 },
+                { keys: ['34'], count: 1 },
+                { keys: ['35'], count: 5 },
+                { keys: ['36'], count: 4 },
+                { keys: ['37'], count: 4 },
+                { keys: ['38'], count: 4 },
+                { keys: ['39'], count: 7 },
+                { keys: ['4a'], count: 7 },
+                { keys: ['4b'], count: 8 },
+                { keys: ['4c'], count: 1 },
+                { keys: ['4d'], count: 4 },
+                { keys: ['4e'], count: 2 },
+                { keys: ['4f'], count: 3 },
+                { keys: ['40'], count: 7 },
+                { keys: ['41'], count: 2 },
+                { keys: ['42'], count: 4 },
+                { keys: ['43'], count: 1 },
+                { keys: ['44'], count: 4 },
+                { keys: ['45'], count: 6 },
+                { keys: ['46'], count: 4 },
+                { keys: ['47'], count: 3 },
+                { keys: ['48'], count: 3 },
+                { keys: ['49'], count: 9 },
+                { keys: ['5a'], count: 2 },
+                { keys: ['5b'], count: 2 },
+                { keys: ['5c'], count: 3 },
+                { keys: ['5d'], count: 10 },
+                { keys: ['5e'], count: 2 },
+                { keys: ['5f'], count: 3 },
+                { keys: ['50'], count: 4 },
+                { keys: ['51'], count: 6 },
+                { keys: ['52'], count: 3 },
+                { keys: ['53'], count: 5 },
+                { keys: ['54'], count: 4 },
+                { keys: ['55'], count: 6 },
+                { keys: ['56'], count: 3 },
+                { keys: ['57'], count: 4 },
+                { keys: ['58'], count: 2 },
+                { keys: ['59'], count: 5 },
+                { keys: ['6a'], count: 4 },
+                { keys: ['6b'], count: 3 },
+                { keys: ['6c'], count: 4 },
+                { keys: ['6d'], count: 3 },
+                { keys: ['6e'], count: 2 },
+                { keys: ['6f'], count: 8 },
+                { keys: ['60'], count: 2 },
+                { keys: ['62'], count: 4 },
+                { keys: ['63'], count: 5 },
+                { keys: ['64'], count: 2 },
+                { keys: ['65'], count: 1 },
+                { keys: ['66'], count: 4 },
+                { keys: ['67'], count: 1 },
+                { keys: ['68'], count: 4 },
+                { keys: ['69'], count: 5 },
+                { keys: ['7a'], count: 7 },
+                { keys: ['7b'], count: 7 },
+                { keys: ['7c'], count: 5 },
+                { keys: ['7d'], count: 4 },
+                { keys: ['7e'], count: 8 },
+                { keys: ['7f'], count: 4 },
+                { keys: ['70'], count: 3 },
+                { keys: ['71'], count: 4 },
+                { keys: ['72'], count: 6 },
+                { keys: ['73'], count: 4 },
+                { keys: ['74'], count: 6 },
+                { keys: ['75'], count: 6 },
+                { keys: ['76'], count: 2 },
+                { keys: ['77'], count: 6 },
+                { keys: ['78'], count: 3 },
+                { keys: ['79'], count: 5 },
+                { keys: ['8a'], count: 2 },
+                { keys: ['8b'], count: 1 },
+                { keys: ['8c'], count: 4 },
+                { keys: ['8d'], count: 2 },
+                { keys: ['8e'], count: 4 },
+                { keys: ['8f'], count: 4 },
+                { keys: ['80'], count: 4 },
+                { keys: ['81'], count: 3 },
+                { keys: ['82'], count: 3 },
+                { keys: ['83'], count: 7 },
+                { keys: ['84'], count: 6 },
+                { keys: ['85'], count: 4 },
+                { keys: ['86'], count: 9 },
+                { keys: ['87'], count: 7 },
+                { keys: ['88'], count: 6 },
+                { keys: ['89'], count: 9 },
+                { keys: ['9a'], count: 5 },
+                { keys: ['9b'], count: 6 },
+                { keys: ['9c'], count: 4 },
+                { keys: ['9d'], count: 3 },
+                { keys: ['9e'], count: 1 },
+                { keys: ['9f'], count: 4 },
+                { keys: ['90'], count: 8 },
+                { keys: ['91'], count: 3 },
+                { keys: ['92'], count: 2 },
+                { keys: ['93'], count: 10 },
+                { keys: ['94'], count: 5 },
+                { keys: ['95'], count: 1 },
+                { keys: ['96'], count: 4 },
+                { keys: ['97'], count: 5 },
+                { keys: ['98'], count: 2 },
+                { keys: ['99'], count: 1 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(evenBulkData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64URL, no special key data', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                key_type: IDType.base64url,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: readerClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['aa'], count: 3 },
+                { keys: ['ab'], count: 3 },
+                { keys: ['ac'], count: 3 },
+                { keys: ['ad'], count: 4 },
+                { keys: ['ae'], count: 4 },
+                { keys: ['af'], count: 1 },
+                { keys: ['a0'], count: 5 },
+                { keys: ['a1'], count: 7 },
+                { keys: ['a3'], count: 2 },
+                { keys: ['a4'], count: 3 },
+                { keys: ['a5'], count: 3 },
+                { keys: ['a6'], count: 3 },
+                { keys: ['a7'], count: 4 },
+                { keys: ['a8'], count: 5 },
+                { keys: ['a9'], count: 8 },
+                { keys: ['ba'], count: 7 },
+                { keys: ['bb'], count: 2 },
+                { keys: ['bc'], count: 6 },
+                { keys: ['bd'], count: 8 },
+                { keys: ['be'], count: 6 },
+                { keys: ['bf'], count: 6 },
+                { keys: ['b0'], count: 2 },
+                { keys: ['b1'], count: 1 },
+                { keys: ['b2'], count: 4 },
+                { keys: ['b3'], count: 5 },
+                { keys: ['b4'], count: 5 },
+                { keys: ['b5'], count: 5 },
+                { keys: ['b6'], count: 5 },
+                { keys: ['b7'], count: 7 },
+                { keys: ['b8'], count: 6 },
+                { keys: ['b9'], count: 7 },
+                { keys: ['ca'], count: 4 },
+                { keys: ['cb'], count: 3 },
+                { keys: ['cc'], count: 2 },
+                { keys: ['cd'], count: 2 },
+                { keys: ['ce'], count: 2 },
+                { keys: ['cf'], count: 5 },
+                { keys: ['c0'], count: 1 },
+                { keys: ['c1'], count: 2 },
+                { keys: ['c2'], count: 6 },
+                { keys: ['c3'], count: 9 },
+                { keys: ['c4'], count: 6 },
+                { keys: ['c5'], count: 6 },
+                { keys: ['c6'], count: 9 },
+                { keys: ['c7'], count: 1 },
+                { keys: ['c8'], count: 3 },
+                { keys: ['c9'], count: 3 },
+                { keys: ['da'], count: 1 },
+                { keys: ['db'], count: 3 },
+                { keys: ['dc'], count: 3 },
+                { keys: ['dd'], count: 1 },
+                { keys: ['de'], count: 4 },
+                { keys: ['df'], count: 5 },
+                { keys: ['d0'], count: 3 },
+                { keys: ['d1'], count: 1 },
+                { keys: ['d2'], count: 3 },
+                { keys: ['d3'], count: 3 },
+                { keys: ['d4'], count: 6 },
+                { keys: ['d5'], count: 1 },
+                { keys: ['d6'], count: 5 },
+                { keys: ['d7'], count: 7 },
+                { keys: ['d8'], count: 1 },
+                { keys: ['d9'], count: 2 },
+                { keys: ['ea'], count: 2 },
+                { keys: ['eb'], count: 4 },
+                { keys: ['ec'], count: 1 },
+                { keys: ['ed'], count: 5 },
+                { keys: ['ee'], count: 1 },
+                { keys: ['ef'], count: 5 },
+                { keys: ['e0'], count: 7 },
+                { keys: ['e2'], count: 6 },
+                { keys: ['e3'], count: 5 },
+                { keys: ['e4'], count: 3 },
+                { keys: ['e5'], count: 6 },
+                { keys: ['e6'], count: 4 },
+                { keys: ['e7'], count: 2 },
+                { keys: ['e8'], count: 3 },
+                { keys: ['e9'], count: 5 },
+                { keys: ['fa'], count: 3 },
+                { keys: ['fb'], count: 4 },
+                { keys: ['fc'], count: 3 },
+                { keys: ['fd'], count: 6 },
+                { keys: ['fe'], count: 1 },
+                { keys: ['ff'], count: 4 },
+                { keys: ['f1'], count: 1 },
+                { keys: ['f2'], count: 2 },
+                { keys: ['f3'], count: 4 },
+                { keys: ['f4'], count: 2 },
+                { keys: ['f5'], count: 6 },
+                { keys: ['f6'], count: 1 },
+                { keys: ['f7'], count: 3 },
+                { keys: ['f8'], count: 4 },
+                { keys: ['f9'], count: 7 },
+                { keys: ['0a'], count: 8 },
+                { keys: ['0b'], count: 6 },
+                { keys: ['0c'], count: 6 },
+                { keys: ['0d'], count: 3 },
+                { keys: ['0e'], count: 3 },
+                { keys: ['0f'], count: 7 },
+                { keys: ['00'], count: 8 },
+                { keys: ['01'], count: 4 },
+                { keys: ['02'], count: 3 },
+                { keys: ['03'], count: 1 },
+                { keys: ['04'], count: 5 },
+                { keys: ['05'], count: 2 },
+                { keys: ['06'], count: 4 },
+                { keys: ['07'], count: 5 },
+                { keys: ['08'], count: 1 },
+                { keys: ['09'], count: 4 },
+                { keys: ['1a'], count: 7 },
+                { keys: ['1b'], count: 2 },
+                { keys: ['1c'], count: 7 },
+                { keys: ['1d'], count: 2 },
+                { keys: ['1e'], count: 6 },
+                { keys: ['1f'], count: 1 },
+                { keys: ['10'], count: 2 },
+                { keys: ['11'], count: 3 },
+                { keys: ['12'], count: 6 },
+                { keys: ['13'], count: 7 },
+                { keys: ['14'], count: 4 },
+                { keys: ['15'], count: 1 },
+                { keys: ['16'], count: 2 },
+                { keys: ['17'], count: 3 },
+                { keys: ['18'], count: 1 },
+                { keys: ['19'], count: 1 },
+                { keys: ['2a'], count: 3 },
+                { keys: ['2b'], count: 5 },
+                { keys: ['2c'], count: 3 },
+                { keys: ['2d'], count: 1 },
+                { keys: ['2e'], count: 5 },
+                { keys: ['2f'], count: 4 },
+                { keys: ['20'], count: 2 },
+                { keys: ['21'], count: 6 },
+                { keys: ['22'], count: 2 },
+                { keys: ['23'], count: 4 },
+                { keys: ['24'], count: 6 },
+                { keys: ['25'], count: 4 },
+                { keys: ['26'], count: 2 },
+                { keys: ['27'], count: 3 },
+                { keys: ['28'], count: 2 },
+                { keys: ['29'], count: 3 },
+                { keys: ['3a'], count: 5 },
+                { keys: ['3b'], count: 4 },
+                { keys: ['3c'], count: 8 },
+                { keys: ['3d'], count: 2 },
+                { keys: ['3e'], count: 2 },
+                { keys: ['3f'], count: 4 },
+                { keys: ['31'], count: 2 },
+                { keys: ['32'], count: 2 },
+                { keys: ['34'], count: 1 },
+                { keys: ['35'], count: 5 },
+                { keys: ['36'], count: 4 },
+                { keys: ['37'], count: 4 },
+                { keys: ['38'], count: 4 },
+                { keys: ['39'], count: 7 },
+                { keys: ['4a'], count: 7 },
+                { keys: ['4b'], count: 8 },
+                { keys: ['4c'], count: 1 },
+                { keys: ['4d'], count: 4 },
+                { keys: ['4e'], count: 2 },
+                { keys: ['4f'], count: 3 },
+                { keys: ['40'], count: 7 },
+                { keys: ['41'], count: 2 },
+                { keys: ['42'], count: 4 },
+                { keys: ['43'], count: 1 },
+                { keys: ['44'], count: 4 },
+                { keys: ['45'], count: 6 },
+                { keys: ['46'], count: 4 },
+                { keys: ['47'], count: 3 },
+                { keys: ['48'], count: 3 },
+                { keys: ['49'], count: 9 },
+                { keys: ['5a'], count: 2 },
+                { keys: ['5b'], count: 2 },
+                { keys: ['5c'], count: 3 },
+                { keys: ['5d'], count: 10 },
+                { keys: ['5e'], count: 2 },
+                { keys: ['5f'], count: 3 },
+                { keys: ['50'], count: 4 },
+                { keys: ['51'], count: 6 },
+                { keys: ['52'], count: 3 },
+                { keys: ['53'], count: 5 },
+                { keys: ['54'], count: 4 },
+                { keys: ['55'], count: 6 },
+                { keys: ['56'], count: 3 },
+                { keys: ['57'], count: 4 },
+                { keys: ['58'], count: 2 },
+                { keys: ['59'], count: 5 },
+                { keys: ['6a'], count: 4 },
+                { keys: ['6b'], count: 3 },
+                { keys: ['6c'], count: 4 },
+                { keys: ['6d'], count: 3 },
+                { keys: ['6e'], count: 2 },
+                { keys: ['6f'], count: 8 },
+                { keys: ['60'], count: 2 },
+                { keys: ['62'], count: 4 },
+                { keys: ['63'], count: 5 },
+                { keys: ['64'], count: 2 },
+                { keys: ['65'], count: 1 },
+                { keys: ['66'], count: 4 },
+                { keys: ['67'], count: 1 },
+                { keys: ['68'], count: 4 },
+                { keys: ['69'], count: 5 },
+                { keys: ['7a'], count: 7 },
+                { keys: ['7b'], count: 7 },
+                { keys: ['7c'], count: 5 },
+                { keys: ['7d'], count: 4 },
+                { keys: ['7e'], count: 8 },
+                { keys: ['7f'], count: 4 },
+                { keys: ['70'], count: 3 },
+                { keys: ['71'], count: 4 },
+                { keys: ['72'], count: 6 },
+                { keys: ['73'], count: 4 },
+                { keys: ['74'], count: 6 },
+                { keys: ['75'], count: 6 },
+                { keys: ['76'], count: 2 },
+                { keys: ['77'], count: 6 },
+                { keys: ['78'], count: 3 },
+                { keys: ['79'], count: 5 },
+                { keys: ['8a'], count: 2 },
+                { keys: ['8b'], count: 1 },
+                { keys: ['8c'], count: 4 },
+                { keys: ['8d'], count: 2 },
+                { keys: ['8e'], count: 4 },
+                { keys: ['8f'], count: 4 },
+                { keys: ['80'], count: 4 },
+                { keys: ['81'], count: 3 },
+                { keys: ['82'], count: 3 },
+                { keys: ['83'], count: 7 },
+                { keys: ['84'], count: 6 },
+                { keys: ['85'], count: 4 },
+                { keys: ['86'], count: 9 },
+                { keys: ['87'], count: 7 },
+                { keys: ['88'], count: 6 },
+                { keys: ['89'], count: 9 },
+                { keys: ['9a'], count: 5 },
+                { keys: ['9b'], count: 6 },
+                { keys: ['9c'], count: 4 },
+                { keys: ['9d'], count: 3 },
+                { keys: ['9e'], count: 1 },
+                { keys: ['9f'], count: 4 },
+                { keys: ['90'], count: 8 },
+                { keys: ['91'], count: 3 },
+                { keys: ['92'], count: 2 },
+                { keys: ['93'], count: 10 },
+                { keys: ['94'], count: 5 },
+                { keys: ['95'], count: 1 },
+                { keys: ['96'], count: 4 },
+                { keys: ['97'], count: 5 },
+                { keys: ['98'], count: 2 },
+                { keys: ['99'], count: 1 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(baseURLData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64URL, bug fix with - escaping', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                index: baseURLIndex,
+                key_type: IDType.base64url,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: baseURLClient, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['U9-a'], count: 34 },
+                { keys: ['U9-b'], count: 40 },
+                { keys: ['U9-c'], count: 34 },
+                { keys: ['U9-d'], count: 27 },
+                { keys: ['U9-e'], count: 39 },
+                { keys: ['U9-f'], count: 32 },
+                { keys: ['U9-0'], count: 32 },
+                { keys: ['U9-1'], count: 18 },
+                { keys: ['U9-2'], count: 32 },
+                { keys: ['U9-3'], count: 27 },
+                { keys: ['U9-4'], count: 34 },
+                { keys: ['U9-5'], count: 26 },
+                { keys: ['U9-6'], count: 32 },
+                { keys: ['U9-7[A-Za-z0-7]'], count: 31 },
+                { keys: ['U9-7[8-9\\-_]'], count: 10 },
+                { keys: ['U9-8'], count: 29 },
+                { keys: ['U9-9'], count: 23 },
+                { keys: ['U9_a'], count: 31 },
+                { keys: ['U9_b'], count: 37 },
+                { keys: ['U9_c'], count: 34 },
+                { keys: ['U9_d'], count: 28 },
+                { keys: ['U9_e'], count: 31 },
+                { keys: ['U9_f'], count: 27 },
+                { keys: ['U9_0'], count: 20 },
+                { keys: ['U9_1'], count: 26 },
+                { keys: ['U9_2'], count: 32 },
+                { keys: ['U9_3'], count: 37 },
+                { keys: ['U9_4'], count: 31 },
+                { keys: ['U9_5'], count: 37 },
+                { keys: ['U9_6'], count: 28 },
+                { keys: ['U9_7[A-Za-z0-6]'], count: 35 },
+                { keys: ['U9_7[7-9\\-_]'], count: 8 },
+                { keys: ['U9_8'], count: 33 },
+                { keys: ['U9_9'], count: 25 }
+            ];
+
+            const slices = await gatherSlices(slicer);
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(baseURLData.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(evenBulkData.length);
+        });
+
+        it('can make id slices with recurse_optimization with base64, with base64 keys', async () => {
+            const opConfig = {
+                ...defaultConfig,
+                index: base64Index,
+                key_type: IDType.base64,
+                starting_key_depth: 1,
+                size: 40,
+                recurse_optimization: true
+            };
+
+            const api = createElasticsearchReaderAPI({
+                config: opConfig, client: base64Client, logger, emitter
+            });
+
+            const slicer = await api.makeIDSlicer({
+                slicerID: 0,
+                numOfSlicers: 1,
+                recoveryData: [],
+            });
+
+            const expectedSlices = [
+                { keys: ['a\\-'], count: 13 },
+                { keys: ['a_'], count: 15 },
+                { keys: ['a\\+'], count: 14 },
+                { keys: ['a/'], count: 16 },
+                { keys: ['b\\-'], count: 22 },
+                { keys: ['b_'], count: 21 },
+                { keys: ['b\\+'], count: 20 },
+                { keys: ['b/'], count: 19 },
+                { keys: ['c\\-'], count: 16 },
+                { keys: ['c_'], count: 16 },
+                { keys: ['c\\+'], count: 17 },
+                { keys: ['c/'], count: 15 },
+                { keys: ['d\\-'], count: 12 },
+                { keys: ['d_'], count: 12 },
+                { keys: ['d\\+'], count: 13 },
+                { keys: ['d/'], count: 12 },
+                { keys: ['e\\-'], count: 16 },
+                { keys: ['e_'], count: 16 },
+                { keys: ['e\\+'], count: 12 },
+                { keys: ['e/'], count: 15 },
+                { keys: ['f\\-'], count: 12 },
+                { keys: ['f_'], count: 11 },
+                { keys: ['f\\+'], count: 15 },
+                { keys: ['f/'], count: 13 },
+                { keys: ['0\\-'], count: 18 },
+                { keys: ['0_'], count: 18 },
+                { keys: ['0\\+'], count: 18 },
+                { keys: ['0/'], count: 16 },
+                { keys: ['1\\-'], count: 13 },
+                { keys: ['1_'], count: 14 },
+                { keys: ['1\\+'], count: 13 },
+                { keys: ['1/'], count: 15 },
+                { keys: ['2\\-'], count: 16 },
+                { keys: ['2_'], count: 13 },
+                { keys: ['2\\+'], count: 12 },
+                { keys: ['2/'], count: 14 },
+                { keys: ['3\\-'], count: 13 },
+                { keys: ['3_'], count: 14 },
+                { keys: ['3\\+'], count: 14 },
+                { keys: ['3/'], count: 13 },
+                { keys: ['4\\-'], count: 17 },
+                { keys: ['4_'], count: 17 },
+                { keys: ['4\\+'], count: 17 },
+                { keys: ['4/'], count: 17 },
+                { keys: ['5\\-'], count: 16 },
+                { keys: ['5_'], count: 16 },
+                { keys: ['5\\+'], count: 16 },
+                { keys: ['5/'], count: 16 },
+                { keys: ['6\\-'], count: 12 },
+                { keys: ['6_'], count: 13 },
+                { keys: ['6\\+'], count: 13 },
+                { keys: ['6/'], count: 14 },
+                { keys: ['7\\-'], count: 21 },
+                { keys: ['7_'], count: 19 },
+                { keys: ['7\\+'], count: 20 },
+                { keys: ['7/'], count: 20 },
+                { keys: ['8\\-'], count: 18 },
+                { keys: ['8_'], count: 20 },
+                { keys: ['8\\+'], count: 19 },
+                { keys: ['8/'], count: 18 },
+                { keys: ['9\\-'], count: 15 },
+                { keys: ['9_'], count: 15 },
+                { keys: ['9\\+'], count: 17 },
+                { keys: ['9/'], count: 17 },
+            ];
+
+            const slices = await gatherSlices(slicer);
+
+            const sliceCount = slices.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(sliceCount).toEqual(base64Data.length);
+            expect(slices).toEqual(expectedSlices);
+
+            const records = await pMap(slices, async (slice) => {
+                const data = await api.fetch(slice) as DataEntity[];
+
+                return { slice, data, count: data.length };
+            });
+
+            const recordCount = records.reduce((prev, curr) => {
+                return curr.count + prev;
+            }, 0);
+
+            expect(recordCount).toEqual(base64Data.length);
+        });
+
         it('will throw is size is beyond window_size of index', async () => {
             const size = 1000000000;
 
@@ -666,105 +1603,13 @@ describe('Reader API', () => {
             });
 
             expect(results).toEqual([
-                {
-                    keys: [
-                        'a',
-                        'h',
-                        'o',
-                        'v',
-                        'C',
-                        'J',
-                        'Q',
-                        'X',
-                        '4',
-                        '_'
-                    ],
-                    count: 126
-                },
-                {
-                    keys: [
-                        'b',
-                        'i',
-                        'p',
-                        'w',
-                        'D',
-                        'K',
-                        'R',
-                        'Y',
-                        '5'
-                    ],
-                    count: 146
-                },
-                {
-                    keys: [
-                        'c',
-                        'j',
-                        'q',
-                        'x',
-                        'E',
-                        'L',
-                        'S',
-                        'Z',
-                        '6'
-                    ],
-                    count: 116
-                },
-                {
-                    keys: [
-                        'd',
-                        'k',
-                        'r',
-                        'y',
-                        'F',
-                        'M',
-                        'T',
-                        '0',
-                        '7'
-                    ],
-                    count: 199
-                },
-                {
-                    keys: [
-                        'e',
-                        'l',
-                        's',
-                        'z',
-                        'G',
-                        'N',
-                        'U',
-                        '1',
-                        '8'
-                    ],
-                    count: 189
-                },
-                {
-                    keys: [
-                        'f',
-                        'm',
-                        't',
-                        'A',
-                        'H',
-                        'O',
-                        'V',
-                        '2',
-                        '9'
-                    ],
-                    count: 170
-                },
-                {
-                    keys: [
-                        'g',
-                        'n',
-                        'u',
-                        'B',
-                        'I',
-                        'P',
-                        'W',
-                        '3',
-                        '-'
-                    ],
-                    count: 54
-                }
+                { keys: ['A', 'H', 'O', 'V', 'c', 'j', 'q', 'x', '4', '_'] },
+                { keys: ['B', 'I', 'P', 'W', 'd', 'k', 'r', 'y', '5'] },
+                { keys: ['C', 'J', 'Q', 'X', 'e', 'l', 's', 'z', '6'] },
+                { keys: ['D', 'K', 'R', 'Y', 'f', 'm', 't', '0', '7'] },
+                { keys: ['E', 'L', 'S', 'Z', 'g', 'n', 'u', '1', '8'] },
+                { keys: ['F', 'M', 'T', 'a', 'h', 'o', 'v', '2', '9'] },
+                { keys: ['G', 'N', 'U', 'b', 'i', 'p', 'w', '3', '-'] }
             ]);
         });
 

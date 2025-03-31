@@ -1,22 +1,26 @@
 import { TSError, isNumber } from '@terascope/utils';
+import { safeRegexChars } from './id-utils/index.js';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults,
     IDType
 } from '../interfaces.js';
-import { generateCountQueryForKeys, SplitKeyTracker } from './id-helpers.js';
+import { generateCountQueryForKeys, SplitKeyManager } from './id-utils/index.js';
 
 export function idSlicerOptimized(args: IDSlicerArgs): () => Promise<IDSlicerResults> {
     const {
         events,
         retryData,
         range,
-        baseKeyArray,
-        keySet,
+        baseKeyArray: unsafeKeyArray,
+        keySet: unsafeKeySet,
         countFn,
         startingKeyDepth,
         size,
         keyType
     } = args;
+
+    const baseKeyArray = unsafeKeyArray.map(safeRegexChars);
+    const keySet = unsafeKeySet.map(safeRegexChars);
 
     const createRatio = createRatioFN(size, baseKeyArray.length);
 
@@ -131,7 +135,7 @@ export function* recurse(
         const newStr = str + key;
         const resp = yield newStr;
 
-        // false == go deeper, true == all done, number = split keys
+        // false => recurse deeper, true => all done, number => split keys
         if (resp === false) {
             yield* recurse(baseArray, newStr, keyType);
         } else if (isNumber(resp)) {
@@ -147,45 +151,59 @@ export function* splitKeys(
     str: string,
     keyType: IDType,
     ratio: number,
-    forwardTo?: string
 ): KeyGenerator {
+    const tracker = new SplitKeyManager(keyType);
+
+    let chunkSize = ratio;
     let isLimitOfSplitting = false;
-    const tracker = new SplitKeyTracker(keyType);
-
-    if (forwardTo) {
-        tracker.forward(forwardTo);
-    }
-
     let isDone = false;
+    let nextKey = '';
 
     while (!isDone) {
-        const split = tracker.split(ratio);
+        const split = tracker.split(chunkSize);
 
         if (split.length === 0) {
             isDone = true;
             return null;
         }
 
-        if (split.length === 1) {
+        // it has the [] chars so thats two, third if only a single key
+        if (split.length === 3) {
             isLimitOfSplitting = true;
+            nextKey = split.charAt(1);
+        } else if (split.length === 4 && split.includes('\\')) {
+            isLimitOfSplitting = true;
+            nextKey = split.charAt(2);
         }
 
-        const response = yield `${str}[${split}]`;
+        const response = yield `${str}${split}`;
 
+        // if its a number, the current split is too big
         if (isNumber(response)) {
             if (isLimitOfSplitting) {
                 // if we have to split further and we are at limit, do normal recursion
-                // on that key
-                yield* recurse(baseArray, `${str}${split}`, keyType);
-                isDone = true;
+                // on that key, split is just a single char here
+                yield* recurse(baseArray, `${str}${nextKey}`, keyType);
+                // we are done with that key split using recurse so commit the split
+                tracker.commit();
             } else {
-                const newRatio = Math.max(
+                // change to chunk size, do not commit as we need to redo
+                const newChunkSize = Math.max(
                     Math.floor(ratio * (response / baseArray.length)),
                     1
                 );
-                yield* splitKeys(baseArray, str, keyType, newRatio, split);
-                isDone = true;
+
+                // if the old size is less or equal to last calculation, decrease further
+                // this could happen if count size and new ratio are two close together,
+                // the Math.floor will make it the same index number in the array
+                if (chunkSize <= newChunkSize) {
+                    chunkSize -= 1;
+                } else {
+                    chunkSize = newChunkSize;
+                }
             }
+        } else {
+            tracker.commit();
         }
     }
 

@@ -26,8 +26,8 @@ import {
     ESReaderOptions, DateSegments, InputDateSegments,
     SlicerArgs, IDType, DateSlicerArgs,
     IDSlicerArgs, IDSlicerConfig, DateSlicerResults,
-    ReaderClient, IDSlicerRanges, DateSlicerRanges,
-    DateSlicerRange, IDSlicerRange, DateSlicerMetadata,
+    ReaderClient, IDStartingRanges, DateSlicerRanges,
+    DateSlicerRange, IDStartingRange, DateSlicerMetadata,
     GetIntervalResult, ReaderSlice, IDSlicerResults,
     FetchResponseType
 } from './interfaces.js';
@@ -83,8 +83,7 @@ export class ElasticsearchReaderAPI {
 
     async count(queryParams: ReaderSlice = {}): Promise<number> {
         const query = buildQuery(this.config, { ...queryParams, count: 0 });
-        // TODO: change this to search probably
-        return this.client.count(query as any);
+        return this.client.count(query);
     }
 
     /**
@@ -329,7 +328,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicerRanges(
         config: Pick<IDSlicerConfig, 'numOfSlicers'>
-    ): Promise<IDSlicerRanges> {
+    ): Promise<IDStartingRanges> {
         const {
             numOfSlicers,
         } = config;
@@ -362,7 +361,7 @@ export class ElasticsearchReaderAPI {
         }
 
         return determineIDSlicerRanges(
-            keyArray, numOfSlicers, this.count
+            keyArray, numOfSlicers
         );
     }
 
@@ -373,7 +372,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicer(config: IDSlicerConfig): Promise<() => Promise<IDSlicerResults>> {
         const ranges = await this.makeIDSlicerRanges(config);
-        return this.makeIDSlicerFromRange(config, ranges[config.slicerID]);
+        return this.makeIDSlicerFromRange(config, ranges[config.slicerID] as any);
     }
 
     /**
@@ -383,7 +382,7 @@ export class ElasticsearchReaderAPI {
     */
     async makeIDSlicerFromRange(
         config: IDSlicerConfig,
-        range: IDSlicerRange
+        range: IDStartingRange
     ): Promise<() => Promise<IDSlicerResults>> {
         this.validateIDSlicerConfig(config);
 
