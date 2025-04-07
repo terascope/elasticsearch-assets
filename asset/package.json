@@ -18,12 +18,12 @@
         "test": "yarn --cwd ../ test"
     },
     "dependencies": {
-        "@terascope/data-mate": "~1.7.8",
-        "@terascope/elasticsearch-api": "~4.8.5",
+        "@terascope/data-mate": "~1.8.0",
+        "@terascope/elasticsearch-api": "~4.9.0",
         "@terascope/elasticsearch-asset-apis": "~1.2.3",
-        "@terascope/job-components": "~1.9.8",
-        "@terascope/teraslice-state-storage": "~1.8.5",
-        "@terascope/utils": "~1.7.7",
+        "@terascope/job-components": "~1.10.0",
+        "@terascope/teraslice-state-storage": "~1.9.0",
+        "@terascope/utils": "~1.8.0",
         "datemath-parser": "~1.0.6",
         "got": "~13.0.0",
         "moment": "~2.30.1"
