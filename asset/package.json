@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@terascope/data-mate": "~1.7.8",
-        "@terascope/elasticsearch-api": "~4.8.5",
+        "@terascope/elasticsearch-api": "~4.9.0",
         "@terascope/elasticsearch-asset-apis": "~1.2.3",
         "@terascope/job-components": "~1.9.8",
         "@terascope/teraslice-state-storage": "~1.8.5",
