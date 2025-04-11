@@ -1,9 +1,10 @@
-# id_reader #
+# id_reader
+
 The id_reader reads data from an elasticsearch index using an algorithm that partitions the data based on a string field of the record. This field value needs to have high uniqueness, like an id of some sort.
 
 The behavior of this reader changes with the version of elasticsearch being searched.
 
-For this reader to function correctly the parameter `id_field_name` is required.
+For this reader to function correctly the parameter `id_field_name` is required. The [string field type](https://opensearch.org/docs/latest/field-types/supported-field-types/string/) of `id_field_name` should be `keyword`. A field type of `text` will be far less performant and will likely match on the same key multiple times, resulting in duplicate document reads. If the field type is `text` and was created by a dynamic mapping, it is possible to append `.keyword` to `id_field_name` to use the text field as a keyword. See [here](https://www.elastic.co/blog/strings-are-dead-long-live-strings) for some background on why this works.
 
 Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 
@@ -12,6 +13,7 @@ this is a [recoverable](https://terascope.github.io/teraslice/docs/management-ap
 ## Usage
 
 Example Teraslice Config
+
 ```yaml
 terafoundation:
     environment: 'development'
@@ -31,9 +33,11 @@ teraslice:
 ```
 
 ### Batch read the entire content of an index with elasticsearch v6 or newer and return filtered fields
+
 This is an example of using the id_reader to run queries against the uuid field on the records to split them up. Since `fields` parameter was set, then only those fields of the records will be returned
 
 Example Job:
+
 ```json
 {
   "name": "ID_Reader",
@@ -55,7 +59,9 @@ Example Job:
   ]
 }
 ```
+
 Here is representation of elasticsearch data being sliced by the uuid field and returning only the fields requested
+
 ```javascript
 // elasticsearch index data
 [
@@ -138,9 +144,11 @@ const thirdSliceResults = [
 ```
 
 ### Batch read the index with filter with key_range and query parameters
+
 This will run queries against the uuid field on the records to split them up. The results will be filtered by the `query` parameter, and will only search against a subset of of the uuid specified in `key_range`.
 
 Example Job:
+
 ```json
 {
   "name": "ID_Reader",
@@ -163,7 +171,9 @@ Example Job:
   ]
 }
 ```
+
 Here is representation of elasticsearch data being sliced and filtered by the query parameter
+
 ```javascript
 const elasticsearchData = [
     {
@@ -228,7 +238,9 @@ const firstSliceResults = [
 ```
 
 ### Higher Throughput Job
+
 This will create 4 slicers that will divide up the the chars that it will search against, making more slices. The workers run each slice independently
+
 ```json
 {
   "name": "ID_Reader",
@@ -249,6 +261,7 @@ This will create 4 slicers that will divide up the the chars that it will search
   ]
 }
 ```
+
 `Note`: having too many slicers could potentially overwhelm your elasticsearch cluster since regex queries are a little more expensive to run
 
 ## Parameters
@@ -256,8 +269,8 @@ This will create 4 slicers that will divide up the the chars that it will search
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
-| index | Which index to read from | String | required
-| size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000
+| index | Which index to read from | String | required |
+| size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000 |
 | key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`|
 | key_range | if provided, slicer will only recurse on these given keys | Array | optional |
 | starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting | Number | optional |
@@ -265,15 +278,17 @@ This will create 4 slicers that will divide up the the chars that it will search
 | query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
 | api_name | name of api to be used by id reader | String | optional, defaults to 'elasticsearch_reader_api' |
 | connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch|
-| id_field_name | The field on which we are searching against | String | required
+| id_field_name | The field on which we are searching against | String | required |
 
 ## Advanced Configuration
 
-#### starting_key_depth
+### starting_key_depth
+
 This processor works by taking a char from a list of possible chars for a given key_type (base64url) and checking the count of each char to see if its digestible.
 
 If the count is too large it will extend the key_depth to attempt to further divide up the data to digestible chunks.
-```
+
+```sh
 a =>
 aa, ab, ac ...aK, ...a4, a_ =>
 aaa, aab, aac ...aaK
@@ -288,13 +303,15 @@ If its in the tens of billions, usually setting it to `5` works.
 The higher the key_depth, the longer it take to finish to slice through all the permutations of keys possible, but it will be safer with larger data sets. Please know your data requirements when using this operator.
 
 #### API usage in a job
+
 In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
+
 - `index`
 
-
 `SHORT FORM (no api specified)`
+
 ```json
 {
     "name" : "testing",
