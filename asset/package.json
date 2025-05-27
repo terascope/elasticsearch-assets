@@ -1,7 +1,7 @@
 {
     "name": "asset",
     "displayName": "Asset",
-    "version": "4.2.4",
+    "version": "4.3.0",
     "private": true,
     "description": "",
     "license": "MIT",
@@ -29,7 +29,7 @@
         "moment": "~2.30.1"
     },
     "engines": {
-        "node": ">=18.0.0",
+        "node": ">=22.0.0",
         "yarn": ">=1.22.19"
     },
     "terascope": {}
