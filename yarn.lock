@@ -3664,7 +3664,7 @@ __metadata:
     "@types/jest": "npm:~29.5.14"
     "@types/node": "npm:~22.15.21"
     "@types/semver": "npm:~7.7.0"
-    elasticsearch-store: "npm:~1.10.3"
+    elasticsearch-store: "npm:~1.10.4"
     eslint: "npm:~9.27.0"
     fs-extra: "npm:~11.3.0"
     jest: "npm:~29.7.0"
@@ -3679,9 +3679,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"elasticsearch-store@npm:~1.10.3":
-  version: 1.10.3
-  resolution: "elasticsearch-store@npm:1.10.3"
+"elasticsearch-store@npm:~1.10.4":
+  version: 1.10.4
+  resolution: "elasticsearch-store@npm:1.10.4"
   dependencies:
     "@terascope/data-mate": "npm:~1.8.2"
     "@terascope/data-types": "npm:~1.8.2"
@@ -3697,7 +3697,7 @@ __metadata:
     setimmediate: "npm:~1.0.5"
     uuid: "npm:~11.1.0"
     xlucene-translator: "npm:~1.8.2"
-  checksum: 10c0/2530afd4c64198687c045007e7be4322d85a6b17f2bd7dcc1eeff676ecd544196de3985bd8e95d4c54103745e4b40c27f0781996235309e8c6233024ae3130ac
+  checksum: 10c0/15715107d3d9ea1a31e772df70f6945abf41a3d096a116ca480e108cfc2fc2ea7e5f73589990f6adb3c3fae7ac492d5604d35a0a46118d3744aaa1f99a973a86
   languageName: node
   linkType: hard
 
