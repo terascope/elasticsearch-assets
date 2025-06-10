@@ -1,4 +1,5 @@
-# elasticsearch_bulk #
+# elasticsearch_bulk
+
 The elasticsearch_bulk operator is a high throughput bulk sender to an elasticsearch index.
 
 There are four types of [bulk requests](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/docs-bulk.html#docs-bulk-api-desc): index, create, update and delete.
@@ -8,14 +9,17 @@ have a `_key` metadata field set to the id of the record for `update`, `create` 
 
 Although not needed for `index` bulk requests, setting the `_key` on the record will create the new record with that id as opposed to one that is automatically generated for you.
 
-When using the elasticsearch_reader or the elasticsearch_reader_api to fetch records, the `_key` will automatically be set to the elasticsearch records _id.
+When using the elasticsearch_reader or the elasticsearch_reader_api to fetch records, the `_key` will automatically be set to the elasticsearch records `_id`.
 You can use other processors to remove or alter that if it is not wanted.
 
 ## Usage
+
 ### Send index batch request, setting the _id of the records
+
 By default we make an index bulk request, since the records have a `_key`, that is used as the new elasticsearch _id of the record
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -40,6 +44,7 @@ Example Job
     ]
 }
 ```
+
 Below is a representation of the incoming data and the resulting bulk request being made to elasticsearch
 
 ```javascript
@@ -61,9 +66,11 @@ const records = [
 ```
 
 ### Send an update batch request, only updating selected fields
+
 We can make an update batch request and limit what fields are being updated, in this job, only the name and job fields will be updated
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -90,6 +97,7 @@ Example Job
     ]
 }
 ```
+
 Below is a representation of the incoming data and the resulting bulk request being made to elasticsearch
 
 ```javascript
@@ -108,9 +116,11 @@ const records = [
 ```
 
 ### Send upsert batch request and use scripts to make additional changes
+
 By default we make an index bulk request, since the records have a `_key`, that is used as the new elasticsearch _id of the record
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -138,6 +148,7 @@ Example Job
     ]
 }
 ```
+
 Below is a representation of the incoming data and the resulting bulk request being made to elasticsearch
 
 ```javascript
@@ -163,8 +174,8 @@ const records = [
 
 ```
 
-
 ## Parameters
+
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
@@ -183,14 +194,16 @@ const records = [
 | update_retry_on_conflict | If there is a version conflict from an update how often should it be retried | Number | optional, defaults to 0 |
 | api_name | name of api to be used by elasticsearch bulk sender | String | optional, defaults to 'elasticsearch_sender_api' |
 
+### API usage in a job
 
-#### API usage in a job
 In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
+
 - `index`
 
 `SHORT FORM (no api specified)`
+
 ```json
 {
     "name" : "testing",
@@ -262,11 +275,13 @@ this configuration will be expanded out to the long form underneath the hood
 ```
 
 ### Dead Letter Queue Support
-The elasticsearch_bulk processor supports the [dead letter queue api](https://github.com/terascope/kafka-assets/blob/master/docs/apis/kafka_dead_letter.md) as of version `3.5.0`.  When the dead_letter_queue functionality is active records that are rejected by elasticsearch with a `_bulk_sender_rejection` error are forwarded to the kafka topic specified in the dead letter queue api configs. Records that do not have the error are still written to the designated cluster as usual.
+
+The elasticsearch_bulk processor supports the [dead letter queue api](https://github.com/terascope/kafka-assets/blob/master/docs/asset/apis/kafka_dead_letter.md) as of version `3.5.0`.  When the dead_letter_queue functionality is active records that are rejected by elasticsearch with a `_bulk_sender_rejection` error are forwarded to the kafka topic specified in the dead letter queue api configs. Records that do not have the error are still written to the designated cluster as usual.
 
 To trigger this behavior add the property and value `_dead_letter_action: kafka_dead_letter` to the `elasticsearch_bulk` _op configs.
 
 Example Job:
+
 ```json
 {
     "name" : "testing",
