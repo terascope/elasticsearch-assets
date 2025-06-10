@@ -5,6 +5,7 @@
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
+    "documentation": "https://terascope.github.io/elasticsearch-assets",
     "bugs": {
         "url": "https://github.com/terascope/elasticsearch-assets/issues"
     },
@@ -29,6 +30,7 @@
         "docker:limit": "./scripts/docker-limit-check.sh",
         "docker:listImages": "ts-scripts images list",
         "docker:saveImages": "ts-scripts images save",
+        "docs": "ts-scripts docs",
         "lint": "eslint",
         "lint:fix": "yarn lint --fix",
         "publish:changed": "./scripts/publish.sh",

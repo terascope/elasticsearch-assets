@@ -3,7 +3,7 @@
     "displayName": "Asset",
     "version": "4.3.0",
     "private": true,
-    "description": "",
+    "description": "Teraslice asset for elasticsearch operations",
     "license": "MIT",
     "author": "",
     "type": "module",
