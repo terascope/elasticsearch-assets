@@ -1,11 +1,13 @@
 # elasticsearch_sender_api
 
-The `elasticsearch_sender_api` makes the elasticsearch sender functionality available to any processor.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory) to create, cache, and manage multiple elasticsearch senders.   This api is the core of the [elasticsearch bulk](../operations/elasticsearch_bulk.md) operation and utilizes the standard metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
+The `elasticsearch_sender_api` makes the elasticsearch sender functionality available to any processor.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/operations/api-factory/overview) to create, cache, and manage multiple elasticsearch senders.   This api is the core of the [elasticsearch bulk](../operations/elasticsearch_bulk.md) operation and utilizes the standard metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
 The elasticsearch_sender_api will also look for the metadata field `_delete_id` in each record's metadata, if this field exists it adds a delete operation for the id in the `_delete_id` field to the bulk request.  This allows for an index (or any other action) and a delete operation in the same bulk request.
 
 ## Usage
+
 ### Example using the elasticsearch sender API
+
 A teraslice job and the associated processor using the elasticsearch_sender_api
 
 Example Job
@@ -39,6 +41,7 @@ Example Job
     ]
 }
 ```
+
 The processor for the job described above
 
 ```javascript
@@ -71,26 +74,34 @@ export default class SomeSender extends BatchProcessor {
 Returns the number of separate sender apis
 
 ### get
+
 parameters:
+
 - name: String
 
 Fetches any sender api associated with the name provided
 
 ### getConfig
+
 parameters:
+
 - name: String
 
 Fetches any sender api config associated with the name provided
 
 ### create (async)
+
 parameters:
+
 - name: String
 - configOverrides: Check options below, optional
 
-Creates an instance of a [sender api](#elasticsearch_sender_instance) and caches it with the name given. Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if you try creating another api with the same name.
+Creates an instance of a [sender api](#elasticsearch-sender-instance) and caches it with the name given. Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if you try creating another api with the same name.
 
 ### remove (async)
+
 parameters:
+
 - name: String
 
 Removes an instance of a sender api and follows any cleanup code specified in the api code.
@@ -107,8 +118,8 @@ Iterates over the cached names
 
 Iterates over the values
 
-
 ## Example of using the factory methods in a processor
+
 ```javascript
 // example of api configuration
 const apiConfig = {
@@ -156,24 +167,29 @@ apiManager.get('normalClient') === undefined
 ```
 
 ## Elasticsearch Sender Instance
+
 The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/routesenderapi),  returned from the create method of the APIFactory, follows our common sender api interface.
 
 ### send (async)
+
 ```(records: DataEntities[]) => Promise<void>```
 Formats an elasticsearch bulk request and sends it to elasticsearch
 
 parameters:
+
 - records: an array of data-entities
 
 ### verify (async)
+
 ```(route?: string) => Promise<void>```
-Ensures that the index is created. The bulk index request will make the index if it doesn't exist so this function is not necessary for the Elasticsearch sender, but this might change in the future. 
+Ensures that the index is created. The bulk index request will make the index if it doesn't exist so this function is not necessary for the Elasticsearch sender, but this might change in the future.
 
 parameters:
+
 - route: a string representing the index to create
 
-
 ### Usage of the elasticsearch sender instance
+
 ```js
 await api.send([
     DataEntity.make({

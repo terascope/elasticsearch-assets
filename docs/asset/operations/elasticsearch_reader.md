@@ -1,4 +1,4 @@
-# elasticsearch_reader #
+# elasticsearch_reader
 
 The elasticsearch_reader reads data from an Elasticsearch index using an algorithm that partitions the data using date range queries. This enables high throughput reading of data out of very large indices without having to use deep paging or state dependent scan/scroll.
 
@@ -9,12 +9,15 @@ Since this data is ordered, it can be sliced in parallel, and be read in paralle
 this is a [recoverable](https://terascope.github.io/teraslice/docs/management-apis/endpoints-json#post-v1jobsjobid_recover) reader, meaning that this job can be stopped, and then pick back up where it left off.
 
 Fetched records will already have metadata associated with it, like the `_key` field. Please reference the [metadata section](#metadata) for more information.
+
 ## Usage
 
 ### Batch read the entire content of an index
+
 Here is an example of a job that will check the `test_index` index and query against the `created` field for date values. Since no `start` or `end` is specified it will read the entire index. This will use the `es-1` connection configuration described in your [terafoundation connector config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors)
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -37,7 +40,9 @@ Example Job
     ]
 }
 ```
+
 Here is an example of elasticsearch data being fetched and returned from the reader in order
+
 ```javascript
 const elasticsearchIndexData = [
     { created: "2020-08-04T16:38:18", id: 1 },
@@ -55,13 +60,16 @@ const expected fetchResults = [
     { created: "2020-08-04T20:38:19", id: 3 },
 ]
 ```
+
 `Notes`: since this job has one worker and slicer, the data fetched is sequential
 and that worker will process all the data in order.
 
 ### Batch read a filtered subset of an index
+
 Here is an example of of a job that will check the `query_index` and get records between start date(inclusive) and the `end` date (exclusive). This will also filter based on the `query` parameter. This will use the `es-1` connection configuration described in your [terafoundation connector config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors)
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -87,6 +95,7 @@ Example Job
     ]
 }
 ```
+
 Here is a representation of what data is being returned from the additional lucene query along with the date range restrictions
 
 ```javascript
@@ -103,12 +112,15 @@ const expected fetchResults = [
     { created: "2020-08-04T16:38:18.372Z", id: 1, bytes: 213 },
 ]
 ```
+
 `Notes`: be careful to take note of the `start` and `end` dates you specify, especially the formatting (UTC vs ISO etc) compared to the data in elasticsearch. Make sure to use the same formatting so you can filter the data you want. If one date encapsulates time zones but the other doesn't, you could be several hours off and get the wrong results.
 
 ### Higher Throughput Job
+
 This job has 4 slicers, it will determine the date range for the entire index and divide it by four which will be the date range for each slicer. Each slicer will determine processable slice chunks from earliest to latest within their assigned ranges. The slices will be doled out to the 35 workers as they come in so a given worker make process later dates, then on the next slice process early dates. Some slicers may finish earlier than others.
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -133,9 +145,11 @@ Example Job
 ```
 
 ### Persistent Job
+
 When lifecycle is set to persistent, this will try reading from a stream of input. When the execution starts, it will try to read within the range of the `interval` with a latency time specified in `delay`
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -160,7 +174,9 @@ Example Job
     ]
 }
 ```
+
 Here is a representation of when a job starts, how the internal clock of the reader is calculated with the interval and delay parameters
+
 ```javascript
 // this is the server start time of the job
 const currentExecutionTime = "2020-08-04T16:30:00"
@@ -177,11 +193,13 @@ const endRange = "2020-08-04T16:30:00";
 ```
 
 ### Hinting the algorithm to optimize performance
+
 By default the reader will do its best to quickly slice the data down to a reasonable size however sometimes really large jobs can use a few hints to run more efficiently. If the record's date allow, changing the `interval` and `time_resolution` allows more fine grained control.
 
 The example job will try to read in 1 minute chunks, and if it needs make smaller chunks, it can chunk at the millisecond resolution.
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -208,6 +226,7 @@ Example Job
 ```
 
 ## Parameters
+
 | Configuration | Description | Type |  Notes |
 | --------- | -------- | ------ | ------ |
 | \_op| Name of operation, it must reflect the exact name of the file | String | required |
@@ -234,44 +253,46 @@ Example Job
 | geo_sort_order | the order used for sorting geo queries, can either be 'asc' or 'desc' | String | optional, defaults to 'asc' |
 | geo_sort_unit | the unit of measurement for sorting, may be set to 'mi', 'km', 'm','yd', 'ft | String | optional, defaults to 'm' |
 
-
 - as the query parameter expects a lucene query (which does not support geo queries), the geo parameters provide additional ways to filter records and will be used in conjunction with query
 
 - Geo points are written in the format of: '33.4484,112.0740' , which is 'latitude,longitude'
 
-- start and end may be specified in elasticsearch's [date math syntax](https://www.elastic.co/guide/en/elasticsearch/reference/2.x/common-options.html#date-math)
+- start and end may be specified in elasticsearch's [date math syntax](https://www.elastic.co/docs/reference/elasticsearch/rest-apis/common-options#date-math)
 
 - for geo distance queries, it defaults to sorting the returning results based off either the geo_point, or the geo_sort_point if specified. The results from a bounding box queriers are not sorted by default.
 
-
 ## Advanced Configuration
 
-#### interval
+### interval
+
 by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
 
 If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
 
 Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
 
-#### subslice_by_key
+### subslice_by_key
+
 When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
 
-#### Note on common errors ####
+### Note on common errors
+
 - You must be aware of how your dates are saved in elasticsearch in a given index. If you specify your start or end dates as common '2016-01-23' dates, it is likely the reader will not reach data that have dates set in utc as the time zone difference may set it in the next day. If you would like to go through the entire index, then leave start and end empty, the job will find the dates for you and later be reflected in the execution context (ex) configuration for this operation
 
 - If you are using elasticsearch >= 2.1.0 they introduced a default query limit of 10000 docs for each index which will throw an error if you query anything above that. This will pose an issue if you set the size to big or if you have more than 10000 docs within 1 millisecond, which is the shortest interval the slicer will attempt to make before overriding your size setting for that slice. Your best option is to raise the max_result_window setting for that given index.
 
 - this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
 
+### API usage in a job
 
-#### API usage in a job
 In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
+
 - `index`
 
-
 `SHORT FORM (no api specified)`
+
 ```json
 {
     "name" : "testing",
@@ -331,6 +352,7 @@ this configuration will be expanded out to the long form underneath the hood
 ```
 
 ### Metadata
+
 When the records are fetched from elasticsearch, metadata will be attached
 based off of the what metadata elasticsearch results provides
 
@@ -345,6 +367,7 @@ based off of the what metadata elasticsearch results provides
 - `_primary_term` is set to the records _primary_term parameter if it exists
 
 Example of metadata from a fetched record
+
 ```javascript
 // example record in elasticsearch
 {

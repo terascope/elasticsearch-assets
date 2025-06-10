@@ -2,16 +2,19 @@
 
 This is a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis), which encapsulates a specific functionality that can be utilized by any processor, reader or slicer.
 
- The `spaces_reader_api` will provide an [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory), which is a singleton that can create, cache and manage multiple elasticsearch readers that can be accessed in any operation through the `getAPI` method on the operation.
+ The `spaces_reader_api` will provide an [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/operations/api-factory/overview), which is a singleton that can create, cache and manage multiple elasticsearch readers that can be accessed in any operation through the `getAPI` method on the operation.
 
 This api is the core of the [spaces reader](../operations/spaces_reader.md). This contains all the same behavior, functionality and configuration of that reader
 
 Fetched records will already have metadata associated with it, like the `_key` field. Please reference the [metadata section](#metadata) for more information.
 
 ## Usage
+
 ### Example Processor using a spaces reader API
+
 This is an example of a custom fetcher using the spaces_reader_api to make its own queries to elasticsearch.
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -42,7 +45,9 @@ Example Job
     ]
 }
 ```
+
 Here is a custom fetcher for the job described above
+
 ```typescript
 // found at my_reader/fetcher.ts
 export default class MyReader extends Fetcher<ESDateConfig> {
@@ -68,26 +73,34 @@ export default class MyReader extends Fetcher<ESDateConfig> {
 this will return how many separate reader apis are in the cache
 
 ### get
+
 parameters:
+
 - name: String
 
 this will fetch any reader api that is associated with the name provided
 
 ### getConfig
+
 parameters:
+
 - name: String
 
 this will fetch any reader api config that is associated with the name provided
 
 ### create (async)
+
 parameters:
+
 - name: String
 - configOverrides: Check options below, optional
 
-this will create an instance of a [reader api](#spaces_reader_instance), and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
+this will create an instance of a [reader api](#spaces-reader-instance), and cache it with the name given. Any config provided in the second argument will override what is specified in the apiConfig and cache it with the name provided. It will throw an error if you try creating another api with the same name parameter
 
 ### remove (async)
+
 parameters:
+
 - name: String
 
 this will remove an instance of a reader api from the cache and will follow any cleanup code specified in the api code.
@@ -105,6 +118,7 @@ This will allow you to iterate over the cache name of the cache
 This will allow you to iterate over the values of the cache
 
 ## Example of using the factory methods in a processor
+
 ```typescript
 // example of api configuration
 const apiConfig = {
@@ -155,43 +169,48 @@ apiManager.get('normalClient') === undefined
 ```
 
 ## Spaces Reader Instance
+
 This is the reader class that is returned from the create method of the APIFactory. This returns a restricted [elastic-api](https://terascope.github.io/teraslice/docs/packages/elasticsearch-api/overview). Only the search and count methods will work appropriately.
 
 ### fetch
+
 ```(query: ElasticsearchSliceQuery) => Promise<DataEntities[]>```
 This will perform an date range or wildcard query to elasticsearch and return the results of the query.
 
 parameters:
-- query: an slice query object
-  -  start: string, must be paired with end to do a date range query.
-  -  end: string, must be paired with start to do a date range query.
-  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
-  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
+- query: an slice query object
+  - start: string, must be paired with end to do a date range query.
+  - end: string, must be paired with start to do a date range query.
+  - wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ### count
+
 ```(query: ElasticsearchQuery) => Promise<number>```
 This will perform an count query and return the number of records in that query.
 
 parameters:
-- query: an slice query object
-  -  start: string, must be paired with end to do a date range query.
-  -  end: string, must be paired with start to do a date range query.
-  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
-  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
+- query: an slice query object
+  - start: string, must be paired with end to do a date range query.
+  - end: string, must be paired with start to do a date range query.
+  - wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 parameters:
+
 - query: an elasticsearch query object
 
 ### version
+
 ```() => number```
 This returns the major elasticsearch version that this client is connected to
 
 ### verifyIndex
+
 ```() => Promise<void>```
 This check if the index exists and throw otherwise, this will also log the window_size of that given index.
-
 
 ```js
 const dateRangeQuery = {
@@ -218,7 +237,7 @@ api.version === 6
 | Configuration          | Description                                                                                                                                                                          | Type                                          | Notes                                                                                                                                                                      |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | \_name                 | Name of operation, it must reflect the exact name of the file                                                                                                                        | String                                        | required                                                                                                                                                                   |
-| endpoint               | The base API endpoint to read from: i.e.http://yourdomain.com/api/v2                                                                                                                 | String                                        | required                                                                                                                                                                   |
+| endpoint               | The base API endpoint to read from: i.e.`http://yourdomain.com/api/v2`                                                                                                                 | String                                        | required                                                                                                                                                                   |
 | token                  | teraserver API access token for making requests                                                                                                                                      | String                                        | required                                                                                                                                                                   |
 | timeout                | Time in milliseconds to wait for a connection to timeout                                                                                                                             | Number                                        | optional, defaults to 300000 ms or 5 mins                                                                                                                                  |
 | index                  | Which index to read from                                                                                                                                                             | String                                        | required                                                                                                                                                                   |
@@ -246,11 +265,10 @@ api.version === 6
 | variables              | can specify an xLuceneVariable object for the given xLucene query                                                                                                                    | Object                                        | optional                                                                                                                                                                   |
 | caCertificate          | CA certificate used to validate an https endpoint | String | optional |
 
-
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
-
 ### Metadata
+
 When the records are fetched from elasticsearch, metadata will be attached
 based off of the what metadata elasticsearch results provides
 
@@ -265,6 +283,7 @@ based off of the what metadata elasticsearch results provides
 - `_primary_term` is set to the records _primary_term parameter if it exists
 
 Example of metadata from a fetched record
+
 ```javascript
 // example record in elasticsearch
 {

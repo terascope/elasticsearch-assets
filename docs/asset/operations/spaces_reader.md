@@ -1,4 +1,5 @@
-# spaces_reader #
+# spaces_reader
+
 The spaces_reader allows you to fetch data from a endpoint on a spaces server. This reader is a wrapper around the [elasticsearch_reader](./elasticsearch_reader.md) so it has all the same behaviors, functionality and requirements of that reader.
 
 For this reader to function correctly the data must contain a date field with enough time resolution to slice the data into reasonably sized chunks and the data must be spread out through time. You must also have a valid space `endpoint` url and valid user `token` to communicate with the server.
@@ -12,9 +13,11 @@ Fetched records will already have metadata associated with it, like the `_key` f
 ## Usage
 
 ### Batch read a filtered subset of an index
+
 Here is an example of of a job that will check the `query_index` and get records between start date(inclusive) and the `end` date (exclusive). This will also filter based on the `query` parameter. This will use the `es-1` connection configuration described in your [terafoundation connector config](https://terascope.github.io/teraslice/docs/configuration/overview#terafoundation-connectors)
 
 Example Job
+
 ```json
 {
     "name" : "testing",
@@ -41,6 +44,7 @@ Example Job
     ]
 }
 ```
+
 Here is a representation of what data is being returned from the additional lucene query along with the date range restrictions
 
 ```javascript
@@ -57,6 +61,7 @@ const expected fetchResults = [
     { created: "2020-08-04T16:38:18.372Z", id: 1, bytes: 213 },
 ]
 ```
+
 `Notes`: be careful to take note of the `start` and `end` dates you specify, especially the formatting (UTC vs ISO etc) compared to the data in elasticsearch. Make sure to use the same formatting so you can filter the data you want. If one date encapsulates time zones but the other doesn't, you could be several hours off and get the wrong results.
 
 ## Parameters
@@ -64,7 +69,7 @@ const expected fetchResults = [
 | Configuration | Description | Type |  Notes   |
 | --------- | -------- | ------ | ------ |
 | \_op | Name of operation, it must reflect the exact name of the file | String | required |
-| endpoint | The base API endpoint to read from: i.e. http://yourdomain.com/api/v1 | String | required |
+| endpoint | The base API endpoint to read from: i.e. `http://yourdomain.com/api/v1` | String | required |
 | token | teraserver API access token for making requests | String | required |
 | timeout | Time in milliseconds to wait for a connection to timeout | Number | optional, defaults to 300000 ms or 5 mins  |
 | api_name | name of api to be used by spaces reader | String | optional, defaults to 'spaces_reader_api' |
@@ -95,27 +100,32 @@ const expected fetchResults = [
 
 ## Advanced Configuration
 
-#### interval
+### interval
+
 by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
 
 If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
 
 Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
 
-#### subslice_by_key
+### subslice_by_key
+
 When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
 
-#### Note on common errors ####
+### Note on common errors
+
 - You must be aware of how your dates are saved in elasticsearch in a given index. If you specify your start or end dates as common '2016-01-23' dates, it is likely the reader will not reach data that have dates set in utc as the time zone difference may set it in the next day. If you would like to go through the entire index, then leave start and end empty, the job will find the dates for you and later be reflected in the execution context (ex) configuration for this operation
 
 - If you are using elasticsearch >= 2.1.0 they introduced a default query limit of 10000 docs for each index which will throw an error if you query anything above that. This will pose an issue if you set the size to big or if you have more than 10000 docs within 1 millisecond, which is the shortest interval the slicer will attempt to make before overriding your size setting for that slice. Your best option is to raise the max_result_window setting for that given index.
 
 - this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
 
-#### API usage in a job
+### API usage in a job
+
 In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
 
 If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
+
 - `index`
 - `endpoint`
 - `token`
@@ -123,6 +133,7 @@ If submitting the job in long form, here is a list of parameters that will throw
 - `date_field_name`
 
 `SHORT FORM (no api specified)`
+
 ```json
 {
     "name" : "testing",
@@ -183,7 +194,8 @@ this configuration will be expanded out to the long form underneath the hood
 }
 ```
 
-### Metadata
+## Metadata
+
 When the records are fetched from elasticsearch, metadata will be attached
 based off of the what metadata elasticsearch results provides
 
@@ -198,6 +210,7 @@ based off of the what metadata elasticsearch results provides
 - `_primary_term` is set to the records _primary_term parameter if it exists
 
 Example of metadata from a fetched record
+
 ```javascript
 // example record in elasticsearch
 {
