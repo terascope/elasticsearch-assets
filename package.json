@@ -1,11 +1,10 @@
 {
     "name": "elasticsearch-asset-bundle",
     "displayName": "Elasticsearch Asset Bundle",
-    "version": "4.3.0",
+    "version": "4.3.1",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
-    "documentation": "https://terascope.github.io/elasticsearch-assets",
     "bugs": {
         "url": "https://github.com/terascope/elasticsearch-assets/issues"
     },
@@ -78,6 +77,7 @@
         "node": ">=22.0.0",
         "yarn": ">=1.22.19"
     },
+    "documentation": "https://terascope.github.io/elasticsearch-assets",
     "terascope": {
         "root": true,
         "testSuite": "search",
