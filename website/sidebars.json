@@ -1,0 +1,34 @@
+{
+    "asset": {
+        "Overview": [
+            "asset/overview"
+        ],
+        "Apis": [
+            "asset/apis/elasticsearch_reader_api",
+            "asset/apis/elasticsearch_sender_api",
+            "asset/apis/elasticsearch_state_storage",
+            "asset/apis/spaces_reader_api"
+        ],
+        "Operations": [
+            "asset/operations/elasticsearch_bulk",
+            "asset/operations/elasticsearch_reader",
+            "asset/operations/id_reader",
+            "asset/operations/spaces_reader"
+        ]
+    },
+    "packages": {
+        "Overview": [
+            "packages"
+        ],
+        "Packages": [
+            {
+                "type": "category",
+                "label": "elasticsearch-asset-apis",
+                "items": [
+                    "packages/elasticsearch-asset-apis/overview",
+                    "packages/elasticsearch-asset-apis/api/overview"
+                ]
+            }
+        ]
+    }
+}
