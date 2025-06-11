@@ -2597,22 +2597,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"asset@workspace:asset":
-  version: 0.0.0-use.local
-  resolution: "asset@workspace:asset"
-  dependencies:
-    "@terascope/data-mate": "npm:~1.8.3"
-    "@terascope/elasticsearch-api": "npm:~4.9.2"
-    "@terascope/elasticsearch-asset-apis": "npm:~1.2.4"
-    "@terascope/job-components": "npm:~1.10.2"
-    "@terascope/teraslice-state-storage": "npm:~1.9.2"
-    "@terascope/utils": "npm:~1.8.2"
-    datemath-parser: "npm:~1.0.6"
-    got: "npm:~13.0.0"
-    moment: "npm:~2.30.1"
-  languageName: unknown
-  linkType: soft
-
 "ast-types-flow@npm:^0.0.8":
   version: 0.0.8
   resolution: "ast-types-flow@npm:0.0.8"
@@ -3679,9 +3663,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"elasticsearch-assets@workspace:.":
+"elasticsearch-asset-bundle@workspace:.":
   version: 0.0.0-use.local
-  resolution: "elasticsearch-assets@workspace:."
+  resolution: "elasticsearch-asset-bundle@workspace:."
   dependencies:
     "@terascope/data-types": "npm:~1.8.3"
     "@terascope/elasticsearch-api": "npm:~4.9.2"
@@ -3709,6 +3693,22 @@ __metadata:
     teraslice-test-harness: "npm:~1.3.5"
     ts-jest: "npm:~29.3.4"
     typescript: "npm:~5.8.3"
+  languageName: unknown
+  linkType: soft
+
+"elasticsearch-assets@workspace:asset":
+  version: 0.0.0-use.local
+  resolution: "elasticsearch-assets@workspace:asset"
+  dependencies:
+    "@terascope/data-mate": "npm:~1.8.3"
+    "@terascope/elasticsearch-api": "npm:~4.9.2"
+    "@terascope/elasticsearch-asset-apis": "npm:~1.2.4"
+    "@terascope/job-components": "npm:~1.10.2"
+    "@terascope/teraslice-state-storage": "npm:~1.9.2"
+    "@terascope/utils": "npm:~1.8.2"
+    datemath-parser: "npm:~1.0.6"
+    got: "npm:~13.0.0"
+    moment: "npm:~2.30.1"
   languageName: unknown
   linkType: soft
 

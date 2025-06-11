@@ -1,10 +1,12 @@
 # elasticsearch_reader_api
 
-The `elasticsearch_reader_api` makes the elasticsearch reader functionality available to any processor, reader or slicer.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/classes/apifactory) to create, cache, and manage multiple elasticsearch readers.   This api is the core of the [elasticsearch reader](../operations/elasticsearch_reader.md) and [id reader](../operations/id_reader.md) operations.
+The `elasticsearch_reader_api` makes the elasticsearch reader functionality available to any processor, reader or slicer.   It's a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis) that uses the [api factory](https://terascope.github.io/teraslice/docs/packages/job-components/api/operations/api-factory/overview) to create, cache, and manage multiple elasticsearch readers.   This api is the core of the [elasticsearch reader](../operations/elasticsearch_reader.md) and [id reader](../operations/id_reader.md) operations.
 The records fetched via this api will have the standard associated metadata fields, e.g., `_key`, `_process_time`,`_ingest_time`, etc... See the [metadata section](#metadata) for details about metadata fields.
 
 ## Usage
+
 ### Example Processor using the elasticsearch_reader_api
+
 Example of a Custom fetcher
 
 Example Job
@@ -40,6 +42,7 @@ Example Job
 ```
 
 Custom fetcher code
+
 ```js
 // found at  /some_reader/fetcher.js
 export default class SomeReader extends Fetcher {
@@ -62,26 +65,34 @@ export default class SomeReader extends Fetcher {
 Returns the number of reader apis in the cache
 
 ### get
+
 parameters:
+
 - name: String
 
 Returns the reader api associated with the name
 
 ### getConfig
+
 parameters:
+
 - name: String
 
 Returns the reader api config associated with the name
 
 ### create (async)
+
 parameters:
+
 - name: String
-- configOverrides (optional) see [parameters](#Parameters) for config fields
+- configOverrides (optional) see [parameters](#parameters) for config fields
 
 Creates an instance of a [reader api](#elasticsearch-reader-instance). Any config provided in the second argument will override what is specified in the apiConfig. Throws an error if the api name has been previously used.
 
 ### remove (async)
+
 parameters:
+
 - name: String
 
 Removes an instance of a reader api from the cache and will follow any cleanup specified in the api code.
@@ -99,6 +110,7 @@ Returns a Map of the names of the cached api names
 Returns a Map of the cached api instances
 
 ## Example of using the factory api methods
+
 ```javascript
 // example of api configuration
 const apiConfig = {
@@ -147,14 +159,17 @@ apiManager.get('normalClient') === undefined
 ```
 
 ## Elasticsearch Reader Instance
+
 This is the reader api instance that is returned from the create method of the APIFactory.  The api methods can then be used to fetch and query data from elasticsearch.
 
 Create a new reader instance:
+
 ```js
 const api = apiManager.create('newAPI', {});
 ```
 
 Get a previously created reader instance:
+
 ```js
 const api = apiManager.get('oldAPI');
 ```
@@ -164,11 +179,12 @@ const api = apiManager.get('oldAPI');
 Returns the results of a date range or wildcard query
 
 parameters:
+
 - query: an slice query object
-  -  start: string, must be paired with end to do a date range query.
-  -  end: string, must be paired with start to do a date range query.
-  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
-  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
+  - start: string, must be paired with end to do a date range query.
+  - end: string, must be paired with start to do a date range query.
+  - wildcard: `{ field: string, value: string }`, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
 const api = apiManager.create('newAPI', {});
@@ -197,17 +213,17 @@ let results = await api.fetch(wildcardQuery);
 results === [ { some: 'record', uuid: 'afe18550-0081-453f-9e80-93a90782a5bd' }]
 ```
 
-
 ### count (async)
 
 Returns the number of records that are in the range of the query.
 
 parameters:
+
 - query: a slice query object
-  -  start: string, must be paired with end to do a date range query.
-  -  end: string, must be paired with start to do a date range query.
-  -  wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
-  -  key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
+  - start: string, must be paired with end to do a date range query.
+  - end: string, must be paired with start to do a date range query.
+  - wildcard: `{ field: string, value: string }`, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
 const api = apiManager.create('countAPI', {});
@@ -243,6 +259,7 @@ Returns results from a custom elasticsearch query
 `WARNING: _searchRequest is an internal api and likely to change.`
 
 parameters:
+
 - query: an elasticsearch query object
 
 ```js
@@ -280,11 +297,11 @@ try {
 A helper api used to determine the size of the slice interval for the date_slicer.  If interval is set to `auto`, dateRange must be provided and the function will calculate an interval. If passed in a duration, it will parse the duration in the format listed by the `time_resolution` configuration.
 
 parameters:
+
 - interval: a duration string (ie. `5min`, `30s`, `750ms`), or it may be set to `auto`
 - dateRange: optional, only used when interval is set to `auto`,
   - start: a start date
   - limit: the end date
-
 
 ```js
 const apiConfig = {
@@ -309,16 +326,18 @@ interval === [2763533, 'ms'];
 Generates a slicer based on the elasticsearch_reader slicer.
 
 parameters:
+
 - args: an slice query object
-  -  lifecycle: must be set to `once` or `persistent`.
-  -  slicerID: the numerical id of the slicer.
-  -  numOfSlicers: the number of total slicers that will be generated
-  -  recoveryData?: the `SlicerRecoveryData` for the job
-  -  windowState?: the windowState controller, *only needed in persistent mode*
-  -  startTime?: the start time of the operation, *only needed in persistent mode*
-  -  hook?: an optional async callback that you can provide to handle the updates that the slicer creates (start/end times of the index, the interval for the job etc)
+  - lifecycle: must be set to `once` or `persistent`.
+  - slicerID: the numerical id of the slicer.
+  - numOfSlicers: the number of total slicers that will be generated
+  - recoveryData?: the `SlicerRecoveryData` for the job
+  - windowState?: the windowState controller, *only needed in persistent mode*
+  - startTime?: the start time of the operation, *only needed in persistent mode*
+  - hook?: an optional async callback that you can provide to handle the updates that the slicer creates (start/end times of the index, the interval for the job etc)
 
 Once mode configuration
+
 ```js
 const lifecycle = 'once';
 const numOfSlicers = 3;
@@ -350,6 +369,7 @@ results === {
 ```
 
 Persistent mode configuration
+
 ```js
 const lifecycle = 'persistent';
 const numOfSlicers = 3;
@@ -382,7 +402,7 @@ results === {
 ### makeWindowState (async)
 
 A helper method that will return a synchronization window to coordinate slicer date range progression. THIS IS ONLY NEEDED FOR A DATE SLICER IN *PERSISTENT* MODE. This needs to be made once at the top level of the processor/slicer and passed in each time `makeDateSlicer` is called.
-See [makeDateSlicer](#makeDateSlicer) example above.
+See [makeDateSlicer](#makedateslicer-async) example above.
 
 ```js
 const windowState = await api.makeWindowState();
@@ -393,15 +413,16 @@ const windowState = await api.makeWindowState();
 Generates a slicer based on the id_reader slicer.
 
 parameters:
+
 - args: an slice query object
-  -  lifecycle: must be set to `once` or `persistent`.
-  -  slicerID: the numerical id of the slicer.
-  -  numOfSlicers: the number of total slicers that will be generated
-  -  recoveryData?: the `SlicerRecoveryData` for the job
-  -  keyType: The type of id used in index or the chars contained in the field'
-  -  keyRange?: if provided, slicer will only recurse on these given keys
-  -  startingKeyDepth: the length of the key generated before attempting to count the records in the index
-  -  idFieldName: the field where the id resides
+  - lifecycle: must be set to `once` or `persistent`.
+  - slicerID: the numerical id of the slicer.
+  - numOfSlicers: the number of total slicers that will be generated
+  - recoveryData?: the `SlicerRecoveryData` for the job
+  - keyType: The type of id used in index or the chars contained in the field'
+  - keyRange?: if provided, slicer will only recurse on these given keys
+  - startingKeyDepth: the length of the key generated before attempting to count the records in the index
+  - idFieldName: the field where the id resides
 
 ```js
 const lifecycle = 'once';
@@ -427,6 +448,7 @@ const slicer = await api.makeIDSlicer(args);
 const results = await slicer();
 results ===  { key: 'a0*', count: 5 }
 ```
+
 ### determineDateRanges (async)
 
 A helper method used to parse the start/end dates set on the apiConfig. If no start or end is specified it will query against the index to find the earliest and latest record, and produce dates to include them.
@@ -494,6 +516,7 @@ size === 100000
  You can specify which api config applies to which _op by appending a semi-colon and an id to the end of the api `_name`.
 
  example job:
+
 ```json
 {
     "name": "test-job",
@@ -531,6 +554,7 @@ size === 100000
 ```
 
 Processor for the custom-api-reader-op
+
 ```js
 'use strict';
 
@@ -565,6 +589,7 @@ module.exports = CustomAPIReaderOp;
 ```
 
 ### Metadata
+
 The metadata fields are calculated  by teraslice or provided by elasticsearch and attached to each record fetched from elasticsearch.  The metadata fields can then be called or referenced during a job by using the `getMetadata` method.
 
 - `_key` is set to the _id
@@ -573,11 +598,12 @@ The metadata fields are calculated  by teraslice or provided by elasticsearch an
 - `_eventTime`  is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
 - `_index` is set from the index it was from
 - `_type` is set to the records _type
-- `_version` is set to the records _version_
+- `_version` is set to the records \_version_
 - `_seq_no` is set to the records _seq_no parameter if it exists
 - `_primary_term` is set to the records _primary_term parameter if it exists
 
 Example of metadata from a fetched record
+
 ```javascript
 // example record in elasticsearch
 {

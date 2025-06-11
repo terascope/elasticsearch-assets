@@ -4,7 +4,7 @@ The id_reader reads data from an elasticsearch index using an algorithm that par
 
 The behavior of this reader changes with the version of elasticsearch being searched.
 
-For this reader to function correctly the parameter `id_field_name` is required. The [string field type](https://opensearch.org/docs/latest/field-types/supported-field-types/string/) of `id_field_name` should be `keyword`. A field type of `text` will be far less performant and will likely match on the same key multiple times, resulting in duplicate document reads. If the field type is `text` and was created by a dynamic mapping, it is possible to append `.keyword` to `id_field_name` to use the text field as a keyword. See [here](https://www.elastic.co/blog/strings-are-dead-long-live-strings) for some background on why this works.
+For this reader to function correctly the parameter `id_field_name` is required. The [string field type](https://opensearch.org/docs/latest/field-types/supported-field-types/string/) of `id_field_name` should be `keyword`. A field type of `text` will be far less performant and will likely match on the same key multiple times, resulting in duplicate document reads. If the field type is `text` and was created by a dynamic mapping, it is possible to append `.keyword` to `id_field_name` to use the text field as a keyword. See this [blog post](https://www.elastic.co/blog/strings-are-dead-long-live-strings) for some background on why this works.
 
 Currently the id_reader will makes keys for base64url (elasticsearch native id generator) and hexadecimal. However at this point the hexadecimal only works if the keys are lowercase, future updates will fix this.
 

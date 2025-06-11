@@ -1,7 +1,7 @@
 {
-    "name": "elasticsearch-assets",
-    "displayName": "Elasticsearch Assets",
-    "version": "4.3.0",
+    "name": "elasticsearch-asset-bundle",
+    "displayName": "Elasticsearch Asset Bundle",
+    "version": "4.3.1",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
@@ -29,6 +29,7 @@
         "docker:limit": "./scripts/docker-limit-check.sh",
         "docker:listImages": "ts-scripts images list",
         "docker:saveImages": "ts-scripts images save",
+        "docs": "ts-scripts docs",
         "lint": "eslint",
         "lint:fix": "yarn lint --fix",
         "publish:changed": "./scripts/publish.sh",
@@ -76,6 +77,7 @@
         "node": ">=22.0.0",
         "yarn": ">=1.22.19"
     },
+    "documentation": "https://terascope.github.io/elasticsearch-assets",
     "terascope": {
         "root": true,
         "testSuite": "search",
