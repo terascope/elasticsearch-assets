@@ -168,7 +168,7 @@ apiManager.get('normalClient') === undefined
 
 ## Elasticsearch Sender Instance
 
-The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/routesenderapi),  returned from the create method of the APIFactory, follows our common sender api interface.
+The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/utils/api/interfaces/interfaces/RouteSenderAPI/),  returned from the create method of the APIFactory, follows our common sender api interface.
 
 ### send (async)
 

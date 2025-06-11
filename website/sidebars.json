@@ -18,7 +18,7 @@
     },
     "packages": {
         "Overview": [
-            "packages"
+            "packages/overview"
         ],
         "Packages": [
             {

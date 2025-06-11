@@ -2,7 +2,7 @@
 
 This is a [teraslice api](https://terascope.github.io/teraslice/docs/jobs/configuration#apis), which encapsulates a specific functionality that can be utilized by any processor, reader or slicer.
 
-The `elasticsearch_state_storage` will provide a [state-storage api](https://github.com/terascope/teraslice/blob/master/docs/packages/teraslice-state-storage/overview.md)
+The `elasticsearch_state_storage` will provide a [state-storage api](https://terascope.github.io/teraslice/docs/packages/teraslice-state-storage/overview)
 
 This api provides an LRU caching system, based on [mnemonist's](https://www.npmjs.com/package/mnemonist) LRU map, for teraslice processors. The in memory cache is backed by Elasticsearch.
 
@@ -181,7 +181,7 @@ api.cache.get('456def'); // undefined
 
 ### mset
 
-mset([{ key: KEY1, data: VALUE1}, { key: KEY2, data: VALUE2 }, etc ...] - Sets multiple key, value pairs.  Requires an array of { key: key, data: value } objects
+`mset([{ key: KEY1, data: VALUE1}, { key: KEY2, data: VALUE2 }, etc ...]` - Sets multiple key, value pairs.  Requires an array of `{ key: key, data: value }` objects
 
 ```javascript
 api.cache.mset([{ key: 1, data: { name: 'foo' } }, { key: 'abc123', data: { name: 'bar' } }]);

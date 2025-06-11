@@ -183,7 +183,7 @@ parameters:
 - query: an slice query object
   - start: string, must be paired with end to do a date range query.
   - end: string, must be paired with start to do a date range query.
-  - wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - wildcard: `{ field: string, value: string }`, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
   - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
@@ -222,7 +222,7 @@ parameters:
 - query: a slice query object
   - start: string, must be paired with end to do a date range query.
   - end: string, must be paired with start to do a date range query.
-  - wildcard: { field: string, value: string }, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
+  - wildcard: `{ field: string, value: string }`, an elasticsearch wildcard query on string values. The value needs to be formatted in `key*`,please reference examples below.
   - key: string, only used for _uid queries on elasticsearch v5 or older. The key need to be specified as `docType#key*` format, please reference examples below.
 
 ```js
