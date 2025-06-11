@@ -1,5 +1,5 @@
 {
-    "name": "asset",
+    "name": "elasticsearch-assets",
     "displayName": "Asset",
     "version": "4.3.0",
     "private": true,

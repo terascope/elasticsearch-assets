@@ -4,7 +4,7 @@
 
 > Teraslice asset for elasticsearch operations
 
-This is a package within the [Elasticsearch Assets](https://github.com/terascope/elasticsearch-assets#readme) monorepo. See our [documentation](https://terascope.github.io/elasticsearch-assets/docs/asset/overview) for more information or the [issues](https://github.com/terascope/elasticsearch-assets/issues?q=is%3Aopen+is%3Aissue+label%3Apkg%2Fasset) associated with this package
+This is a package within the [Elasticsearch Asset Bundle](https://github.com/terascope/elasticsearch-assets#readme) monorepo. See our [documentation](https://terascope.github.io/elasticsearch-assets/docs/asset/overview) for more information or the [issues](https://github.com/terascope/elasticsearch-assets/issues?q=is%3Aopen+is%3Aissue+label%3Apkg%2Fasset) associated with this package
 
 ## Contributing
 
