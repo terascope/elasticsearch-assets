@@ -91,26 +91,26 @@ describe('elasticsearch_reader schema', () => {
         const validGeoDistance = ESReaderSchema.schema.geo_distance.format;
         const geoSortOrder = ESReaderSchema.schema.geo_sort_order.format;
 
-        expect(() => geoPointValidation(null)).not.toThrowError();
-        expect(() => validGeoDistance(null)).not.toThrowError();
-        expect(() => geoSortOrder(null)).not.toThrowError();
+        expect(() => geoPointValidation(null)).not.toThrow();
+        expect(() => validGeoDistance(null)).not.toThrow();
+        expect(() => geoSortOrder(null)).not.toThrow();
 
         // @ts-expect-error
         expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
-        expect(() => geoPointValidation('19.1234')).toThrowError('Invalid geo_point, received 19.1234');
-        expect(() => geoPointValidation('190.1234,85.2134')).toThrowError('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
-        expect(() => geoPointValidation('80.1234,185.2134')).toThrowError('Invalid longitude parameter, was given 185.2134, should be >= -180 and <= 180');
-        expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrowError();
+        expect(() => geoPointValidation('19.1234')).toThrow('Invalid geo_point, received 19.1234');
+        expect(() => geoPointValidation('190.1234,85.2134')).toThrow('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
+        expect(() => geoPointValidation('80.1234,185.2134')).toThrow('Invalid longitude parameter, was given 185.2134, should be >= -180 and <= 180');
+        expect(() => geoPointValidation('80.1234,-155.2134')).not.toThrow();
 
         // @ts-expect-error
-        expect(() => validGeoDistance(19.1234)).toThrowError('Invalid geo_distance parameter, must be a string IF specified');
-        expect(() => validGeoDistance(' ')).toThrowError('Invalid geo_distance parameter, is formatted incorrectly');
-        expect(() => validGeoDistance('200something')).toThrowError('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
-        expect(() => validGeoDistance('200km')).not.toThrowError();
+        expect(() => validGeoDistance(19.1234)).toThrow('Invalid geo_distance parameter, must be a string IF specified');
+        expect(() => validGeoDistance(' ')).toThrow('Invalid geo_distance parameter, is formatted incorrectly');
+        expect(() => validGeoDistance('200something')).toThrow('Invalid unit type, did not have a proper unit of measurement (ie m, km, yd, ft)');
+        expect(() => validGeoDistance('200km')).not.toThrow();
 
-        expect(() => geoSortOrder(1234)).toThrowError('Invalid geo_sort_order parameter, must be a string IF specified');
-        expect(() => geoSortOrder('hello')).toThrowError('If geo_sort_order is specified it must be either "asc" or "desc"');
-        expect(() => geoSortOrder('asc')).not.toThrowError();
+        expect(() => geoSortOrder(1234)).toThrow('Invalid geo_sort_order parameter, must be a string IF specified');
+        expect(() => geoSortOrder('hello')).toThrow('If geo_sort_order is specified it must be either "asc" or "desc"');
+        expect(() => geoSortOrder('asc')).not.toThrow();
     });
 
     it('subslice_by_key configuration validation', async () => {
