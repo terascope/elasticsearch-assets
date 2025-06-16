@@ -96,7 +96,7 @@ describe('elasticsearch_reader schema', () => {
         expect(() => geoSortOrder(null)).not.toThrow();
 
         // @ts-expect-error
-        expect(() => geoPointValidation(19.1234)).toThrowError('Invalid geo_point, must be a string IF specified');
+        expect(() => geoPointValidation(19.1234)).toThrow('Invalid geo_point, must be a string IF specified');
         expect(() => geoPointValidation('19.1234')).toThrow('Invalid geo_point, received 19.1234');
         expect(() => geoPointValidation('190.1234,85.2134')).toThrow('Invalid latitude parameter, was given 190.1234, should be >= -90 and <= 90');
         expect(() => geoPointValidation('80.1234,185.2134')).toThrow('Invalid longitude parameter, was given 185.2134, should be >= -180 and <= 180');
