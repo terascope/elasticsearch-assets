@@ -93,4 +93,4 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-[MIT](./LICENSE) licensed.
+[MIT](https://github.com/terascope/elasticsearch-assets/blob/master/LICENSE) licensed.
