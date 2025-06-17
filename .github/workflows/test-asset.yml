@@ -106,6 +106,18 @@ jobs:
         run: yarn test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
 
+  test-website:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          # NOTE: Hard Coded Node Version
+          node-version: '22'
+      - run: yarn && yarn setup
+      - run: ./scripts/build-documentation.sh
+
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
     if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
