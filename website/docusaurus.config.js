@@ -1,3 +1,5 @@
+import { themes } from 'prism-react-renderer';
+
 module.exports = {
     title: 'Elasticsearch Assets',
     tagline: 'Teraslice asset for elasticsearch operations',
@@ -155,6 +157,11 @@ module.exports = {
                 light: 'default',
                 dark: 'dark'
             },
-        }
+        },
+        prism: {
+            theme: themes.default,
+            darkTheme: themes.dark,
+            additionalLanguages: ['bash'],
+        },
     }
 };

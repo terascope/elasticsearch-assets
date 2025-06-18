@@ -218,3 +218,63 @@ await api.send([
 | script                   | Inline script to include in each indexing request. Only very simple painless scripts are currently supported                                                                                                         | String  | optional                                                                                                                                                                                                                                                              |
 | script_params            | key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key                                                                               | Object  | optional                                                                                                                                                                                                                                                              |
 | update_retry_on_conflict | If there is a version conflict from an update how often should it be retried                                                                                                                                         | Number  | optional, defaults to 0                                                                                                                                                                                                                                               |
+
+### Metadata
+
+When the records are fetched from elasticsearch, metadata will be attached
+based off of the what metadata elasticsearch results provides
+
+- `_key` is set to the _id
+- `_processTime` is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
+- `_ingestTime` is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
+- `_eventTime`  is set to a a number representing the milliseconds elapsed since the UNIX epoch of when it was first fetched
+- `_index` is set from the index it was from
+- `_type` is set to the records _type
+- `_version` is set to the records _version_
+- `_seq_no` is set to the records _seq_no parameter if it exists
+- `_primary_term` is set to the records _primary_term parameter if it exists
+
+Example of metadata from a fetched record
+
+```javascript
+// example record in elasticsearch
+{
+    "_index" : "test_index",
+    "_type" : "_doc",
+    "_id" : "ltyRQW4B8WLke7PkER8L",
+    "_score" : 1.0,
+    "_source" : {
+      "ip" : "120.67.248.156",
+      "url" : "http://lucious.biz",
+      "uuid" : "a23a8550-0081-453f-9e80-93a90782a5bd",
+      "created" : "2019-04-26T08:00:23.225-07:00",
+      "ipv6" : "9e79:7798:585a:b847:f1c4:81eb:0c3d:7eb8",
+      "location" : "50.15003, -94.89355",
+      "bytes" : 124
+    }
+}
+
+const expectedResults = {
+    "ip" : "120.67.248.156",
+    "url" : "http://lucious.biz",
+    "uuid" : "a23a8550-0081-453f-9e80-93a90782a5bd",
+    "created" : "2019-04-26T08:00:23.225-07:00",
+    "ipv6" : "9e79:7798:585a:b847:f1c4:81eb:0c3d:7eb8",
+    "location" : "50.15003, -94.89355",
+    "bytes" : 124
+};
+
+DataEntity.isDataEntity(expectedResults) === true;
+
+expectedResults.getMetadata() === {
+    _key: "ltyRQW4B8WLke7PkER8L",
+    _type: "_doc",
+    _index: "test_index",
+    _version: undefined,
+    _seq_no: undefined,
+    _primary_term: undefined,
+    _processTime: 1596663162372,
+    _ingestTime: 1596663162372,
+    _eventTime: 1596663162372,
+}
+```
