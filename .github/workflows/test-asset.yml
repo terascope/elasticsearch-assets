@@ -149,6 +149,12 @@ jobs:
     uses: terascope/workflows/.github/workflows/check-docker-limit.yml@main
     secrets: inherit
 
+  all-tests-passed:
+    needs: [build-elasticsearch-assets, test-elasticsearch-assets, test-website]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "All tests have passed"
+      
 # TODO:
 # - Add Macos Test
 # - Add post test build verify for all supported node versions, no Opensearch/ES
