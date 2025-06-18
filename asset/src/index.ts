@@ -11,11 +11,11 @@ import ElasticsearchReaderSlicer from '../src/elasticsearch_reader/slicer';
 import ElasticsearchReaderAPI from '../src/elasticsearch_reader_api/api';
 import ElasticsearchReaderAPISchema from '../src/elasticsearch_reader_api/schema';
 
-import ElasticsearchStateStorageAPI from '../src/elasticsearch_state_storage/api';
-import ElasticsearchStateStorageSchema from '../src/elasticsearch_state_storage/schema';
-
 import ElasticsearchSenderAPI from '../src/elasticsearch_sender_api/api';
 import ElasticsearchSenderAPISchema from '../src/elasticsearch_sender_api/schema';
+
+import ElasticsearchStateStorageAPI from '../src/elasticsearch_state_storage/api';
+import ElasticsearchStateStorageSchema from '../src/elasticsearch_state_storage/schema';
 
 import IdReaderFetcher from '../src/id_reader/fetcher';
 import IdReaderSchema from '../src/id_reader/schema';
@@ -42,13 +42,13 @@ export const ASSETS = {
         API: ElasticsearchReaderAPI,
         Schema: ElasticsearchReaderAPISchema,
     },
-    elasticsearch_state_storage: {
-        API: ElasticsearchStateStorageAPI,
-        Schema: ElasticsearchStateStorageSchema,
-    },
     elasticsearch_sender_api: {
         API: ElasticsearchSenderAPI,
         Schema: ElasticsearchSenderAPISchema,
+    },
+    elasticsearch_state_storage: {
+        API: ElasticsearchStateStorageAPI,
+        Schema: ElasticsearchStateStorageSchema,
     },
     id_reader: {
         Fetcher: IdReaderFetcher,
