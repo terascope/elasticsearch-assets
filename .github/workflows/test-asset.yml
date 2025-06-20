@@ -97,7 +97,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: /tmp/docker_cache
-          key: docker-images-${{ hashFiles('./images/image-list.txt') }}
+          key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
+          restore-keys: |
+            docker-images-${{ hashFiles('./images/image-list.txt') }}-
+            docker-images-
 
       - name: Test asset for ${{ matrix.search-version }}
         run: SKIP_IMAGE_DELETION='true' yarn test:${{ matrix.search-version }}
@@ -107,7 +110,7 @@ jobs:
         working-directory: ./packages/elasticsearch-asset-apis
 
   test-website:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -115,7 +118,10 @@ jobs:
         with:
           # NOTE: Hard Coded Node Version
           node-version: '22'
-      - run: yarn && ./scripts/build-documentation.sh
+      - name: Build Documentation
+        run: yarn && ./scripts/build-documentation.sh
+      - name: Check Output
+        run: find ./website/build
 
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
