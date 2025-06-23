@@ -29,7 +29,7 @@
         "@terascope/data-mate": "~1.8.3",
         "@terascope/data-types": "~1.8.3",
         "@terascope/elasticsearch-api": "~4.9.2",
-        "@terascope/utils": "~1.8.2",
+        "@terascope/utils": "~1.8.3",
         "datemath-parser": "~1.0.6",
         "got": "~13.0.0",
         "moment": "~2.30.1"
