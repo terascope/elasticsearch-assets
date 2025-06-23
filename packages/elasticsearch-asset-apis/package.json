@@ -1,7 +1,7 @@
 {
     "name": "@terascope/elasticsearch-asset-apis",
     "displayName": "Elasticsearch Asset Apis",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "description": "Elasticsearch reader and sender apis",
     "homepage": "https://github.com/terascope/elasticsearch-assets",
     "repository": "git@github.com:terascope/elasticsearch-assets.git",
@@ -26,19 +26,19 @@
         "test:watch": "TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "~1.8.3",
-        "@terascope/data-types": "~1.8.3",
-        "@terascope/elasticsearch-api": "~4.9.2",
-        "@terascope/utils": "~1.8.2",
+        "@terascope/data-mate": "~1.8.4",
+        "@terascope/data-types": "~1.8.4",
+        "@terascope/elasticsearch-api": "~4.9.3",
+        "@terascope/utils": "~1.8.3",
         "datemath-parser": "~1.0.6",
         "got": "~13.0.0",
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "~1.18.0",
+        "@terascope/scripts": "~1.18.1",
         "@terascope/types": "~1.4.1",
         "@types/node": "~24.0.3",
-        "jest": "~30.0.0"
+        "jest": "~30.0.2"
     },
     "engines": {
         "node": ">=22.0.0",
