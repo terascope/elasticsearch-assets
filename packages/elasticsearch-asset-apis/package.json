@@ -35,7 +35,7 @@
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "~1.18.0",
+        "@terascope/scripts": "~1.18.1",
         "@terascope/types": "~1.4.1",
         "@types/node": "~24.0.3",
         "jest": "~30.0.0"
