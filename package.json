@@ -48,7 +48,7 @@
         "@terascope/data-types": "~1.8.4",
         "@terascope/elasticsearch-api": "~4.9.3",
         "@terascope/elasticsearch-asset-apis": "~1.2.5",
-        "@terascope/eslint-config": "~1.1.18",
+        "@terascope/eslint-config": "~1.1.19",
         "@terascope/job-components": "~1.10.3",
         "@terascope/scripts": "~1.18.1",
         "@terascope/teraslice-state-storage": "~1.9.3",
