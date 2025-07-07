@@ -23,7 +23,7 @@
         "@terascope/elasticsearch-asset-apis": "~1.2.5",
         "@terascope/job-components": "~1.10.3",
         "@terascope/teraslice-state-storage": "~1.9.3",
-        "@terascope/utils": "~1.8.3",
+        "@terascope/utils": "~1.9.3",
         "datemath-parser": "~1.0.6",
         "got": "~13.0.0",
         "moment": "~2.30.1"
