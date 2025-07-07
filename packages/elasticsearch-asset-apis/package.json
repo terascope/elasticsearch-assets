@@ -26,19 +26,19 @@
         "test:watch": "TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "~1.8.4",
-        "@terascope/data-types": "~1.8.4",
-        "@terascope/elasticsearch-api": "~4.9.3",
-        "@terascope/utils": "~1.8.3",
+        "@terascope/data-mate": "~1.9.3",
+        "@terascope/data-types": "~1.9.3",
+        "@terascope/elasticsearch-api": "~4.10.3",
+        "@terascope/utils": "~1.9.3",
         "datemath-parser": "~1.0.6",
         "got": "~13.0.0",
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "~1.18.1",
-        "@terascope/types": "~1.4.1",
-        "@types/node": "~24.0.7",
-        "jest": "~30.0.3"
+        "@terascope/scripts": "~1.19.4",
+        "@terascope/types": "~1.4.3",
+        "@types/node": "~24.0.10",
+        "jest": "~30.0.4"
     },
     "engines": {
         "node": ">=22.0.0",
