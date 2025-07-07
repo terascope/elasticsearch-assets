@@ -52,7 +52,7 @@
         "@terascope/job-components": "~1.10.3",
         "@terascope/scripts": "~1.18.1",
         "@terascope/teraslice-state-storage": "~1.9.3",
-        "@terascope/types": "~1.4.1",
+        "@terascope/types": "~1.4.3",
         "@types/bluebird": "~3.5.42",
         "@types/fs-extra": "~11.0.4",
         "@types/got": "~9.6.12",
