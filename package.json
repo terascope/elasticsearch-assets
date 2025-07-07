@@ -59,7 +59,7 @@
         "@types/jest": "~30.0.0",
         "@types/node": "~24.0.7",
         "@types/semver": "~7.7.0",
-        "elasticsearch-store": "~1.10.6",
+        "elasticsearch-store": "~1.11.3",
         "eslint": "~9.30.0",
         "fs-extra": "~11.3.0",
         "jest": "~30.0.3",
