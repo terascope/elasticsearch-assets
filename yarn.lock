@@ -1593,13 +1593,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@terascope/elasticsearch-api@npm:~4.11.0":
+  version: 4.11.0
+  resolution: "@terascope/elasticsearch-api@npm:4.11.0"
+  dependencies:
+    "@terascope/types": "npm:~1.4.3"
+    "@terascope/utils": "npm:~1.9.3"
+    bluebird: "npm:~3.7.2"
+    setimmediate: "npm:~1.0.5"
+  checksum: 10c0/bbdd9fa124bbcd9d0356b17866913772411483287d3e36ede744f5d8c0ff2e48a1c8195af64ee570f3d285726af7dde645df827417945bae37db3a4821fa3874
+  languageName: node
+  linkType: hard
+
 "@terascope/elasticsearch-asset-apis@npm:~1.2.5, @terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis":
   version: 0.0.0-use.local
   resolution: "@terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis"
   dependencies:
     "@terascope/data-mate": "npm:~1.9.3"
     "@terascope/data-types": "npm:~1.9.3"
-    "@terascope/elasticsearch-api": "npm:~4.10.3"
+    "@terascope/elasticsearch-api": "npm:~4.11.0"
     "@terascope/scripts": "npm:~1.19.4"
     "@terascope/types": "npm:~1.4.3"
     "@terascope/utils": "npm:~1.9.3"
@@ -4048,7 +4060,7 @@ __metadata:
   resolution: "elasticsearch-asset-bundle@workspace:."
   dependencies:
     "@terascope/data-types": "npm:~1.9.3"
-    "@terascope/elasticsearch-api": "npm:~4.10.3"
+    "@terascope/elasticsearch-api": "npm:~4.11.0"
     "@terascope/elasticsearch-asset-apis": "npm:~1.2.5"
     "@terascope/eslint-config": "npm:~1.1.19"
     "@terascope/job-components": "npm:~1.11.3"
@@ -4081,7 +4093,7 @@ __metadata:
   resolution: "elasticsearch-assets@workspace:asset"
   dependencies:
     "@terascope/data-mate": "npm:~1.9.3"
-    "@terascope/elasticsearch-api": "npm:~4.10.3"
+    "@terascope/elasticsearch-api": "npm:~4.11.0"
     "@terascope/elasticsearch-asset-apis": "npm:~1.2.5"
     "@terascope/job-components": "npm:~1.11.3"
     "@terascope/teraslice-state-storage": "npm:~1.10.3"
