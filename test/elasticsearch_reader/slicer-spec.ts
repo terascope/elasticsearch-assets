@@ -4,7 +4,7 @@ import {
     AnyObject, sortBy, SliceRequest, debugLogger,
     TestClientConfig
 } from '@terascope/job-components';
-import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import moment from 'moment';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '@terascope/elasticsearch-asset-apis';

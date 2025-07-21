@@ -1,5 +1,5 @@
 import elasticAPI from '@terascope/elasticsearch-api';
-import { Client } from 'elasticsearch-store';
+import { Client } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import {
     AnyObject, DataEntity, get, Logger

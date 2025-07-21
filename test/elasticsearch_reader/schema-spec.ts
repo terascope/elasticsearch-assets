@@ -3,7 +3,7 @@ import {
     newTestJobConfig, OpConfig, APIConfig,
     debugLogger, TestClientConfig
 } from '@terascope/job-components';
-import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema.js';

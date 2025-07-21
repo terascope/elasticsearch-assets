@@ -1,7 +1,7 @@
 import 'jest-extended';
 import { DataEntity, TestClientConfig, debugLogger } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
-import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex, addToIndex

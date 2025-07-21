@@ -1,4 +1,4 @@
-import { Client, ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { Client, ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { ClientParams } from '@terascope/types';
 import { DataEntity, debugLogger, uniq } from '@terascope/utils';
 import elasticAPI from '@terascope/elasticsearch-api';

@@ -1,7 +1,7 @@
 import 'jest-extended';
 import { debugLogger, DataEntity } from '@terascope/utils';
 import { DataFrame } from '@terascope/data-mate';
-import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { EventEmitter } from 'node:events';
 import {
     TEST_INDEX_PREFIX,
