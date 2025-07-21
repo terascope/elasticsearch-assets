@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { TestClientConfig, debugLogger } from '@terascope/job-components';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';

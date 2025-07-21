@@ -1,6 +1,6 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SlicerRecoveryData, debugLogger, TestClientConfig } from '@terascope/job-components';
-import { ElasticsearchTestHelpers } from 'elasticsearch-store';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,

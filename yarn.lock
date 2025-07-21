@@ -1684,6 +1684,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@terascope/opensearch-client@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@terascope/opensearch-client@npm:1.0.0"
+  dependencies:
+    "@terascope/data-types": "npm:~1.10.0"
+    "@terascope/types": "npm:~1.4.3"
+    "@terascope/utils": "npm:~1.9.3"
+    elasticsearch6: "npm:@elastic/elasticsearch@~6.8.0"
+    elasticsearch7: "npm:@elastic/elasticsearch@~7.17.0"
+    elasticsearch8: "npm:@elastic/elasticsearch@~8.15.0"
+    opensearch1: "npm:@opensearch-project/opensearch@~1.2.0"
+    opensearch2: "npm:@opensearch-project/opensearch@~2.12.0"
+    opensearch3: "npm:@opensearch-project/opensearch@~3.5.1"
+    setimmediate: "npm:~1.0.5"
+  checksum: 10c0/15da8015f03156fa330341bfb25190f2a87246773f490acd2e8196583dc0d7f138966558546f7a3a6b53b2085a1f74fb17b7e7b27c2ee051df793ba219f37971
+  languageName: node
+  linkType: hard
+
 "@terascope/scripts@npm:~1.20.1":
   version: 1.20.1
   resolution: "@terascope/scripts@npm:1.20.1"
@@ -2086,13 +2104,6 @@ __metadata:
   version: 3.5.42
   resolution: "@types/bluebird@npm:3.5.42"
   checksum: 10c0/ce752a5e277bbc0cdee3dee9c875ac093d1331905a8a5175665ccb8cb76b7b95a84836f92bc46076c2fd1e384a107866893eeeb20f6fb33427482663879faf93
-  languageName: node
-  linkType: hard
-
-"@types/elasticsearch@npm:~5.0.43":
-  version: 5.0.43
-  resolution: "@types/elasticsearch@npm:5.0.43"
-  checksum: 10c0/f01693998136cb68c60cd75d238856b993532e11c8a474158bdc58abf63422bc1e34c9b62533c67a612a37d318cce35e97779f05b9a4bad4c3e14442a47490e7
   languageName: node
   linkType: hard
 
@@ -2750,20 +2761,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ajv-formats@npm:~3.0.1":
-  version: 3.0.1
-  resolution: "ajv-formats@npm:3.0.1"
-  dependencies:
-    ajv: "npm:^8.0.0"
-  peerDependencies:
-    ajv: ^8.0.0
-  peerDependenciesMeta:
-    ajv:
-      optional: true
-  checksum: 10c0/168d6bca1ea9f163b41c8147bae537e67bd963357a5488a1eaf3abe8baa8eec806d4e45f15b10767e6020679315c7e1e5e6803088dfb84efa2b4e9353b83dd0a
-  languageName: node
-  linkType: hard
-
 "ajv@npm:^6.12.4":
   version: 6.12.6
   resolution: "ajv@npm:6.12.6"
@@ -2773,18 +2770,6 @@ __metadata:
     json-schema-traverse: "npm:^0.4.1"
     uri-js: "npm:^4.2.2"
   checksum: 10c0/41e23642cbe545889245b9d2a45854ebba51cda6c778ebced9649420d9205f2efb39cb43dbc41e358409223b1ea43303ae4839db682c848b891e4811da1a5a71
-  languageName: node
-  linkType: hard
-
-"ajv@npm:^8.0.0, ajv@npm:~8.17.1":
-  version: 8.17.1
-  resolution: "ajv@npm:8.17.1"
-  dependencies:
-    fast-deep-equal: "npm:^3.1.3"
-    fast-uri: "npm:^3.0.1"
-    json-schema-traverse: "npm:^1.0.0"
-    require-from-string: "npm:^2.0.2"
-  checksum: 10c0/ec3ba10a573c6b60f94639ffc53526275917a2df6810e4ab5a6b959d87459f9ef3f00d5e7865b82677cb7d21590355b34da14d1d0b9c32d75f95a187e76fff35
   languageName: node
   linkType: hard
 
@@ -4068,6 +4053,7 @@ __metadata:
     "@terascope/elasticsearch-asset-apis": "npm:~1.2.5"
     "@terascope/eslint-config": "npm:~1.1.19"
     "@terascope/job-components": "npm:~1.11.3"
+    "@terascope/opensearch-client": "npm:^1.0.0"
     "@terascope/scripts": "npm:~1.20.1"
     "@terascope/teraslice-state-storage": "npm:~1.11.0"
     "@terascope/types": "npm:~1.4.3"
@@ -4077,7 +4063,6 @@ __metadata:
     "@types/jest": "npm:~30.0.0"
     "@types/node": "npm:~24.0.13"
     "@types/semver": "npm:~7.7.0"
-    elasticsearch-store: "npm:~1.12.0"
     eslint: "npm:~9.31.0"
     fs-extra: "npm:~11.3.0"
     jest: "npm:~30.0.4"
@@ -4107,29 +4092,6 @@ __metadata:
     moment: "npm:~2.30.1"
   languageName: unknown
   linkType: soft
-
-"elasticsearch-store@npm:~1.12.0":
-  version: 1.12.0
-  resolution: "elasticsearch-store@npm:1.12.0"
-  dependencies:
-    "@terascope/data-mate": "npm:~1.10.0"
-    "@terascope/data-types": "npm:~1.10.0"
-    "@terascope/types": "npm:~1.4.3"
-    "@terascope/utils": "npm:~1.9.3"
-    ajv: "npm:~8.17.1"
-    ajv-formats: "npm:~3.0.1"
-    elasticsearch6: "npm:@elastic/elasticsearch@~6.8.0"
-    elasticsearch7: "npm:@elastic/elasticsearch@~7.17.0"
-    elasticsearch8: "npm:@elastic/elasticsearch@~8.15.0"
-    opensearch1: "npm:@opensearch-project/opensearch@~1.2.0"
-    opensearch2: "npm:@opensearch-project/opensearch@~2.12.0"
-    opensearch3: "npm:@opensearch-project/opensearch@~3.5.1"
-    setimmediate: "npm:~1.0.5"
-    uuid: "npm:~11.1.0"
-    xlucene-translator: "npm:~1.9.3"
-  checksum: 10c0/e5825110515c88b8b101c3e115f74879d0d3072980cc548efb9f7f0534c4cd591e64e9d7f6cb31821d5b91374079848eaa0303bab7bd2f21504c6b5006ecd705
-  languageName: node
-  linkType: hard
 
 "elasticsearch6@npm:@elastic/elasticsearch@~6.8.0":
   version: 6.8.8
@@ -4991,13 +4953,6 @@ __metadata:
   version: 2.0.6
   resolution: "fast-levenshtein@npm:2.0.6"
   checksum: 10c0/111972b37338bcb88f7d9e2c5907862c280ebf4234433b95bc611e518d192ccb2d38119c4ac86e26b668d75f7f3894f4ff5c4982899afced7ca78633b08287c4
-  languageName: node
-  linkType: hard
-
-"fast-uri@npm:^3.0.1":
-  version: 3.0.6
-  resolution: "fast-uri@npm:3.0.6"
-  checksum: 10c0/74a513c2af0584448aee71ce56005185f81239eab7a2343110e5bad50c39ad4fb19c5a6f99783ead1cac7ccaf3461a6034fda89fffa2b30b6d99b9f21c2f9d29
   languageName: node
   linkType: hard
 
@@ -7099,13 +7054,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"json-schema-traverse@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "json-schema-traverse@npm:1.0.0"
-  checksum: 10c0/71e30015d7f3d6dc1c316d6298047c8ef98a06d31ad064919976583eb61e1018a60a0067338f0f79cabc00d84af3fcc489bd48ce8a46ea165d9541ba17fb30c6
-  languageName: node
-  linkType: hard
-
 "json-schema@npm:0.4.0":
   version: 0.4.0
   resolution: "json-schema@npm:0.4.0"
@@ -8735,13 +8683,6 @@ __metadata:
   version: 2.1.1
   resolution: "require-directory@npm:2.1.1"
   checksum: 10c0/83aa76a7bc1531f68d92c75a2ca2f54f1b01463cb566cf3fbc787d0de8be30c9dbc211d1d46be3497dac5785fe296f2dd11d531945ac29730643357978966e99
-  languageName: node
-  linkType: hard
-
-"require-from-string@npm:^2.0.2":
-  version: 2.0.2
-  resolution: "require-from-string@npm:2.0.2"
-  checksum: 10c0/aaa267e0c5b022fc5fd4eef49d8285086b15f2a1c54b28240fdf03599cbd9c26049fee3eab894f2e1f6ca65e513b030a7c264201e3f005601e80c49fb2937ce2
   languageName: node
   linkType: hard
 
@@ -10481,18 +10422,6 @@ __metadata:
     peggy: "npm:~4.2.0"
     ts-pegjs: "npm:~4.2.1"
   checksum: 10c0/7e87b0e99ab556f538f6582f92a27fa8d7d4b16f62a0b09821f51142437758cdfabd5a37c63a75919ef7006a433bdfa2afac2926ecd4b45b1dbdefe4c96cf675
-  languageName: node
-  linkType: hard
-
-"xlucene-translator@npm:~1.9.3":
-  version: 1.9.3
-  resolution: "xlucene-translator@npm:1.9.3"
-  dependencies:
-    "@terascope/types": "npm:~1.4.3"
-    "@terascope/utils": "npm:~1.9.3"
-    "@types/elasticsearch": "npm:~5.0.43"
-    xlucene-parser: "npm:~1.9.3"
-  checksum: 10c0/1c0bbb5b6908cd22bcd1153b81888521bceb24e07f0d684d66b4c5ebf4e8242e86509ce301a02193f86c5936347cedc8d7604b13843efc541fb516b08442c678
   languageName: node
   linkType: hard
 

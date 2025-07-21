@@ -3,7 +3,7 @@ import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
 import {
     ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
     isElasticsearch8
-} from 'elasticsearch-store';
+} from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {

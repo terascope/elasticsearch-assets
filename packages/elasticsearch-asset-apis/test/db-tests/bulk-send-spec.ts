@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
-import { isOpensearch2, isElasticsearch8 } from 'elasticsearch-store';
+import { isOpensearch2, isElasticsearch8 } from '@terascope/opensearch-client';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
     TEST_INDEX_PREFIX, waitForData, cleanupIndex,
