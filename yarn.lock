@@ -1609,6 +1609,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@terascope/elasticsearch-api@npm:~4.11.1":
+  version: 4.11.1
+  resolution: "@terascope/elasticsearch-api@npm:4.11.1"
+  dependencies:
+    "@terascope/types": "npm:~1.4.3"
+    "@terascope/utils": "npm:~1.9.3"
+    bluebird: "npm:~3.7.2"
+    setimmediate: "npm:~1.0.5"
+  checksum: 10c0/d868756f78a29e9ac5aa8fd81820d40b62a4b4966385bb1236200225f60f691b5f101afd950ff613f2495bb58ccf2bc47e9aefb0d076e0877d80bcb26da3f037
+  languageName: node
+  linkType: hard
+
 "@terascope/elasticsearch-asset-apis@npm:~1.2.5, @terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis":
   version: 0.0.0-use.local
   resolution: "@terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis"
@@ -1721,13 +1733,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@terascope/teraslice-state-storage@npm:~1.11.0":
-  version: 1.11.0
-  resolution: "@terascope/teraslice-state-storage@npm:1.11.0"
+"@terascope/teraslice-state-storage@npm:~1.11.1":
+  version: 1.11.1
+  resolution: "@terascope/teraslice-state-storage@npm:1.11.1"
   dependencies:
-    "@terascope/elasticsearch-api": "npm:~4.11.0"
+    "@terascope/elasticsearch-api": "npm:~4.11.1"
     "@terascope/utils": "npm:~1.9.3"
-  checksum: 10c0/0461ad035ad41cab8acb11e7979fd6d84f8874b0bd85e0a2868665d73ea7b04428fc108d7b78d024c9a22eb114350c7f84824b56c02903494f32a75f1269fdf4
+  checksum: 10c0/0cb63d8096115e8389abe0e8e4adb5af8aed226af0f48abc927571395b35fb9bc2f7afbb96087e939e768adf4b2261aa7c948518b8f65ad3e5465c7f7d8b880e
   languageName: node
   linkType: hard
 
@@ -4069,7 +4081,7 @@ __metadata:
     "@terascope/eslint-config": "npm:~1.1.19"
     "@terascope/job-components": "npm:~1.11.3"
     "@terascope/scripts": "npm:~1.20.1"
-    "@terascope/teraslice-state-storage": "npm:~1.11.0"
+    "@terascope/teraslice-state-storage": "npm:~1.11.1"
     "@terascope/types": "npm:~1.4.3"
     "@types/bluebird": "npm:~3.5.42"
     "@types/fs-extra": "npm:~11.0.4"
@@ -4100,7 +4112,7 @@ __metadata:
     "@terascope/elasticsearch-api": "npm:~4.11.0"
     "@terascope/elasticsearch-asset-apis": "npm:~1.2.5"
     "@terascope/job-components": "npm:~1.11.3"
-    "@terascope/teraslice-state-storage": "npm:~1.11.0"
+    "@terascope/teraslice-state-storage": "npm:~1.11.1"
     "@terascope/utils": "npm:~1.9.3"
     datemath-parser: "npm:~1.0.6"
     got: "npm:~13.0.0"

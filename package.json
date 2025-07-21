@@ -51,7 +51,7 @@
         "@terascope/eslint-config": "~1.1.19",
         "@terascope/job-components": "~1.11.3",
         "@terascope/scripts": "~1.20.1",
-        "@terascope/teraslice-state-storage": "~1.11.0",
+        "@terascope/teraslice-state-storage": "~1.11.1",
         "@terascope/types": "~1.4.3",
         "@types/bluebird": "~3.5.42",
         "@types/fs-extra": "~11.0.4",
