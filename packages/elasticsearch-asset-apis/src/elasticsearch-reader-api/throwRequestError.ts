@@ -29,22 +29,28 @@ export function throwRequestError(endpointName: string, statusCode: number, body
             });
         } else {
             let errorMessage = resp.error;
+            let isElasticsearchError = false;
 
-            // Check if this is an elasticsearch error that should be surfaced to the user
+            // Handle elasticsearch errors - these should always be surfaced to users
             if (typeof resp.error === 'string') {
-                if (resp.error.includes('search_phase_execution_exception')
-                    || resp.error.includes('too_many_clauses')
-                    || resp.error.includes('maxClauseCount')) {
-                    errorMessage = `Elasticsearch query failed: ${resp.error}`;
-                }
+                // Any string error from elasticsearch should be clearly formatted
+                errorMessage = `Elasticsearch query failed: ${resp.error}`;
+                isElasticsearchError = true;
             }
 
-            // Check if the error is in a nested structure common in elasticsearch responses
+            // Handle nested elasticsearch error structure common in elasticsearch responses
             if (resp.error && typeof resp.error === 'object') {
                 const nestedError = resp.error;
-                if (nestedError.type === 'search_phase_execution_exception'
-                    || (nestedError.reason && nestedError.reason.includes('too_many_clauses'))) {
-                    errorMessage = `Elasticsearch query failed: ${nestedError.reason || nestedError.type}`;
+                if (nestedError.type || nestedError.reason) {
+                    // Format structured elasticsearch errors
+                    const type = nestedError.type || 'elasticsearch_error';
+                    const reason = nestedError.reason || 'Unknown error';
+                    errorMessage = `Elasticsearch query failed: ${type}: ${reason}`;
+                    isElasticsearchError = true;
+                } else {
+                    // Generic object error
+                    errorMessage = `Elasticsearch query failed: ${JSON.stringify(resp.error)}`;
+                    isElasticsearchError = true;
                 }
             }
 
@@ -52,7 +58,7 @@ export function throwRequestError(endpointName: string, statusCode: number, body
                 statusCode,
                 context: {
                     endpoint: endpointName,
-                    safe: typeof errorMessage === 'string' && errorMessage.startsWith('Elasticsearch query failed') ? false : true
+                    safe: !isElasticsearchError
                 }
             });
         }

@@ -263,7 +263,8 @@ describe('spaces_reader slicer', () => {
                     }
                 });
 
-            // Mock the elasticsearch error response for too many clauses during slicer initialization
+            // Mock the elasticsearch error response for too many clauses during
+            // slicer initialization
             // The slicer calls getIndexDate twice - once for start (asc) and once for end (desc)
             scope.post(`/${testIndex}?token=${token}`, {
                 q: 'ip:(TERM_1 OR TERM_2 OR TERM_3)',
