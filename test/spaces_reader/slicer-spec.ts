@@ -223,6 +223,75 @@ describe('spaces_reader slicer', () => {
             expect(scope.isDone()).toBeTrue();
         });
     });
+
+    describe('when the query has too many clauses during slicer initialization', () => {
+        const query = 'ip:(TERM_1 OR TERM_2 OR TERM_3)';
+        const opConfig = {
+            _op: 'spaces_reader',
+            query,
+            index: testIndex,
+            endpoint: baseUri,
+            token,
+            size: 100000,
+            interval: 'auto',
+            delay: '30s',
+            date_field_name: 'date',
+            timeout: 5000,
+            retry: 0
+        };
+
+        const job = newTestJobConfig({
+            name: 'spaces-reader-slicer-too-many-clauses',
+            lifecycle: 'once',
+            operations: [
+                opConfig,
+                { _op: 'noop' }
+            ]
+        });
+
+        let harness: SlicerTestHarness;
+
+        beforeEach(async () => {
+            harness = new SlicerTestHarness(job, { assetDir, clients });
+
+            scope.get(`/${testIndex}/_info?token=${token}`)
+                .reply(200, {
+                    params: {
+                        size: {
+                            max: maxSize
+                        }
+                    }
+                });
+
+            // Mock the elasticsearch error response for too many clauses during count operation
+            scope.post(`/${testIndex}?token=${token}`)
+                .reply(400, {
+                    error: 'search_phase_execution_exception: [too_many_clauses] Reason: too_many_clauses: maxClauseCount is set to 1024'
+                });
+        });
+
+        afterEach(async () => {
+            if (harness) await harness.shutdown();
+        });
+
+        it('should throw a meaningful error during initialization', async () => {
+            try {
+                await harness.initialize([]);
+                throw new Error('Expected initialization to fail');
+            } catch (err) {
+                expect(
+                    // @ts-expect-error
+                    err.message
+                ).toContain('Failed to initialize date slicer ranges');
+                expect(
+                    // @ts-expect-error
+                    err.message
+                ).toContain('Elasticsearch query failed');
+            }
+
+            expect(scope.isDone()).toBeTrue();
+        });
+    });
 });
 
 /*

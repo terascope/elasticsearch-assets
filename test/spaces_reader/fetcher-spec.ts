@@ -305,5 +305,72 @@ describe('spaces_reader fetcher', () => {
                 expect(scope.isDone()).toBeTrue();
             });
         });
+
+        describe('when the query has too many clauses', () => {
+            const query = 'ip:(TERM_1 OR TERM_2 OR TERM_3)'; // Simplified version of the issue
+            const harness = new WorkerTestHarness(newTestJobConfig({
+                name: 'too-many-clauses-test',
+                max_retries: 0,
+                operations: [
+                    {
+                        _op: 'spaces_reader',
+                        query,
+                        index: testIndex,
+                        endpoint: baseUri,
+                        token,
+                        size: 100000,
+                        interval: '30s',
+                        delay: '30s',
+                        date_field_name: 'date',
+                        timeout: 5000,
+                        retry: 0
+                    },
+                    {
+                        _op: 'noop'
+                    }
+                ]
+            }), { clients });
+
+            beforeEach(async () => {
+                scope.get(`/${testIndex}/_info?token=${token}`)
+                    .reply(200, {
+                        params: {
+                            size: {
+                                max: maxSize
+                            }
+                        }
+                    });
+
+                // Mock the elasticsearch error response for too many clauses
+                scope.post(`/${testIndex}?token=${token}`)
+                    .reply(400, {
+                        error: 'search_phase_execution_exception: [too_many_clauses] Reason: too_many_clauses: maxClauseCount is set to 1024'
+                    });
+
+                await harness.initialize();
+            });
+
+            afterEach(async () => {
+                await harness.shutdown();
+            });
+
+            it('should throw a meaningful error about too many clauses', async () => {
+                try {
+                    await harness.runSlice({ count: 5000 });
+                    throw new Error('Expected slice to fail');
+                } catch (err) {
+                    expect(
+                        // @ts-expect-error
+                        err.message
+                    ).toContain('Elasticsearch query failed');
+                    expect(
+                        // @ts-expect-error
+                        err.message
+                    ).toContain('too_many_clauses');
+                }
+
+                expect(scope.isDone()).toBeTrue();
+            });
+        });
     });
 });
