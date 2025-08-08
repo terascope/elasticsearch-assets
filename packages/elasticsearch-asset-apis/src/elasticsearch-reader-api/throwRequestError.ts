@@ -29,25 +29,25 @@ export function throwRequestError(endpointName: string, statusCode: number, body
             });
         } else {
             let errorMessage = resp.error;
-            
+
             // Check if this is an elasticsearch error that should be surfaced to the user
             if (typeof resp.error === 'string') {
-                if (resp.error.includes('search_phase_execution_exception') || 
-                    resp.error.includes('too_many_clauses') ||
-                    resp.error.includes('maxClauseCount')) {
+                if (resp.error.includes('search_phase_execution_exception')
+                    || resp.error.includes('too_many_clauses')
+                    || resp.error.includes('maxClauseCount')) {
                     errorMessage = `Elasticsearch query failed: ${resp.error}`;
                 }
             }
-            
+
             // Check if the error is in a nested structure common in elasticsearch responses
             if (resp.error && typeof resp.error === 'object') {
                 const nestedError = resp.error;
-                if (nestedError.type === 'search_phase_execution_exception' || 
-                    (nestedError.reason && nestedError.reason.includes('too_many_clauses'))) {
+                if (nestedError.type === 'search_phase_execution_exception'
+                    || (nestedError.reason && nestedError.reason.includes('too_many_clauses'))) {
                     errorMessage = `Elasticsearch query failed: ${nestedError.reason || nestedError.type}`;
                 }
             }
-            
+
             throw new TSError(errorMessage, {
                 statusCode,
                 context: {
