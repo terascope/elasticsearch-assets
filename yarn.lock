@@ -1600,6 +1600,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@terascope/data-types@npm:~1.11.1":
+  version: 1.11.1
+  resolution: "@terascope/data-types@npm:1.11.1"
+  dependencies:
+    "@terascope/types": "npm:~1.4.4"
+    "@terascope/utils": "npm:~1.10.1"
+    graphql: "npm:~16.11.0"
+    yargs: "npm:~18.0.0"
+  bin:
+    data-types: ./bin/data-types.js
+  checksum: 10c0/f9f8bc7750615da4ea6e4acb34fc0082f55ce10ac7378e2abd217d49110206abf9f85fc177ef7e699f0e4f9f1923e4b744e85bbc61ce52fd9171647b4e6c8bfc
+  languageName: node
+  linkType: hard
+
 "@terascope/elasticsearch-api@npm:~4.11.1":
   version: 4.11.1
   resolution: "@terascope/elasticsearch-api@npm:4.11.1"
@@ -1687,13 +1701,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@terascope/opensearch-client@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "@terascope/opensearch-client@npm:1.0.0"
+"@terascope/opensearch-client@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "@terascope/opensearch-client@npm:1.1.1"
   dependencies:
-    "@terascope/data-types": "npm:~1.10.0"
-    "@terascope/types": "npm:~1.4.3"
-    "@terascope/utils": "npm:~1.9.3"
+    "@terascope/data-types": "npm:~1.11.1"
+    "@terascope/types": "npm:~1.4.4"
+    "@terascope/utils": "npm:~1.10.1"
     elasticsearch6: "npm:@elastic/elasticsearch@~6.8.0"
     elasticsearch7: "npm:@elastic/elasticsearch@~7.17.0"
     elasticsearch8: "npm:@elastic/elasticsearch@~8.15.0"
@@ -1701,7 +1715,7 @@ __metadata:
     opensearch2: "npm:@opensearch-project/opensearch@~2.12.0"
     opensearch3: "npm:@opensearch-project/opensearch@~3.5.1"
     setimmediate: "npm:~1.0.5"
-  checksum: 10c0/15da8015f03156fa330341bfb25190f2a87246773f490acd2e8196583dc0d7f138966558546f7a3a6b53b2085a1f74fb17b7e7b27c2ee051df793ba219f37971
+  checksum: 10c0/3846294709a6768bccccee08c5f58fbac641e8fd7f57a460d2df9f2476ec161cd4859946f772485e62a4adcba0138b57dfdd161515c4e3d97531bb4248ce5c62
   languageName: node
   linkType: hard
 
@@ -1758,6 +1772,59 @@ __metadata:
   dependencies:
     prom-client: "npm:~15.1.3"
   checksum: 10c0/2187e0fbbd7e939a6c060fdeccd4cbdf61ce3802b20eb3b52ea86885416fed9892beb621c5feaf0336a1d1986b4f2dbba5b0bf265cc507e54d99d73b1cb04753
+  languageName: node
+  linkType: hard
+
+"@terascope/types@npm:~1.4.4":
+  version: 1.4.4
+  resolution: "@terascope/types@npm:1.4.4"
+  dependencies:
+    prom-client: "npm:~15.1.3"
+  checksum: 10c0/eed0b08c294d1610b869549e196dbd641122d22e2aa1e503daaef8ef40ae58ff86dd25cff01c66ef83f41546fc0b1e101e58f77e34d6a41c21ad495ecb5b5546
+  languageName: node
+  linkType: hard
+
+"@terascope/utils@npm:~1.10.1":
+  version: 1.10.1
+  resolution: "@terascope/utils@npm:1.10.1"
+  dependencies:
+    "@chainsafe/is-ip": "npm:~2.1.0"
+    "@terascope/types": "npm:~1.4.4"
+    "@turf/bbox": "npm:~7.2.0"
+    "@turf/bbox-polygon": "npm:~7.2.0"
+    "@turf/boolean-contains": "npm:~7.2.0"
+    "@turf/boolean-disjoint": "npm:~7.2.0"
+    "@turf/boolean-equal": "npm:~7.2.0"
+    "@turf/boolean-intersects": "npm:~7.2.0"
+    "@turf/boolean-point-in-polygon": "npm:~7.2.0"
+    "@turf/boolean-within": "npm:~7.2.0"
+    "@turf/circle": "npm:~7.2.0"
+    "@turf/helpers": "npm:~7.2.0"
+    "@turf/invariant": "npm:~7.2.0"
+    "@turf/line-to-polygon": "npm:~7.2.0"
+    "@types/lodash-es": "npm:~4.17.12"
+    "@types/validator": "npm:~13.12.3"
+    awesome-phonenumber: "npm:~7.5.0"
+    date-fns: "npm:~4.1.0"
+    date-fns-tz: "npm:~3.2.0"
+    datemath-parser: "npm:~1.0.6"
+    debug: "npm:~4.4.1"
+    geo-tz: "npm:~8.1.4"
+    ip-bigint: "npm:~8.2.1"
+    ip-cidr: "npm:~4.0.2"
+    ip6addr: "npm:~0.2.5"
+    ipaddr.js: "npm:~2.2.0"
+    is-cidr: "npm:~5.1.1"
+    is-plain-object: "npm:~5.0.0"
+    js-string-escape: "npm:~1.0.1"
+    kind-of: "npm:~6.0.3"
+    latlon-geohash: "npm:~2.0.0"
+    lodash-es: "npm:~4.17.21"
+    mnemonist: "npm:~0.40.3"
+    p-map: "npm:~7.0.3"
+    shallow-clone: "npm:~3.0.1"
+    validator: "npm:~13.12.0"
+  checksum: 10c0/40e1fb4562ce14b94ecd13e3bb4b69d696a19eaba5318d7cc9a083ab036346ae7db54501b3204b05ad1ba02a9e34e8252cd0fea19244a05d230141dd94e26200
   languageName: node
   linkType: hard
 
@@ -4132,7 +4199,7 @@ __metadata:
     "@terascope/elasticsearch-asset-apis": "npm:~1.2.6"
     "@terascope/eslint-config": "npm:~1.1.21"
     "@terascope/job-components": "npm:~1.11.3"
-    "@terascope/opensearch-client": "npm:^1.0.0"
+    "@terascope/opensearch-client": "npm:^1.1.1"
     "@terascope/scripts": "npm:~1.20.4"
     "@terascope/teraslice-state-storage": "npm:~1.11.1"
     "@terascope/types": "npm:~1.4.3"
