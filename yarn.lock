@@ -1620,7 +1620,7 @@ __metadata:
     "@terascope/data-types": "npm:~1.10.0"
     "@terascope/elasticsearch-api": "npm:~4.11.1"
     "@terascope/scripts": "npm:~1.20.4"
-    "@terascope/types": "npm:~1.4.3"
+    "@terascope/types": "npm:~1.4.4"
     "@terascope/utils": "npm:~1.9.3"
     "@types/node": "npm:~24.2.0"
     datemath-parser: "npm:~1.0.6"
@@ -1758,6 +1758,15 @@ __metadata:
   dependencies:
     prom-client: "npm:~15.1.3"
   checksum: 10c0/2187e0fbbd7e939a6c060fdeccd4cbdf61ce3802b20eb3b52ea86885416fed9892beb621c5feaf0336a1d1986b4f2dbba5b0bf265cc507e54d99d73b1cb04753
+  languageName: node
+  linkType: hard
+
+"@terascope/types@npm:~1.4.4":
+  version: 1.4.4
+  resolution: "@terascope/types@npm:1.4.4"
+  dependencies:
+    prom-client: "npm:~15.1.3"
+  checksum: 10c0/eed0b08c294d1610b869549e196dbd641122d22e2aa1e503daaef8ef40ae58ff86dd25cff01c66ef83f41546fc0b1e101e58f77e34d6a41c21ad495ecb5b5546
   languageName: node
   linkType: hard
 
@@ -4135,7 +4144,7 @@ __metadata:
     "@terascope/opensearch-client": "npm:^1.0.0"
     "@terascope/scripts": "npm:~1.20.4"
     "@terascope/teraslice-state-storage": "npm:~1.11.1"
-    "@terascope/types": "npm:~1.4.3"
+    "@terascope/types": "npm:~1.4.4"
     "@types/bluebird": "npm:~3.5.42"
     "@types/fs-extra": "npm:~11.0.4"
     "@types/got": "npm:~9.6.12"

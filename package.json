@@ -53,7 +53,7 @@
         "@terascope/opensearch-client": "^1.0.0",
         "@terascope/scripts": "~1.20.4",
         "@terascope/teraslice-state-storage": "~1.11.1",
-        "@terascope/types": "~1.4.3",
+        "@terascope/types": "~1.4.4",
         "@types/bluebird": "~3.5.42",
         "@types/fs-extra": "~11.0.4",
         "@types/got": "~9.6.12",
