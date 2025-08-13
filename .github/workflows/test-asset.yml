@@ -67,7 +67,7 @@ jobs:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
-        search-version: [elasticsearch6, elasticsearch7, opensearch1, opensearch2, opensearch3]
+        search-version: [elasticsearch7, opensearch1, opensearch2, opensearch3]
     steps:
       - uses: actions/checkout@v4
 
