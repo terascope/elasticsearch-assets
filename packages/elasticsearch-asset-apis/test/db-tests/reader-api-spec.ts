@@ -2,7 +2,7 @@ import 'jest-extended';
 import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
 import {
     ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
-    isElasticsearch8
+    isElasticsearch8, isOpensearch3
 } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
@@ -106,7 +106,7 @@ describe('Reader API', () => {
     beforeAll(async () => {
         client = await makeClient();
 
-        if (isOpensearch2(client) || isElasticsearch8(client)) {
+        if (isOpensearch2(client) || isOpensearch3(client) || isElasticsearch8(client)) {
             docType = undefined;
         } else {
             docType = '_doc';
