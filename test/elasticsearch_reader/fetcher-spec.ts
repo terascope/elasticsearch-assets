@@ -1,7 +1,10 @@
 import 'jest-extended';
 import { DataEntity, TestClientConfig, debugLogger } from '@terascope/job-components';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
-import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from '@terascope/opensearch-client';
+import {
+    ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8,
+    isOpensearch3
+} from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex, addToIndex
@@ -30,7 +33,7 @@ describe('elasticsearch_reader fetcher', () => {
     beforeAll(async () => {
         esClient = await makeClient();
 
-        if (isOpensearch2(esClient) || isElasticsearch8(esClient)) {
+        if (isOpensearch2(esClient) || isOpensearch3(esClient) || isElasticsearch8(esClient)) {
             hasTypedDoc = false;
         }
 

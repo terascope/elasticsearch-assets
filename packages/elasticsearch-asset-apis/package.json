@@ -23,6 +23,7 @@
         "test:elasticsearch8": "TEST_ELASTICSEARCH='true' ELASTICSEARCH_VERSION='8.1.2' ts-scripts test . --",
         "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test . --",
         "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.15.0' ts-scripts test . --",
+        "test:opensearch3": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='3.1.0' ts-scripts test . --",
         "test:watch": "TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {

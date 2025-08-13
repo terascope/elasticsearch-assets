@@ -1,15 +1,14 @@
 import 'jest-extended';
 import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-components';
-import { ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8 } from '@terascope/opensearch-client';
+import {
+    ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8,
+    isOpensearch3
+} from '@terascope/opensearch-client';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
-    TEST_INDEX_PREFIX,
-    getListOfIds,
-    getTotalSliceCounts,
-    makeClient,
-    cleanupIndex,
-    populateIndex
+    TEST_INDEX_PREFIX, getListOfIds, getTotalSliceCounts,
+    makeClient, cleanupIndex, populateIndex
 } from '../helpers/index.js';
 
 describe('id_reader fetcher', () => {
@@ -34,9 +33,11 @@ describe('id_reader fetcher', () => {
 
     beforeAll(async () => {
         esClient = await makeClient();
-        if (isOpensearch2(esClient) || isElasticsearch8(esClient)) {
+
+        if (isOpensearch2(esClient) || isOpensearch3(esClient) || isElasticsearch8(esClient)) {
             hasTypedDoc = false;
         }
+
         await cleanupIndex(esClient, makeIndex('*'));
         await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
     });
