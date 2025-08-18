@@ -22,7 +22,7 @@ jobs:
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [22, 24]
+        node-version: [22, 24.4]
     steps:
       - uses: actions/checkout@v4
 
@@ -66,7 +66,7 @@ jobs:
       fail-fast: false
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
-        node-version: [22, 24]
+        node-version: [22, 24.4]
         search-version: [elasticsearch7, opensearch1, opensearch2, opensearch3]
     steps:
       - uses: actions/checkout@v4
