@@ -9,9 +9,7 @@ import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
-    TEST_INDEX_PREFIX,
-    makeClient,
-    cleanupIndex,
+    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex
 } from '../helpers/index.js';
 
@@ -234,5 +232,35 @@ describe('elasticsearch_reader schema', () => {
         );
 
         expect(apiConfig).toMatchObject({ index });
+    });
+
+    it('should be able to just move all connection values to the api', async () => {
+        const apiConfig = {
+            _name: DEFAULT_API_NAME,
+            index,
+            type: docType,
+            date_field_name: 'created'
+        };
+
+        const job = newTestJobConfig({
+            apis: [apiConfig],
+            operations: [
+                {
+                    _op: name,
+                    api_name: DEFAULT_API_NAME
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const validatedApiConfig = harness.executionContext.config.apis.find(
+            (api: APIConfig) => api._name === DEFAULT_API_NAME
+        );
+
+        expect(validatedApiConfig).toMatchObject(apiConfig);
     });
 });

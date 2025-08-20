@@ -251,4 +251,33 @@ describe('id_reader Schema', () => {
             await expect(testValidation(job6)).toReject();
         });
     });
+
+    it('should not throw if all connection config is on api', async () => {
+        const job = newTestJobConfig({
+            apis: [
+                { _name: DEFAULT_API_NAME, index }
+            ],
+            operations: [
+                {
+                    _op: name,
+                    api_name: DEFAULT_API_NAME
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const validatedApiConfig = harness.executionContext.config.apis.find(
+            (api: APIConfig) => api._name === DEFAULT_API_NAME
+        );
+
+        expect(validatedApiConfig).toMatchObject({
+            _name: DEFAULT_API_NAME,
+            index,
+            size: 5000
+        });
+    });
 });
