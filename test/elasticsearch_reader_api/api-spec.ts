@@ -3,11 +3,8 @@ import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-compon
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    makeClient,
-    upload,
-    waitForData
+    TEST_INDEX_PREFIX, cleanupIndex, makeClient,
+    upload, waitForData
 } from '../helpers/index.js';
 
 describe('elasticsearch reader api', () => {

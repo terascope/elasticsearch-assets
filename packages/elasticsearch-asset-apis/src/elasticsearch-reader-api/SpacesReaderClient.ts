@@ -194,7 +194,8 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
-                track_total_hits: queryConfig.track_total_hits
+                track_total_hits: queryConfig.track_total_hits,
+                meta_fields: config?.meta_fields
             });
         }
 

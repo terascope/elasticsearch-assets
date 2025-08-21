@@ -1,16 +1,18 @@
 import { Fetcher, DataEntity, isPromAvailable } from '@terascope/job-components';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchReaderAPI, ReaderSlice } from '@terascope/elasticsearch-asset-apis';
-import { ESDateConfig } from '../elasticsearch_reader/interfaces.js';
+import { SharedReaderConfig } from './interfaces.js';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces.js';
 
-export class ReaderAPIFetcher extends Fetcher<ESDateConfig> {
+export class ReaderAPIFetcher extends Fetcher<SharedReaderConfig> {
     api!: ElasticsearchReaderAPI;
 
     async initialize(): Promise<void> {
         const apiName = this.opConfig.api_name as string;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
+
         this.api = await apiManager.create(apiName, {});
+
         await super.initialize();
 
         const { context, api, opConfig } = this;

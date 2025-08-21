@@ -148,4 +148,35 @@ describe('spaces-reader schema', () => {
 
         expect(apiConfig).toMatchObject({ index });
     });
+
+    it('should not throw if all connection config is on api', async () => {
+        const testAPIConfig = {
+            _name: DEFAULT_API_NAME,
+            index,
+            endpoint: '127.0.0.1',
+            token: 'someToken',
+            date_field_name: 'created',
+        };
+
+        const job = newTestJobConfig({
+            apis: [testAPIConfig],
+            operations: [
+                {
+                    _op: name,
+                    api_name: DEFAULT_API_NAME
+                },
+                { _op: 'noop' }
+            ]
+        });
+
+        harness = new WorkerTestHarness(job, { clients });
+
+        await harness.initialize();
+
+        const validatedApiConfig = harness.executionContext.config.apis.find(
+            (api: APIConfig) => api._name === DEFAULT_API_NAME
+        );
+
+        expect(validatedApiConfig).toMatchObject(testAPIConfig);
+    });
 });

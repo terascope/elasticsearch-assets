@@ -370,6 +370,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;
+    meta_fields?: string[];
 }
 
 export interface DetermineSliceResults {

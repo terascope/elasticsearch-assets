@@ -1,6 +1,9 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { debugLogger, OpConfig, TestClientConfig } from '@terascope/job-components';
+import {
+    debugLogger, OpConfig, TestClientConfig,
+    APIConfig
+} from '@terascope/job-components';
 import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
@@ -43,20 +46,8 @@ describe('Elasticsearch Bulk Schema', () => {
 
     describe('when validating the schema', () => {
         it('should have defaults', async () => {
-            const {
-                size,
-                type,
-                create,
-                upsert,
-                update_fields,
-                api_name
-            } = await makeSchema({ index });
+            const { api_name } = await makeSchema({ index });
 
-            expect(size).toEqual(500);
-            expect(type).toEqual('_doc');
-            expect(create).toEqual(false);
-            expect(upsert).toEqual(false);
-            expect(update_fields).toBeArrayOfSize(0);
             expect(api_name).toEqual(DEFAULT_API_NAME);
         });
 
@@ -74,7 +65,7 @@ describe('Elasticsearch Bulk Schema', () => {
             await expect(makeSchema({ api_name: [1, 2, 3] })).toReject();
         });
 
-        it('should throw if api is created but opConfig has index set', async () => {
+        it('should not throw if api is created but opConfig has index set', async () => {
             const job = newTestJobConfig({
                 apis: [
                     { _name: DEFAULT_API_NAME, index }
@@ -88,6 +79,32 @@ describe('Elasticsearch Bulk Schema', () => {
             harness = new WorkerTestHarness(job, { clients });
 
             await expect(harness.initialize()).toResolve();
+        });
+
+        it('should not throw if all connection config is on api', async () => {
+            const job = newTestJobConfig({
+                apis: [
+                    { _name: DEFAULT_API_NAME, index }
+                ],
+                operations: [
+                    { _op: 'test-reader' },
+                    { _op: name, api_name: DEFAULT_API_NAME }
+                ]
+            });
+
+            harness = new WorkerTestHarness(job, { clients });
+
+            await harness.initialize();
+
+            const validatedApiConfig = harness.executionContext.config.apis.find(
+                (api: APIConfig) => api._name === DEFAULT_API_NAME
+            );
+
+            expect(validatedApiConfig).toMatchObject({
+                _name: DEFAULT_API_NAME,
+                index,
+                size: 500
+            });
         });
     });
 });
