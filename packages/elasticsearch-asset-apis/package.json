@@ -27,7 +27,7 @@
         "test:watch": "TEST_ELASTICSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/data-mate": "~1.11.2",
+        "@terascope/data-mate": "~1.12.0",
         "@terascope/data-types": "~1.11.2",
         "@terascope/elasticsearch-api": "~4.12.2",
         "@terascope/utils": "~1.10.2",
@@ -36,7 +36,7 @@
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "~1.21.3",
+        "@terascope/scripts": "~1.21.4",
         "@terascope/types": "~1.4.4",
         "@types/node": "~24.3.0",
         "jest": "~30.0.5"
