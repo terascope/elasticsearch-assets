@@ -25,7 +25,7 @@
         "@terascope/teraslice-state-storage": "~1.12.2",
         "@terascope/utils": "~1.10.2",
         "datemath-parser": "~1.0.6",
-        "got": "~14.4.7",
+        "got": "~14.4.8",
         "moment": "~2.30.1"
     },
     "engines": {
