@@ -1664,9 +1664,9 @@ __metadata:
     "@terascope/scripts": "npm:~1.21.8"
     "@terascope/types": "npm:~1.4.4"
     "@terascope/utils": "npm:~1.10.4"
-    "@types/node": "npm:~24.10.0"
+    "@types/node": "npm:~24.10.1"
     datemath-parser: "npm:~1.0.6"
-    got: "npm:~14.6.3"
+    got: "npm:~14.6.4"
     jest: "npm:~30.2.0"
     moment: "npm:~2.30.1"
   languageName: unknown
@@ -2356,12 +2356,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:~24.10.0":
-  version: 24.10.0
-  resolution: "@types/node@npm:24.10.0"
+"@types/node@npm:~24.10.1":
+  version: 24.10.1
+  resolution: "@types/node@npm:24.10.1"
   dependencies:
     undici-types: "npm:~7.16.0"
-  checksum: 10c0/f82ed7194e16f5590ef7afdc20c6d09068c76d50278b485ede8f0c5749683536e3064ffa8def8db76915196afb3724b854aa5723c64d6571b890b14492943b46
+  checksum: 10c0/d6bca7a78f550fbb376f236f92b405d676003a8a09a1b411f55920ef34286ee3ee51f566203920e835478784df52662b5b2af89159d9d319352e9ea21801c002
   languageName: node
   linkType: hard
 
@@ -4286,7 +4286,7 @@ __metadata:
     "@types/fs-extra": "npm:~11.0.4"
     "@types/got": "npm:~9.6.12"
     "@types/jest": "npm:~30.0.0"
-    "@types/node": "npm:~24.10.0"
+    "@types/node": "npm:~24.10.1"
     "@types/semver": "npm:~7.7.1"
     eslint: "npm:~9.39.1"
     fs-extra: "npm:~11.3.2"
@@ -4313,7 +4313,7 @@ __metadata:
     "@terascope/teraslice-state-storage": "npm:~1.13.1"
     "@terascope/utils": "npm:~1.10.4"
     datemath-parser: "npm:~1.0.6"
-    got: "npm:~14.6.3"
+    got: "npm:~14.6.4"
     moment: "npm:~2.30.1"
   languageName: unknown
   linkType: soft
@@ -5810,9 +5810,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"got@npm:~14.6.3":
-  version: 14.6.3
-  resolution: "got@npm:14.6.3"
+"got@npm:~14.6.4":
+  version: 14.6.4
+  resolution: "got@npm:14.6.4"
   dependencies:
     "@sindresorhus/is": "npm:^7.0.1"
     byte-counter: "npm:^0.1.0"
@@ -5826,7 +5826,7 @@ __metadata:
     p-cancelable: "npm:^4.0.1"
     responselike: "npm:^4.0.2"
     type-fest: "npm:^4.26.1"
-  checksum: 10c0/b5a2a0a8bfd44399f804c0875d0cfe832c32dd0067a25a965c0800ea58742a42135272dc1b30da477d70f1f6fd875c2bf38f0946be0f9d44ec8864f9a889f613
+  checksum: 10c0/ee8980feb842db876cffa42fa27da6d90cc1a9cfe2a38942f4b319cbb37c000e34919a7e5dea017a0fa53b0535c02d00426abbbf528d6a4e89c6eb07b2bde977
   languageName: node
   linkType: hard
 
