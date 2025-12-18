@@ -3899,7 +3899,7 @@ __metadata:
     node-notifier: "npm:~10.0.1"
     semver: "npm:~7.7.3"
     teraslice-test-harness: "npm:2.0.0-dev.13"
-    ts-jest: "npm:~29.4.5"
+    ts-jest: "npm:~29.4.6"
     typescript: "npm:~5.9.3"
   languageName: unknown
   linkType: soft
@@ -9410,7 +9410,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-jest@npm:~29.4.5":
+"ts-jest@npm:~29.4.6":
   version: 29.4.6
   resolution: "ts-jest@npm:29.4.6"
   dependencies:
