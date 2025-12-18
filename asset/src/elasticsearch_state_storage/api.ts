@@ -20,7 +20,7 @@ export default class ElasticsearchStateStorage extends OperationAPI {
         }
 
         const { client } = await this.context.apis.foundation.createClient({
-            endpoint: this.apiConfig.connection,
+            endpoint: this.apiConfig._connection,
             type: 'elasticsearch-next',
             cached: true
         });

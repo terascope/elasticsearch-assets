@@ -1,7 +1,6 @@
 import 'jest-extended';
-import { debugLogger, AnyObject, DataEntity } from '@terascope/utils';
-import { isOpensearch2, isElasticsearch8 } from '@terascope/opensearch-client';
-import elasticAPI from '@terascope/elasticsearch-api';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
+import elasticAPI, { Client } from '@terascope/elasticsearch-api';
 import {
     TEST_INDEX_PREFIX, waitForData, cleanupIndex,
     fetch, makeClient
@@ -13,24 +12,13 @@ describe('elasticsearch bulk sender module', () => {
     const logger = debugLogger('sender_api_test');
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
 
-    let apiClient: elasticAPI.Client;
+    let apiClient: Client;
     let client: any;
-    let type: string | undefined;
 
     beforeAll(async () => {
         client = await makeClient();
 
         apiClient = elasticAPI(client, logger);
-
-        if (apiClient.isElasticsearch6()) {
-            type = 'events';
-        } else if (isOpensearch2(client) || isElasticsearch8(client)) {
-            type = undefined;
-        } else {
-            type = '_doc';
-        }
-
-        type = apiClient.isElasticsearch6() ? 'events' : '_doc';
         await cleanupIndex(client, `${senderIndex}*`);
     });
 
@@ -38,14 +26,13 @@ describe('elasticsearch bulk sender module', () => {
         await cleanupIndex(client, `${senderIndex}*`);
     });
 
-    function createSender(config: AnyObject = {}) {
+    function createSender(config: Record<string, any> = {}) {
         const senderConfig = Object.assign(
             {},
             {
                 _name: 'test',
                 size: 100,
                 index: senderIndex,
-                type
             },
             config
         ) as any;
@@ -69,7 +56,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 index: {
                     _index: senderIndex,
-                    _type: type
                 }
             });
 
@@ -79,8 +65,6 @@ describe('elasticsearch bulk sender module', () => {
         it('can format bulk index data with es7', async () => {
             const sender = createSender();
 
-            sender.isElasticsearch6 = false;
-
             const docArray = [DataEntity.make({ action: 'index' })];
 
             const [{ action, data }] = Array.from(sender.createBulkMetadata(docArray));
@@ -88,7 +72,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 index: {
                     _index: senderIndex,
-                    _type: '_doc'
                 }
             });
             expect(data).toEqual(docArray[0]);
@@ -106,7 +89,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 index: {
                     _index: senderIndex,
-                    _type: type,
                     _id: key
                 }
             });
@@ -125,7 +107,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 index: {
                     _index: senderIndex,
-                    _type: type,
                 }
             });
             expect(data).toEqual(dataArray[0]);
@@ -143,7 +124,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 index: {
                     _index: `${senderIndex}-${route}`,
-                    _type: type,
                 }
             });
             expect(data).toEqual(dataArray[0]);
@@ -158,7 +138,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 create: {
                     _index: senderIndex,
-                    _type: type,
                 }
             });
             expect(data).toEqual(dataArray[0]);
@@ -173,7 +152,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 update: {
                     _index: senderIndex,
-                    _type: type,
                 }
             });
 
@@ -191,7 +169,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 update: {
                     _index: senderIndex,
-                    _type: type,
                 }
             });
             expect(data).toEqual({
@@ -214,7 +191,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(action).toEqual({
                 delete: {
                     _index: senderIndex,
-                    _type: type,
                     _id: key
                 }
             });
@@ -240,7 +216,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(bulkReq[0].action).toEqual({
                 create: {
                     _index: senderIndex,
-                    _type: type,
                     _id: 'one'
                 }
             });
@@ -250,7 +225,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(bulkReq[1].action).toEqual({
                 delete: {
                     _index: senderIndex,
-                    _type: type,
                     _id: 'bar1'
                 }
             });
@@ -258,7 +232,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(bulkReq[2].action).toEqual({
                 create: {
                     _index: senderIndex,
-                    _type: type,
                     _id: 'two'
                 }
             });
@@ -268,7 +241,6 @@ describe('elasticsearch bulk sender module', () => {
             expect(bulkReq[3].action).toEqual({
                 delete: {
                     _index: senderIndex,
-                    _type: type,
                     _id: 'bar2'
                 }
             });
@@ -277,7 +249,6 @@ describe('elasticsearch bulk sender module', () => {
         it('can upsert specified fields by passing in an array of keys matching the document', async () => {
             const opConfig = {
                 index: 'some_index',
-                type: 'events',
                 upsert: true,
                 update_fields: ['name', 'job']
             };
@@ -289,7 +260,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = Array.from(sender.createBulkMetadata(dataArray));
 
-            const expectedMetadata = { update: { _index: 'some_index', _type: type } };
+            const expectedMetadata = { update: { _index: 'some_index' } };
 
             const expectedMutateMetadata = {
                 upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
@@ -305,7 +276,6 @@ describe('elasticsearch bulk sender module', () => {
         it('script file to run as part of an update request', async () => {
             const opConfig = {
                 index: 'some_index',
-                type: 'events',
                 upsert: true,
                 update_fields: [],
                 script_file: 'someFile',
@@ -319,7 +289,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = Array.from(sender.createBulkMetadata(dataArray));
 
-            const expectedMetadata = { update: { _index: 'some_index', _type: type } };
+            const expectedMetadata = { update: { _index: 'some_index' } };
 
             const expectedMutateMetadata = {
                 upsert: { some: 'data', name: 'someName', job: 'to be awesome!' },
@@ -334,7 +304,6 @@ describe('elasticsearch bulk sender module', () => {
         it('script to run as part of an update request', async () => {
             const opConfig = {
                 index: 'hello',
-                type: 'events',
                 upsert: true,
                 update_fields: [],
                 script: 'ctx._source.count += add',
@@ -347,7 +316,7 @@ describe('elasticsearch bulk sender module', () => {
             const sender = createSender(opConfig);
             const results = Array.from(sender.createBulkMetadata(dataArray));
 
-            const expectedMetadata = { update: { _index: 'hello', _type: type } };
+            const expectedMetadata = { update: { _index: 'hello' } };
 
             const expectedMutateMetadata = {
                 upsert: { count: 1, add: 2 },
@@ -367,7 +336,6 @@ describe('elasticsearch bulk sender module', () => {
         it('can chunk requests into config.size chunks', () => {
             const opConfig = {
                 index: 'hello',
-                type: '_doc',
                 upsert: true,
                 size: 3
             };

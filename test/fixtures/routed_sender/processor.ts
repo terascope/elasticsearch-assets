@@ -1,7 +1,7 @@
 import { BatchProcessor } from '@terascope/job-components';
-import { AnyObject, DataEntity } from '@terascope/utils';
+import { DataEntity } from '@terascope/core-utils';
 
-export default class TestSenderAPI extends BatchProcessor<AnyObject> {
+export default class TestSenderAPI extends BatchProcessor<Record<string, any>> {
     async onBatch(data: DataEntity[]): Promise<DataEntity[]> {
         return data;
     }

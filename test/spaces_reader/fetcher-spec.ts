@@ -1,10 +1,8 @@
 import 'jest-extended';
 import nock from 'nock';
 import { SearchParams } from '@terascope/types';
-import {
-    DataEntity, newTestJobConfig, TestClientConfig,
-    debugLogger
-} from '@terascope/job-components';
+import { newTestJobConfig, TestClientConfig } from '@terascope/job-components';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import MockClient from '../helpers/mock_client.js';
 

@@ -1,20 +1,17 @@
 import 'jest-extended';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { debugLogger, TestClientConfig } from '@terascope/job-components';
+import { TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import {
-    TEST_INDEX_PREFIX,
-    getTotalSliceCounts,
-    makeClient,
-    cleanupIndex,
-    populateIndex
+    TEST_INDEX_PREFIX, getTotalSliceCounts, makeClient,
+    cleanupIndex, populateIndex
 } from '../helpers/index.js';
 
 describe('date_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
     const date_field_name = 'created';
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
-    const docType = '_doc';
     const bulkData = evenSpread.data;
     const logger = debugLogger('test-logger');
 
@@ -31,7 +28,7 @@ describe('date_reader job', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData);
     });
 
     afterAll(async () => {
@@ -66,7 +63,6 @@ describe('date_reader job', () => {
     it('can fetch all even-data with job in long form', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             index: evenIndex,
             date_field_name
         };
@@ -76,7 +72,7 @@ describe('date_reader job', () => {
             max_retries: 0,
             apis: [apiConfig],
             operations: [
-                { _op: 'elasticsearch_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
@@ -98,7 +94,6 @@ describe('date_reader job', () => {
             operations: [
                 {
                     _op: 'elasticsearch_reader',
-                    type: docType,
                     index: evenIndex,
                     date_field_name
                 },
@@ -118,11 +113,10 @@ describe('date_reader job', () => {
     it('can fetch all even-data with job in long form but it makes its own api', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             index: 'something_else',
         };
 
-        // KEY DIFFERENCE IS LACK OF API_NAME,
+        // KEY DIFFERENCE IS LACK OF _api_name,
         // it will make 'elasticsearch_reader_api:elasticsearch_reader-0'
         const job = newTestJobConfig({
             slicers: 1,
@@ -131,7 +125,6 @@ describe('date_reader job', () => {
             operations: [
                 {
                     _op: 'elasticsearch_reader',
-                    type: docType,
                     index: evenIndex,
                     date_field_name
                 },
@@ -156,9 +149,8 @@ describe('date_reader job', () => {
             apis: [
                 {
                     _name: 'elasticsearch_reader_api',
-                    connection: 'otherConnection',
+                    _connection: 'otherConnection',
                     index: `${makeIndex('even_spread')}-*`,
-                    type: '_doc',
                     date_field_name: 'created',
                     interval: 'auto',
                     time_resolution: 'ms',
@@ -168,7 +160,7 @@ describe('date_reader job', () => {
             operations: [
                 {
                     _op: 'elasticsearch_reader',
-                    api_name: 'elasticsearch_reader_api'
+                    _api_name: 'elasticsearch_reader_api'
                 },
                 { _op: 'noop' }
             ]

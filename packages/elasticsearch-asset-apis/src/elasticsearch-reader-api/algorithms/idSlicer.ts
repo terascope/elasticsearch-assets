@@ -1,4 +1,4 @@
-import { TSError } from '@terascope/utils';
+import { TSError } from '@terascope/core-utils';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults
 } from '../interfaces.js';

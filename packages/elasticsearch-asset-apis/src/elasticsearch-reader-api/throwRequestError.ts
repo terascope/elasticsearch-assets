@@ -1,6 +1,4 @@
-import {
-    has, tryParseJSON, TSError
-} from '@terascope/utils';
+import { has, tryParseJSON, TSError } from '@terascope/core-utils';
 import { inspect } from 'node:util';
 
 /**

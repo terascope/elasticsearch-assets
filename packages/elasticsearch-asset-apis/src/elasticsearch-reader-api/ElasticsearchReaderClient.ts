@@ -1,16 +1,14 @@
-import elasticAPI from '@terascope/elasticsearch-api';
+import elasticAPI, { Client as ESClient } from '@terascope/elasticsearch-api';
 import { Client } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
-import {
-    AnyObject, DataEntity, get, Logger
-} from '@terascope/utils';
+import { DataEntity, get, Logger } from '@terascope/core-utils';
 import { DataTypeConfig, ClientParams, ClientResponse } from '@terascope/types';
 import { ReaderClient, FetchResponseType } from './interfaces.js';
 
 export class ElasticsearchReaderClient implements ReaderClient {
     private readonly _baseClient: Client;
-    private readonly client: elasticAPI.Client;
-    private readonly fullResponseClient: elasticAPI.Client;
+    private readonly client: ESClient;
+    private readonly fullResponseClient: ESClient;
 
     constructor(
         elasticsearchClient: Client,
@@ -65,7 +63,7 @@ export class ElasticsearchReaderClient implements ReaderClient {
             query, true
         );
 
-        const records = searchResults.hits.hits.map((data) => data._source as AnyObject);
+        const records = searchResults.hits.hits.map((data) => data._source as Record<string, any>);
         const metrics = {
             total: get(searchResults, 'hits.total.value', get(searchResults, 'hits.total'))
         };
@@ -91,15 +89,15 @@ export class ElasticsearchReaderClient implements ReaderClient {
     _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse: true
-    ): Promise<ClientResponse.SearchResponse<AnyObject>>;
+    ): Promise<ClientResponse.SearchResponse<Record<string, any>>>;
     async _searchRequest(
         query: ClientParams.SearchParams,
         fullResponse?: boolean
-    ): Promise<DataEntity[] | ClientResponse.SearchResponse<AnyObject>> {
+    ): Promise<DataEntity[] | ClientResponse.SearchResponse<Record<string, any>>> {
         if (fullResponse) {
             return this.fullResponseClient.search(
                 query as any
-            ) as Promise<ClientResponse.SearchResponse<AnyObject>>;
+            ) as Promise<ClientResponse.SearchResponse<Record<string, any>>>;
         }
         return this.client.search(query as any) as Promise<DataEntity[]>;
     }

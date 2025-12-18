@@ -1,5 +1,5 @@
 import 'jest-extended';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { EventEmitter } from 'node:events';
@@ -34,7 +34,6 @@ describe('id_reader tests', () => {
     const testIndex = makeIndex('id_refactored_tests');
     const evenBulkData = evenSpread.data.map((obj) => DataEntity.make(obj, { _key: obj.uuid }));
 
-    const docType = '_doc';
     let client: any;
     let readerClient: ElasticsearchReaderClient;
 
@@ -48,7 +47,7 @@ describe('id_reader tests', () => {
         );
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(
-            client, testIndex, evenSpread.EvenDataType, evenBulkData, docType
+            client, testIndex, evenSpread.EvenDataType, evenBulkData
         );
         await waitForData(client, testIndex, evenBulkData.length);
     });
@@ -63,7 +62,6 @@ describe('id_reader tests', () => {
             size: 1000,
             date_field_name: 'created',
             query: '*',
-            type: docType,
             response_type: FetchResponseType.data_frame,
             type_config: evenSpread.EvenDataType,
             start: null,
@@ -76,7 +74,7 @@ describe('id_reader tests', () => {
             subslice_key_threshold: 1000000,
             key_type: IDType.base64url,
             time_resolution: 'ms',
-            connection: 'default',
+            _connection: 'default',
             starting_key_depth: 0
         });
 

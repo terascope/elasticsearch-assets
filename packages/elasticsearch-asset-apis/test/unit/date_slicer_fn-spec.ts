@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { EventEmitter } from 'node:events';
-import { debugLogger, times, pDelay } from '@terascope/utils';
+import { debugLogger, times, pDelay } from '@terascope/core-utils';
 import moment from 'moment';
 import {
     WindowState, SlicerArgs, ParsedInterval,

@@ -1,4 +1,4 @@
-import { isKey, times, toIntegerOrThrow } from '@terascope/utils';
+import { isKey, times, toIntegerOrThrow } from '@terascope/core-utils';
 import moment from 'moment';
 import fs from 'node:fs';
 // @ts-expect-error

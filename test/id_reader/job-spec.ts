@@ -1,6 +1,7 @@
 import 'jest-extended';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
-import { TestClientConfig, debugLogger } from '@terascope/job-components';
+import { TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
@@ -14,7 +15,6 @@ import {
 
 describe('id_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;
-    const docType = '_doc';
     const logger = debugLogger('test-logger');
     // in es5 this should be ignored
     const id_field_name = 'uuid';
@@ -35,7 +35,7 @@ describe('id_reader job', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData);
     });
 
     afterAll(async () => {
@@ -70,7 +70,6 @@ describe('id_reader job', () => {
     it('can fetch all even-data with job in long form with deprecated "id_field_name"', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             field: id_field_name,
             index: evenIndex,
             key_type: IDType.base64url
@@ -81,7 +80,7 @@ describe('id_reader job', () => {
             max_retries: 0,
             apis: [apiConfig],
             operations: [
-                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
@@ -110,7 +109,6 @@ describe('id_reader job', () => {
     it('can fetch all even-data with job in long form with non-deprecated', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             id_field_name,
             index: evenIndex,
             key_type: IDType.base64url
@@ -121,7 +119,7 @@ describe('id_reader job', () => {
             max_retries: 0,
             apis: [apiConfig],
             operations: [
-                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
@@ -155,7 +153,6 @@ describe('id_reader job', () => {
             operations: [
                 {
                     _op: 'id_reader',
-                    type: docType,
                     id_field_name,
                     index: evenIndex,
                     key_type: IDType.base64url
@@ -188,12 +185,11 @@ describe('id_reader job', () => {
     it('can fetch all even-data with job in long form but it makes its own api', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             id_field_name,
             index: 'something_else',
             key_type: IDType.base64url
         };
-        // KEY DIFFERENCE IS LACK OF API_NAME, it will make 'elasticsearch_reader_api:id_reader-0'
+        // KEY DIFFERENCE IS LACK OF _api_name, it will make 'elasticsearch_reader_api:id_reader-0'
         const job = newTestJobConfig({
             slicers: 1,
             max_retries: 0,
@@ -201,7 +197,6 @@ describe('id_reader job', () => {
             operations: [
                 {
                     _op: 'id_reader',
-                    type: docType,
                     id_field_name,
                     index: evenIndex,
                     key_type: IDType.base64url
@@ -234,7 +229,6 @@ describe('id_reader job', () => {
     it('can fetch all even-data with recursive optimizations set to true', async () => {
         const apiConfig = {
             _name: 'elasticsearch_reader_api',
-            type: docType,
             field: id_field_name,
             index: evenIndex,
             key_type: IDType.base64url,
@@ -247,7 +241,7 @@ describe('id_reader job', () => {
             max_retries: 0,
             apis: [apiConfig],
             operations: [
-                { _op: 'id_reader', api_name: 'elasticsearch_reader_api' },
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });

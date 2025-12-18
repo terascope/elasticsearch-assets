@@ -8,6 +8,6 @@ export interface ESIDReaderConfig extends OpConfig {
     starting_key_depth: number;
     query?: string;
     fields: null | string[];
-    connection: string;
-    api_name: string;
+    _connection: string;
+    _api_name: string;
 }

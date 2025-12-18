@@ -1,6 +1,6 @@
 import { Client, ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { ClientParams } from '@terascope/types';
-import { DataEntity, debugLogger, uniq } from '@terascope/utils';
+import { DataEntity, debugLogger, uniq } from '@terascope/core-utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 
 const {
@@ -24,13 +24,11 @@ export async function addToIndex(
     client: Client,
     index: string,
     records: any[],
-    type = '_doc'
 ): Promise<void> {
     const body = formatUploadData(index, records);
 
     const results = await client.bulk({
         index,
-        type,
         body,
         refresh: true
     });

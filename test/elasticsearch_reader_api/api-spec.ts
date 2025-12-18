@@ -1,5 +1,6 @@
 import 'jest-extended';
-import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-components';
+import { TestClientConfig } from '@terascope/job-components';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticReaderFactoryAPI } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
@@ -10,8 +11,6 @@ import {
 describe('elasticsearch reader api', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_reader_api_`;
     const logger = debugLogger('test-logger');
-
-    const docType = '_doc';
 
     let harness: WorkerTestHarness;
     let esClient: any;
@@ -35,7 +34,7 @@ describe('elasticsearch reader api', () => {
 
         const data = [{ some: 'data' }, { other: 'data' }];
 
-        await upload(esClient, { index: apiReaderIndex, type: docType }, data);
+        await upload(esClient, { index: apiReaderIndex }, data);
 
         await waitForData(esClient, apiReaderIndex, 2);
     });
@@ -56,7 +55,6 @@ describe('elasticsearch reader api', () => {
             {
                 _name: 'elasticsearch_reader_api',
                 index: apiReaderIndex,
-                type: docType
             },
             overrideConfig
         );

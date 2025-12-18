@@ -1,12 +1,12 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { APIConfig, debugLogger, TestClientConfig } from '@terascope/job-components';
+import { APIConfig, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces.js';
 
 describe('elasticsearch state storage api schema', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;
-    const docType = '_doc';
     const apiName = 'elasticsearch_state_storage';
     const logger = debugLogger('test-logger');
 
@@ -33,7 +33,6 @@ describe('elasticsearch state storage api schema', () => {
         const base: Record<string, any> = {
             _name: apiName,
             index: apiReaderIndex,
-            type: docType,
             cache_size: 100000,
         };
 
@@ -71,13 +70,12 @@ describe('elasticsearch state storage api schema', () => {
         const schema = await makeSchema();
 
         expect(schema).toMatchObject({
-            type: docType,
             concurrency: 10,
             source_fields: [],
             chunk_size: 2500,
             persist: false,
             meta_key_field: '_key',
-            connection: 'default',
+            _connection: 'default',
         });
     });
 
@@ -95,7 +93,7 @@ describe('elasticsearch state storage api schema', () => {
         await expect(makeSchema({ chunk_size: -34 })).toReject();
         await expect(makeSchema({ chunk_size: 'stuff' })).toReject();
         await expect(makeSchema({ meta_key_field: 3453 })).toReject();
-        await expect(makeSchema({ connection: 3453 })).toReject();
+        await expect(makeSchema({ _connection: 3453 })).toReject();
         await expect(makeSchema({ cache_size: -3453 })).toReject();
         await expect(makeSchema({ cache_size: 'field' })).toReject();
     });

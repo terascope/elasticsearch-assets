@@ -1,11 +1,11 @@
 import { EventEmitter } from 'node:events';
 import {
-    AnyObject, DataEntity, isObjectEntity,
+    DataEntity, isObjectEntity, isKey,
     getTypeOf, Logger, isSimpleObject,
     isNumber, isValidDate, isFunction,
     isString, isWildCardString, matchWildcard,
-    pRetry, toIntegerOrThrow, isKey, TSError,
-} from '@terascope/utils';
+    pRetry, toIntegerOrThrow, TSError,
+} from '@terascope/core-utils';
 import {
     ClientParams, ClientResponse,
     IndicesIndexSettings,
@@ -791,7 +791,7 @@ export class ElasticsearchReaderAPI {
     }
 }
 
-function isObject(val: unknown): val is AnyObject {
+function isObject(val: unknown): val is Record<string, any> {
     return isObjectEntity(val);
 }
 

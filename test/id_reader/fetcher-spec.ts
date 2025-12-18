@@ -1,9 +1,7 @@
 import 'jest-extended';
-import { DataEntity, debugLogger, TestClientConfig } from '@terascope/job-components';
-import {
-    ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8,
-    isOpensearch3
-} from '@terascope/opensearch-client';
+import { TestClientConfig } from '@terascope/job-components';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
 import {
@@ -15,7 +13,6 @@ describe('id_reader fetcher', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_fetcher_`;
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const logger = debugLogger('test-logger');
-    const docType = '_doc';
     // in es5 this should be ignored
     const id_field_name = 'uuid';
     const bulkData = evenSpread.data;
@@ -29,17 +26,12 @@ describe('id_reader fetcher', () => {
     let harness: JobTestHarness;
     let clients: TestClientConfig[];
     let esClient: any;
-    let hasTypedDoc = true;
 
     beforeAll(async () => {
         esClient = await makeClient();
 
-        if (isOpensearch2(esClient) || isOpensearch3(esClient) || isElasticsearch8(esClient)) {
-            hasTypedDoc = false;
-        }
-
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, bulkData);
     });
 
     afterAll(async () => {
@@ -75,7 +67,7 @@ describe('id_reader fetcher', () => {
         const idReader = Object.assign(
             { _op: 'id_reader' },
             opConfig,
-            { type: docType, id_field_name }
+            { id_field_name }
         );
 
         const job = newTestJobConfig({
@@ -174,13 +166,7 @@ describe('id_reader fetcher', () => {
         expect(metadata._eventTime).toBeNumber();
         expect(metadata._key).toBeString();
         expect(metadata._index).toEqual(evenIndex);
-
-        if (hasTypedDoc) {
-            expect(metadata._type).toEqual(docType);
-        } else {
-            expect(metadata._type).toBeUndefined();
-        }
-
+        expect(metadata._type).toBeUndefined();
         expect(metadata._eventTime).toBeNumber();
     });
 });

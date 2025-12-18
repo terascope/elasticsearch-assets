@@ -1,12 +1,12 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { TestClientConfig, APIConfig, debugLogger } from '@terascope/job-components';
+import { TestClientConfig, APIConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
 describe('elasticsearch reader api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_api_schema_`;
-    const docType = '_doc';
     const logger = debugLogger('test-logger');
 
     const apiName = DEFAULT_API_NAME;
@@ -35,7 +35,6 @@ describe('elasticsearch reader api schema', () => {
     ): Promise<ElasticsearchReaderAPIConfig> {
         const defaults = {
             _name: apiName,
-            type: docType,
             index: apiSenderIndex,
         };
         const apiConfig = Object.assign({}, defaults, config);
@@ -77,14 +76,14 @@ describe('elasticsearch reader api schema', () => {
     });
 
     it('should values are incorrect', async () => {
-        await expect(makeSchema({ connection: -4 })).toReject();
+        await expect(makeSchema({ _connection: -4 })).toReject();
         await expect(makeSchema({ index: -3 })).toReject();
         await expect(makeSchema({ index: undefined })).toReject();
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true, type: undefined };
-        const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
+        const badOP = { subslice_by_key: true };
+        const goodOP = { subslice_by_key: true, field: 'events-' };
         const otherGoodOP = { subslice_by_key: false, other: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 

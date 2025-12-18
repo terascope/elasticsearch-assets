@@ -1,9 +1,8 @@
-import { isPlainObject, isObjectEntity } from '@terascope/utils';
+import { isPlainObject, isObjectEntity } from '@terascope/core-utils';
 
 function createData() {
     return {
         _index: 'test-index',
-        _type: 'test-type',
         _version: 1,
         _id: 'someId',
         _source: { '@timestamp': new Date() }

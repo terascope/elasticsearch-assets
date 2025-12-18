@@ -3,7 +3,7 @@ import {
     DataTypeConfig, FieldType,
     ClientParams, SearchParams
 } from '@terascope/types';
-import { debugLogger } from '@terascope/utils';
+import { debugLogger } from '@terascope/core-utils';
 import 'jest-extended';
 import nock, { RequestBodyMatcher } from 'nock';
 import {
@@ -47,7 +47,7 @@ describe('Spaces Reader Client', () => {
             time_resolution: 'ms',
             size: maxSize,
             date_field_name: 'created',
-            connection: 'default',
+             _connection: 'default',
             interval: '1m',
             delay: '30s',
             ...overrides

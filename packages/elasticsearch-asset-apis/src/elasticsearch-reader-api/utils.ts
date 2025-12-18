@@ -1,5 +1,6 @@
-import { AnyObject, GeoPoint, ClientParams, GeoQuery } from '@terascope/types';
-import { isString, parseGeoPoint } from '@terascope/utils';
+import { GeoPoint, ClientParams, GeoQuery } from '@terascope/types';
+import { isString } from '@terascope/core-utils';
+import { parseGeoPoint } from '@terascope/geo-utils';
 import { ESReaderOptions, ReaderSlice } from './interfaces.js';
 
 /**
@@ -43,7 +44,7 @@ export function buildQuery(
 function _buildRangeQuery(
     opConfig: ESReaderOptions, params: ReaderSlice
 ) {
-    const body: AnyObject = {
+    const body: Record<string, any> = {
         query: {
             bool: {
                 must: [],
@@ -163,9 +164,9 @@ export function validateGeoParameters(opConfig: ESReaderOptions): void {
     }
 }
 
-export function geoSearch(opConfig: ESReaderOptions): AnyObject {
+export function geoSearch(opConfig: ESReaderOptions): Record<string, any> {
     let isGeoSort = false;
-    const queryResults: AnyObject = {};
+    const queryResults: Record<string, any> = {};
     // check for key existence to see if they are user defined
     if (opConfig.geo_sort_order || opConfig.geo_sort_unit || opConfig.geo_sort_point) {
         isGeoSort = true;
@@ -182,7 +183,7 @@ export function geoSearch(opConfig: ESReaderOptions): AnyObject {
     } = opConfig;
 
     function createGeoSortQuery(location: GeoPoint) {
-        const sortedSearch: AnyObject = { _geo_distance: {} };
+        const sortedSearch: Record<string, any> = { _geo_distance: {} };
         sortedSearch._geo_distance[opConfig.geo_field as string] = {
             lat: location.lat,
             lon: location.lon,

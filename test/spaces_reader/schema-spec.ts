@@ -1,8 +1,6 @@
 import 'jest-extended';
-import {
-    newTestJobConfig, AnyObject, APIConfig,
-    debugLogger, TestClientConfig
-} from '@terascope/job-components';
+import { newTestJobConfig, APIConfig, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { makeClient } from '../helpers/index.js';
 import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces.js';
@@ -12,7 +10,6 @@ describe('spaces-reader schema', () => {
     const index = 'some_index';
     const name = 'spaces_reader';
     const logger = debugLogger('test-logger');
-    const docType = '_doc';
 
     let esClient: any;
     let clients: TestClientConfig[];
@@ -32,12 +29,12 @@ describe('spaces-reader schema', () => {
         ];
     });
 
-    async function makeTest(opConfig: AnyObject, apiConfig?: AnyObject) {
+    async function makeTest(opConfig: Record<string, any>, apiConfig?: Record<string, any>) {
         const readerConfig = Object.assign({
             _op: 'spaces_reader',
         }, opConfig);
 
-        const partialJob: AnyObject = {
+        const partialJob: Record<string, any> = {
             name: 'simple-api-reader-job',
             apis: [],
             operations: [
@@ -81,9 +78,9 @@ describe('spaces-reader schema', () => {
         if (apiManager == null) throw new Error('Could not find spaces_reader_api:spaces_reader-0');
 
         const apiConfig = apiManager.getConfig(apiName);
-        const { api_name } = op.opConfig;
+        const { _api_name } = op.opConfig;
 
-        expect(api_name).toEqual(apiName);
+        expect(_api_name).toEqual(apiName);
         expect(apiConfig).toMatchObject(config);
     });
 
@@ -95,16 +92,16 @@ describe('spaces-reader schema', () => {
             token: 'someToken'
         };
 
-        await expect(makeTest({ api_name: 'spaces_reader_api' }, apiConfig)).toResolve();
+        await expect(makeTest({ _api_name: 'spaces_reader_api' }, apiConfig)).toResolve();
     });
 
     it('should throw if api is created but opConfig has index set to another value', async () => {
         const job = newTestJobConfig({
             apis: [
-                { _name: DEFAULT_API_NAME, index, type: docType }
+                { _name: DEFAULT_API_NAME, index }
             ],
             operations: [
-                { _op: name, index: 'something_else', api_name: DEFAULT_API_NAME },
+                { _op: name, index: 'something_else', _api_name: DEFAULT_API_NAME },
                 { _op: 'noop' }
             ]
         });
@@ -163,7 +160,7 @@ describe('spaces-reader schema', () => {
             operations: [
                 {
                     _op: name,
-                    api_name: DEFAULT_API_NAME
+                    _api_name: DEFAULT_API_NAME
                 },
                 { _op: 'noop' }
             ]

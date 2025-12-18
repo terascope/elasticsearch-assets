@@ -1,5 +1,6 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SlicerRecoveryData, debugLogger, TestClientConfig } from '@terascope/job-components';
+import { SlicerRecoveryData, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX,
@@ -11,7 +12,6 @@ import {
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
-    const docType = '_doc';
     const field = 'uuid';
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const logger = debugLogger('test-logger');
@@ -26,7 +26,7 @@ describe('id_reader slicer', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
-        await populateIndex(esClient, apiReaderIndex, evenSpread.EvenDataType, bulkData, docType);
+        await populateIndex(esClient, apiReaderIndex, evenSpread.EvenDataType, bulkData);
         await waitForData(esClient, apiReaderIndex, bulkData.length);
     });
 
@@ -55,7 +55,6 @@ describe('id_reader slicer', () => {
         _op: 'id_reader',
         field,
         index: apiReaderIndex,
-        type: docType
     };
 
     async function makeSlicerTest(

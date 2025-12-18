@@ -1,17 +1,15 @@
 import 'jest-extended';
 import {
-    pDelay, LifeCycle, SlicerRecoveryData,
-    AnyObject, sortBy, SliceRequest, debugLogger,
+    LifeCycle, SlicerRecoveryData, SliceRequest,
     TestClientConfig
 } from '@terascope/job-components';
+import { debugLogger, sortBy, pDelay } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import moment from 'moment';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '@terascope/elasticsearch-asset-apis';
 import {
-    TEST_INDEX_PREFIX,
-    makeClient,
-    cleanupIndex,
+    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex,
 } from '../helpers/index.js';
 
@@ -27,7 +25,6 @@ describe('elasticsearch_reader slicer', () => {
 
     const evenIndex = makeIndex('even_data');
     const unevenIndex = makeIndex('uneven_data');
-    const docType = '_doc';
 
     const evenOriginalStart = '2019-04-26T15:00:23.201Z';
     const evenOriginalEnd = '2019-04-26T15:00:23.394Z';
@@ -75,10 +72,10 @@ describe('elasticsearch_reader slicer', () => {
 
         await Promise.all([
             await populateIndex(
-                esClient, evenIndex, evenSpread.EvenDataType, evenBulkData, docType
+                esClient, evenIndex, evenSpread.EvenDataType, evenBulkData
             ),
             await populateIndex(
-                esClient, unevenIndex, unevenSpread.UnevenDataTypeFields, unevenBulkData, docType
+                esClient, unevenIndex, unevenSpread.UnevenDataTypeFields, unevenBulkData
             )
         ]);
     });
@@ -104,7 +101,7 @@ describe('elasticsearch_reader slicer', () => {
     }
 
     interface SlicerTestArgs {
-        opConfig: AnyObject | undefined;
+        opConfig: Record<string, any> | undefined;
         numOfSlicers?: number;
         recoveryData?: SlicerRecoveryData[];
         eventHook?: EventHook;
@@ -117,7 +114,6 @@ describe('elasticsearch_reader slicer', () => {
         date_field_name: 'created',
         size: 50,
         index: evenIndex,
-        type: docType
     };
 
     async function makeSlicerTest({
@@ -1147,7 +1143,6 @@ describe('elasticsearch_reader slicer', () => {
             subslice_key_threshold: 50,
             key_type: IDType.hexadecimal,
             field: 'uuid',
-            type: docType,
             start: '2020-08-12T16:05:00Z'
         };
 
@@ -1334,7 +1329,7 @@ describe('elasticsearch_reader slicer', () => {
 
         const allSlices = await test.getAllSlices();
 
-        const [firstSlice, secondSlice, thirdSlice] = sortBy(allSlices.filter(Boolean), 'start') as AnyObject[];
+        const [firstSlice, secondSlice, thirdSlice] = sortBy(allSlices.filter(Boolean), 'start') as Record<string, any>[];
 
         expect(firstSlice.limit).toEqual(secondSlice.start);
 
@@ -1388,7 +1383,7 @@ describe('elasticsearch_reader slicer', () => {
 
         const [
             slice1, slice2, slice3, slice4, slice5
-        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as AnyObject[];
+        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as Record<string, any>[];
 
         // the first and second slicers break up the first segment
         expect(slice1.request.start).toEqual(recoveryData[0].lastSlice.end);
@@ -1439,7 +1434,7 @@ describe('elasticsearch_reader slicer', () => {
         const allSlices = await test.getAllSlices({ fullResponse: true });
         const [
             slice1, slice2, slice3, slice4
-        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as AnyObject[];
+        ] = sortBy(allSlices.filter(Boolean), 'slicer_id') as Record<string, any>[];
 
         // the first and second slicers break up the first segment
         expect(slice1.request.start).toEqual(recoveryData[0].lastSlice.end);

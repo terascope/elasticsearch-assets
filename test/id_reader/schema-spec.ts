@@ -2,15 +2,13 @@ import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import {
-    ValidatedJobConfig, OpConfig, APIConfig,
-    debugLogger, TestClientConfig
+    ValidatedJobConfig, OpConfig, APIConfig, TestClientConfig
 } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 import {
-    TEST_INDEX_PREFIX,
-    makeClient,
-    cleanupIndex,
+    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex
 } from '../helpers/index.js';
 
@@ -27,8 +25,6 @@ describe('id_reader Schema', () => {
 
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
-    const docType = '_doc';
-
     const index = makeIndex('even_data');
 
     const evenBulkData = evenSpread.data;
@@ -39,8 +35,13 @@ describe('id_reader Schema', () => {
 
     async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
         const base: Record<string, any> = {};
-        const opConfig = Object.assign(base, { _op: name, index, id_field_name }, config);
-        harness = WorkerTestHarness.testFetcher(opConfig, { clients });
+        // TODO: fixme
+        const opConfig = Object.assign(base, { _op: name, _api_name: test }, config) as any;
+        harness = WorkerTestHarness.testFetcher(
+            opConfig,
+            { _name: 'test', index, id_field_name },
+            { clients }
+        );
 
         await harness.initialize();
 
@@ -70,7 +71,7 @@ describe('id_reader Schema', () => {
             },
         ];
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, index, evenSpread.EvenDataType, evenBulkData, docType);
+        await populateIndex(esClient, index, evenSpread.EvenDataType, evenBulkData);
     });
 
     afterAll(async () => {
@@ -83,9 +84,9 @@ describe('id_reader Schema', () => {
 
     describe('when validating the schema', () => {
         it('should have defaults', async () => {
-            const { api_name } = await makeSchema({ index });
+            const { _api_name } = await makeSchema({ index });
 
-            expect(api_name).toEqual('elasticsearch_reader_api:id_reader-0');
+            expect(_api_name).toEqual('elasticsearch_reader_api:id_reader-0');
         });
 
         it('should throw if index is incorrect', async () => {
@@ -107,17 +108,17 @@ describe('id_reader Schema', () => {
             await expect(makeSchema({ fields: 'ehh' })).toReject();
             await expect(makeSchema({ fields: ['hello', 2] })).toReject();
 
-            await expect(makeSchema({ api_name: [1, 2, 3] })).toReject();
-            await expect(makeSchema({ api_name: 'hello' })).toReject();
+            await expect(makeSchema({ _api_name: [1, 2, 3] })).toReject();
+            await expect(makeSchema({ _api_name: 'hello' })).toReject();
         });
 
         it('should throw if api is created but opConfig has index set to another value', async () => {
             const job = newTestJobConfig({
                 apis: [
-                    { _name: DEFAULT_API_NAME, index, type: docType }
+                    { _name: DEFAULT_API_NAME, index }
                 ],
                 operations: [
-                    { _op: name, index: 'something_else', api_name: DEFAULT_API_NAME },
+                    { _op: name, index: 'something_else', _api_name: DEFAULT_API_NAME },
                     { _op: 'noop' }
                 ]
             });
@@ -131,10 +132,10 @@ describe('id_reader Schema', () => {
         it('should not throw if base api is created but opConfig has index set to another value', async () => {
             const job = newTestJobConfig({
                 apis: [
-                    { _name: DEFAULT_API_NAME, index, type: docType }
+                    { _name: DEFAULT_API_NAME, index }
                 ],
                 operations: [
-                    { _op: name, index, type: docType },
+                    { _op: name, index },
                     { _op: 'noop' }
                 ]
             });
@@ -157,7 +158,7 @@ describe('id_reader Schema', () => {
                     {
                         _op: name,
                         index: 'something_else',
-                        api_name: DEFAULT_API_NAME,
+                        _api_name: DEFAULT_API_NAME,
                         key_range: ['a', 'b']
                     },
                     { _op: 'noop' }
@@ -202,42 +203,42 @@ describe('id_reader Schema', () => {
             const job1 = newTestJobConfig({
                 slicers: 1,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_range: ['a', 'b']
+                    _op: 'id_reader', index, key_range: ['a', 'b']
                 },
                 { _op: 'noop' }]
             });
             const job2 = newTestJobConfig({
                 slicers: 2,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_range: ['a']
+                    _op: 'id_reader', index, key_range: ['a']
                 },
                 { _op: 'noop' }]
             });
             const job3 = newTestJobConfig({
                 slicers: 4,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
+                    _op: 'id_reader', index, key_type: 'hexadecimal'
                 },
                 { _op: 'noop' }]
             });
             const job4 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_type: 'hexadecimal'
+                    _op: 'id_reader', index, key_type: 'hexadecimal'
                 },
                 { _op: 'noop' }]
             });
             const job5 = newTestJobConfig({
                 slicers: 20,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_type: 'base64url'
+                    _op: 'id_reader', index, key_type: 'base64url'
                 },
                 { _op: 'noop' }]
             });
             const job6 = newTestJobConfig({
                 slicers: 70,
                 operations: [{
-                    _op: 'id_reader', type: docType, index, key_type: 'base64url'
+                    _op: 'id_reader', index, key_type: 'base64url'
                 },
                 { _op: 'noop' }]
             });
@@ -260,7 +261,7 @@ describe('id_reader Schema', () => {
             operations: [
                 {
                     _op: name,
-                    api_name: DEFAULT_API_NAME
+                    _api_name: DEFAULT_API_NAME
                 },
                 { _op: 'noop' }
             ]

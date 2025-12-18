@@ -1,8 +1,9 @@
 import 'jest-extended';
 import {
     newTestJobConfig, OpConfig, APIConfig,
-    debugLogger, TestClientConfig
+    TestClientConfig
 } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
@@ -23,7 +24,6 @@ describe('elasticsearch_reader schema', () => {
     }
 
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
-    const docType = '_doc';
     const index = makeIndex('even_spread');
     const evenBulkData = evenSpread.data;
 
@@ -45,7 +45,7 @@ describe('elasticsearch_reader schema', () => {
         ];
 
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, index, evenSpread.EvenDataType, evenBulkData, docType);
+        await populateIndex(esClient, index, evenSpread.EvenDataType, evenBulkData);
     });
 
     afterAll(async () => {
@@ -64,9 +64,13 @@ describe('elasticsearch_reader schema', () => {
             _op: name,
             index,
             date_field_name: 'created',
-            type: docType
+            _api_name: 'elasticsearch_reader_api'
         }, config);
-        harness = WorkerTestHarness.testFetcher(opConfig, { clients });
+        harness = WorkerTestHarness.testFetcher(
+            opConfig,
+            { _name: 'test' },
+            { clients }
+        );
 
         await harness.initialize();
 
@@ -79,9 +83,9 @@ describe('elasticsearch_reader schema', () => {
 
     it('has defaults', async () => {
         const schema = await makeSchema();
-        const { api_name } = schema;
+        const { _api_name } = schema;
 
-        expect(api_name).toEqual('elasticsearch_reader_api:elasticsearch_reader-0');
+        expect(_api_name).toEqual('elasticsearch_reader_api:elasticsearch_reader-0');
     });
 
     it('can geo validate', async () => {
@@ -112,9 +116,9 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true, type: null };
-        const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-', type: docType };
+        const badOP = { subslice_by_key: true };
+        const goodOP = { subslice_by_key: true, field: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -132,7 +136,7 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('will throw if configured incorrectly', async () => {
-        await expect(makeSchema({ api_name: [1, 2, 3] })).toReject();
+        await expect(makeSchema({ _api_name: [1, 2, 3] })).toReject();
 
         await expect(makeSchema({ index: [1, 2, 3] })).toReject();
         await expect(makeSchema({ index: 'Hello' })).toReject();
@@ -171,7 +175,7 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('should throw if in subslice_by_key is set', async () => {
-        await expect(makeSchema({ subslice_by_key: true, type: null })).toReject();
+        await expect(makeSchema({ subslice_by_key: true })).toReject();
         await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
     });
 
@@ -181,7 +185,6 @@ describe('elasticsearch_reader schema', () => {
                 {
                     _name: DEFAULT_API_NAME,
                     index,
-                    type: docType,
                     date_field_name: 'created'
                 }
             ],
@@ -189,7 +192,7 @@ describe('elasticsearch_reader schema', () => {
                 {
                     _op: name,
                     index: 'something_else',
-                    api_name: DEFAULT_API_NAME,
+                    _api_name: DEFAULT_API_NAME,
                     date_field_name: 'created'
                 },
                 { _op: 'noop' }
@@ -208,7 +211,6 @@ describe('elasticsearch_reader schema', () => {
                 {
                     _name: DEFAULT_API_NAME,
                     index,
-                    type: docType,
                     date_field_name: 'created'
                 }
             ],
@@ -217,7 +219,6 @@ describe('elasticsearch_reader schema', () => {
                     _op: name,
                     index,
                     date_field_name: 'created',
-                    type: docType,
                 },
                 { _op: 'noop' }
             ]
@@ -238,7 +239,6 @@ describe('elasticsearch_reader schema', () => {
         const apiConfig = {
             _name: DEFAULT_API_NAME,
             index,
-            type: docType,
             date_field_name: 'created'
         };
 
@@ -247,7 +247,7 @@ describe('elasticsearch_reader schema', () => {
             operations: [
                 {
                     _op: name,
-                    api_name: DEFAULT_API_NAME
+                    _api_name: DEFAULT_API_NAME
                 },
                 { _op: 'noop' }
             ]

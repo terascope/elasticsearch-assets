@@ -3,10 +3,8 @@ import nock from 'nock';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import moment from 'moment';
-import {
-    newTestJobConfig, SlicerRecoveryData, debugLogger,
-    TestClientConfig
-} from '@terascope/job-components';
+import { newTestJobConfig, SlicerRecoveryData, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { SlicerTestHarness } from 'teraslice-test-harness';
 import MockClient from '../helpers/mock_client.js';
 
