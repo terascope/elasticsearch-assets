@@ -34,7 +34,7 @@ export default class ElasticsearchSenderAPI extends APIFactory
     ): Promise<{ client: ElasticsearchBulkSender; config: ElasticsearchAPISenderConfig }> {
         const apiConfig = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
         const { _api_name, ...config } = apiConfig;
-        console.log('base apiConfig', apiConfig, config);
+
         const { client } = await this.context.apis.foundation.createClient({
             endpoint: config._connection,
             type: 'elasticsearch-next',

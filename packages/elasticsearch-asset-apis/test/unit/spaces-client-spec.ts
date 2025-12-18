@@ -47,7 +47,7 @@ describe('Spaces Reader Client', () => {
             time_resolution: 'ms',
             size: maxSize,
             date_field_name: 'created',
-             _connection: 'default',
+            _connection: 'default',
             interval: '1m',
             delay: '30s',
             ...overrides
