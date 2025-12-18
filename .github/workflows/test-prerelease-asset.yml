@@ -1,13 +1,15 @@
 name: Test Teraslice Asset
-run-name: ${{ github.actor }} is testing the Teraslice Asset
+run-name: ${{ github.actor }} is testing the Teraslice Prerelease Asset
 on:
   workflow_dispatch:
   push:
     branches:
       - master
+      - 'release/elasticsearch-assets-v*'
   pull_request:
     branches:
       - master
+      - 'release/elasticsearch-assets-v*'
 
 jobs:
   check-docker-limit-before:
@@ -47,8 +49,8 @@ jobs:
           jq '.version += "-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
 
-      - run: yarn dlx teraslice-cli -v
-      - run: yarn dlx teraslice-cli assets build
+      - run: yarn dlx teraslice-cli@prerelease -v
+      - run: yarn dlx teraslice-cli@prerelease assets build
       - run: ls -l build/
 
       - name: Archive test build artifacts
