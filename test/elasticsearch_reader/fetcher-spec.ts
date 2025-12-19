@@ -59,17 +59,18 @@ describe('elasticsearch_reader fetcher', () => {
     });
 
     const defaults = {
-        _op: 'elasticsearch_reader',
+        _name: 'elasticsearch_reader_api',
         date_field_name: 'created',
         index: evenIndex,
         time_resolution: 'ms',
     };
 
     async function makeFetcherTest(config: Record<string, any> = {}) {
-        const opConfig = Object.assign({ _api_name: 'elasticsearch_reader_api' }, defaults, config);
+        const apiConfig = Object.assign({}, defaults, config);
+
         workerHarness = WorkerTestHarness.testFetcher(
-            opConfig,
-            { _name: 'test' },
+            { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
+            apiConfig,
             { clients }
         );
 
@@ -79,10 +80,11 @@ describe('elasticsearch_reader fetcher', () => {
     }
 
     async function makeJobTest(config: Record<string, any> = {}) {
-        const opConfig = Object.assign({}, defaults, config);
+        const apiConfig = Object.assign({}, defaults, config);
         const job = newTestJobConfig({
+            apis: [apiConfig],
             operations: [
-                opConfig,
+                { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ]
         });

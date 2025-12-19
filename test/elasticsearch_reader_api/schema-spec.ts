@@ -48,7 +48,7 @@ describe('elasticsearch reader api schema', () => {
                 },
                 {
                     _op: 'noop',
-                    apiName: 'elasticsearch_sender_api'
+                    apiName: apiName
                 }
             ],
         });
@@ -70,9 +70,9 @@ describe('elasticsearch reader api schema', () => {
     });
 
     it('should have defaults', async () => {
-        const { connection } = await makeSchema({ index: apiSenderIndex });
+        const { _connection } = await makeSchema({ index: apiSenderIndex });
 
-        expect(connection).toEqual('default');
+        expect(_connection).toEqual('default');
     });
 
     it('should values are incorrect', async () => {
@@ -83,8 +83,8 @@ describe('elasticsearch reader api schema', () => {
 
     it('subslice_by_key configuration validation', async () => {
         const badOP = { subslice_by_key: true };
-        const goodOP = { subslice_by_key: true, field: 'events-' };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
+        const goodOP = { subslice_by_key: true, id_field_name: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, id_field_name: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -104,6 +104,6 @@ describe('elasticsearch reader api schema', () => {
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
         await expect(makeSchema({ subslice_by_key: true })).toReject();
-        await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
+        await expect(makeSchema({ subslice_by_key: true, id_field_name: 'hello' })).toResolve();
     });
 });

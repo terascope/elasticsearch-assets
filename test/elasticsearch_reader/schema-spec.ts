@@ -60,15 +60,17 @@ describe('elasticsearch_reader schema', () => {
     });
 
     async function makeSchema(config: Record<string, any> = {}): Promise<ESReaderConfig> {
-        const opConfig = Object.assign({}, {
-            _op: name,
-            index,
-            date_field_name: 'created',
-            _api_name: 'elasticsearch_reader_api'
-        }, config);
+        const opConfig = {
+            _op: name, _api_name: 'elasticsearch_reader_api'
+        };
+        const apiConfig = Object.assign(
+            { _name: 'elasticsearch_reader_api', index, date_field_name: 'created' },
+            config
+        );
+
         harness = WorkerTestHarness.testFetcher(
             opConfig,
-            { _name: 'test' },
+            apiConfig,
             { clients }
         );
 
@@ -80,13 +82,6 @@ describe('elasticsearch_reader schema', () => {
 
         return validConfig as ESReaderConfig;
     }
-
-    it('has defaults', async () => {
-        const schema = await makeSchema();
-        const { _api_name } = schema;
-
-        expect(_api_name).toEqual('elasticsearch_reader_api:elasticsearch_reader-0');
-    });
 
     it('can geo validate', async () => {
         const geoPointValidation = ESReaderSchema.schema.geo_box_top_left.format;
@@ -117,8 +112,8 @@ describe('elasticsearch_reader schema', () => {
 
     it('subslice_by_key configuration validation', async () => {
         const badOP = { subslice_by_key: true };
-        const goodOP = { subslice_by_key: true, field: 'events-' };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
+        const goodOP = { subslice_by_key: true, id_field_name: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, id_field_name: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -136,12 +131,9 @@ describe('elasticsearch_reader schema', () => {
     });
 
     it('will throw if configured incorrectly', async () => {
-        await expect(makeSchema({ _api_name: [1, 2, 3] })).toReject();
-
         await expect(makeSchema({ index: [1, 2, 3] })).toReject();
         await expect(makeSchema({ index: 'Hello' })).toReject();
 
-        await expect(makeSchema({ field: 1234 })).toReject();
         await expect(makeSchema({ size: -1234 })).toReject();
         await expect(makeSchema({ size: 'stuff' })).toReject();
 
@@ -176,63 +168,7 @@ describe('elasticsearch_reader schema', () => {
 
     it('should throw if in subslice_by_key is set', async () => {
         await expect(makeSchema({ subslice_by_key: true })).toReject();
-        await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
-    });
-
-    it('should throw if api is created but opConfig has index set to another value', async () => {
-        const job = newTestJobConfig({
-            apis: [
-                {
-                    _name: DEFAULT_API_NAME,
-                    index,
-                    date_field_name: 'created'
-                }
-            ],
-            operations: [
-                {
-                    _op: name,
-                    index: 'something_else',
-                    _api_name: DEFAULT_API_NAME,
-                    date_field_name: 'created'
-                },
-                { _op: 'noop' }
-            ]
-        });
-
-        await expect(async () => {
-            const test = new WorkerTestHarness(job, { clients });
-            await test.initialize();
-        }).rejects.toThrow();
-    });
-
-    it('should not throw if base api is created but opConfig has index set to another value', async () => {
-        const job = newTestJobConfig({
-            apis: [
-                {
-                    _name: DEFAULT_API_NAME,
-                    index,
-                    date_field_name: 'created'
-                }
-            ],
-            operations: [
-                {
-                    _op: name,
-                    index,
-                    date_field_name: 'created',
-                },
-                { _op: 'noop' }
-            ]
-        });
-
-        harness = new WorkerTestHarness(job, { clients });
-
-        await harness.initialize();
-
-        const apiConfig = harness.executionContext.config.apis.find(
-            (api: APIConfig) => api._name === 'elasticsearch_reader_api:elasticsearch_reader-0'
-        );
-
-        expect(apiConfig).toMatchObject({ index });
+        await expect(makeSchema({ subslice_by_key: true, id_field_name: 'hello' })).toResolve();
     });
 
     it('should be able to just move all connection values to the api', async () => {

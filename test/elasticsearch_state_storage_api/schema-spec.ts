@@ -85,7 +85,6 @@ describe('elasticsearch state storage api schema', () => {
 
     it('will throw other settings are not correct', async () => {
         await expect(makeSchema({ index: undefined })).toReject();
-        await expect(makeSchema({ type: 34 })).toReject();
         await expect(makeSchema({ concurrency: -34 })).toReject();
         await expect(makeSchema({ concurrency: 'hello' })).toReject();
         await expect(makeSchema({ source_fields: 'hello' })).toReject();

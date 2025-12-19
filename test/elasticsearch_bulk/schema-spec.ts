@@ -44,23 +44,9 @@ describe('Elasticsearch Bulk Schema', () => {
 
     describe('when validating the schema', () => {
         it('should have defaults', async () => {
-            const { _api_name } = await makeSchema({ index });
+            const { _api_name } = await makeSchema({});
 
             expect(_api_name).toEqual(DEFAULT_API_NAME);
-        });
-
-        it('should throw if index is incorrect', async () => {
-            await expect(makeSchema({ index: 4 })).toReject();
-            await expect(makeSchema({ index: '' })).toReject();
-            await expect(makeSchema({ index: 'Hello' })).toReject();
-            await expect(makeSchema({ index: 'hello' })).toResolve();
-        });
-
-        it('should values are incorrect', async () => {
-            await expect(makeSchema({ size: -4 })).toReject();
-            await expect(makeSchema({ update_retry_on_conflict: -3 })).toReject();
-            await expect(makeSchema({ delete: { some: 'stuff' } })).toReject();
-            await expect(makeSchema({ _api_name: [1, 2, 3] })).toReject();
         });
 
         it('should not throw if api is created but opConfig has index set', async () => {

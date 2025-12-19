@@ -80,12 +80,13 @@ describe('elasticsearch_bulk', () => {
 
     async function makeTest(opConfig = {}) {
         const bulkConfig: OpConfig = Object.assign(
-            { _op: 'elasticsearch_bulk', index: bulkIndex },
+            { _op: 'elasticsearch_bulk' },
             opConfig,
         );
 
         const job = newTestJobConfig({
             max_retries: 0,
+            apis: [{ _name: 'elasticsearch_sender_api', index: bulkIndex }],
             operations: [
                 {
                     _op: 'test-reader',

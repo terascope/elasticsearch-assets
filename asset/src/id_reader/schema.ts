@@ -5,21 +5,17 @@ import { isNil } from '@terascope/core-utils';
 
 export default class Schema extends ConvictSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
-        const opConfig = job.operations.find((op) => {
-            if (op._op === 'id_reader') {
-                return op;
+        const apiConfig = job.apis.find((api) => {
+            if (api._name === 'elasticsearch_reader_api') {
+                return api;
             }
             return false;
         });
 
-        if (opConfig == null) throw new Error('Could not find id_reader operation in jobConfig');
+        if (apiConfig == null) throw new Error('Could not find an elasticsearch_reader_api definition in the jobConfig');
 
-        const {
-            _api_name, ...newConfig
-        } = opConfig;
-
-        if (isNil(newConfig.id_field_name)) {
-            throw new Error('For operation id_reader, parameter "id_field_name" must be set');
+        if (isNil(apiConfig.id_field_name)) {
+            throw new Error('For the api connected to the id_reader, parameter "id_field_name" must be set');
         }
     }
 

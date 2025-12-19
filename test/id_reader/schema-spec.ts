@@ -34,12 +34,10 @@ describe('id_reader Schema', () => {
     let clients: TestClientConfig[];
 
     async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
-        const base: Record<string, any> = {};
-        // TODO: fixme
-        const opConfig = Object.assign(base, { _op: name, _api_name: test }, config) as any;
+        const apiConfig = Object.assign({}, { _name: 'elasticsearch_reader_api', id_field_name }, config) as any;
         harness = WorkerTestHarness.testFetcher(
-            opConfig,
-            { _name: 'test', index, id_field_name },
+            { _op: name, _api_name: 'elasticsearch_reader_api' },
+            apiConfig,
             { clients }
         );
 
@@ -86,7 +84,7 @@ describe('id_reader Schema', () => {
         it('should have defaults', async () => {
             const { _api_name } = await makeSchema({ index });
 
-            expect(_api_name).toEqual('elasticsearch_reader_api:id_reader-0');
+            expect(_api_name).toEqual('elasticsearch_reader_api');
         });
 
         it('should throw if index is incorrect', async () => {
@@ -129,38 +127,13 @@ describe('id_reader Schema', () => {
             }).rejects.toThrow();
         });
 
-        it('should not throw if base api is created but opConfig has index set to another value', async () => {
-            const job = newTestJobConfig({
-                apis: [
-                    { _name: DEFAULT_API_NAME, index }
-                ],
-                operations: [
-                    { _op: name, index },
-                    { _op: 'noop' }
-                ]
-            });
-
-            harness = new WorkerTestHarness(job, { clients });
-
-            await harness.initialize();
-
-            const apiConfig = harness.executionContext.config.apis.find(
-                (api: APIConfig) => api._name === 'elasticsearch_reader_api:id_reader-0'
-            );
-
-            expect(apiConfig).toMatchObject({ index });
-        });
-
         it('should throw if number of slicers are greater than key_range length', async () => {
+            const apiConfig = Object.assign({}, { _name: 'elasticsearch_reader_api', id_field_name }, { index: 'something_else', key_range: ['a', 'b'] });
             const job = newTestJobConfig({
                 slicers: 72,
+                apis: [apiConfig],
                 operations: [
-                    {
-                        _op: name,
-                        index: 'something_else',
-                        _api_name: DEFAULT_API_NAME,
-                        key_range: ['a', 'b']
-                    },
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
                     { _op: 'noop' }
                 ]
             });
@@ -172,10 +145,14 @@ describe('id_reader Schema', () => {
         });
 
         it('should throw if number of slicers are greater than key_type length', async () => {
+            const apiConfig1 = Object.assign({}, { _name: 'elasticsearch_reader_api', id_field_name }, { index });
+            const apiConfig2 = Object.assign({}, { _name: 'elasticsearch_reader_api', id_field_name }, { index, key_type: 'hexadecimal' });
+
             const job = newTestJobConfig({
                 slicers: 72,
+                apis: [apiConfig1],
                 operations: [
-                    { _op: name, index },
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
                     { _op: 'noop' }
                 ]
             });
@@ -187,8 +164,9 @@ describe('id_reader Schema', () => {
 
             const job2 = newTestJobConfig({
                 slicers: 17,
+                apis: [apiConfig2],
                 operations: [
-                    { _op: name, index, key_type: 'hexadecimal' },
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
                     { _op: 'noop' }
                 ]
             });
@@ -200,47 +178,61 @@ describe('id_reader Schema', () => {
         });
 
         it('can validateJob to make sure its configured correctly', async () => {
+            const base = { _name: 'elasticsearch_reader_api', id_field_name, index };
+            const apiConfig1 = Object.assign({}, base, { key_range: ['a', 'b'] });
+            const apiConfig2 = Object.assign({}, base, { key_range: ['a'] });
+            const apiConfig3 = Object.assign({}, base, { key_type: 'hexadecimal' });
+            const apiConfig4 = Object.assign({}, base, { key_type: 'hexadecimal' });
+            const apiConfig5 = Object.assign({}, base, { key_type: 'base64url' });
+            const apiConfig6 = Object.assign({}, base, { key_type: 'base64url' });
+
             const job1 = newTestJobConfig({
                 slicers: 1,
-                operations: [{
-                    _op: 'id_reader', index, key_range: ['a', 'b']
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig1],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
             const job2 = newTestJobConfig({
                 slicers: 2,
-                operations: [{
-                    _op: 'id_reader', index, key_range: ['a']
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig2],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
             const job3 = newTestJobConfig({
                 slicers: 4,
-                operations: [{
-                    _op: 'id_reader', index, key_type: 'hexadecimal'
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig3],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
             const job4 = newTestJobConfig({
                 slicers: 20,
-                operations: [{
-                    _op: 'id_reader', index, key_type: 'hexadecimal'
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig4],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
             const job5 = newTestJobConfig({
                 slicers: 20,
-                operations: [{
-                    _op: 'id_reader', index, key_type: 'base64url'
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig5],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
             const job6 = newTestJobConfig({
                 slicers: 70,
-                operations: [{
-                    _op: 'id_reader', index, key_type: 'base64url'
-                },
-                { _op: 'noop' }]
+                apis: [apiConfig6],
+                operations: [
+                    { _op: name, _api_name: 'elasticsearch_reader_api' },
+                    { _op: 'noop' }
+                ]
             });
 
             await expect(testValidation(job1)).toResolve();
@@ -256,7 +248,7 @@ describe('id_reader Schema', () => {
     it('should not throw if all connection config is on api', async () => {
         const job = newTestJobConfig({
             apis: [
-                { _name: DEFAULT_API_NAME, index }
+                { _name: DEFAULT_API_NAME, index, id_field_name }
             ],
             operations: [
                 {

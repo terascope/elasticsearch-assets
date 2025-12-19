@@ -61,14 +61,14 @@ describe('spaces_reader slicer', () => {
             recoveryData?: SlicerRecoveryData[],
             eventHook?: EventHook
         ) {
+            const apiConfig = Object.assign({}, { _name: 'spaces_reader_api' }, config);
             const job = newTestJobConfig({
                 analytics: true,
                 slicers: numOfSlicers ?? 1,
+                apis: [apiConfig],
                 operations: [
-                    config,
-                    {
-                        _op: 'noop'
-                    }
+                    { _op: 'spaces_reader', _api_name: 'spaces_reader_api' },
+                    { _op: 'noop' }
                 ]
             });
             const myTest = new SlicerTestHarness(job, { assetDir, clients });
@@ -83,7 +83,6 @@ describe('spaces_reader slicer', () => {
         }
 
         const opConfig = {
-            _op: 'spaces_reader',
             date_field_name: 'created',
             time_resolution: 's',
             size: 100,
@@ -159,9 +158,9 @@ describe('spaces_reader slicer', () => {
             name: 'simple-api-reader-job',
             lifecycle: 'once',
             max_retries: 0,
-            operations: [
+            apis: [
                 {
-                    _op: 'spaces_reader',
+                    _name: 'spaces_reader_api',
                     query: 'slicer:query',
                     index: testIndex,
                     endpoint: baseUri,
@@ -175,9 +174,11 @@ describe('spaces_reader slicer', () => {
                     timeout: 50,
                     variables
                 },
-                {
-                    _op: 'noop'
-                }
+
+            ],
+            operations: [
+                { _op: 'spaces_reader', _api_name: 'spaces_reader_api' },
+                { _op: 'noop' }
             ]
         }), {});
 
@@ -222,16 +223,3 @@ describe('spaces_reader slicer', () => {
         });
     });
 });
-
-/*
-{
-      {
-        q: 'created:[2012-12-12T00:00:00.000Z TO 2012-12-12T00:01:00.000Z} AND (slicer:query)',
-        size: 0,
-        variables: { '@foo': 'foo', '$bar': 'bar' },
-        track_total_hits: true
-      },
-      start: '2012-12-12T00:00:00.000Z',
-      end: '2012-12-12T00:01:00.000Z'
-    }
-*/

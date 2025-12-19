@@ -29,26 +29,19 @@ describe('spaces-reader schema', () => {
         ];
     });
 
-    async function makeTest(opConfig: Record<string, any>, apiConfig?: Record<string, any>) {
-        const readerConfig = Object.assign({
-            _op: 'spaces_reader',
-        }, opConfig);
+    async function makeTest(config: Record<string, any>) {
+        const apiConfig = Object.assign({
+            _name: 'spaces_reader_api',
+        }, config);
 
         const partialJob: Record<string, any> = {
             name: 'simple-api-reader-job',
-            apis: [],
+            apis: [apiConfig],
             operations: [
-                readerConfig,
-                {
-                    _op: 'noop'
-                }
+                { _op: 'spaces_reader', _api_name: 'spaces_reader_api' },
+                { _op: 'noop' }
             ]
         };
-
-        if (apiConfig) {
-            const newAPIConfig = Object.assign({ _name: 'spaces_reader_api' }, apiConfig);
-            partialJob.apis.push(newAPIConfig);
-        }
 
         harness = new WorkerTestHarness(newTestJobConfig(partialJob), {});
 
@@ -62,7 +55,7 @@ describe('spaces-reader schema', () => {
     });
 
     it('can properly instantiate', async () => {
-        const apiName = 'spaces_reader_api:spaces_reader-0';
+        const apiName = 'spaces_reader_api';
         const config = {
             index: 'test_index',
             date_field_name: 'created',
@@ -75,75 +68,13 @@ describe('spaces-reader schema', () => {
         const apiManager = test.getAPI(apiName);
 
         if (op == null) throw new Error('Could not find spaces_reader');
-        if (apiManager == null) throw new Error('Could not find spaces_reader_api:spaces_reader-0');
+        if (apiManager == null) throw new Error('Could not find spaces_reader_api');
 
         const apiConfig = apiManager.getConfig(apiName);
         const { _api_name } = op.opConfig;
 
         expect(_api_name).toEqual(apiName);
         expect(apiConfig).toMatchObject(config);
-    });
-
-    it('will not throw if parameters are in api', async () => {
-        const apiConfig = {
-            index: 'test_index',
-            date_field_name: 'created',
-            endpoint: '127.0.0.1',
-            token: 'someToken'
-        };
-
-        await expect(makeTest({ _api_name: 'spaces_reader_api' }, apiConfig)).toResolve();
-    });
-
-    it('should throw if api is created but opConfig has index set to another value', async () => {
-        const job = newTestJobConfig({
-            apis: [
-                { _name: DEFAULT_API_NAME, index }
-            ],
-            operations: [
-                { _op: name, index: 'something_else', _api_name: DEFAULT_API_NAME },
-                { _op: 'noop' }
-            ]
-        });
-
-        await expect(async () => {
-            const test = new WorkerTestHarness(job, { clients });
-            await test.initialize();
-        }).rejects.toThrow();
-    });
-
-    it('should not throw if base api is created but opConfig has index set to another value', async () => {
-        const job = newTestJobConfig({
-            apis: [
-                {
-                    _name: 'spaces_reader_api',
-                    index: 'test_index',
-                    date_field_name: 'created',
-                    endpoint: '127.0.0.1',
-                    token: 'someToken'
-                }
-            ],
-            operations: [
-                {
-                    _op: name,
-                    index,
-                    date_field_name: 'created',
-                    endpoint: '127.0.0.1',
-                    token: 'someToken'
-                },
-                { _op: 'noop' }
-            ]
-        });
-
-        harness = new WorkerTestHarness(job, { clients });
-
-        await harness.initialize();
-
-        const apiConfig = harness.executionContext.config.apis.find(
-            (api: APIConfig) => api._name === 'spaces_reader_api:spaces_reader-0'
-        );
-
-        expect(apiConfig).toMatchObject({ index });
     });
 
     it('should not throw if all connection config is on api', async () => {

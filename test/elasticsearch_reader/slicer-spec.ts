@@ -101,7 +101,7 @@ describe('elasticsearch_reader slicer', () => {
     }
 
     interface SlicerTestArgs {
-        opConfig: Record<string, any> | undefined;
+        config: Record<string, any> | undefined;
         numOfSlicers?: number;
         recoveryData?: SlicerRecoveryData[];
         eventHook?: EventHook;
@@ -109,7 +109,7 @@ describe('elasticsearch_reader slicer', () => {
     }
 
     const defaults = {
-        _op: 'elasticsearch_reader',
+        _name: 'elasticsearch_reader_api',
         time_resolution: 'ms',
         date_field_name: 'created',
         size: 50,
@@ -117,23 +117,22 @@ describe('elasticsearch_reader slicer', () => {
     };
 
     async function makeSlicerTest({
-        opConfig = {},
+        config = {},
         numOfSlicers = 1,
         recoveryData,
         eventHook,
         lifecycle = 'once'
     }: SlicerTestArgs) {
-        const config = Object.assign({}, defaults, opConfig);
+        const apiConfig = Object.assign({}, defaults, config);
 
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
             lifecycle,
+            apis: [apiConfig],
             operations: [
-                config,
-                {
-                    _op: 'noop'
-                }
+                { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
+                { _op: 'noop' }
             ],
         });
 
@@ -146,35 +145,35 @@ describe('elasticsearch_reader slicer', () => {
     }
 
     it('can create a slicer', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 50,
         };
 
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const slicer = test.slicer();
 
         expect(slicer.slicers()).toEqual(1);
     });
 
     it('can create multiple slicers', async () => {
-        const opConfig = {};
+        const config = {};
         const numOfSlicers = 2;
-        const test = await makeSlicerTest({ opConfig, numOfSlicers });
+        const test = await makeSlicerTest({ config, numOfSlicers });
         const slicer = test.slicer();
 
         expect(slicer.slicers()).toEqual(2);
     });
 
     it('slicers will throw if date_field_name does not exist on docs in the index', async () => {
-        const opConfig = { date_field_name: 'date' };
+        const config = { date_field_name: 'date' };
 
-        await expect(makeSlicerTest({ opConfig })).toReject();
+        await expect(makeSlicerTest({ config })).toReject();
     });
 
     describe('when start and end parameters and generate updates for range of job', () => {
         it('can handle no start or end (auto)', async () => {
-            const test = await makeSlicerTest({ opConfig: {} });
+            const test = await makeSlicerTest({ config: {} });
             const update = await getMeta(test);
 
             expect(update).toEqual({
@@ -199,7 +198,7 @@ describe('elasticsearch_reader slicer', () => {
 
         it('can handle only start specified', async () => {
             const start = '2019-04-26T15:00:23.250Z';
-            const test = await makeSlicerTest({ opConfig: { start } });
+            const test = await makeSlicerTest({ config: { start } });
             const update = await getMeta(test);
 
             expect(update).toEqual({
@@ -224,7 +223,7 @@ describe('elasticsearch_reader slicer', () => {
 
         it('can handle only end specified', async () => {
             const end = '2019-04-26T15:00:23.280Z';
-            const test = await makeSlicerTest({ opConfig: { end } });
+            const test = await makeSlicerTest({ config: { end } });
             const update = await getMeta(test);
 
             expect(update).toEqual({
@@ -249,22 +248,22 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer will not error out if query returns no results', async () => {
-        const opConfig = {
+        const config = {
             query: 'some:luceneQueryWithNoResults'
         };
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const results = await test.createSlices();
 
         expect(results).toEqual([null]);
     });
 
     it('slicer can produce date slices', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 'ms',
             size: 200
         };
 
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const getAllSlices = await test.getAllSlices();
 
         const expectedResults = [
@@ -333,7 +332,7 @@ describe('elasticsearch_reader slicer', () => {
         const proximateBeforeDelayedBoundary = moment.utc(proximateBeforeStartTime)
             .subtract(delay[0], delay[1]);
 
-        const opConfig = {
+        const config = {
             size: 100,
             interval: '100ms',
             delay: delay.join(''),
@@ -344,7 +343,7 @@ describe('elasticsearch_reader slicer', () => {
             return moment(val).isBetween(firstDate, secondDate);
         }
 
-        const test = await makeSlicerTest({ opConfig, lifecycle: 'persistent' });
+        const test = await makeSlicerTest({ config, lifecycle: 'persistent' });
 
         const firstSegment = await consume(test);
         const secondSegment = await consume(test);
@@ -385,7 +384,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can reduce date slices down to size', async () => {
-        const opConfig = { size: 50 };
+        const config = { size: 50 };
         let hasRecursed = false;
 
         function hasRecursedEvent() {
@@ -394,7 +393,7 @@ describe('elasticsearch_reader slicer', () => {
 
         const eventHook = { event: 'slicer:slice:recursion', fn: hasRecursedEvent };
         const test = await makeSlicerTest({
-            opConfig,
+            config,
             eventHook
         });
 
@@ -639,7 +638,7 @@ describe('elasticsearch_reader slicer', () => {
     it('slicer can do a simple expansion of date slices up to find data', async () => {
         // stopping before big slice
         const end = '2020-08-12T16:00:00.000Z';
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 100,
             index: unevenIndex,
@@ -656,7 +655,7 @@ describe('elasticsearch_reader slicer', () => {
         const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
 
         const test = await makeSlicerTest({
-            opConfig,
+            config,
             eventHook
         });
 
@@ -790,7 +789,7 @@ describe('elasticsearch_reader slicer', () => {
     it('slicer can do an expansion of date slices up to find data even when none is returned', async () => {
         // stopping at first gap
         const end = '2020-08-12T15:52:48.000Z';
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 100,
             index: unevenIndex,
@@ -807,7 +806,7 @@ describe('elasticsearch_reader slicer', () => {
         const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
 
         const test = await makeSlicerTest({
-            opConfig,
+            config,
             eventHook
         });
 
@@ -907,7 +906,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can do expansion of date slices with large slices', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 50,
             index: unevenIndex,
@@ -920,7 +919,7 @@ describe('elasticsearch_reader slicer', () => {
         }
 
         const eventHook = { event: 'slicer:slice:range_expansion', fn: hasExpandedFn };
-        const test = await makeSlicerTest({ opConfig, eventHook });
+        const test = await makeSlicerTest({ config, eventHook });
 
         const allSlices = await test.getAllSlices();
 
@@ -1085,7 +1084,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can will recurse down to smallest factor using "s" format', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 10,
             index: unevenIndex,
@@ -1102,14 +1101,14 @@ describe('elasticsearch_reader slicer', () => {
             count: 100
         };
 
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const [resultsS] = await test.createSlices();
 
         expect(resultsS).toMatchObject(expectedSlice);
     });
 
     it('slicer can will recurse down to smallest factor using "ms" format', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 'ms',
             size: 10,
             index: unevenIndex,
@@ -1127,14 +1126,14 @@ describe('elasticsearch_reader slicer', () => {
         };
 
         // Need to run them separately so they get a different client
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const [resultsMS] = await test.createSlices();
 
         expect(resultsMS).toMatchObject(expectedSlice);
     });
 
     it('slicer can will recurse down to smallest factor and subslice by key', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 10,
             index: unevenIndex,
@@ -1142,11 +1141,11 @@ describe('elasticsearch_reader slicer', () => {
             subslice_by_key: true,
             subslice_key_threshold: 50,
             key_type: IDType.hexadecimal,
-            field: 'uuid',
+            id_field_name: 'uuid',
             start: '2020-08-12T16:05:00Z'
         };
 
-        const test = await makeSlicerTest({ opConfig });
+        const test = await makeSlicerTest({ config });
         const allSlices = await test.getAllSlices();
 
         const dates = {
@@ -1234,7 +1233,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can enter recovery and return to the last slice state', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 'ms',
             size: 200
         };
@@ -1260,14 +1259,14 @@ describe('elasticsearch_reader slicer', () => {
             }
         ];
 
-        const test = await makeSlicerTest({ opConfig, recoveryData });
+        const test = await makeSlicerTest({ config, recoveryData });
 
         const [results] = await test.createSlices();
         expect(results).toMatchObject(expectedNextSlice);
     });
 
     it('multiple slicers can enter recovery and return to the last slice state', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 'ms',
             size: 200,
             index: unevenIndex
@@ -1298,7 +1297,7 @@ describe('elasticsearch_reader slicer', () => {
 
         const numOfSlicers = 2;
 
-        const test = await makeSlicerTest({ opConfig, numOfSlicers, recoveryData });
+        const test = await makeSlicerTest({ config, numOfSlicers, recoveryData });
 
         const allSlices = await test.getAllSlices();
         const slices = allSlices.filter(Boolean);
@@ -1307,7 +1306,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can enter recovery and return to the last slice state when number of slicers have increased (1 => 2, even increase)', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 'ms',
             size: 200
         };
@@ -1325,7 +1324,7 @@ describe('elasticsearch_reader slicer', () => {
             }
         ];
 
-        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 2 });
+        const test = await makeSlicerTest({ config, recoveryData, numOfSlicers: 2 });
 
         const allSlices = await test.getAllSlices();
 
@@ -1337,7 +1336,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can enter recovery and return to the last slice state when number of slicers have increased (3 => 5, odd increase)', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 100,
             index: unevenIndex,
@@ -1377,7 +1376,7 @@ describe('elasticsearch_reader slicer', () => {
             }
         ];
 
-        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 5 });
+        const test = await makeSlicerTest({ config, recoveryData, numOfSlicers: 5 });
 
         const allSlices = await test.getAllSlices({ fullResponse: true });
 
@@ -1399,7 +1398,7 @@ describe('elasticsearch_reader slicer', () => {
     });
 
     it('slicer can enter recovery and return to the last slice state when number of slicers have decreased (2 => 1, even increase)', async () => {
-        const opConfig = {
+        const config = {
             time_resolution: 's',
             size: 100,
             index: unevenIndex,
@@ -1429,7 +1428,7 @@ describe('elasticsearch_reader slicer', () => {
             }
         ];
 
-        const test = await makeSlicerTest({ opConfig, recoveryData, numOfSlicers: 1 });
+        const test = await makeSlicerTest({ config, recoveryData, numOfSlicers: 1 });
 
         const allSlices = await test.getAllSlices({ fullResponse: true });
         const [

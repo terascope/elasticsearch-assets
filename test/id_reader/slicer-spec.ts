@@ -52,22 +52,23 @@ describe('id_reader slicer', () => {
     });
 
     const defaults = {
-        _op: 'id_reader',
-        field,
+        _name: 'elasticsearch_reader_api',
+        id_field_name: field,
         index: apiReaderIndex,
     };
 
     async function makeSlicerTest(
-        opConfig: Record<string, any> = {},
+        config: Record<string, any> = {},
         numOfSlicers = 1,
         recoveryData: SlicerRecoveryData[] | undefined = undefined
     ) {
-        const config = Object.assign({}, defaults, opConfig);
+        const apiConfig = Object.assign({}, defaults, config);
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
+            apis: [apiConfig],
             operations: [
-                config,
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 {
                     _op: 'noop'
                 }

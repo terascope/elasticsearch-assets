@@ -86,61 +86,6 @@ describe('date_reader job', () => {
         expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
     });
 
-    it('can fetch all even-data with job in short form', async () => {
-        const job = newTestJobConfig({
-            slicers: 1,
-            max_retries: 0,
-            apis: [],
-            operations: [
-                {
-                    _op: 'elasticsearch_reader',
-                    index: evenIndex,
-                    date_field_name
-                },
-                { _op: 'noop' }
-            ],
-        });
-
-        harness = new JobTestHarness(job, { clients });
-
-        await harness.initialize();
-
-        const sliceResults = await harness.runToCompletion();
-
-        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-    });
-
-    it('can fetch all even-data with job in long form but it makes its own api', async () => {
-        const apiConfig = {
-            _name: 'elasticsearch_reader_api',
-            index: 'something_else',
-        };
-
-        // KEY DIFFERENCE IS LACK OF _api_name,
-        // it will make 'elasticsearch_reader_api:elasticsearch_reader-0'
-        const job = newTestJobConfig({
-            slicers: 1,
-            max_retries: 0,
-            apis: [apiConfig],
-            operations: [
-                {
-                    _op: 'elasticsearch_reader',
-                    index: evenIndex,
-                    date_field_name
-                },
-                { _op: 'noop' }
-            ],
-        });
-
-        harness = new JobTestHarness(job, { clients });
-
-        await harness.initialize();
-
-        const sliceResults = await harness.runToCompletion();
-
-        expect(getTotalSliceCounts(sliceResults)).toEqual(1000);
-    });
-
     it('can read indicies with a "*"', async () => {
         const job = newTestJobConfig({
             name: 'test_job',

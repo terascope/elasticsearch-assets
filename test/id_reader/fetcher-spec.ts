@@ -63,18 +63,19 @@ describe('id_reader fetcher', () => {
         if (harness) await harness.shutdown();
     });
 
-    async function makeTest(opConfig?: any, numOfSlicers = 1) {
-        const idReader = Object.assign(
-            { _op: 'id_reader' },
-            opConfig,
-            { id_field_name }
+    async function makeTest(config?: any, numOfSlicers = 1) {
+        const apiConfig = Object.assign(
+            {},
+            { _name: 'elasticsearch_reader_api', id_field_name },
+            config,
         );
 
         const job = newTestJobConfig({
             slicers: numOfSlicers,
             max_retries: 0,
+            apis: [apiConfig],
             operations: [
-                idReader,
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ],
         });
