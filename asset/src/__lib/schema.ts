@@ -1,10 +1,10 @@
-import { isString } from '@terascope/job-components';
+import { isString } from '@terascope/core-utils';
 
 export const opSchema = {
-    api_name: {
+    _api_name: {
         doc: 'name of api to be used by spaces reader',
         default: null,
-        format: 'optional_String'
+        format: 'optional_string'
     }
 };
 

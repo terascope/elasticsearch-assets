@@ -1,9 +1,7 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import {
-    debugLogger, OpConfig, TestClientConfig,
-    APIConfig
-} from '@terascope/job-components';
+import { OpConfig, TestClientConfig, APIConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
@@ -26,8 +24,8 @@ describe('Elasticsearch Bulk Schema', () => {
     let harness: WorkerTestHarness;
 
     async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchBulkConfig> {
-        const opConfig = Object.assign({}, { _op: name, index }, config);
-        harness = WorkerTestHarness.testProcessor(opConfig, { clients });
+        const opConfig = Object.assign({}, { _op: name, _api_name: 'elasticsearch_sender_api' }, config);
+        harness = WorkerTestHarness.testSender(opConfig, { _name: 'elasticsearch_sender_api', index, _connection: 'default' }, { clients });
 
         await harness.initialize();
 
@@ -46,23 +44,9 @@ describe('Elasticsearch Bulk Schema', () => {
 
     describe('when validating the schema', () => {
         it('should have defaults', async () => {
-            const { api_name } = await makeSchema({ index });
+            const { _api_name } = await makeSchema({});
 
-            expect(api_name).toEqual(DEFAULT_API_NAME);
-        });
-
-        it('should throw if index is incorrect', async () => {
-            await expect(makeSchema({ index: 4 })).toReject();
-            await expect(makeSchema({ index: '' })).toReject();
-            await expect(makeSchema({ index: 'Hello' })).toReject();
-            await expect(makeSchema({ index: 'hello' })).toResolve();
-        });
-
-        it('should values are incorrect', async () => {
-            await expect(makeSchema({ size: -4 })).toReject();
-            await expect(makeSchema({ update_retry_on_conflict: -3 })).toReject();
-            await expect(makeSchema({ delete: { some: 'stuff' } })).toReject();
-            await expect(makeSchema({ api_name: [1, 2, 3] })).toReject();
+            expect(_api_name).toEqual(DEFAULT_API_NAME);
         });
 
         it('should not throw if api is created but opConfig has index set', async () => {
@@ -88,7 +72,7 @@ describe('Elasticsearch Bulk Schema', () => {
                 ],
                 operations: [
                     { _op: 'test-reader' },
-                    { _op: name, api_name: DEFAULT_API_NAME }
+                    { _op: name, _api_name: DEFAULT_API_NAME }
                 ]
             });
 

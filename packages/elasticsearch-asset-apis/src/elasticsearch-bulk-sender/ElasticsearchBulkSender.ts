@@ -1,21 +1,19 @@
 import {
-    RouteSenderAPI, DataEntity, isString,
-    set, pMap
-} from '@terascope/utils';
-import elasticAPI from '@terascope/elasticsearch-api';
+    DataEntity, isString, set, pMap
+} from '@terascope/core-utils';
+import type { RouteSenderAPI } from '@terascope/job-components';
+import { Client, BulkRecord, BulkActionMetadata } from '@terascope/elasticsearch-api';
 import {
     ElasticsearchSenderConfig, UpdateConfig
 } from './interfaces.js';
 
 export class ElasticsearchBulkSender implements RouteSenderAPI {
-    client: elasticAPI.Client;
+    client: Client;
     config: ElasticsearchSenderConfig;
-    isElasticsearch6: boolean;
     private isRouter = false;
 
-    constructor(client: elasticAPI.Client, config: ElasticsearchSenderConfig) {
+    constructor(client: Client, config: ElasticsearchSenderConfig) {
         this.client = client;
-        this.isElasticsearch6 = client.isElasticsearch6();
         this.config = config;
         // _key is the char from router
         if (config._key && isString(config._key)) this.isRouter = true;
@@ -48,15 +46,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return index;
     }
 
-    private getType(): string {
-        if (this.isElasticsearch6 && this.config.type) {
-            return this.config.type;
-        }
-
-        return '_doc';
-    }
-
-    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<elasticAPI.BulkRecord> {
+    * createBulkMetadata(input: Iterable<DataEntity>): Iterable<BulkRecord> {
         for (const record of input) {
             yield this.createEsActionMeta(record);
 
@@ -72,7 +62,7 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         }
     }
 
-    private createEsActionMeta(record: DataEntity): elasticAPI.BulkRecord {
+    private createEsActionMeta(record: DataEntity): BulkRecord {
         const meta = this.buildMetadata(record);
 
         if (this.config.update || this.config.upsert) {
@@ -90,10 +80,9 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return { action: { index: meta }, data: record };
     }
 
-    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<elasticAPI.BulkActionMetadata> {
-        const meta: Partial<elasticAPI.BulkActionMetadata> = {
+    buildMetadata(record: DataEntity, metaKey = '_key'): Partial<BulkActionMetadata> {
+        const meta: Partial<BulkActionMetadata> = {
             _index: this.createRoute(record),
-            _type: this.getType()
         };
 
         if (this.config.update_retry_on_conflict && this.config.update_retry_on_conflict > 0) {
@@ -108,9 +97,9 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
     }
 
     update(
-        meta: Partial<elasticAPI.BulkActionMetadata>,
+        meta: Partial<BulkActionMetadata>,
         record: DataEntity
-    ): elasticAPI.BulkRecord {
+    ): BulkRecord {
         const data = this.addUpdateMethod(record);
 
         if (this.config.upsert) {
@@ -161,9 +150,9 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
         return data;
     }
 
-    * chunkRequests(dataArray: Iterable<elasticAPI.BulkRecord>): Iterable<elasticAPI.BulkRecord[]> {
+    * chunkRequests(dataArray: Iterable<BulkRecord>): Iterable<BulkRecord[]> {
         let i = 0;
-        let bulkChunk: elasticAPI.BulkRecord[] = [];
+        let bulkChunk: BulkRecord[] = [];
 
         for (const item of dataArray) {
             bulkChunk.push(item);

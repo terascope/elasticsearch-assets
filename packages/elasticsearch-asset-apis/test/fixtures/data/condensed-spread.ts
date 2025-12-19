@@ -1,4 +1,4 @@
-import { times } from '@terascope/utils';
+import { times } from '@terascope/core-utils';
 import { DataType } from '@terascope/data-types';
 
 const baseDate = new Date('2019-04-26T08:00:23.207-07:00').valueOf();

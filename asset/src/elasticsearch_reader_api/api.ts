@@ -1,8 +1,8 @@
 import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject,
-    getTypeOf, AnyObject
-} from '@terascope/utils';
+    getTypeOf
+} from '@terascope/core-utils';
 import {
     ESReaderOptions, createElasticsearchReaderAPI,
     ElasticsearchReaderAPI, ElasticsearchAPIArgs, ElasticsearchReaderClient
@@ -19,7 +19,7 @@ export default class ElasticsearchReaderAPIFactory extends APIFactory<
         if (!isObject(config)) {
             throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         }
-        if (isNil(config.connection) || !isString(config.connection)) {
+        if (isNil(config._connection) || !isString(config._connection)) {
             throw new Error('Invalid parameter "connection", must provide a valid connection');
         }
         if (isNil(config.index) || !isString(config.index)) {
@@ -30,11 +30,11 @@ export default class ElasticsearchReaderAPIFactory extends APIFactory<
 
     async create(
         _name: string, overrideConfigs: Partial<ESReaderOptions>
-    ): Promise<{ client: ElasticsearchReaderAPI; config: AnyObject }> {
+    ): Promise<{ client: ElasticsearchReaderAPI; config: Record<string, any> }> {
         const config = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfigs));
-        const { connection } = config;
+        const { _connection } = config;
         const { client: esClient } = await this.context.apis.foundation.createClient({
-            endpoint: connection,
+            endpoint: _connection,
             type: 'elasticsearch-next',
             cached: true
         });
@@ -43,7 +43,7 @@ export default class ElasticsearchReaderAPIFactory extends APIFactory<
         const clientConfig: ElasticsearchAPIArgs = {
             config,
             client: new ElasticsearchReaderClient(esClient, {
-                connection,
+                connection: _connection,
                 index: config.index,
             }, this.logger),
             emitter,
@@ -58,6 +58,6 @@ export default class ElasticsearchReaderAPIFactory extends APIFactory<
     async remove(_index: string): Promise<void> {}
 }
 
-function isObject(input: unknown): input is AnyObject {
+function isObject(input: unknown): input is Record<string, any> {
     return isPlainObject(input);
 }

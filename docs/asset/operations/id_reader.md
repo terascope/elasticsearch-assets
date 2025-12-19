@@ -266,19 +266,19 @@ This will create 4 slicers that will divide up the the chars that it will search
 
 ## Parameters
 
-| Configuration | Description | Type |  Notes |
-| --------- | -------- | ------ | ------ |
-| \_op | Name of operation, it must reflect the exact name of the file | String | required |
-| index | Which index to read from | String | required |
-| size | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000 |
-| key_type | Used to specify the key type of the \_ids of the documents being queried | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal`|
-| key_range | if provided, slicer will only recurse on these given keys | Array | optional |
-| starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting | Number | optional |
-| fields | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned | Array | optional |
-| query | specify any valid lucene query for elasticsearch to use in filtering| String | optional |
-| api_name | name of api to be used by id reader | String | optional, defaults to 'elasticsearch_reader_api' |
-| connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch|
-| id_field_name | The field on which we are searching against | String | required |
+| Configuration      | Description                                                                                                                                                                          | Type   | Notes                                                                                                           |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------- |
+| \_op               | Name of operation, it must reflect the exact name of the file                                                                                                                        | String | required                                                                                                        |
+| index              | Which index to read from                                                                                                                                                             | String | required                                                                                                        |
+| size               | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000                                                                                      |
+| key_type           | Used to specify the key type of the \_ids of the documents being queried                                                                                                             | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal` |
+| key_range          | if provided, slicer will only recurse on these given keys                                                                                                                            | Array  | optional                                                                                                        |
+| starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting                                                                                            | Number | optional                                                                                                        |
+| fields             | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned                                                                       | Array  | optional                                                                                                        |
+| query              | specify any valid lucene query for elasticsearch to use in filtering                                                                                                                 | String | optional                                                                                                        |
+| _api_name          | name of api to be used by id reader                                                                                                                                                  | String | optional, defaults to 'elasticsearch_reader_api'                                                                |
+| connection         | Name of the elasticsearch connection to use when sending data                                                                                                                        | String | optional, defaults to the 'default' connection created for elasticsearch                                        |
+| id_field_name      | The field on which we are searching against                                                                                                                                          | String | required                                                                                                        |
 
 ## Advanced Configuration
 

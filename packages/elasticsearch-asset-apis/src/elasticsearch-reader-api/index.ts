@@ -1,4 +1,4 @@
-import { debugLogger, Logger } from '@terascope/utils';
+import { debugLogger, Logger } from '@terascope/core-utils';
 import { EventEmitter } from 'node:events';
 import { ElasticsearchReaderAPI } from './ElasticsearchReaderAPI.js';
 import {

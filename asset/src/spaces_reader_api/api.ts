@@ -1,8 +1,8 @@
 import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject,
-    getTypeOf, AnyObject, isNumber
-} from '@terascope/utils';
+    getTypeOf, isNumber
+} from '@terascope/core-utils';
 import { createSpacesReaderAPI, SpacesAPIConfig, ElasticsearchReaderAPI } from '@terascope/elasticsearch-asset-apis';
 
 export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, SpacesAPIConfig> {
@@ -14,7 +14,7 @@ export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, 
         if (!isObject(config)) {
             throw new Error(`Invalid config, must be an object, was given ${getTypeOf(config)}`);
         }
-        if (isNil(config.connection) || !isString(config.connection)) {
+        if (isNil(config._connection) || !isString(config._connection)) {
             throw new Error('Invalid parameter "connection", must provide a valid connection');
         }
         if (isNil(config.index) || !isString(config.index)) {
@@ -45,6 +45,6 @@ export default class SpacesReaderAPI extends APIFactory<ElasticsearchReaderAPI, 
     async remove(_index: string): Promise<void> {}
 }
 
-function isObject(input: unknown): input is AnyObject {
+function isObject(input: unknown): input is Record<string, any> {
     return isPlainObject(input);
 }

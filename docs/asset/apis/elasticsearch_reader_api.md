@@ -48,7 +48,7 @@ Custom fetcher code
 export default class SomeReader extends Fetcher {
     async initialize() {
         await super.initialize();
-        const apiManager = this.getAPI(this.opConfig.api_name;);
+        const apiManager = this.getAPI(this.opConfig._api_name;);
         this.api = await apiManager.create(apiName, {});
     }
 
@@ -99,7 +99,7 @@ Removes an instance of a reader api from the cache and will follow any cleanup s
 
 ### entries
 
-Returns a Map of objects, `{ api_name: api_instance }`, of the cached names and api instances.
+Returns a Map of objects, `{ _api_name: api_instance }`, of the cached names and api instances.
 
 ### keys
 
@@ -118,7 +118,7 @@ const apiConfig = {
   index: "test_index",
   id_field_name: "uuid",
   size: 1000,
-  connection: "default"
+   _connection: "default"
 };
 
 const apiManager = this.getAPI(apiName);
@@ -133,7 +133,7 @@ apiManager.size() === 1
 apiManager.get('normalClient') === normalClient
 
 // this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
-const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other" })
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index',  _connection: "other" })
 
 apiManager.size() === 2
 
@@ -143,7 +143,7 @@ apiManger.getConfig('overrideClient') === {
   index: "other_index",
   id_field_name: "uuid",
   size: 1000,
-  connection: "other"
+   _connection: "other"
 }
 
 // iterate through all the cached api names
@@ -562,7 +562,7 @@ const { BatchProcessor } = require('@terascope/job-components');
 
 class CustomAPIReaderOp extends BatchProcessor {
     async initialize() {
-        this.apiManager = this.getAPI(this.opConfig.api_name);
+        this.apiManager = this.getAPI(this.opConfig._api_name);
         this.api = await this.apiManager.create('customClient', {});
 
         // _searchRequest needs an index as part of the elasticsearch object query
@@ -636,7 +636,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

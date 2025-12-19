@@ -1,10 +1,8 @@
 import 'jest-extended';
-import { DataEntity, TestClientConfig, debugLogger } from '@terascope/job-components';
+import { TestClientConfig } from '@terascope/job-components';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
-import {
-    ElasticsearchTestHelpers, isOpensearch2, isElasticsearch8,
-    isOpensearch3
-} from '@terascope/opensearch-client';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX, makeClient, cleanupIndex,
     populateIndex, addToIndex
@@ -20,7 +18,6 @@ describe('elasticsearch_reader fetcher', () => {
     }
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const evenIndex = makeIndex('even_index');
-    const docType = '_doc';
 
     const evenBulkData = evenSpread.data;
 
@@ -28,14 +25,9 @@ describe('elasticsearch_reader fetcher', () => {
     let jobHarness: JobTestHarness;
     let esClient: any;
     let clients: TestClientConfig[];
-    let hasTypedDoc = true;
 
     beforeAll(async () => {
         esClient = await makeClient();
-
-        if (isOpensearch2(esClient) || isOpensearch3(esClient) || isElasticsearch8(esClient)) {
-            hasTypedDoc = false;
-        }
 
         clients = [
             {
@@ -50,7 +42,7 @@ describe('elasticsearch_reader fetcher', () => {
         ];
 
         await cleanupIndex(esClient, makeIndex('*'));
-        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, evenBulkData, docType);
+        await populateIndex(esClient, evenIndex, evenSpread.EvenDataType, evenBulkData);
     });
 
     afterAll(async () => {
@@ -67,16 +59,20 @@ describe('elasticsearch_reader fetcher', () => {
     });
 
     const defaults = {
-        _op: 'elasticsearch_reader',
+        _name: 'elasticsearch_reader_api',
         date_field_name: 'created',
         index: evenIndex,
         time_resolution: 'ms',
-        type: docType
     };
 
     async function makeFetcherTest(config: Record<string, any> = {}) {
-        const opConfig = Object.assign({}, defaults, config);
-        workerHarness = WorkerTestHarness.testFetcher(opConfig, { clients });
+        const apiConfig = Object.assign({}, defaults, config);
+
+        workerHarness = WorkerTestHarness.testFetcher(
+            { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
+            apiConfig,
+            { clients }
+        );
 
         await workerHarness.initialize();
 
@@ -84,10 +80,11 @@ describe('elasticsearch_reader fetcher', () => {
     }
 
     async function makeJobTest(config: Record<string, any> = {}) {
-        const opConfig = Object.assign({}, defaults, config);
+        const apiConfig = Object.assign({}, defaults, config);
         const job = newTestJobConfig({
+            apis: [apiConfig],
             operations: [
-                opConfig,
+                { _op: 'elasticsearch_reader', _api_name: 'elasticsearch_reader_api' },
                 { _op: 'noop' }
             ]
         });
@@ -132,11 +129,7 @@ describe('elasticsearch_reader fetcher', () => {
         expect(doc.getKey()).toBeString();
         expect(metaData._index).toEqual(evenIndex);
 
-        if (hasTypedDoc) {
-            expect(metaData._type).toEqual(docType);
-        } else {
-            expect(metaData._type).toBeUndefined();
-        }
+        expect(metaData._type).toBeUndefined();
     });
 
     describe('when more records are added to the slice range after slice creation', () => {
@@ -148,9 +141,9 @@ describe('elasticsearch_reader fetcher', () => {
         beforeAll(async () => {
             await cleanupIndex(esClient, evenIndexName1);
             await populateIndex(
-                esClient, evenIndexName1, evenSpread.EvenDataType, evenBulkData, docType
+                esClient, evenIndexName1, evenSpread.EvenDataType, evenBulkData
             );
-            await addToIndex(esClient, evenIndexName1, evenSpreadExtra1BulkData, docType);
+            await addToIndex(esClient, evenIndexName1, evenSpreadExtra1BulkData);
         });
 
         afterAll(async () => {
@@ -187,16 +180,16 @@ describe('elasticsearch_reader fetcher', () => {
         beforeAll(async () => {
             await cleanupIndex(esClient, evenIndexName2);
             await populateIndex(
-                esClient, evenIndexName2, evenSpread.EvenDataType, evenBulkData, docType
+                esClient, evenIndexName2, evenSpread.EvenDataType, evenBulkData
             );
             // add a bunch more records to make sure to trigger the retry failure
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData(), docType);
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
         });
 
         afterAll(async () => {

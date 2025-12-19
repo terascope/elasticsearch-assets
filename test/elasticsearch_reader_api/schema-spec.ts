@@ -1,12 +1,12 @@
 import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { TestClientConfig, APIConfig, debugLogger } from '@terascope/job-components';
+import { TestClientConfig, APIConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchReaderAPIConfig, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
 describe('elasticsearch reader api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_reader_api_schema_`;
-    const docType = '_doc';
     const logger = debugLogger('test-logger');
 
     const apiName = DEFAULT_API_NAME;
@@ -35,7 +35,6 @@ describe('elasticsearch reader api schema', () => {
     ): Promise<ElasticsearchReaderAPIConfig> {
         const defaults = {
             _name: apiName,
-            type: docType,
             index: apiSenderIndex,
         };
         const apiConfig = Object.assign({}, defaults, config);
@@ -49,7 +48,7 @@ describe('elasticsearch reader api schema', () => {
                 },
                 {
                     _op: 'noop',
-                    apiName: 'elasticsearch_sender_api'
+                    apiName: apiName
                 }
             ],
         });
@@ -71,21 +70,21 @@ describe('elasticsearch reader api schema', () => {
     });
 
     it('should have defaults', async () => {
-        const { connection } = await makeSchema({ index: apiSenderIndex });
+        const { _connection } = await makeSchema({ index: apiSenderIndex });
 
-        expect(connection).toEqual('default');
+        expect(_connection).toEqual('default');
     });
 
     it('should values are incorrect', async () => {
-        await expect(makeSchema({ connection: -4 })).toReject();
+        await expect(makeSchema({ _connection: -4 })).toReject();
         await expect(makeSchema({ index: -3 })).toReject();
         await expect(makeSchema({ index: undefined })).toReject();
     });
 
     it('subslice_by_key configuration validation', async () => {
-        const badOP = { subslice_by_key: true, type: undefined };
-        const goodOP = { subslice_by_key: true, field: 'events-', type: docType };
-        const otherGoodOP = { subslice_by_key: false, other: 'events-' };
+        const badOP = { subslice_by_key: true };
+        const goodOP = { subslice_by_key: true, id_field_name: 'events-' };
+        const otherGoodOP = { subslice_by_key: false, id_field_name: 'events-' };
         // NOTE: geo self validations are tested in elasticsearch_api module
 
         const testOpConfig = {
@@ -105,6 +104,6 @@ describe('elasticsearch reader api schema', () => {
 
     it('should throw if in subslice_by_key is set but type is not in elasticsearch <= v5', async () => {
         await expect(makeSchema({ subslice_by_key: true })).toReject();
-        await expect(makeSchema({ subslice_by_key: true, field: 'hello' })).toResolve();
+        await expect(makeSchema({ subslice_by_key: true, id_field_name: 'hello' })).toResolve();
     });
 });

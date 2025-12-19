@@ -1,7 +1,7 @@
 import {
     cloneDeep, isNumber, TSError,
     isString
-} from '@terascope/utils';
+} from '@terascope/core-utils';
 import moment from 'moment';
 import { inspect } from 'node:util';
 import { idSlicer } from './idSlicer.js';

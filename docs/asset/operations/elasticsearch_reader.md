@@ -400,7 +400,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type: "_doc",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

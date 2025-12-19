@@ -2,9 +2,8 @@ import 'jest-extended';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import {
-    APIConfig, Context, debugLogger, TestClientConfig
-} from '@terascope/job-components';
+import { APIConfig, Context, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
@@ -13,7 +12,6 @@ const dirname = path.dirname(fileURLToPath(import.meta.url));
 
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;
-    const docType = '_doc';
     const logger = debugLogger('test-logger');
 
     let harness: WorkerTestHarness;
@@ -40,7 +38,6 @@ describe('elasticsearch sender api schema', () => {
     async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchSenderAPI> {
         const defaults = {
             _name: apiName,
-            type: docType,
             index: apiSenderIndex,
         };
 
@@ -79,14 +76,12 @@ describe('elasticsearch sender api schema', () => {
     it('should have defaults', async () => {
         const {
             size,
-            type,
             create,
             upsert,
             update_fields
         } = await makeSchema({ index: apiSenderIndex });
 
         expect(size).toEqual(500);
-        expect(type).toEqual(docType);
         expect(create).toEqual(false);
         expect(upsert).toEqual(false);
         expect(update_fields).toBeArrayOfSize(0);
@@ -152,7 +147,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'routed_sender',
-                    api_name: 'elasticsearch_sender_api',
+                    _api_name: 'elasticsearch_sender_api',
                     routing: {
                         '**': 'test-es'
                     }
@@ -183,7 +178,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    connection: 'default',
+                    _connection: 'default',
                     index: 'test-index',
                 }
             ],
@@ -194,7 +189,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'routed_sender',
-                    api_name: 'elasticsearch_sender_api',
+                    _api_name: 'elasticsearch_sender_api',
                     routing: {
                         '**': 'test-es'
                     }
@@ -213,17 +208,17 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    connection: 'test-es1',
+                    _connection: 'test-es1',
                     index: 'test-index',
                 },
                 {
                     _name: 'elasticsearch_sender_api:routed1',
-                    connection: 'default',
+                    _connection: 'default',
                     index: 'test-index',
                 },
                 {
                     _name: 'elasticsearch_sender_api:routed2',
-                    connection: 'default',
+                    _connection: 'default',
                     index: 'test-index',
                 }
             ],
@@ -234,7 +229,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'routed_sender',
-                    api_name: 'elasticsearch_sender_api:routed1',
+                    _api_name: 'elasticsearch_sender_api:routed1',
                     routing: {
                         a: 'test-es',
                         b: 'test-es2',
@@ -243,14 +238,14 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'routed_sender',
-                    api_name: 'elasticsearch_sender_api:routed2',
+                    _api_name: 'elasticsearch_sender_api:routed2',
                     routing: {
                         '**': 'test-es'
                     }
                 },
                 {
                     _op: 'noop',
-                    api_name: 'elasticsearch_sender_api'
+                    _api_name: 'elasticsearch_sender_api'
                 }
             ],
         });
@@ -264,7 +259,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
             apis: [
                 {
                     _name: 'elasticsearch_sender_api',
-                    connection: 'test-whatever',
+                    _connection: 'test-whatever',
                     index: 'test-index',
                 }
             ],
@@ -275,7 +270,7 @@ describe('elasticsearch sender api schema for routed sender jobs', () => {
                 },
                 {
                     _op: 'noop',
-                    api_name: 'elasticsearch_sender_api'
+                    _api_name: 'elasticsearch_sender_api'
                 }
             ],
         });

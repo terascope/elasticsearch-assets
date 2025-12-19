@@ -1,5 +1,6 @@
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
-import { SlicerRecoveryData, debugLogger, TestClientConfig } from '@terascope/job-components';
+import { SlicerRecoveryData, TestClientConfig } from '@terascope/job-components';
+import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import {
     TEST_INDEX_PREFIX,
@@ -11,7 +12,6 @@ import {
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;
-    const docType = '_doc';
     const field = 'uuid';
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
     const logger = debugLogger('test-logger');
@@ -26,7 +26,7 @@ describe('id_reader slicer', () => {
     beforeAll(async () => {
         esClient = await makeClient();
         await cleanupIndex(esClient, `${apiReaderIndex}*`);
-        await populateIndex(esClient, apiReaderIndex, evenSpread.EvenDataType, bulkData, docType);
+        await populateIndex(esClient, apiReaderIndex, evenSpread.EvenDataType, bulkData);
         await waitForData(esClient, apiReaderIndex, bulkData.length);
     });
 
@@ -52,23 +52,23 @@ describe('id_reader slicer', () => {
     });
 
     const defaults = {
-        _op: 'id_reader',
-        field,
+        _name: 'elasticsearch_reader_api',
+        id_field_name: field,
         index: apiReaderIndex,
-        type: docType
     };
 
     async function makeSlicerTest(
-        opConfig: Record<string, any> = {},
+        config: Record<string, any> = {},
         numOfSlicers = 1,
         recoveryData: SlicerRecoveryData[] | undefined = undefined
     ) {
-        const config = Object.assign({}, defaults, opConfig);
+        const apiConfig = Object.assign({}, defaults, config);
         const job = newTestJobConfig({
             analytics: true,
             slicers: numOfSlicers,
+            apis: [apiConfig],
             operations: [
-                config,
+                { _op: 'id_reader', _api_name: 'elasticsearch_reader_api' },
                 {
                     _op: 'noop'
                 }

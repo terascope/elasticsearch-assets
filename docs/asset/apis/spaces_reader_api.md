@@ -55,7 +55,7 @@ export default class MyReader extends Fetcher<ESDateConfig> {
 
     async initialize(): Promise<void> {
         await super.initialize();
-        const apiName = this.opConfig.api_name;
+        const apiName = this.opConfig._api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
     }
@@ -126,7 +126,7 @@ const apiConfig = {
   index: "test_index",
   date_field_name: "created",
   size: 1000,
-  connection: "default",
+   _connection: "default",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
   token : "{ YOUR_TOKEN_HERE }",
 };
@@ -144,7 +144,7 @@ apiManager.size() === 1
 apiManager.get('normalClient') === normalClient
 
 // this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
-const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other" })
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index',  _connection: "other" })
 
 apiManager.size() === 2
 
@@ -154,7 +154,7 @@ apiManger.getConfig('overrideClient') === {
   index: "other_index",
   date_field_name: "created",
   size: 1000,
-  connection: "other",
+   _connection: "other",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
   token : "{ YOUR_TOKEN_HERE }",
 }
@@ -237,7 +237,7 @@ api.version === 6
 | Configuration          | Description                                                                                                                                                                          | Type                                          | Notes                                                                                                                                                                      |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | \_name                 | Name of operation, it must reflect the exact name of the file                                                                                                                        | String                                        | required                                                                                                                                                                   |
-| endpoint               | The base API endpoint to read from: i.e.`http://yourdomain.com/api/v2`                                                                                                                 | String                                        | required                                                                                                                                                                   |
+| endpoint               | The base API endpoint to read from: i.e.`http://yourdomain.com/api/v2`                                                                                                               | String                                        | required                                                                                                                                                                   |
 | token                  | teraserver API access token for making requests                                                                                                                                      | String                                        | required                                                                                                                                                                   |
 | timeout                | Time in milliseconds to wait for a connection to timeout                                                                                                                             | Number                                        | optional, defaults to 300000 ms or 5 mins                                                                                                                                  |
 | index                  | Which index to read from                                                                                                                                                             | String                                        | required                                                                                                                                                                   |
@@ -263,7 +263,7 @@ api.version === 6
 | geo_sort_order         | the order used for sorting geo queries, can either be 'asc' or 'desc'                                                                                                                | String                                        | optional, defaults to 'asc'                                                                                                                                                |
 | geo_sort_unit          | the unit of measurement for sorting, may be set to 'mi', 'km', 'm','yd', 'ft                                                                                                         | String                                        | optional, defaults to 'm'                                                                                                                                                  |
 | variables              | can specify an xLuceneVariable object for the given xLucene query                                                                                                                    | Object                                        | optional                                                                                                                                                                   |
-| caCertificate          | CA certificate used to validate an https endpoint | String | optional |
+| caCertificate          | CA certificate used to validate an https endpoint                                                                                                                                    | String                                        | optional                                                                                                                                                                   |
 
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
@@ -316,7 +316,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

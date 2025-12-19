@@ -1,5 +1,5 @@
 import type { DataFrame } from '@terascope/data-mate';
-import type { AnyObject, DataEntity, Logger } from '@terascope/utils';
+import type { DataEntity, Logger } from '@terascope/core-utils';
 import type { EventEmitter } from 'node:events';
 import type {
     DataTypeConfig, xLuceneVariables, ClientParams,
@@ -353,7 +353,7 @@ export interface ESReaderOptions {
     geo_sort_point?: string;
     geo_sort_order?: string;
     geo_sort_unit?: string;
-    connection: string;
+    _connection: string;
     starting_key_depth: number;
     response_type?: FetchResponseType;
     type_config?: DataTypeConfig;
@@ -366,7 +366,7 @@ export interface SpacesAPIConfig extends ESReaderOptions {
     endpoint: string;
     token: string;
     timeout: number;
-    headers?: AnyObject;
+    headers?: Record<string, any>;
     retry?: number;
     variables?: xLuceneVariables;
     caCertificate?: string;

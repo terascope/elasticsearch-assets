@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { EventEmitter } from 'node:events';
-import { debugLogger, DataEntity } from '@terascope/utils';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import {
     TEST_INDEX_PREFIX,
     cleanupIndex,
@@ -28,8 +28,6 @@ describe('ReaderAPI with condensed time data', () => {
     const condensedIndex = makeIndex(condensedData.index);
     const evenBulkData = condensedData.data.map((obj) => DataEntity.make(obj, { _key: obj.bytes }));
 
-    const docType = '_doc';
-
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
     }
@@ -47,7 +45,7 @@ describe('ReaderAPI with condensed time data', () => {
 
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(
-            client, condensedIndex, condensedData.CondensedDataType, evenBulkData, docType
+            client, condensedIndex, condensedData.CondensedDataType, evenBulkData
         );
         await waitForData(client, condensedIndex, evenBulkData.length);
     });
@@ -72,7 +70,7 @@ describe('ReaderAPI with condensed time data', () => {
         subslice_key_threshold: 1000000,
         key_type: IDType.base64url,
         time_resolution: 'ms',
-        connection: 'default',
+        _connection: 'default',
         starting_key_depth: 0
     });
 

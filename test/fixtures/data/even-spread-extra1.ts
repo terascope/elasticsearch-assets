@@ -1,5 +1,5 @@
 import { DataTypeFields, FieldType } from '@terascope/types';
-import { cloneDeep } from '@terascope/utils';
+import { cloneDeep } from '@terascope/core-utils';
 
 // These records are meant to fall within the following range
 // start: '2019-04-26T15:00:23.201Z',

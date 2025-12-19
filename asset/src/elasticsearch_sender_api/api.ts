@@ -1,8 +1,8 @@
 import { APIFactory } from '@terascope/job-components';
 import {
     isNil, isString, isPlainObject,
-    AnyObject, isNumber, getTypeOf
-} from '@terascope/utils';
+    isNumber, getTypeOf
+} from '@terascope/core-utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import {
     createElasticsearchBulkSender,
@@ -23,7 +23,7 @@ export default class ElasticsearchSenderAPI extends APIFactory
         if (!isNumber(config.size)) {
             throw new Error(`Invalid size parameter, expected number, got ${getTypeOf(config.size)}`);
         }
-        if (isNil(config.connection) || !isString(config.connection)) {
+        if (isNil(config._connection) || !isString(config._connection)) {
             throw new Error('Invalid parameter "connection", must provide a valid connection');
         }
         return config as ElasticsearchAPISenderConfig;
@@ -33,10 +33,10 @@ export default class ElasticsearchSenderAPI extends APIFactory
         _name: string, overrideConfig: Partial<ElasticsearchAPISenderConfig>
     ): Promise<{ client: ElasticsearchBulkSender; config: ElasticsearchAPISenderConfig }> {
         const apiConfig = this.validateConfig(Object.assign({}, this.apiConfig, overrideConfig));
-        const { api_name, ...config } = apiConfig;
+        const { _api_name, ...config } = apiConfig;
 
         const { client } = await this.context.apis.foundation.createClient({
-            endpoint: config.connection,
+            endpoint: config._connection,
             type: 'elasticsearch-next',
             cached: true
         });
@@ -50,6 +50,6 @@ export default class ElasticsearchSenderAPI extends APIFactory
     async remove(_index: string): Promise<void> {}
 }
 
-function isObject(input: unknown): input is AnyObject {
+function isObject(input: unknown): input is Record<string, any> {
     return isPlainObject(input);
 }
