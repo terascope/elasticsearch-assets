@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "displayName": "Asset",
-    "version": "4.5.0",
+    "version": "5.0.0-dev.0",
     "private": true,
     "description": "Teraslice asset for elasticsearch operations",
     "license": "MIT",
@@ -21,7 +21,7 @@
         "@terascope/core-utils": "2.0.0-dev.12",
         "@terascope/data-mate": "2.0.0-dev.12",
         "@terascope/elasticsearch-api": "5.0.0-dev.13",
-        "@terascope/elasticsearch-asset-apis": "~1.4.0",
+        "@terascope/elasticsearch-asset-apis": "~2.0.0-dev.0",
         "@terascope/job-components": "2.0.0-dev.13",
         "@terascope/teraslice-state-storage": "2.0.0-dev.13",
         "datemath-parser": "~1.0.6",

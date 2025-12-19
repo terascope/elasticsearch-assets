@@ -1418,7 +1418,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@terascope/elasticsearch-asset-apis@npm:~1.4.0, @terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis":
+"@terascope/elasticsearch-asset-apis@npm:~2.0.0-dev.0, @terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis":
   version: 0.0.0-use.local
   resolution: "@terascope/elasticsearch-asset-apis@workspace:packages/elasticsearch-asset-apis"
   dependencies:
@@ -3878,7 +3878,7 @@ __metadata:
   dependencies:
     "@terascope/data-types": "npm:2.0.0-dev.12"
     "@terascope/elasticsearch-api": "npm:5.0.0-dev.13"
-    "@terascope/elasticsearch-asset-apis": "npm:~1.4.0"
+    "@terascope/elasticsearch-asset-apis": "npm:~2.0.0-dev.0"
     "@terascope/eslint-config": "npm:~1.1.26"
     "@terascope/job-components": "npm:2.0.0-dev.13"
     "@terascope/opensearch-client": "npm:2.0.0-dev.12"
@@ -3911,7 +3911,7 @@ __metadata:
     "@terascope/core-utils": "npm:2.0.0-dev.12"
     "@terascope/data-mate": "npm:2.0.0-dev.12"
     "@terascope/elasticsearch-api": "npm:5.0.0-dev.13"
-    "@terascope/elasticsearch-asset-apis": "npm:~1.4.0"
+    "@terascope/elasticsearch-asset-apis": "npm:~2.0.0-dev.0"
     "@terascope/job-components": "npm:2.0.0-dev.13"
     "@terascope/teraslice-state-storage": "npm:2.0.0-dev.13"
     datemath-parser: "npm:~1.0.6"
