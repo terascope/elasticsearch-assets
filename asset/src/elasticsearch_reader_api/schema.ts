@@ -1,4 +1,4 @@
-import { ConvictSchema, ValidatedJobConfig } from '@terascope/job-components';
+import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import {
     has, isKey, isNumber, getTypeOf,
     toNumber, isNotNil, isString
@@ -248,7 +248,7 @@ export const schema = {
     }
 };
 
-export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> {
+export default class Schema extends BaseSchema<ElasticsearchReaderAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 

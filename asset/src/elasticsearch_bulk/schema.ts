@@ -1,9 +1,9 @@
-import { ConvictSchema } from '@terascope/job-components';
+import { BaseSchema } from '@terascope/job-components';
 import { isString, getTypeOf } from '@terascope/core-utils';
 import { ElasticsearchBulkConfig } from './interfaces.js';
 import { DEFAULT_API_NAME } from '../elasticsearch_sender_api/interfaces.js';
 
-export default class Schema extends ConvictSchema<ElasticsearchBulkConfig> {
+export default class Schema extends BaseSchema<ElasticsearchBulkConfig> {
     build(): Record<string, any> {
         return {
             _api_name: {
