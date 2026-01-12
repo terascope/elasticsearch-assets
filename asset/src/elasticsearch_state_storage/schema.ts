@@ -1,9 +1,9 @@
-import { ConvictSchema } from '@terascope/job-components';
+import { BaseSchema } from '@terascope/job-components';
 import { isNumber, getTypeOf, isString } from '@terascope/core-utils';
 
 import { ESStateStorageConfig } from './interfaces.js';
 
-export default class Schema extends ConvictSchema<ESStateStorageConfig> {
+export default class Schema extends BaseSchema<ESStateStorageConfig> {
     build(): Record<string, any> {
         return {
             index: {

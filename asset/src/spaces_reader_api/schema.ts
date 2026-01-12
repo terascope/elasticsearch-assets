@@ -1,4 +1,4 @@
-import { ConvictSchema, ValidatedJobConfig } from '@terascope/job-components';
+import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import { cloneDeep, isObjectEntity, getTypeOf } from '@terascope/core-utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
@@ -61,7 +61,7 @@ delete spacesSchema._api_name;
 
 spacesSchema.date_field_name.format = 'required_string';
 
-export default class Schema extends ConvictSchema<SpacesAPIConfig> {
+export default class Schema extends BaseSchema<SpacesAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 
