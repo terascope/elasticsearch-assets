@@ -12,25 +12,6 @@ this is a [recoverable](https://terascope.github.io/teraslice/docs/management-ap
 
 ## Usage
 
-Example Teraslice Config
-
-```yaml
-terafoundation:
-    environment: 'development'
-    log_level: info
-    connectors:
-        elasticsearch-next:
-            default:
-                node:
-                    - "http://localhost:9200"
-
-teraslice:
-    workers: 8
-    master: true
-    master_hostname: "127.0.0.1"
-    port: 5678
-    name: "local_tera_cluster"
-```
 
 ### Batch read the entire content of an index with elasticsearch v6 or newer and return filtered fields
 
@@ -45,13 +26,19 @@ Example Job:
   "slicers": 1,
   "workers": 1,
   "assets": ["elasticsearch"],
+  "apis" : [
+      {
+          "_name": "elasticsearch_reader_api",
+          "index": "test_index",
+          "id_field_name": "uuid",
+          "fields": ["ip", "created", "bytes", "uuid"],
+          "_connection": "default"
+      }
+  ],
   "operations": [
     {
       "_op": "id_reader",
-      "index": "test_index",
-      "id_field_name": "uuid",
-      "fields": ["ip", "created", "bytes", "uuid"],
-      "connection": "default"
+      "_api_name": "elasticsearch_reader_api"
     },
     {
       "_op": "noop"
@@ -156,14 +143,20 @@ Example Job:
   "slicers": 1,
   "workers": 1,
   "assets": ["elasticsearch"],
+  "apis" : [
+      {
+          "_name": "elasticsearch_reader_api",
+          "index": "test_index",
+          "id_field_name": "uuid",
+          "key_range": ["a"],
+          "query": "bytes:>= 1000",
+          "_connection": "default"
+      }
+  ],
   "operations": [
     {
       "_op": "id_reader",
-      "index": "test_index",
-      "id_field_name": "uuid",
-      "key_range": ["a"],
-      "query": "bytes:>= 1000",
-      "connection": "default"
+      "_api_name": "elasticsearch_reader_api"
     },
     {
       "_op": "noop"
@@ -248,12 +241,18 @@ This will create 4 slicers that will divide up the the chars that it will search
   "slicers": 4,
   "workers": 25,
   "assets": ["elasticsearch"],
+  "apis" : [
+      {
+          "_name": "elasticsearch_reader_api",
+          "index": "test_index",
+          "id_field_name": "uuid",
+          "_connection": "default"
+      }
+  ],
   "operations": [
     {
       "_op": "id_reader",
-      "index": "test_index",
-      "id_field_name": "uuid",
-      "connection": "default"
+      "_api_name": "elasticsearch_reader_api"
     },
     {
       "_op": "noop"
@@ -266,108 +265,10 @@ This will create 4 slicers that will divide up the the chars that it will search
 
 ## Parameters
 
-| Configuration      | Description                                                                                                                                                                          | Type   | Notes                                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------ | --------------------------------------------------------------------------------------------------------------- |
-| \_op               | Name of operation, it must reflect the exact name of the file                                                                                                                        | String | required                                                                                                        |
-| index              | Which index to read from                                                                                                                                                             | String | required                                                                                                        |
-| size               | The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the slicer exceeds this number, it will cause the slicer to recurse to provide a smaller batch | Number | optional, defaults to 5000                                                                                      |
-| key_type           | Used to specify the key type of the \_ids of the documents being queried                                                                                                             | String | optional, defaults to elasticsearch id generator (base64url) may be set to `base64url`, `base64`, `hexadecimal` |
-| key_range          | if provided, slicer will only recurse on these given keys                                                                                                                            | Array  | optional                                                                                                        |
-| starting_key_depth | if provided, slicer will only produce keys with minimum length determined by this setting                                                                                            | Number | optional                                                                                                        |
-| fields             | Used to restrict what is returned from elasticsearch. If used, only these fields on the documents are returned                                                                       | Array  | optional                                                                                                        |
-| query              | specify any valid lucene query for elasticsearch to use in filtering                                                                                                                 | String | optional                                                                                                        |
-| _api_name          | name of api to be used by id reader                                                                                                                                                  | String | optional, defaults to 'elasticsearch_reader_api'                                                                |
-| connection         | Name of the elasticsearch connection to use when sending data                                                                                                                        | String | optional, defaults to the 'default' connection created for elasticsearch                                        |
-| id_field_name      | The field on which we are searching against                                                                                                                                          | String | required                                                                                                        |
+| Configuration | Description                                                   | Type   | Notes    |
+| ------------- | ------------------------------------------------------------- | ------ | -------- |
+| \_op          | Name of operation, it must reflect the exact name of the file | String | required |
+| _api_name     | name of api to be used by id reader                           | String | required |
+|               |
 
-## Advanced Configuration
-
-### starting_key_depth
-
-This processor works by taking a char from a list of possible chars for a given key_type (base64url) and checking the count of each char to see if its digestible.
-
-If the count is too large it will extend the key_depth to attempt to further divide up the data to digestible chunks.
-
-```sh
-a =>
-aa, ab, ac ...aK, ...a4, a_ =>
-aaa, aab, aac ...aaK
-```
-
-It does this repeatedly until its comes to a digestible chunk.
-
-If the initial key size was to small and its corresponding data count too big, it could potentially hurt your cluster and/or timeout the job since its trying to fetch the size of a really large number of records.
-
-If its in the tens of billions, usually setting it to `5` works.
-
-The higher the key_depth, the longer it take to finish to slice through all the permutations of keys possible, but it will be safer with larger data sets. Please know your data requirements when using this operator.
-
-#### API usage in a job
-
-In elasticsearch_assets v3, many core components were made into teraslice apis. When you use an elasticsearch processor it will automatically setup the api for you, but if you manually specify the api, then there are restrictions on what configurations you can put on the operation so that clashing of configurations are minimized. The api configs take precedence.
-
-If submitting the job in long form, here is a list of parameters that will throw an error if also specified on the opConfig, since these values should be placed on the api:
-
-- `index`
-
-`SHORT FORM (no api specified)`
-
-```json
-{
-    "name" : "testing",
-    "workers" : 1,
-    "slicers" : 1,
-    "lifecycle" : "once",
-    "assets" : [
-        "elasticsearch"
-    ],
-    "operations" : [
-        {
-            "_op": "elasticsearch_reader",
-            "index": "test_index",
-            "id_field_name": "uuid",
-            "size": 1000,
-            "key_type": "base64url",
-            "connection": "default"
-        },
-        {
-            "_op": "noop"
-        }
-    ]
-}
-
-```
-
-this configuration will be expanded out to the long form underneath the hood
-`LONG FORM (api is specified)`
-
-```json
-{
-    "name" : "testing",
-    "workers" : 1,
-    "slicers" : 1,
-    "lifecycle" : "once",
-    "assets" : [
-        "elasticsearch"
-    ],
-    "apis" : [
-        {
-            "_name": "elasticsearch_reader_api",
-            "index": "test_index",
-            "id_field_name": "uuid",
-            "size": 1000,
-            "key_type": "base64url",
-            "connection": "default"
-        }
-    ],
-    "operations" : [
-        {
-            "_op" : "id_reader",
-            "api_name" : "elasticsearch_reader_api"
-        },
-        {
-            "_op": "noop"
-        }
-    ]
-}
-```
+In elasticsearch_assets v5, teraslice apis must be set within the job configuration. Teraslice will no longer automatically setup the api for you. All fields related to the api that were previously allowed on the operation config must be specified in the api config. Configurations for the api should no longer be set on the operation as they will be ignored. The api's `_name` must match the operation's `_api_name`.
