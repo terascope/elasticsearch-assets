@@ -1,7 +1,7 @@
 import {
-    ConvictSchema, isNumber, ValidatedJobConfig,
-    APIConfig, getOpConfig, getTypeOf
+    BaseSchema, ValidatedJobConfig, APIConfig, getOpConfig
 } from '@terascope/job-components';
+import { isNumber, getTypeOf } from '@terascope/core-utils';
 import { ElasticsearchAPISenderConfig, DEFAULT_API_NAME } from './interfaces.js';
 import { isValidIndex } from '../__lib/schema.js';
 
@@ -16,10 +16,10 @@ export const schema: Record<string, any> = {
             if (val <= 0) throw new Error('Invalid size parameter, must be greater than zero');
         }
     },
-    connection: {
+    _connection: {
         doc: 'Name of the elasticsearch connection to use when sending data.',
         default: 'default',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     index: {
         doc: 'Which index to read from',
@@ -27,11 +27,6 @@ export const schema: Record<string, any> = {
         format(val: unknown): void {
             isValidIndex(val);
         }
-    },
-    type: {
-        doc: 'Set the elasticsearch mapping type, required for elasticsearch v5 or lower, accepted in v6, and depreciated in v7 or above',
-        default: '_doc',
-        format: 'optional_String'
     },
     delete: {
         doc: 'Use the id_field from the incoming records to bulk delete documents.',
@@ -71,12 +66,12 @@ export const schema: Record<string, any> = {
     script_file: {
         doc: 'Name of the script file to run as part of an update request.',
         default: '',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     script: {
         doc: 'Inline script to include in each indexing request. Only very simple painless scripts are currently supported.',
         default: '',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     script_params: {
         doc: 'key -> value parameter mappings. The value will be extracted from the incoming data and passed to the script as param based on the key.',
@@ -85,7 +80,7 @@ export const schema: Record<string, any> = {
     }
 };
 
-export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> {
+export default class Schema extends BaseSchema<ElasticsearchAPISenderConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const apiConfigs = job.apis.filter((config) => {
             const apiName = config._name;
@@ -100,11 +95,11 @@ export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> 
         }
 
         apiConfigs.forEach((apiConfig: Record<string, any>) => {
-            const { connection } = apiConfig;
-            const endpointConfig = connectors['elasticsearch-next'][connection];
+            const { _connection } = apiConfig;
+            const endpointConfig = connectors['elasticsearch-next'][_connection];
 
             if (endpointConfig == null) {
-                throw new Error(`Could not find elasticsearch-next endpoint configuration for connection ${connection}`);
+                throw new Error(`Could not find elasticsearch-next endpoint configuration for _connection ${_connection}`);
             }
         });
     }
@@ -115,9 +110,9 @@ export default class Schema extends ConvictSchema<ElasticsearchAPISenderConfig> 
     _applyRoutedSenderConnection(job: ValidatedJobConfig, apiConfigs: APIConfig[]): void {
         job.operations.forEach((op) => {
             if (op._op === 'routed_sender') {
-                apiConfigs.filter((config) => config._name === op.api_name && config.connection === 'default')
+                apiConfigs.filter((config) => config._name === op._api_name && config._connection === 'default')
                     .forEach((config) => {
-                        [config.connection] = Object.values(op.routing);
+                        [config._connection] = Object.values(op.routing);
                     });
             }
         });

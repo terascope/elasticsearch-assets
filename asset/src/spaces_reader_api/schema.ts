@@ -1,7 +1,5 @@
-import {
-    ConvictSchema, AnyObject, cloneDeep,
-    ValidatedJobConfig, isObjectEntity, getTypeOf
-} from '@terascope/job-components';
+import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
+import { cloneDeep, isObjectEntity, getTypeOf } from '@terascope/core-utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import { SpacesAPIConfig } from '@terascope/elasticsearch-asset-apis';
 import { schema } from '../elasticsearch_reader_api/schema.js';
@@ -13,12 +11,12 @@ const apiSchema = {
     endpoint: {
         doc: 'The base API endpoint to read from: i.e. http://yourdomain.com/api/v1',
         default: null,
-        format: 'required_String'
+        format: 'required_string'
     },
     token: {
         doc: 'API access token for making requests',
         default: null,
-        format: 'required_String'
+        format: 'required_string'
     },
     timeout: {
         doc: 'Time in milliseconds to wait for a connection to timeout.',
@@ -56,14 +54,14 @@ const apiSchema = {
     }
 };
 
-const spacesSchema = Object.assign({}, clone, apiSchema) as AnyObject;
+const spacesSchema = Object.assign({}, clone, apiSchema) as Record<string, any>;
 
 // this should not continue onward
-delete spacesSchema.api_name;
+delete spacesSchema._api_name;
 
-spacesSchema.date_field_name.format = 'required_String';
+spacesSchema.date_field_name.format = 'required_string';
 
-export default class Schema extends ConvictSchema<SpacesAPIConfig> {
+export default class Schema extends BaseSchema<SpacesAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 
@@ -72,12 +70,12 @@ export default class Schema extends ConvictSchema<SpacesAPIConfig> {
             return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
         });
 
-        apiConfigs.forEach((apiConfig: AnyObject) => {
-            elasticAPI({}, logger).validateGeoParameters(apiConfig);
+        apiConfigs.forEach((apiConfig: Record<string, any>) => {
+            elasticAPI({} as any, logger).validateGeoParameters(apiConfig);
         });
     }
 
-    build(): AnyObject {
+    build() {
         return spacesSchema;
     }
 }

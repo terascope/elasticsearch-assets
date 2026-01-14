@@ -1,10 +1,8 @@
 import 'jest-extended';
 import nock from 'nock';
 import { SearchParams } from '@terascope/types';
-import {
-    DataEntity, newTestJobConfig, TestClientConfig,
-    debugLogger
-} from '@terascope/job-components';
+import { newTestJobConfig, TestClientConfig } from '@terascope/job-components';
+import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
 import MockClient from '../helpers/mock_client.js';
 
@@ -176,8 +174,8 @@ describe('spaces_reader fetcher', () => {
                 }],
 
         ])('when performing a %s', (m, { query, opConfig: _opConfig, msg }) => {
-            const opConfig = Object.assign({
-                _op: 'spaces_reader',
+            const config = Object.assign({
+                _name: 'spaces_reader_api',
                 index: testIndex,
                 endpoint: baseUri,
                 interval: '30s',
@@ -188,11 +186,10 @@ describe('spaces_reader fetcher', () => {
 
             const harness = new WorkerTestHarness(newTestJobConfig({
                 name: 'simple-api-reader-job',
+                apis: [config],
                 operations: [
-                    opConfig,
-                    {
-                        _op: 'noop'
-                    }
+                    { _op: 'spaces_reader', _api_name: 'spaces_reader_api' },
+                    { _op: 'noop' }
                 ]
             }), { clients });
 
@@ -204,7 +201,7 @@ describe('spaces_reader fetcher', () => {
             let results: DataEntity[];
 
             beforeEach(async () => {
-                scope.get(`/${testIndex}/_info?token=${opConfig.token}`)
+                scope.get(`/${testIndex}/_info?token=${config.token}`)
                     .reply(200, {
                         params: {
                             size: {
@@ -213,7 +210,7 @@ describe('spaces_reader fetcher', () => {
                         }
                     });
 
-                scope.post(`/${testIndex}?token=${opConfig.token}`, query)
+                scope.post(`/${testIndex}?token=${config.token}`, query)
                     .reply(200, {
                         results: [{ some: 'data' }],
                         total: 1
@@ -240,9 +237,9 @@ describe('spaces_reader fetcher', () => {
             const harness = new WorkerTestHarness(newTestJobConfig({
                 name: 'simple-api-reader-job',
                 max_retries: 0,
-                operations: [
+                apis: [
                     {
-                        _op: 'spaces_reader',
+                        _name: 'spaces_reader_api',
                         query,
                         index: testIndex,
                         endpoint: baseUri,
@@ -253,10 +250,11 @@ describe('spaces_reader fetcher', () => {
                         date_field_name: 'date',
                         timeout: 75,
                         retry: 0
-                    },
-                    {
-                        _op: 'noop'
                     }
+                ],
+                operations: [
+                    { _op: 'spaces_reader', _api_name: 'spaces_reader_api' },
+                    { _op: 'noop' }
                 ]
             }), {});
 

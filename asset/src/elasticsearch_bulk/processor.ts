@@ -1,5 +1,5 @@
 import { BatchProcessor, isPromAvailable } from '@terascope/job-components';
-import { DataEntity } from '@terascope/utils';
+import { DataEntity } from '@terascope/core-utils';
 import { ElasticsearchBulkSender } from '@terascope/elasticsearch-asset-apis';
 import { ElasticSenderAPI } from '../elasticsearch_sender_api/interfaces.js';
 import { ElasticsearchBulkConfig } from './interfaces.js';
@@ -11,7 +11,7 @@ export default class ElasticsearchBulk extends BatchProcessor<ElasticsearchBulkC
 
     async initialize(): Promise<void> {
         await super.initialize();
-        const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig.api_name);
+        const apiManager = this.getAPI<ElasticSenderAPI>(this.opConfig._api_name);
         this.client = await apiManager.create('bulkSender', this.opConfig);
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const self = this;

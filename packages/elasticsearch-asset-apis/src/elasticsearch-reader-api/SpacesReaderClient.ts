@@ -1,9 +1,8 @@
 import tls from 'tls';
 import {
     Logger, TSError, get, isNil,
-    AnyObject, withoutNil, DataEntity,
-    isKey,
-} from '@terascope/utils';
+    withoutNil, DataEntity, isKey,
+} from '@terascope/core-utils';
 import { ClientParams, ClientResponse } from '@terascope/types';
 import { DataTypeConfig } from '@terascope/data-types';
 import got, {
@@ -44,7 +43,7 @@ export class SpacesReaderClient implements ReaderClient {
     }
 
     getRequestOptions(
-        query: AnyObject,
+        query: Record<string, any>,
         format?: 'json' | 'dfjson'
     ): OptionsOfJSONResponseBody {
         const {
@@ -81,15 +80,15 @@ export class SpacesReaderClient implements ReaderClient {
     }
 
     protected async makeRequest(
-        query: AnyObject,
+        query: Record<string, any>,
         format?: 'json'
     ): Promise<SearchResult>;
     protected async makeRequest(
-        query: AnyObject,
+        query: Record<string, any>,
         format: 'dfjson'
     ): Promise<Buffer>;
     protected async makeRequest(
-        query: AnyObject,
+        query: Record<string, any>,
         format?: 'json' | 'dfjson'
     ): Promise<SearchResult | Buffer> {
         let response: Response<SearchResult | Buffer>;
@@ -132,7 +131,7 @@ export class SpacesReaderClient implements ReaderClient {
         return response.body;
     }
 
-    protected translateSearchQuery(queryConfig: ClientParams.SearchParams): AnyObject {
+    protected translateSearchQuery(queryConfig: ClientParams.SearchParams): Record<string, any> {
         const { config } = this;
 
         const size = queryConfig?.size ?? config.size;
@@ -148,7 +147,7 @@ export class SpacesReaderClient implements ReaderClient {
         const fieldsQuery = fields ? { fields: fields.join(',') } : {};
         const mustQuery = get(queryConfig, 'body.query.bool.must', null);
 
-        function parseQueryConfig(mustArray: null | any[]): AnyObject {
+        function parseQueryConfig(mustArray: null | any[]): Record<string, any> {
             const queryOptions: Record<string, (op: any) => string> = {
                 query_string: _parseEsQ,
                 range: _parseDate,
@@ -199,7 +198,7 @@ export class SpacesReaderClient implements ReaderClient {
             });
         }
 
-        function _parseGeoQuery(): AnyObject {
+        function _parseGeoQuery(): Record<string, any> {
             const {
                 geo_box_top_left: geoBoxTopLeft,
                 geo_box_bottom_right: geoBoxBottomRight,

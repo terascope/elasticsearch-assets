@@ -14,14 +14,14 @@ export default class ESIDSlicer extends ParallelSlicer<ESIDReaderConfig> {
         // NOTE ORDER MATTERS
         // a parallel slicer initialize calls newSlicer multiple times
         // need to make api before newSlicer is called
-        const apiName = this.opConfig.api_name;
+        const apiName = this.opConfig._api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
 
         this.api = await apiManager.create(apiName, {});
 
         const apiConfig = apiManager.getConfig(apiName);
 
-        if (!apiConfig) throw new Error(`Could not find api config for api_name ${apiName}`);
+        if (!apiConfig) throw new Error(`Could not find api config for _api_name ${apiName}`);
         this.config = apiConfig;
 
         if (!apiConfig.id_field_name) {

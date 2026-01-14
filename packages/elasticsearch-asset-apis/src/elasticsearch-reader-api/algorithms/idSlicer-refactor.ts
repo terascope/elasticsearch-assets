@@ -1,4 +1,4 @@
-import { TSError, isNumber } from '@terascope/utils';
+import { TSError, isNumber } from '@terascope/core-utils';
 import { safeRegexChars } from './id-utils/index.js';
 import {
     IDSlicerArgs, ReaderSlice, IDSlicerResults,

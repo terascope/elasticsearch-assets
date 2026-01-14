@@ -1,8 +1,7 @@
-import { ConvictSchema } from '@terascope/job-components';
-import { AnyObject } from '@terascope/utils';
+import { BaseSchema } from '@terascope/job-components';
 
-export default class Schema extends ConvictSchema<AnyObject> {
-    build(): AnyObject {
+export default class Schema extends BaseSchema<Record<string, any>> {
+    build() {
         return {};
     }
 }

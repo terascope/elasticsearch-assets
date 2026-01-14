@@ -1,8 +1,8 @@
+import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import {
-    ConvictSchema, AnyObject, ValidatedJobConfig,
-    toNumber, isString, isNumber, getTypeOf,
-    isNotNil, has, isKey
-} from '@terascope/job-components';
+    has, isKey, isNumber, getTypeOf,
+    toNumber, isNotNil, isString
+} from '@terascope/core-utils';
 import elasticAPI from '@terascope/elasticsearch-api';
 import moment from 'moment';
 // @ts-expect-error
@@ -19,15 +19,10 @@ export const schema = {
             isValidIndex(val);
         }
     },
-    field: {
-        doc: 'DEPRECATED: USE "id_field_name" INSTEAD. field to use for id_slicer if subslice_by_key is set to true',
-        default: null,
-        format: 'optional_String'
-    },
     id_field_name: {
         doc: 'field to use for id_slicer',
         default: null,
-        format: 'optional_String'
+        format: 'optional_string'
     },
     size: {
         doc: 'The limit to the number of docs pulled in a chunk, if the number of docs retrieved by the interval exceeds this number, it will cause the function to recurse to provide a smaller batch',
@@ -90,12 +85,12 @@ export const schema = {
     date_field_name: {
         doc: 'field name where the date of the doc is located',
         default: null,
-        format: 'optional_String'
+        format: 'optional_string'
     },
     query: {
         doc: 'You may place a lucene query here, and the slicer will use it when making slices',
         default: '',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     fields: {
         doc: 'used to only return fields that you are interested in',
@@ -159,7 +154,7 @@ export const schema = {
     geo_field: {
         doc: 'field name where the geolocation data is located',
         default: '',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     geo_box_top_left: {
         doc: 'used for a bounding box query',
@@ -202,10 +197,10 @@ export const schema = {
         default: '',
         format: checkUnits
     },
-    connection: {
+    _connection: {
         doc: 'Name of the elasticsearch connection to use when sending data.',
         default: 'default',
-        format: 'optional_String'
+        format: 'optional_string'
     },
     key_range: {
         doc: 'if provided, slicer will only recurse on these given keys',
@@ -253,7 +248,7 @@ export const schema = {
     }
 };
 
-export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> {
+export default class Schema extends BaseSchema<ElasticsearchReaderAPIConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const { logger } = this.context;
 
@@ -262,23 +257,23 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
             return apiName === DEFAULT_API_NAME || apiName.startsWith(`${DEFAULT_API_NAME}:`);
         });
 
-        apiConfigs.forEach((apiConfig: AnyObject) => {
+        apiConfigs.forEach((apiConfig: Record<string, any>) => {
             if (apiConfig.field) {
                 this.context.logger.warn(`For api "${apiConfig._name}", parameter "field" is deprecated and will be removed in later versions, please use "id_field_name" instead`);
                 apiConfig.id_field_name = apiConfig.field;
                 delete apiConfig.field;
             }
 
-            const { connection, id_field_name, subslice_by_key } = apiConfig;
+            const { _connection, id_field_name, subslice_by_key } = apiConfig;
 
             const { connectors } = this.context.sysconfig.terafoundation;
-            const endpointConfig = connectors['elasticsearch-next'][connection];
+            const endpointConfig = connectors['elasticsearch-next'][_connection];
 
             if (endpointConfig == null) {
-                throw new Error(`Could not find elasticsearch-next endpoint configuration for connection ${connection}`);
+                throw new Error(`Could not find elasticsearch-next endpoint configuration for _connection ${_connection}`);
             }
 
-            elasticAPI({}, logger).validateGeoParameters(apiConfig);
+            elasticAPI({} as any, logger).validateGeoParameters(apiConfig);
 
             if (subslice_by_key) {
                 if (
@@ -308,7 +303,7 @@ export default class Schema extends ConvictSchema<ElasticsearchReaderAPIConfig> 
         });
     }
 
-    build(): AnyObject {
+    build(): Record<string, any> {
         return schema;
     }
 }

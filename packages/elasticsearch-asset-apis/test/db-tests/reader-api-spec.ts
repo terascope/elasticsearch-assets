@@ -1,9 +1,6 @@
 import 'jest-extended';
-import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/utils';
-import {
-    ElasticsearchTestHelpers, getClientMetadata, isOpensearch2,
-    isElasticsearch8, isOpensearch3
-} from '@terascope/opensearch-client';
+import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/core-utils';
+import { ElasticsearchTestHelpers, getClientMetadata } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
@@ -94,8 +91,6 @@ describe('Reader API', () => {
         }
     );
 
-    let docType: string | undefined;
-
     let readerClient: ElasticsearchReaderClient;
     let base64Client: ElasticsearchReaderClient;
     let baseURLClient: ElasticsearchReaderClient;
@@ -105,12 +100,6 @@ describe('Reader API', () => {
 
     beforeAll(async () => {
         client = await makeClient();
-
-        if (isOpensearch2(client) || isOpensearch3(client) || isElasticsearch8(client)) {
-            docType = undefined;
-        } else {
-            docType = '_doc';
-        }
 
         const results = getClientMetadata(client);
         majorVersion = results.majorVersion;
@@ -135,9 +124,9 @@ describe('Reader API', () => {
 
         await cleanupIndex(client, makeIndex('*'));
         await Promise.all([
-            populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData, docType),
-            populateIndex(client, base64Index, evenSpread.EvenDataType, base64Data, docType),
-            populateIndex(client, baseURLIndex, evenSpread.EvenDataType, baseURLData, docType),
+            populateIndex(client, evenIndex, evenSpread.EvenDataType, evenBulkData),
+            populateIndex(client, base64Index, evenSpread.EvenDataType, base64Data),
+            populateIndex(client, baseURLIndex, evenSpread.EvenDataType, baseURLData),
 
         ]);
 
@@ -169,7 +158,7 @@ describe('Reader API', () => {
             subslice_key_threshold: 1000000,
             key_type: IDType.base64url,
             time_resolution: 'ms',
-            connection: 'default',
+            _connection: 'default',
             starting_key_depth: 0,
         });
 
@@ -358,7 +347,7 @@ describe('Reader API', () => {
             subslice_key_threshold: 1000000,
             key_type: IDType.base64url,
             time_resolution: 'ms',
-            connection: 'default',
+            _connection: 'default',
             starting_key_depth: 0
         });
 
@@ -549,7 +538,7 @@ describe('Reader API', () => {
             key_type: IDType.base64url,
             id_field_name: idFieldName,
             time_resolution: 'ms',
-            connection: 'default',
+            _connection: 'default',
             starting_key_depth: 0
         });
 
@@ -632,7 +621,7 @@ describe('Reader API', () => {
                 _type, _index, _key, _createTime
             } = metadata;
 
-            expect(_type).toEqual(docType);
+            expect(_type).toBeUndefined();
             expect(_index).toEqual(evenIndex);
             expect(_key).toBeString();
             expect(_createTime).toBeNumber();

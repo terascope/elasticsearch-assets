@@ -26,13 +26,13 @@ Example Job
             "index": "test_index",
             "id_field_name": "uuid",
             "size": 1000,
-            "connection": "default"
+            "_connection": "default"
         }
     ],
     "operations" : [
         {
             "_op" : "some_reader",
-            "api_name" : "elasticsearch_reader_api"
+            "_api_name" : "elasticsearch_reader_api"
         },
         {
             "_op": "noop"
@@ -48,7 +48,7 @@ Custom fetcher code
 export default class SomeReader extends Fetcher {
     async initialize() {
         await super.initialize();
-        const apiManager = this.getAPI(this.opConfig.api_name;);
+        const apiManager = this.getAPI(this.opConfig._api_name;);
         this.api = await apiManager.create(apiName, {});
     }
 
@@ -99,7 +99,7 @@ Removes an instance of a reader api from the cache and will follow any cleanup s
 
 ### entries
 
-Returns a Map of objects, `{ api_name: api_instance }`, of the cached names and api instances.
+Returns a Map of objects, `{ _api_name: api_instance }`, of the cached names and api instances.
 
 ### keys
 
@@ -118,7 +118,7 @@ const apiConfig = {
   index: "test_index",
   id_field_name: "uuid",
   size: 1000,
-  connection: "default"
+   _connection: "default"
 };
 
 const apiManager = this.getAPI(apiName);
@@ -133,7 +133,7 @@ apiManager.size() === 1
 apiManager.get('normalClient') === normalClient
 
 // this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
-const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other" })
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index',  _connection: "other" })
 
 apiManager.size() === 2
 
@@ -143,7 +143,7 @@ apiManger.getConfig('overrideClient') === {
   index: "other_index",
   id_field_name: "uuid",
   size: 1000,
-  connection: "other"
+   _connection: "other"
 }
 
 // iterate through all the cached api names
@@ -526,7 +526,7 @@ size === 100000
     "apis": [
         {
             "_name": "elasticsearch_reader_api:id",
-            "connection": "connection-1",
+            "_connection": "connection-1",
             "index": "index-1",
             "id_field_name": "_key",
             "query": "key:key-name",
@@ -534,7 +534,7 @@ size === 100000
         },
         {
             "_name": "elasticsearch_reader_api:custom",
-            "connection": "connection-2",
+            "_connection": "connection-2",
             "index": "index2",
             "date_field_name": "name",
             "size": 10000
@@ -543,11 +543,11 @@ size === 100000
     "operations": [
         {
             "_op": "id_reader",
-            "api_name": "elasticsearch_reader_api:id"
+            "_api_name": "elasticsearch_reader_api:id"
         },
         {
             "_op": "custom-api-reader-op",
-            "api_name": "elasticsearch_reader_api:custom"
+            "_api_name": "elasticsearch_reader_api:custom"
         }
     ]
 }
@@ -562,7 +562,7 @@ const { BatchProcessor } = require('@terascope/job-components');
 
 class CustomAPIReaderOp extends BatchProcessor {
     async initialize() {
-        this.apiManager = this.getAPI(this.opConfig.api_name);
+        this.apiManager = this.getAPI(this.opConfig._api_name);
         this.api = await this.apiManager.create('customClient', {});
 
         // _searchRequest needs an index as part of the elasticsearch object query
@@ -636,7 +636,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,
@@ -646,3 +645,45 @@ expectedResults.getMetadata() === {
     _eventTime: 1596663162372,
 }
 ```
+
+## Advanced Configuration
+
+### interval
+
+by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
+
+If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
+
+Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
+
+### subslice_by_key
+
+When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
+
+### starting_key_depth
+
+This processor works by taking a char from a list of possible chars for a given key_type (base64url) and checking the count of each char to see if its digestible.
+
+If the count is too large it will extend the key_depth to attempt to further divide up the data to digestible chunks.
+
+```sh
+a =>
+aa, ab, ac ...aK, ...a4, a_ =>
+aaa, aab, aac ...aaK
+```
+
+It does this repeatedly until its comes to a digestible chunk.
+
+If the initial key size was to small and its corresponding data count too big, it could potentially hurt your cluster and/or timeout the job since its trying to fetch the size of a really large number of records.
+
+If its in the tens of billions, usually setting it to `5` works.
+
+The higher the key_depth, the longer it take to finish to slice through all the permutations of keys possible, but it will be safer with larger data sets. Please know your data requirements when using this operator.
+
+### Note on common errors
+
+- You must be aware of how your dates are saved in elasticsearch in a given index. If you specify your start or end dates as common '2016-01-23' dates, it is likely the reader will not reach data that have dates set in utc as the time zone difference may set it in the next day. If you would like to go through the entire index, then leave start and end empty, the job will find the dates for you and later be reflected in the execution context (ex) configuration for this operation
+
+- If you are using elasticsearch >= 2.1.0 they introduced a default query limit of 10000 docs for each index which will throw an error if you query anything above that. This will pose an issue if you set the size to big or if you have more than 10000 docs within 1 millisecond, which is the shortest interval the slicer will attempt to make before overriding your size setting for that slice. Your best option is to raise the max_result_window setting for that given index.
+
+- this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job

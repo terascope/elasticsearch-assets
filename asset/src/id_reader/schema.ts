@@ -1,40 +1,25 @@
-import { ConvictSchema, ValidatedJobConfig, AnyObject } from '@terascope/job-components';
+import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import { opSchema } from '../__lib/schema.js';
 import { ESIDReaderConfig } from './interfaces.js';
-import { DEFAULT_API_NAME } from '../elasticsearch_reader_api/interfaces.js';
+import { isNil } from '@terascope/core-utils';
 
-export default class Schema extends ConvictSchema<ESIDReaderConfig> {
+export default class Schema extends BaseSchema<ESIDReaderConfig> {
     validateJob(job: ValidatedJobConfig): void {
-        let opIndex = 0;
-
-        const opConfig = job.operations.find((op, ind) => {
-            if (op._op === 'id_reader') {
-                opIndex = ind;
-                return op;
+        const apiConfig = job.apis.find((api) => {
+            if (api._name === 'elasticsearch_reader_api') {
+                return api;
             }
             return false;
         });
 
-        if (opConfig == null) throw new Error('Could not find id_reader operation in jobConfig');
+        if (apiConfig == null) throw new Error('Could not find an elasticsearch_reader_api definition in the jobConfig');
 
-        const {
-            api_name, field, ...newConfig
-        } = opConfig;
-
-        const apiName = api_name || `${DEFAULT_API_NAME}:${opConfig._op}-${opIndex}`;
-
-        // we set the new apiName back on the opConfig so it can reference the unique name
-        opConfig.api_name = apiName;
-
-        if (field) {
-            this.context.logger.warn('For operation id_reader, parameter "field" is deprecated and will be removed in later versions, please use "id_field_name" instead');
-            newConfig.id_field_name = field;
+        if (isNil(apiConfig.id_field_name)) {
+            throw new Error('For the api connected to the id_reader, parameter "id_field_name" must be set');
         }
-
-        this.ensureAPIFromConfig(apiName, job, newConfig);
     }
 
-    build(): AnyObject {
+    build(): Record<string, any> {
         return opSchema;
     }
 }

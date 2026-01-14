@@ -1,4 +1,4 @@
-import { times } from '@terascope/utils';
+import { times } from '@terascope/core-utils';
 
 interface WindowMeta {
     hasCalled: boolean;

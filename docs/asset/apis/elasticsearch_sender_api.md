@@ -24,7 +24,7 @@ Example Job
     "apis" : [
         {
             "_name": "elasticsearch_sender_api",
-            "connection": "ELASTICSEARCH_CONNECTION",
+            "_connection": "ELASTICSEARCH_CONNECTION",
             "index": "example_index",
             "type": "_doc",
             "size": 1000
@@ -36,7 +36,7 @@ Example Job
         },
          {
             "_op" : "example_sender",
-            "api_name" : "elasticsearch_sender_api"
+            "_api_name" : "elasticsearch_sender_api"
         },
     ]
 }
@@ -52,7 +52,7 @@ const { BatchProcessor } = require('@terascope/job-components');
 export default class SomeSender extends BatchProcessor {
     async initialize() {
         await super.initialize();
-        const apiManager = this.getAP(this.opConfig.api_name);
+        const apiManager = this.getAP(this.opConfig._api_name);
         this.client = await apiManager.create('bulkSender', {});
     }
 
@@ -126,8 +126,7 @@ const apiConfig = {
   _name: "elasticsearch_sender_api",
   index: "new_index",
   size: 1000,
-  type: "events",
-  connection: "default"
+   _connection: "default"
 };
 
 
@@ -143,7 +142,7 @@ apiManager.size() === 1
 apiManager.get('normalClient') === normalClient
 
 // returns an api cached at "overrideClient" and it will use the api config, but overrides the index to "other_index" in the new instance.
-const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other", update: true })
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index',  _connection: "other", update: true })
 
 apiManager.size() === 2
 
@@ -152,8 +151,7 @@ apiManger.getConfig('overrideClient') === {
   _name: "elasticsearch_sender_api",
   index: "other_index",
   size: 1000,
-  type: "events",
-  connection: "other",
+   _connection: "other",
   update: true
 }
 
@@ -168,7 +166,7 @@ apiManager.get('normalClient') === undefined
 
 ## Elasticsearch Sender Instance
 
-The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/utils/api/interfaces/interfaces/RouteSenderAPI/),  returned from the create method of the APIFactory, follows our common sender api interface.
+The sender class, [sender api](https://terascope.github.io/teraslice/docs/packages/job-components/api/interfaces/interfaces/RouteSenderAPI/),  returned from the create method of the APIFactory, follows our common sender api interface.
 
 ### send (async)
 
@@ -204,7 +202,7 @@ await api.send([
 
 | Configuration            | Description                                                                                                                                                                                                          | Type    | Notes                                                                                                                                                                                                                                                                 |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \_op                     | Name of operation, it must reflect the exact name of the file                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |
+| \_name                     | Name of the api, it must reflect the exact name of the file                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |
 | size                     | the maximum number of docs it will send in a given request, anything past it will be split up and sent                                                                                                               | Number  | required, typically the index selector returns up to double the length of the original documents due to the metadata involved with bulk requests. This number is essentially doubled to to maintain the notion that we split by actual documents and not the metadata |
 | connection               | Name of the elasticsearch connection to use when sending data                                                                                                                                                        | String  | optional, defaults to the 'default' connection created for elasticsearch                                                                                                                                                                                              |
 | index                    | Index to where the data will be sent to, it must be lowercase                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |
@@ -268,7 +266,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type: "_doc",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,

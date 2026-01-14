@@ -1,4 +1,4 @@
-import { DataEntity } from '@terascope/utils';
+import { DataEntity } from '@terascope/core-utils';
 import { SliceResults } from 'teraslice-test-harness';
 
 export function getListOfIds(data: any[], key: string, depth = 1): Map<string, number> {

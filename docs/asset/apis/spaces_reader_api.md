@@ -37,7 +37,7 @@ Example Job
     "operations" : [
         {
             "_op" : "my_reader",
-            "api_name" : "spaces_reader_api"
+            "_api_name" : "spaces_reader_api"
         },
         {
             "_op" : "noop"
@@ -55,7 +55,7 @@ export default class MyReader extends Fetcher<ESDateConfig> {
 
     async initialize(): Promise<void> {
         await super.initialize();
-        const apiName = this.opConfig.api_name;
+        const apiName = this.opConfig._api_name;
         const apiManager = this.getAPI<ElasticReaderFactoryAPI>(apiName);
         this.api = await apiManager.create(apiName, {});
     }
@@ -126,7 +126,7 @@ const apiConfig = {
   index: "test_index",
   date_field_name: "created",
   size: 1000,
-  connection: "default",
+   _connection: "default",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
   token : "{ YOUR_TOKEN_HERE }",
 };
@@ -144,7 +144,7 @@ apiManager.size() === 1
 apiManager.get('normalClient') === normalClient
 
 // this will return an api cached at "overrideClient" and it will use the api config but override the index to "other_index" in the new instance.
-const overrideClient = await apiManager.create('overrideClient', { index: 'other_index', connection: "other" })
+const overrideClient = await apiManager.create('overrideClient', { index: 'other_index',  _connection: "other" })
 
 apiManager.size() === 2
 
@@ -154,7 +154,7 @@ apiManger.getConfig('overrideClient') === {
   index: "other_index",
   date_field_name: "created",
   size: 1000,
-  connection: "other",
+   _connection: "other",
   endpoint : "{ YOUR_ENDPOINT_HERE }",
   token : "{ YOUR_TOKEN_HERE }",
 }
@@ -237,7 +237,7 @@ api.version === 6
 | Configuration          | Description                                                                                                                                                                          | Type                                          | Notes                                                                                                                                                                      |
 | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | \_name                 | Name of operation, it must reflect the exact name of the file                                                                                                                        | String                                        | required                                                                                                                                                                   |
-| endpoint               | The base API endpoint to read from: i.e.`http://yourdomain.com/api/v2`                                                                                                                 | String                                        | required                                                                                                                                                                   |
+| endpoint               | The base API endpoint to read from: i.e.`http://yourdomain.com/api/v2`                                                                                                               | String                                        | required                                                                                                                                                                   |
 | token                  | teraserver API access token for making requests                                                                                                                                      | String                                        | required                                                                                                                                                                   |
 | timeout                | Time in milliseconds to wait for a connection to timeout                                                                                                                             | Number                                        | optional, defaults to 300000 ms or 5 mins                                                                                                                                  |
 | index                  | Which index to read from                                                                                                                                                             | String                                        | required                                                                                                                                                                   |
@@ -263,7 +263,7 @@ api.version === 6
 | geo_sort_order         | the order used for sorting geo queries, can either be 'asc' or 'desc'                                                                                                                | String                                        | optional, defaults to 'asc'                                                                                                                                                |
 | geo_sort_unit          | the unit of measurement for sorting, may be set to 'mi', 'km', 'm','yd', 'ft                                                                                                         | String                                        | optional, defaults to 'm'                                                                                                                                                  |
 | variables              | can specify an xLuceneVariable object for the given xLucene query                                                                                                                    | Object                                        | optional                                                                                                                                                                   |
-| caCertificate          | CA certificate used to validate an https endpoint | String | optional |
+| caCertificate          | CA certificate used to validate an https endpoint                                                                                                                                    | String                                        | optional                                                                                                                                                                   |
 
 `NOTE`: a difference in behavior compared to the elasticsearch_reader is that the default geo distance sort will be ignored if any sort parameter is specified on the query. Sorting on geo distance while specifying another sorting parameter is still possible if you set any other geo sorting parameter, which will cause the query to sort by both.
 
@@ -316,7 +316,6 @@ DataEntity.isDataEntity(expectedResults) === true;
 
 expectedResults.getMetadata() === {
     _key: "ltyRQW4B8WLke7PkER8L",
-    _type:  "events",
     _index: "test_index",
     _version: undefined,
     _seq_no: undefined,
@@ -326,3 +325,26 @@ expectedResults.getMetadata() === {
     _eventTime: 1596663162372,
 }
 ```
+
+## Advanced Configuration
+
+### interval
+
+by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
+
+If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
+
+Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
+
+### subslice_by_key
+
+When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
+
+### Note on common errors
+
+- You must be aware of how your dates are saved in elasticsearch in a given index. If you specify your start or end dates as common '2016-01-23' dates, it is likely the reader will not reach data that have dates set in utc as the time zone difference may set it in the next day. If you would like to go through the entire index, then leave start and end empty, the job will find the dates for you and later be reflected in the execution context (ex) configuration for this operation
+
+- If you are using elasticsearch >= 2.1.0 they introduced a default query limit of 10000 docs for each index which will throw an error if you query anything above that. This will pose an issue if you set the size to big or if you have more than 10000 docs within 1 millisecond, which is the shortest interval the slicer will attempt to make before overriding your size setting for that slice. Your best option is to raise the max_result_window setting for that given index.
+
+- this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
+

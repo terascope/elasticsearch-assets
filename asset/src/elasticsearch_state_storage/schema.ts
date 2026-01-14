@@ -1,21 +1,15 @@
-import {
-    ConvictSchema, AnyObject, isNumber,
-    getTypeOf, isString
-} from '@terascope/job-components';
+import { BaseSchema } from '@terascope/job-components';
+import { isNumber, getTypeOf, isString } from '@terascope/core-utils';
+
 import { ESStateStorageConfig } from './interfaces.js';
 
-export default class Schema extends ConvictSchema<ESStateStorageConfig> {
-    build(): AnyObject {
+export default class Schema extends BaseSchema<ESStateStorageConfig> {
+    build(): Record<string, any> {
         return {
             index: {
                 doc: 'name of elasticsearch index',
                 default: '',
-                format: 'required_String'
-            },
-            type: {
-                doc: 'type of the elasticsearch data string',
-                default: '_doc',
-                format: 'optional_String'
+                format: 'required_string'
             },
             concurrency: {
                 doc: 'number of concurrent requests to elasticsearch, defaults to 10',
@@ -49,12 +43,12 @@ export default class Schema extends ConvictSchema<ESStateStorageConfig> {
             meta_key_field: {
                 doc: 'Data entity meta field used for cache key and elasticsearch _id for mget/ mset functions',
                 default: '_key',
-                format: 'required_String'
+                format: 'required_string'
             },
-            connection: {
+            _connection: {
                 doc: 'elasticsearch connection',
                 default: 'default',
-                format: 'required_String'
+                format: 'required_string'
             },
             cache_size: {
                 doc: 'max number of items to store in the cache (not memory size), defaults to 2147483647',

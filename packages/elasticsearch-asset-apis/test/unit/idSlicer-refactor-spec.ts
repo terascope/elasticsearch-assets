@@ -1,5 +1,5 @@
 import { EventEmitter } from 'node:events';
-import { debugLogger, times, pWhile } from '@terascope/utils';
+import { debugLogger, times, pWhile } from '@terascope/core-utils';
 import {
     idSlicer, getKeyArray, IDType,
     idSlicerOptimized

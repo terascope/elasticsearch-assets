@@ -1,10 +1,7 @@
-import type { AnyObject } from '@terascope/types';
-
 export interface ElasticsearchSenderConfig {
     size: number;
-    connection: string;
+    _connection: string;
     index: string;
-    type?: string;
     delete?: boolean;
     update?: boolean;
     update_retry_on_conflict?: number;
@@ -13,18 +10,18 @@ export interface ElasticsearchSenderConfig {
     create?: boolean;
     script_file?: string;
     script?: string;
-    script_params?: AnyObject;
+    script_params?: Record<string, any>;
     _key?: string;
 }
 
 export interface ScriptConfig {
     file?: string;
     source?: string;
-    params?: AnyObject;
+    params?: Record<string, any>;
 }
 
 export interface UpdateConfig {
-    upsert?: AnyObject;
-    doc?: AnyObject;
+    upsert?: Record<string, any>;
+    doc?: Record<string, any>;
     script?: ScriptConfig;
 }

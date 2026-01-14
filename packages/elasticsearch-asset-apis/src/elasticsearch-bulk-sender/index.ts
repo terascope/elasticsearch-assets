@@ -1,5 +1,5 @@
-import elasticAPI from '@terascope/elasticsearch-api';
-import { isKey, isNil, isPlainObject, isString } from '@terascope/utils';
+import { Client } from '@terascope/elasticsearch-api';
+import { isKey, isNil, isPlainObject, isString } from '@terascope/core-utils';
 import { ElasticsearchBulkSender } from './ElasticsearchBulkSender.js';
 import { ElasticsearchSenderConfig } from './interfaces.js';
 
@@ -8,7 +8,7 @@ export * from './interfaces.js';
 
 interface BulkAPIArgs {
     config: ElasticsearchSenderConfig;
-    client: elasticAPI.Client;
+    client: Client;
 }
 
 function validateConfig(input: unknown): ElasticsearchSenderConfig {

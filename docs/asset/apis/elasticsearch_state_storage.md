@@ -27,7 +27,7 @@ Example job
      "apis": [
         {
             "_name": "elasticsearch_state_storage",
-            "connection": "ELASTICSEARCH_CLUSTER_URL",
+            "_connection": "ELASTICSEARCH_CLUSTER_URL",
             "index": "INDEX_NAME",
             "type": "ELASTICSEARCH_TYPE",
             "cache_size": 1000000
@@ -39,7 +39,7 @@ Example job
         },
         {
             "_op": "state_storage_processor",
-            "api_name": "elasticsearch_state_storage"
+            "_api_name": "elasticsearch_state_storage"
         },
         {
             "_op": "sender"
@@ -57,7 +57,7 @@ export default class StateStorageProcessor extends BatchProcessor {
 
     async initialize() {
         await super.initialize();
-        this.api = this.getAPI<ElasticsearchStateStorage>(this.opConfig.api_name);;
+        this.api = this.getAPI<ElasticsearchStateStorage>(this.opConfig._api_name);;
     }
 
 
@@ -228,14 +228,14 @@ api.cache.clear();
 
 ## Parameters
 
-| Configuration | Description | Type |  Notes   |
-| --------- | -------- | ------ | ------ |
-| \_name | Name of operation, it must reflect the exact name of the file | String | required |
-| cache_size | Maximum number of keys held in the cache before evicting unused keys  | Number | optional, defaults to 2,147,483,647 |
-| index | Which index to read from | String | required |
-| type | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id|String | required if using elasticsearch v5, optional otherwise, defaults to '_doc' |
-| concurrency | Number of concurrent elasticsearch mget requests | Number | optional, defaults to 10 |
-| chunk_size | Number of documents in each elasticsearch mget request | Number | optional,defaults to 2,500 |
-| persist | Saves the record to elasticsearch upon caching the document | Number | optional, defaults to false |
-| meta_key_field | Field in the metadata to use as the key for caching and searching in elasticsearch | String | optional, defaults to "_key" |
-| connection | Name of the elasticsearch connection to use when sending data | String | optional, defaults to the 'default' connection created for elasticsearch |
+| Configuration  | Description                                                                                                                   | Type   | Notes                                                                      |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ | -------------------------------------------------------------------------- |
+| \_name         | Name of operation, it must reflect the exact name of the file                                                                 | String | required                                                                   |
+| cache_size     | Maximum number of keys held in the cache before evicting unused keys                                                          | Number | optional, defaults to 2,147,483,647                                        |
+| index          | Which index to read from                                                                                                      | String | required                                                                   |
+| type           | The type of the document that you are reading, used when a chuck is so large that it must be divided up by the documents \_id | String | required if using elasticsearch v5, optional otherwise, defaults to '_doc' |
+| concurrency    | Number of concurrent elasticsearch mget requests                                                                              | Number | optional, defaults to 10                                                   |
+| chunk_size     | Number of documents in each elasticsearch mget request                                                                        | Number | optional,defaults to 2,500                                                 |
+| persist        | Saves the record to elasticsearch upon caching the document                                                                   | Number | optional, defaults to false                                                |
+| meta_key_field | Field in the metadata to use as the key for caching and searching in elasticsearch                                            | String | optional, defaults to "_key"                                               |
+| connection     | Name of the elasticsearch connection to use when sending data                                                                 | String | optional, defaults to the 'default' connection created for elasticsearch   |
