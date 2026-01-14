@@ -24,7 +24,7 @@ Example Job
     "apis" : [
         {
             "_name": "elasticsearch_sender_api",
-            "connection": "ELASTICSEARCH_CONNECTION",
+            "_connection": "ELASTICSEARCH_CONNECTION",
             "index": "example_index",
             "type": "_doc",
             "size": 1000
@@ -36,7 +36,7 @@ Example Job
         },
          {
             "_op" : "example_sender",
-            "api_name" : "elasticsearch_sender_api"
+            "_api_name" : "elasticsearch_sender_api"
         },
     ]
 }
@@ -202,7 +202,7 @@ await api.send([
 
 | Configuration            | Description                                                                                                                                                                                                          | Type    | Notes                                                                                                                                                                                                                                                                 |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| \_op                     | Name of operation, it must reflect the exact name of the file                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |
+| \_name                     | Name of the api, it must reflect the exact name of the file                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |
 | size                     | the maximum number of docs it will send in a given request, anything past it will be split up and sent                                                                                                               | Number  | required, typically the index selector returns up to double the length of the original documents due to the metadata involved with bulk requests. This number is essentially doubled to to maintain the notion that we split by actual documents and not the metadata |
 | connection               | Name of the elasticsearch connection to use when sending data                                                                                                                                                        | String  | optional, defaults to the 'default' connection created for elasticsearch                                                                                                                                                                                              |
 | index                    | Index to where the data will be sent to, it must be lowercase                                                                                                                                                        | String  | required                                                                                                                                                                                                                                                              |

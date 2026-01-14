@@ -37,7 +37,7 @@ Example Job
     "operations" : [
         {
             "_op" : "my_reader",
-            "api_name" : "spaces_reader_api"
+            "_api_name" : "spaces_reader_api"
         },
         {
             "_op" : "noop"
@@ -325,3 +325,26 @@ expectedResults.getMetadata() === {
     _eventTime: 1596663162372,
 }
 ```
+
+## Advanced Configuration
+
+### interval
+
+by default, interval is set to auto. This will tell the reader to to make a calculation with the date range, count of the range and the `size` parameter to determine an `interval` value. This works great in most circumstances but this assumes a semi-evenly distributed data across the time range.
+
+If the data is sparse, or heavily lopsided (meaning the range is large, but most dates live in a certain part of the range) then the auto interval may be inappropriate. It could be making a lot of small 5s slices when it needs to jump a week in time. In this case it might be better to set a larger interval to make the jumps and allow it to recurse down when it needs to.
+
+Its a balancing act, and you need to know your data. An interval too small will make spam the elasticsearch cluster with many requests, especially if the count is small for each small slice. However having it to big will have cost as it will then need to split the segment of time and query again to see if that new time segment is digestible.
+
+### subslice_by_key
+
+When you have a very large slice that cannot be further broken up by time, as in there are 500k records all in the same time (as determined by `time_resolution` config) this will try to further divide the dates by using the `id_reader` on a given key. However, its usually a better idea to use the id_reader in the first place if you get to that point, but this allows an escape hatch. Use at your own risk.
+
+### Note on common errors
+
+- You must be aware of how your dates are saved in elasticsearch in a given index. If you specify your start or end dates as common '2016-01-23' dates, it is likely the reader will not reach data that have dates set in utc as the time zone difference may set it in the next day. If you would like to go through the entire index, then leave start and end empty, the job will find the dates for you and later be reflected in the execution context (ex) configuration for this operation
+
+- If you are using elasticsearch >= 2.1.0 they introduced a default query limit of 10000 docs for each index which will throw an error if you query anything above that. This will pose an issue if you set the size to big or if you have more than 10000 docs within 1 millisecond, which is the shortest interval the slicer will attempt to make before overriding your size setting for that slice. Your best option is to raise the max_result_window setting for that given index.
+
+- this reader assumes linear date times, and this slicer will stop at the end date specified or the end date determined at the starting point of the job. This means that if an index continually grows while this is running, this will not reach the new data, you would to start another job with the end date from the other job listed as the start date for the new job
+

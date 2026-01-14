@@ -27,7 +27,7 @@ Example job
      "apis": [
         {
             "_name": "elasticsearch_state_storage",
-            "connection": "ELASTICSEARCH_CLUSTER_URL",
+            "_connection": "ELASTICSEARCH_CLUSTER_URL",
             "index": "INDEX_NAME",
             "type": "ELASTICSEARCH_TYPE",
             "cache_size": 1000000
@@ -39,7 +39,7 @@ Example job
         },
         {
             "_op": "state_storage_processor",
-            "api_name": "elasticsearch_state_storage"
+            "_api_name": "elasticsearch_state_storage"
         },
         {
             "_op": "sender"
