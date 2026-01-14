@@ -209,3 +209,6 @@ const records = [
 | ------------- | ------------------------------------------------------------- | ------ | ------------------------------------------------ |
 | \_op          | Name of operation, it must reflect the exact name of the file | String | required                                         |
 | _api_name     | name of api to be used by elasticsearch bulk sender           | String | required, defaults to 'elasticsearch_sender_api' |
+
+
+In elasticsearch_assets v5, teraslice apis must be set within the job configuration. Teraslice will no longer automatically setup the api for you. All fields related to the api that were previously allowed on the operation config must be specified in the api config. Configurations for the api should no longer be set on the operation as they will be ignored. The api's `_name` must match the operation's `_api_name`.
