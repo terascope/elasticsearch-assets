@@ -4,11 +4,9 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
       - 'release/elasticsearch-assets-v*'
   pull_request:
     branches:
-      - master
       - 'release/elasticsearch-assets-v*'
 
 jobs:
