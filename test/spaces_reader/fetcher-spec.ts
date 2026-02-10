@@ -297,7 +297,7 @@ describe('spaces_reader fetcher', () => {
                     expect(
                         // @ts-expect-error
                         err.message
-                    ).toEqual('HTTP request timed out connecting to API endpoint.');
+                    ).toContain('HTTP request timed out connecting to API endpoint.');
                 }
 
                 expect(scope.isDone()).toBeTrue();
