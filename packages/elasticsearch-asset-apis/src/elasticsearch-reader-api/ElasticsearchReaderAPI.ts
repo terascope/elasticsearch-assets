@@ -777,10 +777,6 @@ export class ElasticsearchReaderAPI {
         return this.config.size;
     }
 
-    get version(): number | undefined {
-        return this.client.getESVersion?.();
-    }
-
     async verifyIndex(): Promise<void> {
         // this is method in api is badly named
         return this.client.verify();

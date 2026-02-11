@@ -102,10 +102,6 @@ export class ElasticsearchReaderClient implements ReaderClient {
         return this.client.search(query as any) as Promise<DataEntity[]>;
     }
 
-    getESVersion(): number {
-        return this.client.getESVersion();
-    }
-
     async verify(): Promise<void> {
         // this is method in api is badly named
         await this.client.version();

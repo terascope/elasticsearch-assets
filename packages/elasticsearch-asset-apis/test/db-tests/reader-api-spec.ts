@@ -1,6 +1,6 @@
 import 'jest-extended';
 import { debugLogger, DataEntity, pWhile, pMap } from '@terascope/core-utils';
-import { ElasticsearchTestHelpers, getClientMetadata } from '@terascope/opensearch-client';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
@@ -95,14 +95,10 @@ describe('Reader API', () => {
     let base64Client: ElasticsearchReaderClient;
     let baseURLClient: ElasticsearchReaderClient;
 
-    let majorVersion: number;
     let client: any;
 
     beforeAll(async () => {
         client = await makeClient();
-
-        const results = getClientMetadata(client);
-        majorVersion = results.majorVersion;
 
         readerClient = new ElasticsearchReaderClient(
             client,
@@ -261,18 +257,6 @@ describe('Reader API', () => {
             const size = await api.getWindowSize();
 
             expect(size).toBeNumber();
-        });
-
-        it('can get api version', async () => {
-            const config: ESReaderOptions = {
-                ...defaultConfig
-            };
-
-            const api = createElasticsearchReaderAPI({
-                config, client: readerClient, logger, emitter
-            });
-
-            expect(api.version).toEqual(majorVersion);
         });
 
         // TODO this is badly named method, might need to change in the future
@@ -450,18 +434,6 @@ describe('Reader API', () => {
             expect(size).toBeNumber();
         });
 
-        it('can get api version', async () => {
-            const config: ESReaderOptions = {
-                ...defaultConfig
-            };
-
-            const api = createElasticsearchReaderAPI({
-                config, client: readerClient, logger, emitter
-            });
-
-            expect(api.version).toEqual(majorVersion);
-        });
-
         // TODO this is badly named method, might need to change in the future
         it('can verify index', async () => {
             const config: ESReaderOptions = {
@@ -635,14 +607,6 @@ describe('Reader API', () => {
             const size = await api.getWindowSize();
 
             expect(size).toBeNumber();
-        });
-
-        it('can get api version', async () => {
-            const api = createElasticsearchReaderAPI({
-                config: defaultConfig, client: readerClient, logger, emitter
-            });
-
-            expect(api.version).toEqual(majorVersion);
         });
 
         // TODO this is badly named method, might need to change in the future

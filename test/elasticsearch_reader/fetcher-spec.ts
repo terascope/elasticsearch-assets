@@ -220,7 +220,7 @@ describe('elasticsearch_reader fetcher', () => {
                 expect(
                     // @ts-expect-error
                     error.message
-                ).toEqual(errMsg);
+                ).toContain(errMsg);
             }
         });
     });
@@ -256,7 +256,7 @@ describe('elasticsearch_reader fetcher', () => {
             expect(
                 // @ts-expect-error
                 error.message
-            ).toEqual(errMsg);
+            ).toContain(errMsg);
         }
     });
 

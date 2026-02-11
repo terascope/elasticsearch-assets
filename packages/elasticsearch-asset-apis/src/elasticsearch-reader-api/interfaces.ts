@@ -59,12 +59,6 @@ export interface ReaderClient {
     ): Promise<DataEntity[] | unknown>;
 
     /**
-     * Gets the elasticsearch major server version,
-     * this will be used to format the search parameters
-    */
-    getESVersion?(): number;
-
-    /**
      * Verify that the cluster is up,
      * internally this will use esClient.version() probably
     */
