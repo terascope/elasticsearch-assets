@@ -272,14 +272,6 @@ const query: {
 const results = await api._searchRequest(query);
 ```
 
-### version
-
-Returns the major elasticsearch version that this client is connected to
-
-```js
-api.version === 6
-```
-
 ### verifyIndex (async)
 
 Verifies that the index exists or throws an error if it is not found.  It also logs the window_size of the index.
