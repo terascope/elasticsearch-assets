@@ -28,13 +28,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - run: yarn && yarn setup
+      - run: pnpm run setup
 
       - name: Get Commit Short SHA
         id: get-short-sha
@@ -47,8 +50,8 @@ jobs:
           jq '.version += "-dev.${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
 
-      - run: yarn dlx teraslice-cli@prerelease -v
-      - run: yarn dlx teraslice-cli@prerelease assets build
+      - run: pnpm dlx teraslice-cli@prerelease -v
+      - run: pnpm dlx teraslice-cli@prerelease assets build
       - run: ls -l build/
 
       - name: Archive test build artifacts
@@ -73,11 +76,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: 'pnpm'
 
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
@@ -86,12 +92,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - run: yarn && yarn setup
-      - run: yarn lint
+      - run: pnpm run setup
+      - run: pnpm run lint
 
       - name: Create Docker Image List
         run: |
-          yarn docker:listImages
+          pnpm run docker:listImages
           cat ./images/image-list.txt
 
       - name: Restore Docker image cache
@@ -105,23 +111,26 @@ jobs:
             docker-images-
 
       - name: Test asset for ${{ matrix.search-version }}
-        run: SKIP_IMAGE_DELETION='true' yarn test:${{ matrix.search-version }}
+        run: SKIP_IMAGE_DELETION='true' pnpm run test:${{ matrix.search-version }}
 
       - name: Test apis for ${{ matrix.search-version }}
-        run: yarn test:${{ matrix.search-version }}
+        run: pnpm run test:${{ matrix.search-version }}
         working-directory: ./packages/elasticsearch-asset-apis
 
   test-website:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
       - name: Use Node.js
         uses: actions/setup-node@v4
         with:
           # NOTE: Hard Coded Node Version
           node-version: '22'
+          cache: 'pnpm'
       - name: Build Documentation
-        run: yarn && ./scripts/build-documentation.sh
+        run: pnpm run setup && ./scripts/build-documentation.sh
       - name: Check Output
         run: find ./website/build
 
