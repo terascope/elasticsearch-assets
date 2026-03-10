@@ -22,12 +22,7 @@
         "disableReferencedProjectLoad": true,
         "typeRoots": [
             "./node_modules/@types"
-        ],
-        "paths": {
-            "got": [
-                "./node_modules/.pnpm/got@14.6.6/node_modules/got/dist/source/index.d.ts"
-            ]
-        }
+        ]
     },
     "include": ["test"],
     "references": [

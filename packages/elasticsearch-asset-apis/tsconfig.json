@@ -3,9 +3,11 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
+        "moduleResolution": "bundler",
         "outDir": "dist",
         "rootDir": ".",
         "esModuleInterop": true
     },
+    
     "include": ["src", "test"]
 }
