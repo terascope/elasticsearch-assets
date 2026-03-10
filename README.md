@@ -43,7 +43,9 @@ This asset bundle requires a running Teraslice cluster. [Documentation](https://
 
 ```bash
 # Step 1: make sure you have teraslice-cli installed
-yarn global add teraslice-cli
+# corepack ships with Node.js (v16.9+) and manages package managers automatically
+corepack enable
+pnpm add -g teraslice-cli
 
 # Step 2:
 # teraslice-cli assets deploy <cluster_alias> <asset-name[@version]>
@@ -59,16 +61,24 @@ teraslice-cli assets deploy cluster2 --build
 
 ## Development
 
+This project uses **pnpm** as its package manager. pnpm is managed via [corepack](https://nodejs.org/api/corepack.html), which ships with Node.js v16.9+. To enable it:
+
+```bash
+corepack enable
+```
+
+This ensures the correct pnpm version (defined in `packageManager` in `package.json`) is used automatically.
+
 ### Tests
 
 Run the elasticsearch-assets tests
 
 **Requirements:**
 
-- `docker` - An [Elasticsearch](https://hub.docker.com/r/elastic/elasticsearch) container will be created using [Docker](https://docs.docker.com/get-started/)
+- `docker` - An [OpenSearch](https://hub.docker.com/r/opensearchproject/opensearch) container will be created using [Docker](https://docs.docker.com/get-started/)
 
 ```bash
-yarn test
+pnpm test
 ```
 
 ### Build
@@ -78,7 +88,7 @@ Build a compiled asset bundle to deploy to a teraslice cluster.
 **Install Teraslice CLI:**
 
 ```bash
-yarn global add teraslice-cli
+pnpm add -g teraslice-cli
 ```
 
 ```bash

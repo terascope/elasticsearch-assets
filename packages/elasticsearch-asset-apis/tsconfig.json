@@ -3,12 +3,11 @@
     "compilerOptions": {
         "target": "ESNext",
         "module": "ESNext",
+        "moduleResolution": "bundler",
         "outDir": "dist",
         "rootDir": ".",
-        "esModuleInterop": true,
-        "paths": {
-            "got": ["./node_modules/got/dist/source/index.d.ts"]
-        }
+        "esModuleInterop": true
     },
+    
     "include": ["src", "test"]
 }

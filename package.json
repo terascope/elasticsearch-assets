@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-asset-bundle",
     "displayName": "Elasticsearch Asset Bundle",
-    "version": "5.1.0",
+    "version": "5.1.1",
     "private": true,
     "description": "bundle of processors for teraslice",
     "homepage": "https://github.com/terascope/elasticsearch-assets#readme",
@@ -15,12 +15,8 @@
     "license": "MIT",
     "author": "Terascope, LLC <info@terascope.io>",
     "type": "module",
-    "workspaces": [
-        "packages/*",
-        "asset"
-    ],
     "scripts": {
-        "asset:build": "yarn && yarn run build",
+        "asset:build": "pnpm install && pnpm run build",
         "asset:post-build": "./scripts/copy-links.sh",
         "build": "tsc --build",
         "build:watch": "tsc --build --watch",
@@ -31,9 +27,9 @@
         "docker:saveImages": "ts-scripts images save",
         "docs": "ts-scripts docs",
         "lint": "eslint",
-        "lint:fix": "yarn lint --fix",
+        "lint:fix": "pnpm lint --fix",
         "publish:changed": "./scripts/publish.sh",
-        "setup": "yarn && yarn build --force",
+        "setup": "pnpm install && pnpm build --force",
         "test": "TEST_OPENSEARCH='true' ts-scripts test asset --",
         "test:all": "TEST_OPENSEARCH='true' ts-scripts test",
         "test:debug": "TEST_OPENSEARCH='true' ts-scripts test --debug asset --",
@@ -43,17 +39,17 @@
         "test:watch": "ts-scripts test --watch asset --"
     },
     "devDependencies": {
-        "@terascope/data-types": "2.2.3",
-        "@terascope/elasticsearch-api": "5.2.2",
-        "@terascope/elasticsearch-asset-apis": "~2.1.0",
+        "@terascope/core-utils": "2.3.1",
+        "@terascope/data-types": "2.3.1",
+        "@terascope/elasticsearch-api": "5.3.1",
+        "@terascope/elasticsearch-asset-apis": "workspace:~",
         "@terascope/eslint-config": "~1.1.29",
-        "@terascope/job-components": "2.2.2",
-        "@terascope/opensearch-client": "2.2.3",
-        "@terascope/scripts": "2.2.2",
-        "@terascope/teraslice-state-storage": "2.2.2",
-        "@terascope/types": "2.2.1",
+        "@terascope/job-components": "2.3.1",
+        "@terascope/opensearch-client": "2.3.1",
+        "@terascope/scripts": "2.3.2",
+        "@terascope/teraslice-state-storage": "2.3.1",
+        "@terascope/types": "2.3.0",
         "@types/fs-extra": "~11.0.4",
-        "@types/got": "~9.6.12",
         "@types/jest": "~30.0.0",
         "@types/node": "~24.10.15",
         "@types/semver": "~7.7.1",
@@ -65,14 +61,14 @@
         "nock": "~14.0.11",
         "node-notifier": "~10.0.1",
         "semver": "~7.7.4",
-        "teraslice-test-harness": "2.2.2",
+        "teraslice-test-harness": "2.3.1",
         "ts-jest": "~29.4.6",
         "typescript": "~5.9.3"
     },
-    "packageManager": "yarn@4.6.0",
+    "packageManager": "pnpm@10.25.0",
     "engines": {
         "node": ">=22.21.1",
-        "yarn": ">=1.22.19"
+        "pnpm": ">=10.25.0"
     },
     "documentation": "https://terascope.github.io/elasticsearch-assets",
     "terascope": {
