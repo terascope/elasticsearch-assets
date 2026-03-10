@@ -2,6 +2,7 @@ packages:
   - 'packages/*'
   - 'asset'
 
-onlyBuiltDependencies:
-  - 'dtrace-provider'
-  - 'unrs-resolver'
+# This builds and tests fine without post installing 
+# onlyBuiltDependencies:
+#   - 'dtrace-provider'
+#   - 'unrs-resolver'
