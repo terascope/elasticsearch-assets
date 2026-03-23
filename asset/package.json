@@ -18,12 +18,12 @@
         "test": "pnpm --cwd ../ test"
     },
     "dependencies": {
-        "@terascope/core-utils": "2.3.1",
-        "@terascope/data-mate": "2.3.2",
-        "@terascope/elasticsearch-api": "5.3.1",
+        "@terascope/core-utils": "2.3.2",
+        "@terascope/data-mate": "2.4.0",
+        "@terascope/elasticsearch-api": "5.3.2",
         "@terascope/elasticsearch-asset-apis": "workspace:~",
-        "@terascope/job-components": "2.3.1",
-        "@terascope/teraslice-state-storage": "2.3.1",
+        "@terascope/job-components": "2.3.2",
+        "@terascope/teraslice-state-storage": "2.3.2",
         "datemath-parser": "~1.0.6",
         "got": "~14.6.6",
         "moment": "~2.30.1"
