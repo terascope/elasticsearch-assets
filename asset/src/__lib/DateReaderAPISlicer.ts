@@ -22,18 +22,25 @@ export class DateReaderAPISlicer extends ParallelSlicer<SharedReaderConfig> {
         const { lifecycle, slicers } = this.executionConfig;
         const { startTime } = this;
 
-        this.slicerRanges = await this.api.makeDateSlicerRanges({
-            lifecycle,
-            numOfSlicers: slicers,
-            recoveryData,
-            startTime,
-            hook: async (params) => {
-                if (!this.hasUpdated) {
-                    await this.updateJob(params);
-                    this.hasUpdated = true;
-                }
-            },
-        });
+        try {
+            this.slicerRanges = await this.api.makeDateSlicerRanges({
+                lifecycle,
+                numOfSlicers: slicers,
+                recoveryData,
+                startTime,
+                hook: async (params) => {
+                    if (!this.hasUpdated) {
+                        await this.updateJob(params);
+                        this.hasUpdated = true;
+                    }
+                },
+            });
+        } catch (error) {
+            // Re-throw elasticsearch errors with more context to prevent them
+            // from being treated as "no data found" scenarios
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            throw new Error(`Failed to initialize date slicer ranges: ${errorMessage}`);
+        }
 
         await super.initialize(recoveryData);
     }

@@ -26,11 +26,37 @@ export function throwRequestError(endpointName: string, statusCode: number, body
                 }
             });
         } else {
-            throw new TSError(resp.error, {
+            let errorMessage = resp.error;
+            let isElasticsearchError = false;
+
+            // Handle elasticsearch errors - these should always be surfaced to users
+            if (typeof resp.error === 'string') {
+                // Any string error from elasticsearch should be clearly formatted
+                errorMessage = `Elasticsearch query failed: ${resp.error}`;
+                isElasticsearchError = true;
+            }
+
+            // Handle nested elasticsearch error structure common in elasticsearch responses
+            if (resp.error && typeof resp.error === 'object') {
+                const nestedError = resp.error;
+                if (nestedError.type || nestedError.reason) {
+                    // Format structured elasticsearch errors
+                    const type = nestedError.type || 'elasticsearch_error';
+                    const reason = nestedError.reason || 'Unknown error';
+                    errorMessage = `Elasticsearch query failed: ${type}: ${reason}`;
+                    isElasticsearchError = true;
+                } else {
+                    // Generic object error
+                    errorMessage = `Elasticsearch query failed: ${JSON.stringify(resp.error)}`;
+                    isElasticsearchError = true;
+                }
+            }
+
+            throw new TSError(errorMessage, {
                 statusCode,
                 context: {
                     endpoint: endpointName,
-                    safe: true
+                    safe: !isElasticsearchError
                 }
             });
         }
