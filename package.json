@@ -33,7 +33,7 @@
         "test": "TEST_OPENSEARCH='true' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
         "test:all": "TEST_OPENSEARCH='true' ts-scripts test -- --testPathIgnorePatterns=test/e2e",
         "test:debug": "TEST_OPENSEARCH='true' ts-scripts test --debug asset -- --testPathIgnorePatterns=test/e2e",
-        "test:e2e": "earl assets build --overwrite && ASSET_ZIP_PATH=$(./scripts/asset-zip-path.sh) TEST_OPENSEARCH=true TEST_TERASLICE=true ts-scripts test --testPathPatterns=test/e2e",
+        "test:e2e": "earl assets build --overwrite && ASSET_ZIP_PATH=$(./scripts/asset-zip-path.sh) TEST_OPENSEARCH=true TEST_TERASLICE=true ts-scripts test -- --testPathPatterns=test/e2e",
         "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
         "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.15.0' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
         "test:opensearch3": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='3.1.0' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
