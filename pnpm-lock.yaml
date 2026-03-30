@@ -74,6 +74,9 @@ importers:
       semver:
         specifier: ~7.7.4
         version: 7.7.4
+      teraslice-client-js:
+        specifier: ~2.4.0
+        version: 2.4.0
       teraslice-test-harness:
         specifier: 2.5.0
         version: 2.5.0
@@ -83,6 +86,9 @@ importers:
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
+      uuid:
+        specifier: ~13.0.0
+        version: 13.0.0
 
   asset:
     dependencies:
@@ -1186,6 +1192,10 @@ packages:
 
   asynckit@0.4.0:
     resolution: {integrity: sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q==}
+
+  auto-bind@5.0.1:
+    resolution: {integrity: sha512-ooviqdwwgfIfNmDwo94wlshcdzfO64XV0Cg6oDsDYBJfITDz1EngD2z7DkbvCWn+XIMsIqW27sEVF6qcpJrRcg==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
   available-typed-arrays@1.0.7:
     resolution: {integrity: sha512-wvUjBtSGN7+7SjNpq/9M2Tg350UZD3q62IFZLbRAR1bSMlCo1ZaeW+BJ+D090e4hIIZLBcTDWe4Mh4jvUDajzQ==}
@@ -3546,6 +3556,10 @@ packages:
   teex@1.0.1:
     resolution: {integrity: sha512-eYE6iEI62Ni1H8oIa7KlDU6uQBtqr4Eajni3wX7rpfXD8ysFx8z0+dri+KWEPWpBsxXfxu58x/0jvTVT1ekOSg==}
 
+  teraslice-client-js@2.4.0:
+    resolution: {integrity: sha512-RKgb1rBfqnw2snuogxbuudi8tc2DoblO6frqmbuzGBZfPcM2OAAweoWXjfBx9bq8nqVAwEqkbM7izeTQ22besg==}
+    engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
+
   teraslice-test-harness@2.5.0:
     resolution: {integrity: sha512-JPdus5bAadHjX4U9BXWF3V9SFlh/ExAKp+GnR9KbixUh3rv1rXZWawm99VNydrukJ0TcCmyrxPmjl/RpsgFCew==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
@@ -5400,6 +5414,8 @@ snapshots:
   async-function@1.0.0: {}
 
   asynckit@0.4.0: {}
+
+  auto-bind@5.0.1: {}
 
   available-typed-arrays@1.0.7:
     dependencies:
@@ -8159,6 +8175,15 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
       - react-native-b4a
+
+  teraslice-client-js@2.4.0:
+    dependencies:
+      '@terascope/core-utils': 2.4.0
+      '@terascope/types': 2.4.0
+      auto-bind: 5.0.1
+      got: 14.6.6
+    transitivePeerDependencies:
+      - supports-color
 
   teraslice-test-harness@2.5.0:
     dependencies:

@@ -30,12 +30,13 @@
         "lint:fix": "pnpm lint --fix",
         "publish:changed": "./scripts/publish.sh",
         "setup": "pnpm install && pnpm build --force",
-        "test": "TEST_OPENSEARCH='true' ts-scripts test asset --",
-        "test:all": "TEST_OPENSEARCH='true' ts-scripts test",
-        "test:debug": "TEST_OPENSEARCH='true' ts-scripts test --debug asset --",
-        "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test asset --",
-        "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.15.0' ts-scripts test asset --",
-        "test:opensearch3": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='3.1.0' ts-scripts test asset --",
+        "test": "TEST_OPENSEARCH='true' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
+        "test:all": "TEST_OPENSEARCH='true' ts-scripts test -- --testPathIgnorePatterns=test/e2e",
+        "test:debug": "TEST_OPENSEARCH='true' ts-scripts test --debug asset -- --testPathIgnorePatterns=test/e2e",
+        "test:e2e": "earl assets build --overwrite && ASSET_ZIP_PATH=$(./scripts/asset-zip-path.sh) TEST_OPENSEARCH=true TEST_TERASLICE=true ts-scripts test --testPathPatterns=test/e2e",
+        "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
+        "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.15.0' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
+        "test:opensearch3": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='3.1.0' ts-scripts test asset -- --testPathIgnorePatterns=test/e2e",
         "test:watch": "ts-scripts test --watch asset --"
     },
     "devDependencies": {
@@ -61,9 +62,11 @@
         "nock": "~14.0.11",
         "node-notifier": "~10.0.1",
         "semver": "~7.7.4",
+        "teraslice-client-js": "~2.4.0",
         "teraslice-test-harness": "2.5.0",
         "ts-jest": "~29.4.6",
-        "typescript": "~5.9.3"
+        "typescript": "~5.9.3",
+        "uuid": "~13.0.0"
     },
     "packageManager": "pnpm@10.25.0",
     "engines": {
