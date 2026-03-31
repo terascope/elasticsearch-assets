@@ -19,7 +19,7 @@
     },
     "dependencies": {
         "@terascope/core-utils": "2.4.0",
-        "@terascope/data-mate": "2.5.0",
+        "@terascope/data-mate": "2.5.1",
         "@terascope/elasticsearch-api": "5.4.0",
         "@terascope/elasticsearch-asset-apis": "workspace:~",
         "@terascope/job-components": "2.4.0",
