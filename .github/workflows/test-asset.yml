@@ -165,6 +165,10 @@ jobs:
             docker-images-${{ hashFiles('./images/image-list.txt') }}-
             docker-images-
 
+      - name: Install mkcert
+        run: curl -Ss -JLO "https://dl.filippo.io/mkcert/v1.4.4?for=linux/amd64" && sudo chmod 777 mkcert-v1.4.4-linux-amd64 && sudo cp mkcert-v1.4.4-linux-amd64 /usr/local/bin/mkcert
+      - name: Check mkcert
+        run: command -v mkcert
       - name: Test asset with encrypted opensearch
         run: SKIP_IMAGE_DELETION='true' pnpm run test:encrypted
 
