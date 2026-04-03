@@ -18,6 +18,7 @@
         "build:watch": "pnpm build --watch",
         "test": "TEST_OPENSEARCH='true' ts-scripts test . --",
         "test:debug": "TEST_OPENSEARCH='true' ts-scripts test --debug . --",
+        "test:encrypted": "TEST_OPENSEARCH=true ENCRYPT_OPENSEARCH=true OPENSEARCH_PASSWORD='passwordsufhbivbU123%$' ts-scripts test . -- --testPathIgnorePatterns=test/e2e",
         "test:opensearch1": "TEST_OPENSEARCH='true' ts-scripts test . --",
         "test:opensearch2": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='2.15.0' ts-scripts test . --",
         "test:opensearch3": "TEST_OPENSEARCH='true' OPENSEARCH_VERSION='3.1.0' ts-scripts test . --",
