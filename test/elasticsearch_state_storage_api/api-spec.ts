@@ -3,10 +3,13 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { TestClientConfig } from '@terascope/job-components';
 import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { ESCachedStateStorage } from '@terascope/teraslice-state-storage';
-import {
-    TEST_INDEX_PREFIX, cleanupIndex, makeClient,
-    waitForData, fetch
-} from '../helpers/index.js';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
+import { fetch } from '../../packages/elasticsearch-asset-apis/test/helpers/index.js';
+
+const {
+    cleanupIndex, waitForData, makeClient,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch state storage api', () => {
     const idField = '_key';

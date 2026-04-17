@@ -9,10 +9,11 @@ import { WorkerTestHarness } from 'teraslice-test-harness';
 import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
-import {
-    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
-    populateIndex
-} from '../helpers/index.js';
+
+const {
+    cleanupIndex, makeClient, populateIndex,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch_reader schema', () => {
     const name = 'elasticsearch_reader';

@@ -6,7 +6,7 @@ import moment from 'moment';
 import { newTestJobConfig, SlicerRecoveryData, TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
 import { SlicerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client.js';
+import { MockClient } from '../../packages/elasticsearch-asset-apis/test/helpers/index.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
 

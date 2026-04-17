@@ -1,13 +1,7 @@
 import 'jest-extended';
 import { EventEmitter } from 'node:events';
 import { debugLogger, DataEntity } from '@terascope/core-utils';
-import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient
-} from '../helpers';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import condensedData from '../fixtures/data/condensed-spread.js';
 import {
     createElasticsearchReaderAPI,
@@ -20,13 +14,20 @@ import {
     FetchResponseType
 } from '../../src/index.js';
 
+const {
+    populateIndex, cleanupIndex, waitForData,
+    makeClient, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
+
+const { index, datatype, data } = condensedData;
+
 describe('ReaderAPI with condensed time data', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_condensed_`;
     const logger = debugLogger('api-condensed-test');
     const emitter = new EventEmitter();
 
-    const condensedIndex = makeIndex(condensedData.index);
-    const evenBulkData = condensedData.data.map((obj) => DataEntity.make(obj, { _key: obj.bytes }));
+    const condensedIndex = makeIndex(index);
+    const evenBulkData = data.map((obj) => DataEntity.make(obj, { _key: obj.bytes }));
 
     function makeIndex(str: string) {
         return `${readerIndex}_${str}`;
@@ -45,7 +46,7 @@ describe('ReaderAPI with condensed time data', () => {
 
         await cleanupIndex(client, makeIndex('*'));
         await populateIndex(
-            client, condensedIndex, condensedData.CondensedDataType, evenBulkData
+            client, condensedIndex, datatype, evenBulkData
         );
         await waitForData(client, condensedIndex, evenBulkData.length);
     });
@@ -60,7 +61,7 @@ describe('ReaderAPI with condensed time data', () => {
         date_field_name: 'created',
         query: '*',
         response_type: FetchResponseType.data_entities,
-        type_config: condensedData.CondensedDataType,
+        type_config: datatype,
         start: null,
         end: null,
         interval: 'auto',

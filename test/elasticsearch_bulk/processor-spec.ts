@@ -3,10 +3,13 @@ import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { ClientParams } from '@terascope/types';
 import { OpConfig, TestClientConfig } from '@terascope/job-components';
 import { DataEntity, debugLogger } from '@terascope/core-utils';
-import {
-    makeClient, cleanupIndex, fetch,
-    upload, waitForData, TEST_INDEX_PREFIX,
-} from '../helpers/index.js';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
+import { fetch } from '../../packages/elasticsearch-asset-apis/test/helpers/index.js';
+
+const {
+    cleanupIndex, waitForData, makeClient,
+    upload, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 interface ClientCalls {
     [key: string]: ClientParams.BulkParams;

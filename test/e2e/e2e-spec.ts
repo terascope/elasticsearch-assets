@@ -3,9 +3,12 @@ import 'jest-extended';
 import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import TerasliceClient, { Job } from 'teraslice-client-js';
-import { ASSET_ZIP_PATH, TERASLICE_HOST } from './config.js';
 import { Client, ElasticsearchTestHelpers } from '@terascope/opensearch-client';
-import { cleanupIndex, makeClient, populateIndex } from '../helpers/index.js';
+import { ASSET_ZIP_PATH, TERASLICE_HOST } from './config.js';
+
+const {
+    cleanupIndex, populateIndex, makeClient,
+} = ElasticsearchTestHelpers;
 
 describe('Elasticsearch Assets e2e', () => {
     jest.setTimeout(60 * 1000);

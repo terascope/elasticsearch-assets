@@ -3,11 +3,12 @@ import { TestClientConfig } from '@terascope/job-components';
 import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness, newTestJobConfig, JobTestHarness } from 'teraslice-test-harness';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
-import {
-    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
-    populateIndex, addToIndex
-} from '../helpers/index.js';
 import evenSpreadExtra1 from '../fixtures/data/even-spread-extra1.js';
+
+const {
+    cleanupIndex, makeClient, populateIndex,
+    upload, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch_reader fetcher', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_fetcher_`;
@@ -143,7 +144,7 @@ describe('elasticsearch_reader fetcher', () => {
             await populateIndex(
                 esClient, evenIndexName1, evenSpread.EvenDataType, evenBulkData
             );
-            await addToIndex(esClient, evenIndexName1, evenSpreadExtra1BulkData);
+            await upload(esClient, { index: evenIndexName1 }, evenSpreadExtra1BulkData);
         });
 
         afterAll(async () => {
@@ -183,13 +184,13 @@ describe('elasticsearch_reader fetcher', () => {
                 esClient, evenIndexName2, evenSpread.EvenDataType, evenBulkData
             );
             // add a bunch more records to make sure to trigger the retry failure
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
-            await addToIndex(esClient, evenIndexName2, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
+            await upload(esClient, { index: evenIndexName2 }, genExtraBulkData());
         });
 
         afterAll(async () => {

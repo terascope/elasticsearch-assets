@@ -3,10 +3,12 @@ import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
-import {
-    TEST_INDEX_PREFIX, getTotalSliceCounts, makeClient,
-    cleanupIndex, populateIndex
-} from '../helpers/index.js';
+import { getTotalSliceCounts } from '../../packages/elasticsearch-asset-apis/test/helpers/utils.js';
+
+const {
+    cleanupIndex, makeClient, populateIndex,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('date_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_es_reader_job_`;
