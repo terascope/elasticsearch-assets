@@ -2,8 +2,10 @@ import 'jest-extended';
 import { newTestJobConfig, APIConfig, TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { makeClient } from '../helpers/index.js';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { DEFAULT_API_NAME } from '../../asset/src/spaces_reader_api/interfaces.js';
+
+const { makeClient } = ElasticsearchTestHelpers;
 
 describe('spaces-reader schema', () => {
     let harness: WorkerTestHarness;

@@ -7,10 +7,11 @@ import {
 import { debugLogger } from '@terascope/core-utils';
 import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
-import {
-    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
-    populateIndex
-} from '../helpers/index.js';
+
+const {
+    cleanupIndex, populateIndex, makeClient,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('id_reader Schema', () => {
     const name = 'id_reader';

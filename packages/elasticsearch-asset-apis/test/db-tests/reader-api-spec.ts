@@ -4,14 +4,16 @@ import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { DataFrame } from '@terascope/data-mate';
 import { EventEmitter } from 'node:events';
 import {
-    TEST_INDEX_PREFIX, cleanupIndex, populateIndex,
-    waitForData, makeClient
-} from '../helpers/index.js';
-import {
     createElasticsearchReaderAPI, DateSlicerRange, ElasticsearchReaderClient,
     ESReaderOptions, FetchResponseType, IDType, base64URLSpecialChars,
     InputDateSegments, ReaderSlice, base64SpecialChars
 } from '../../src/index.js';
+
+const {
+    populateIndex, cleanupIndex,
+    waitForData, makeClient,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('Reader API', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_`;

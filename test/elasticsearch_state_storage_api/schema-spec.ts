@@ -2,8 +2,12 @@ import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { APIConfig, TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { ESStateStorageConfig } from '../../asset/src/elasticsearch_state_storage/interfaces.js';
+
+const {
+    makeClient, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch state storage api schema', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_state__storage_api_`;

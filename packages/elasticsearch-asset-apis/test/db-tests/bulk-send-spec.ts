@@ -1,11 +1,15 @@
 import 'jest-extended';
 import { debugLogger, DataEntity } from '@terascope/core-utils';
 import elasticAPI, { Client } from '@terascope/elasticsearch-api';
-import {
-    TEST_INDEX_PREFIX, waitForData, cleanupIndex,
-    fetch, makeClient
-} from '../helpers/index.js';
+import { ElasticsearchTestHelpers, Client as BaseClient } from '@terascope/opensearch-client';
+import { ClientParams } from '@terascope/types';
 import { createElasticsearchBulkSender } from '../../src/elasticsearch-bulk-sender/index.js';
+import { fetch } from '../helpers/utils.js';
+
+const {
+    cleanupIndex, waitForData, makeClient,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch bulk sender module', () => {
     const META_ROUTE = 'standard:route';
@@ -13,7 +17,7 @@ describe('elasticsearch bulk sender module', () => {
     const senderIndex = `${TEST_INDEX_PREFIX}_sender_api_`;
 
     let apiClient: Client;
-    let client: any;
+    let client: BaseClient;
 
     beforeAll(async () => {
         client = await makeClient();
@@ -397,7 +401,7 @@ describe('elasticsearch bulk sender module', () => {
                 waitForData(client, finalRoute2, 1)
             ]);
 
-            const query = {
+            const query: ClientParams.SearchParams = {
                 index: `${senderIndex}-*`,
                 q: '*'
             };

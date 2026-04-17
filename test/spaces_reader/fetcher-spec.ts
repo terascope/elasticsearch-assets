@@ -4,7 +4,7 @@ import { SearchParams } from '@terascope/types';
 import { newTestJobConfig, TestClientConfig } from '@terascope/job-components';
 import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import MockClient from '../helpers/mock_client.js';
+import { MockClient } from '../../packages/elasticsearch-asset-apis/test/helpers/index.js';
 
 describe('spaces_reader fetcher', () => {
     const baseUri = 'http://test.dev';

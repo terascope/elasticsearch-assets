@@ -3,13 +3,7 @@ import { debugLogger, DataEntity } from '@terascope/core-utils';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { EventEmitter } from 'node:events';
-import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    populateIndex,
-    waitForData,
-    makeClient
-} from '../helpers/index.js';
+
 import {
     createElasticsearchReaderAPI,
     ElasticsearchReaderClient,
@@ -18,6 +12,11 @@ import {
     IDType,
     ReaderSlice
 } from '../../src/index.js';
+
+const {
+    populateIndex, cleanupIndex, waitForData,
+    makeClient, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('id_reader tests', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_api_dataframe_id_reader`;

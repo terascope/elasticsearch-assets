@@ -18,7 +18,7 @@ const data = times(2_000, (index) => {
     return results;
 });
 
-const CondensedDataType = new DataType({
+const datatype = new DataType({
     fields: {
         created: { type: 'Date' },
         bytes: { type: 'Integer' }
@@ -27,6 +27,6 @@ const CondensedDataType = new DataType({
 
 export default {
     data,
-    CondensedDataType,
+    datatype,
     index: 'condensed_spread'
 };

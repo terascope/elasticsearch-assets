@@ -2,13 +2,11 @@ import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { SlicerRecoveryData, TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
-import {
-    TEST_INDEX_PREFIX,
-    cleanupIndex,
-    makeClient,
-    populateIndex,
-    waitForData,
-} from '../helpers/index.js';
+
+const {
+    cleanupIndex, populateIndex, makeClient,
+    waitForData, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('id_reader slicer', () => {
     const apiReaderIndex = `${TEST_INDEX_PREFIX}_id_slicer`;

@@ -4,11 +4,15 @@ import { fileURLToPath } from 'node:url';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { APIConfig, Context, TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
-import { TEST_INDEX_PREFIX, makeClient } from '../helpers/index.js';
+import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { ElasticsearchSenderAPI, DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 import SenderSchema from '../../asset/src/elasticsearch_sender_api/schema.js';
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const {
+    makeClient, config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch sender api schema', () => {
     const apiSenderIndex = `${TEST_INDEX_PREFIX}_elasticsearch_sender_api_schema_`;

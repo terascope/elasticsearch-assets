@@ -4,14 +4,12 @@ import { TestClientConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
 import { JobTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { getKeyArray, IDType } from '@terascope/elasticsearch-asset-apis';
-import {
-    TEST_INDEX_PREFIX,
-    getListOfIds,
-    getTotalSliceCounts,
-    makeClient,
-    cleanupIndex,
-    populateIndex
-} from '../helpers/index.js';
+import { getListOfIds, getTotalSliceCounts } from '../../packages/elasticsearch-asset-apis/test/helpers/index.js';
+
+const {
+    cleanupIndex, populateIndex, makeClient,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('id_reader job', () => {
     const idIndex = `${TEST_INDEX_PREFIX}_id_job_`;

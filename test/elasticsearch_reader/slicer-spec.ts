@@ -8,10 +8,11 @@ import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import moment from 'moment';
 import { SlicerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { IDType } from '@terascope/elasticsearch-asset-apis';
-import {
-    TEST_INDEX_PREFIX, makeClient, cleanupIndex,
-    populateIndex,
-} from '../helpers/index.js';
+
+const {
+    cleanupIndex, makeClient, populateIndex,
+    config: { TEST_INDEX_PREFIX }
+} = ElasticsearchTestHelpers;
 
 describe('elasticsearch_reader slicer', () => {
     const readerIndex = `${TEST_INDEX_PREFIX}_elasticsearch_slicer_`;
