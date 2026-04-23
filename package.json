@@ -68,7 +68,7 @@
         "teraslice-test-harness": "2.7.0",
         "ts-jest": "~29.4.9",
         "typescript": "~5.9.3",
-        "uuid": "~13.0.0"
+        "uuid": "~14.0.0"
     },
     "packageManager": "pnpm@10.25.0",
     "engines": {
