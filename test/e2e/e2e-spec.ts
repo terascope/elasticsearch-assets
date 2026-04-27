@@ -104,7 +104,7 @@ describe('Elasticsearch Assets e2e', () => {
 
             newJobConfig.name = 'elasticsearch-reader (with recovery)';
 
-            newJobConfig.apis![0].size = 50;
+            newJobConfig.apis![0].size = 20;
 
             newJobConfig.apis![1].index = newDateIndex;
 
@@ -225,7 +225,7 @@ describe('Elasticsearch Assets e2e', () => {
             newJobConfig.name = 'id-reader (with recovery)';
 
             newJobConfig.apis![0].key_type = 'hexadecimal';
-            newJobConfig.apis![0].size = 50;
+            newJobConfig.apis![0].size = 20;
 
             newJobConfig.apis![1].index = hexIndex;
 
