@@ -4,6 +4,8 @@ import fs from 'node:fs';
 import { v4 as uuidv4 } from 'uuid';
 import TerasliceClient, { Job } from 'teraslice-client-js';
 import { Client, ElasticsearchTestHelpers } from '@terascope/opensearch-client';
+import { Teraslice } from '@terascope/types';
+import { cloneDeep } from '@terascope/core-utils';
 import { ASSET_ZIP_PATH, TERASLICE_HOST } from './config.js';
 
 const {
@@ -16,8 +18,10 @@ describe('Elasticsearch Assets e2e', () => {
     let terasliceClient: TerasliceClient;
     let searchClient: Client;
     const indexPrefix = 'e2e-test-';
-    const readIndex = `${indexPrefix}read-${uuidv4()}`;
-    const writeIndex = `${indexPrefix}write-${uuidv4()}`;
+    const readIndex = `${indexPrefix}_read-${uuidv4()}`;
+    const writeIndex = `${indexPrefix}_write-${uuidv4()}`;
+    const writeIndex2 = `${indexPrefix}_write-${uuidv4()}`;
+
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
 
     beforeAll(async () => {
@@ -49,50 +53,199 @@ describe('Elasticsearch Assets e2e', () => {
     });
 
     describe('elasticsearch_reader -> elasticsearch_bulk', () => {
+        const jobConfig: Teraslice.JobConfigParams = {
+            name: 'e2e-elasticsearch-reindex',
+            lifecycle: 'once',
+            workers: 1,
+            assets: ['elasticsearch'],
+            operations: [
+                {
+                    _op: 'elasticsearch_reader',
+                    _api_name: 'elasticsearch_reader_api'
+                },
+                {
+                    _op: 'elasticsearch_bulk',
+                    _api_name: 'elasticsearch_sender_api'
+                }
+            ],
+            apis: [
+                {
+                    _name: 'elasticsearch_reader_api',
+                    index: readIndex,
+                    date_field_name: 'created',
+                },
+                {
+                    _name: 'elasticsearch_sender_api',
+                    index: writeIndex
+                }
+            ]
+        };
         let job: Job;
 
-        beforeAll(async () => {
-            job = await terasliceClient.jobs.submit({
-                name: 'e2e-elasticsearch-reindex',
-                lifecycle: 'once',
-                workers: 1,
-                assets: ['elasticsearch'],
-                operations: [
-                    {
-                        _op: 'elasticsearch_reader',
-                        _api_name: 'elasticsearch_reader_api'
-                    },
-                    {
-                        _op: 'elasticsearch_bulk',
-                        _api_name: 'elasticsearch_sender_api'
-                    }
-                ],
-                apis: [
-                    {
-                        _name: 'elasticsearch_reader_api',
-                        index: readIndex,
-                        date_field_name: 'created',
-                    },
-                    {
-                        _name: 'elasticsearch_sender_api',
-                        index: writeIndex
-                    }
-                ]
-            });
+        it('should be able to successfully process slices', async () => {
+            job = await terasliceClient.jobs.submit(jobConfig);
 
             await job.waitForStatus('completed');
-        });
-
-        it('should be able to successfully process slices', async () => {
             const ex = await job.execution();
+
             expect(ex._slicer_stats).toBeDefined();
             expect(ex._slicer_stats.processed).toBe(1);
             expect(ex._slicer_stats.failed).toBe(0);
-        });
 
-        it('should have reindexed 1000 records', async () => {
             await searchClient.indices.refresh({ index: writeIndex });
             const stats = await searchClient.indices.stats({ index: writeIndex });
+
+            expect(stats._all.total.docs.count).toBe(1000);
+        });
+
+        it('should be able to recover and continue while using the elasticsearch_reader', async () => {
+            const newJobConfig = cloneDeep(jobConfig);
+            const newDateIndex = `${indexPrefix}_write-${uuidv4()}`;
+
+            newJobConfig.name = 'elasticsearch-reader (with recovery)';
+
+            newJobConfig.apis![0].size = 20;
+
+            newJobConfig.apis![1].index = newDateIndex;
+
+            job = await terasliceClient.jobs.submit(newJobConfig);
+            await job.waitForStatus('running');
+
+            await job.pause();
+            await job.waitForStatus('paused');
+
+            await job.resume();
+            await job.waitForStatus('running');
+
+            await job.stop();
+            await job.waitForStatus('stopped');
+
+            await job.recover();
+            await job.waitForStatus('completed');
+
+            await searchClient.indices.refresh({ index: newDateIndex });
+            const stats = await searchClient.indices.stats({ index: newDateIndex });
+
+            expect(stats._all.total.docs.count).toBe(1000);
+        });
+    });
+
+    describe('id_reader -> elasticsearch_bulk', () => {
+        const jobConfig: Teraslice.JobConfigParams = {
+            name: 'ID_Reindex',
+            lifecycle: 'once',
+            slicers: 2,
+            workers: 4,
+            assets: ['elasticsearch'],
+            apis: [
+                {
+                    _name: 'elasticsearch_reader_api',
+                    index: readIndex,
+                    size: 500,
+                    key_type: 'base64url',
+                    id_field_name: 'uuid',
+                },
+                {
+                    _name: 'elasticsearch_sender_api',
+                    index: writeIndex2,
+                    size: 200
+                }
+            ],
+            operations: [
+                {
+                    _op: 'id_reader',
+                    _api_name: 'elasticsearch_reader_api',
+                },
+                {
+                    _op: 'elasticsearch_bulk',
+                    _api_name: 'elasticsearch_sender_api'
+                }
+            ]
+        };
+
+        let job: Job;
+
+        it('should support reindexing', async () => {
+            const newJobConfig = cloneDeep(jobConfig);
+
+            job = await terasliceClient.jobs.submit(newJobConfig);
+
+            await job.waitForStatus('completed');
+
+            await searchClient.indices.refresh({ index: writeIndex2 });
+            const stats = await searchClient.indices.stats({ index: writeIndex2 });
+
+            expect(stats._all.total.docs.count).toBe(1000);
+        });
+
+        it('should support reindexing by hex id', async () => {
+            const newJobConfig = cloneDeep(jobConfig);
+            const hexIndex = `${indexPrefix}_write-${uuidv4()}`;
+
+            newJobConfig.name = 'reindex by hex id';
+
+            newJobConfig.apis![0].key_type = 'hexadecimal';
+            newJobConfig.apis![1].index = hexIndex;
+
+            job = await terasliceClient.jobs.submit(newJobConfig);
+
+            await job.waitForStatus('completed');
+
+            await searchClient.indices.refresh({ index: hexIndex });
+            const stats = await searchClient.indices.stats({ index: hexIndex });
+
+            expect(stats._all.total.docs.count).toBe(1000);
+        });
+
+        it('should support reindexing by hex id + key_range', async () => {
+            const newJobConfig = cloneDeep(jobConfig);
+            const hexIndex = `${indexPrefix}_write-${uuidv4()}`;
+
+            newJobConfig.name = 'reindex by hex id (range=a..e)';
+
+            newJobConfig.apis![0].key_type = 'hexadecimal';
+            newJobConfig.apis![0].key_range = ['a', 'b', 'c', 'd', 'e'];
+
+            newJobConfig.apis![1].index = hexIndex;
+
+            job = await terasliceClient.jobs.submit(newJobConfig);
+
+            await job.waitForStatus('completed');
+
+            await searchClient.indices.refresh({ index: hexIndex });
+            const stats = await searchClient.indices.stats({ index: hexIndex });
+
+            expect(stats._all.total.docs.count).toBe(312);
+        });
+
+        it('should be able to recover and continue while using the id_reader', async () => {
+            const newJobConfig = cloneDeep(jobConfig);
+            const hexIndex = `${indexPrefix}_write-${uuidv4()}`;
+
+            newJobConfig.name = 'id-reader (with recovery)';
+
+            newJobConfig.apis![0].key_type = 'hexadecimal';
+            newJobConfig.apis![0].size = 20;
+
+            newJobConfig.apis![1].index = hexIndex;
+
+            job = await terasliceClient.jobs.submit(newJobConfig);
+            await job.waitForStatus('running');
+
+            await job.pause();
+            await job.waitForStatus('paused');
+
+            await job.resume();
+            await job.waitForStatus('running');
+
+            await job.stop();
+            await job.waitForStatus('stopped');
+
+            await job.recover();
+            await job.waitForStatus('completed');
+
+            await searchClient.indices.refresh({ index: hexIndex });
+            const stats = await searchClient.indices.stats({ index: hexIndex });
 
             expect(stats._all.total.docs.count).toBe(1000);
         });
