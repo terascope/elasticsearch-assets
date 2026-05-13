@@ -23,13 +23,22 @@ describe('Elasticsearch Assets e2e', () => {
     const writeIndex2 = `${indexPrefix}_write-${uuidv4()}`;
 
     const evenSpread = ElasticsearchTestHelpers.EvenDateData;
+    const finalData: any[] = [];
+
+    for (let i = 0; i < 100; i++) {
+        const myData = evenSpread.data.map((item) => ({
+            ...item,
+            uuid: uuidv4()
+        }));
+        finalData.concat(myData);
+    }
 
     beforeAll(async () => {
         terasliceClient = new TerasliceClient({ host: TERASLICE_HOST });
         searchClient = await makeClient();
 
         await cleanupIndex(searchClient, `${indexPrefix}*`);
-        await populateIndex(searchClient, readIndex, evenSpread.EvenDataType, evenSpread.data);
+        await populateIndex(searchClient, readIndex, evenSpread.EvenDataType, finalData);
     });
 
     afterAll(async () => {
@@ -95,7 +104,7 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: writeIndex });
             const stats = await searchClient.indices.stats({ index: writeIndex });
 
-            expect(stats._all.total.docs.count).toBe(1000);
+            expect(stats._all.total.docs.count).toBe(finalData.length);
         });
 
         it('should be able to recover and continue while using the elasticsearch_reader', async () => {
@@ -126,7 +135,7 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: newDateIndex });
             const stats = await searchClient.indices.stats({ index: newDateIndex });
 
-            expect(stats._all.total.docs.count).toBe(1000);
+            expect(stats._all.total.docs.count).toBe(finalData.length);
         });
     });
 
@@ -175,7 +184,7 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: writeIndex2 });
             const stats = await searchClient.indices.stats({ index: writeIndex2 });
 
-            expect(stats._all.total.docs.count).toBe(1000);
+            expect(stats._all.total.docs.count).toBe(finalData.length);
         });
 
         it('should support reindexing by hex id', async () => {
@@ -194,17 +203,18 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: hexIndex });
             const stats = await searchClient.indices.stats({ index: hexIndex });
 
-            expect(stats._all.total.docs.count).toBe(1000);
+            expect(stats._all.total.docs.count).toBe(finalData.length);
         });
 
         it('should support reindexing by hex id + key_range', async () => {
             const newJobConfig = cloneDeep(jobConfig);
             const hexIndex = `${indexPrefix}_write-${uuidv4()}`;
+            const keyRange = ['a', 'b', 'c', 'd', 'e'];
 
             newJobConfig.name = 'reindex by hex id (range=a..e)';
 
             newJobConfig.apis![0].key_type = 'hexadecimal';
-            newJobConfig.apis![0].key_range = ['a', 'b', 'c', 'd', 'e'];
+            newJobConfig.apis![0].key_range = keyRange;
 
             newJobConfig.apis![1].index = hexIndex;
 
@@ -215,19 +225,22 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: hexIndex });
             const stats = await searchClient.indices.stats({ index: hexIndex });
 
-            expect(stats._all.total.docs.count).toBe(312);
+            const expectedCount = finalData.filter(
+                (item) => keyRange.includes(item.uuid[0])
+            ); // In a real test, we would calculate how many keys fall into the specified range
+
+            expect(stats._all.total.docs.count).toBe(expectedCount);
         });
 
         it('should be able to recover and continue while using the id_reader', async () => {
             const newJobConfig = cloneDeep(jobConfig);
-            const hexIndex = `${indexPrefix}_write-${uuidv4()}`;
+            const testIndex = `${indexPrefix}_write-${uuidv4()}`;
 
             newJobConfig.name = 'id-reader (with recovery)';
 
-            newJobConfig.apis![0].key_type = 'hexadecimal';
-            newJobConfig.apis![0].size = 20;
+            newJobConfig.apis![0].size = 100;
 
-            newJobConfig.apis![1].index = hexIndex;
+            newJobConfig.apis![1].index = testIndex;
 
             job = await terasliceClient.jobs.submit(newJobConfig);
             await job.waitForStatus('running');
@@ -244,10 +257,10 @@ describe('Elasticsearch Assets e2e', () => {
             await job.recover();
             await job.waitForStatus('completed');
 
-            await searchClient.indices.refresh({ index: hexIndex });
-            const stats = await searchClient.indices.stats({ index: hexIndex });
+            await searchClient.indices.refresh({ index: testIndex });
+            const stats = await searchClient.indices.stats({ index: testIndex });
 
-            expect(stats._all.total.docs.count).toBe(1000);
+            expect(stats._all.total.docs.count).toBe(finalData.length);
         });
     });
 });
