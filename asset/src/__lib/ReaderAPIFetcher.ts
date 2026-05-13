@@ -2,10 +2,10 @@ import { Fetcher, isPromAvailable } from '@terascope/job-components';
 import { DataEntity } from '@terascope/core-utils';
 import { DataFrame } from '@terascope/data-mate';
 import { ElasticsearchReaderAPI, ReaderSlice } from '@terascope/elasticsearch-asset-apis';
-import { SharedReaderConfig } from './interfaces.js';
+import { OpApiConfig } from '../__lib/interfaces.js';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces.js';
 
-export class ReaderAPIFetcher extends Fetcher<SharedReaderConfig> {
+export class ReaderAPIFetcher extends Fetcher<OpApiConfig> {
     api!: ElasticsearchReaderAPI;
 
     async initialize(): Promise<void> {

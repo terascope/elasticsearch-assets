@@ -4,7 +4,7 @@ export const opSchema = {
     _api_name: {
         doc: 'name of api to be used by spaces reader',
         default: null,
-        format: 'optional_string'
+        format: 'required_string'
     }
 };
 

@@ -1,9 +1,9 @@
 import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import { opSchema } from '../__lib/schema.js';
-import { ESIDReaderConfig } from './interfaces.js';
+import { OpApiConfig } from '../__lib/interfaces.js';
 import { isNil } from '@terascope/core-utils';
 
-export default class Schema extends BaseSchema<ESIDReaderConfig> {
+export default class Schema extends BaseSchema<OpApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const apiConfig = job.apis.find((api) => {
             if (api._name === 'elasticsearch_reader_api') {

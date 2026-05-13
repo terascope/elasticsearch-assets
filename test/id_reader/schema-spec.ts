@@ -5,7 +5,7 @@ import {
     ValidatedJobConfig, OpConfig, APIConfig, TestClientConfig
 } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
-import { ESIDReaderConfig } from '../../asset/src/id_reader/interfaces.js';
+import { OpApiConfig } from '../../asset/src/__lib/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
 const {
@@ -34,7 +34,7 @@ describe('id_reader Schema', () => {
     let esClient: any;
     let clients: TestClientConfig[];
 
-    async function makeSchema(config: Record<string, any> = {}): Promise<ESIDReaderConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<OpApiConfig> {
         const apiConfig = Object.assign({}, { _name: 'elasticsearch_reader_api', id_field_name }, config) as any;
         harness = WorkerTestHarness.testFetcher(
             { _op: name, _api_name: 'elasticsearch_reader_api' },
@@ -48,7 +48,7 @@ describe('id_reader Schema', () => {
             (testConfig: OpConfig) => testConfig._op === name
         );
 
-        return validConfig as ESIDReaderConfig;
+        return validConfig as OpApiConfig;
     }
 
     async function testValidation(job: ValidatedJobConfig) {

@@ -3,9 +3,9 @@ import { isFunction } from '@terascope/core-utils';
 import moment from 'moment';
 import { ElasticsearchReaderAPI, DateSlicerRanges } from '@terascope/elasticsearch-asset-apis';
 import { ElasticReaderFactoryAPI } from '../elasticsearch_reader_api/interfaces.js';
-import { SharedReaderConfig } from './interfaces.js';
+import { OpApiConfig } from '../__lib/interfaces.js';
 
-export class DateReaderAPISlicer extends ParallelSlicer<SharedReaderConfig> {
+export class DateReaderAPISlicer extends ParallelSlicer<OpApiConfig> {
     protected api!: ElasticsearchReaderAPI;
     protected hasUpdated = false;
     protected startTime = moment().toISOString();
