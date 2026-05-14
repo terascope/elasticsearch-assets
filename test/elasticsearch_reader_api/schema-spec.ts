@@ -77,6 +77,7 @@ describe('elasticsearch reader api schema', () => {
         const { _connection } = await makeSchema({ index: apiSenderIndex });
 
         expect(_connection).toEqual('default');
+        expect(true).toEqual(false); // TODO: remove - intentional CI failure to verify log artifact upload
     });
 
     it('should values are incorrect', async () => {
