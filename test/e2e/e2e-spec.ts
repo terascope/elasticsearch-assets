@@ -30,7 +30,7 @@ describe('Elasticsearch Assets e2e', () => {
             ...item,
             uuid: uuidv4()
         }));
-        finalData.concat(...myData);
+        finalData.push(...myData);
     }
 
     beforeAll(async () => {
@@ -70,9 +70,7 @@ describe('Elasticsearch Assets e2e', () => {
             operations: [
                 {
                     _op: 'elasticsearch_reader',
-                    _api_name: 'elasticsearch_reader_api',
-                    date_field_name: 'created',
-                    time_resolution: 'ms'
+                    _api_name: 'elasticsearch_reader_api'
                 },
                 {
                     _op: 'elasticsearch_bulk',
@@ -84,6 +82,7 @@ describe('Elasticsearch Assets e2e', () => {
                     _name: 'elasticsearch_reader_api',
                     index: readIndex,
                     date_field_name: 'created',
+                    time_resolution: 'ms'
                 },
                 {
                     _name: 'elasticsearch_sender_api',
@@ -100,7 +99,7 @@ describe('Elasticsearch Assets e2e', () => {
             const ex = await job.execution();
 
             expect(ex._slicer_stats).toBeDefined();
-            expect(ex._slicer_stats.processed).toBe(1);
+            expect(ex._slicer_stats.processed).toBe(32);
             expect(ex._slicer_stats.failed).toBe(0);
 
             await searchClient.indices.refresh({ index: writeIndex });
@@ -115,7 +114,7 @@ describe('Elasticsearch Assets e2e', () => {
 
             newJobConfig.name = 'elasticsearch-reader (with recovery)';
 
-            newJobConfig.apis![0].size = 20;
+            newJobConfig.apis![0].size = 1000;
 
             newJobConfig.apis![1].index = newDateIndex;
 
