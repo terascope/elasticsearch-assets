@@ -239,7 +239,7 @@ describe('Elasticsearch Assets e2e', () => {
 
             newJobConfig.name = 'id-reader (with recovery)';
 
-            newJobConfig.apis![0].size = 100;
+            newJobConfig.apis![0].size = 500;
 
             newJobConfig.apis![1].index = testIndex;
 
