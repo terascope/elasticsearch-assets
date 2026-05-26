@@ -30,7 +30,7 @@ describe('Elasticsearch Assets e2e', () => {
             ...item,
             uuid: uuidv4()
         }));
-        finalData.concat(myData);
+        finalData.concat(...myData);
     }
 
     beforeAll(async () => {
@@ -70,7 +70,9 @@ describe('Elasticsearch Assets e2e', () => {
             operations: [
                 {
                     _op: 'elasticsearch_reader',
-                    _api_name: 'elasticsearch_reader_api'
+                    _api_name: 'elasticsearch_reader_api',
+                    date_field_name: 'created',
+                    time_resolution: 'ms'
                 },
                 {
                     _op: 'elasticsearch_bulk',
@@ -225,9 +227,9 @@ describe('Elasticsearch Assets e2e', () => {
             await searchClient.indices.refresh({ index: hexIndex });
             const stats = await searchClient.indices.stats({ index: hexIndex });
 
-            const expectedCount = finalData.filter(
-                (item) => keyRange.includes(item.uuid[0])
-            ); // In a real test, we would calculate how many keys fall into the specified range
+            const expectedCount = finalData
+                .filter((item) => keyRange.includes(item.uuid[0]))
+                .length;
 
             expect(stats._all.total.docs.count).toBe(expectedCount);
         });
