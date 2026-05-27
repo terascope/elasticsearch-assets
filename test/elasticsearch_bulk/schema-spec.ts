@@ -2,7 +2,7 @@ import 'jest-extended';
 import { WorkerTestHarness, newTestJobConfig } from 'teraslice-test-harness';
 import { OpConfig, TestClientConfig, APIConfig } from '@terascope/job-components';
 import { debugLogger } from '@terascope/core-utils';
-import { ElasticsearchBulkConfig } from '../../asset/src/elasticsearch_bulk/interfaces.js';
+import { OpApiConfig } from '../../asset/src/__lib/interfaces.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_sender_api/interfaces.js';
 
 describe('Elasticsearch Bulk Schema', () => {
@@ -23,7 +23,7 @@ describe('Elasticsearch Bulk Schema', () => {
 
     let harness: WorkerTestHarness;
 
-    async function makeSchema(config: Record<string, any> = {}): Promise<ElasticsearchBulkConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<OpApiConfig> {
         const opConfig = Object.assign({}, { _op: name, _api_name: 'elasticsearch_sender_api' }, config);
         harness = WorkerTestHarness.testSender(opConfig, { _name: 'elasticsearch_sender_api', index, _connection: 'default' }, { clients });
 
@@ -33,7 +33,7 @@ describe('Elasticsearch Bulk Schema', () => {
             (testConfig: OpConfig) => testConfig._op === name
         );
 
-        return validConfig as unknown as ElasticsearchBulkConfig;
+        return validConfig as unknown as OpApiConfig;
     }
 
     afterEach(async () => {

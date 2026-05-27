@@ -6,7 +6,7 @@ import {
 import { debugLogger } from '@terascope/core-utils';
 import { ElasticsearchTestHelpers } from '@terascope/opensearch-client';
 import { WorkerTestHarness } from 'teraslice-test-harness';
-import { ESReaderConfig } from '../../asset/src/elasticsearch_reader/interfaces.js';
+import { OpApiConfig } from '../../asset/src/__lib/interfaces.js';
 import * as ESReaderSchema from '../../asset/src/elasticsearch_reader_api/schema.js';
 import { DEFAULT_API_NAME } from '../../asset/src/elasticsearch_reader_api/interfaces.js';
 
@@ -60,7 +60,7 @@ describe('elasticsearch_reader schema', () => {
         }
     });
 
-    async function makeSchema(config: Record<string, any> = {}): Promise<ESReaderConfig> {
+    async function makeSchema(config: Record<string, any> = {}): Promise<OpApiConfig> {
         const opConfig = {
             _op: name, _api_name: 'elasticsearch_reader_api'
         };
@@ -81,7 +81,7 @@ describe('elasticsearch_reader schema', () => {
             (testConfig: OpConfig) => testConfig._op === name
         );
 
-        return validConfig as ESReaderConfig;
+        return validConfig as OpApiConfig;
     }
 
     it('can geo validate', async () => {

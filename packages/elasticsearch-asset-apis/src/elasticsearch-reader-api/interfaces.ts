@@ -18,7 +18,6 @@ export interface ReaderClient {
      * Counts the number of documents for a given query
     */
     count(query: ClientParams.SearchParams): Promise<number>;
-
     /**
      * Searches for documents for a given query
     */

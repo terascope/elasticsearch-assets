@@ -1,9 +1,9 @@
 import { BaseSchema, ValidatedJobConfig } from '@terascope/job-components';
 import { isNil, getTypeOf } from '@terascope/core-utils';
 import { opSchema } from '../__lib/schema.js';
-import { ESReaderConfig } from './interfaces.js';
+import { OpApiConfig } from '../__lib/interfaces.js';
 
-export default class Schema extends BaseSchema<ESReaderConfig> {
+export default class Schema extends BaseSchema<OpApiConfig> {
     validateJob(job: ValidatedJobConfig): void {
         const opConfig = job.operations.find((op) => {
             if (op._op === 'elasticsearch_reader') {
