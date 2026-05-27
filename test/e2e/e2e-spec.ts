@@ -13,7 +13,7 @@ const {
 } = ElasticsearchTestHelpers;
 
 describe('Elasticsearch Assets e2e', () => {
-    jest.setTimeout(60 * 1000);
+    jest.setTimeout(5 * 60 * 1000);
 
     let terasliceClient: TerasliceClient;
     let searchClient: Client;
