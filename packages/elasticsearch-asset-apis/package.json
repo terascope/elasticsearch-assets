@@ -25,17 +25,17 @@
         "test:watch": "TEST_OPENSEARCH='true' ts-scripts test --watch . --"
     },
     "dependencies": {
-        "@terascope/core-utils": "2.10.0",
-        "@terascope/data-mate": "2.11.0",
-        "@terascope/data-types": "2.10.0",
-        "@terascope/elasticsearch-api": "5.10.0",
-        "@terascope/geo-utils": "2.10.0",
+        "@terascope/core-utils": "2.10.1",
+        "@terascope/data-mate": "2.11.1",
+        "@terascope/data-types": "2.10.1",
+        "@terascope/elasticsearch-api": "5.10.1",
+        "@terascope/geo-utils": "2.10.1",
         "datemath-parser": "~1.0.6",
         "got": "~14.6.6",
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "2.14.0",
+        "@terascope/scripts": "2.15.0",
         "@terascope/types": "2.10.0",
         "@types/node": "~25.9.1",
         "jest": "~30.4.2"
