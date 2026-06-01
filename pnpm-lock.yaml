@@ -12,14 +12,14 @@ importers:
         specifier: ^30.4.1
         version: 30.4.1
       '@terascope/core-utils':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       '@terascope/data-types':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.10.0
-        version: 5.10.0
+        specifier: 5.10.1
+        version: 5.10.1
       '@terascope/elasticsearch-asset-apis':
         specifier: workspace:~
         version: link:packages/elasticsearch-asset-apis
@@ -27,17 +27,17 @@ importers:
         specifier: ~1.2.1
         version: 1.2.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))
       '@terascope/job-components':
-        specifier: 2.12.0
-        version: 2.12.0
+        specifier: 2.12.1
+        version: 2.12.1
       '@terascope/opensearch-client':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/scripts':
-        specifier: 2.14.0
-        version: 2.14.0(typescript@5.9.3)
+        specifier: 2.15.0
+        version: 2.15.0(typescript@5.9.3)
       '@terascope/teraslice-state-storage':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       '@terascope/types':
         specifier: 2.10.0
         version: 2.10.0
@@ -78,11 +78,11 @@ importers:
         specifier: ~7.8.1
         version: 7.8.1
       teraslice-client-js:
-        specifier: ~2.10.0
-        version: 2.10.0
+        specifier: ~2.10.1
+        version: 2.10.1
       teraslice-test-harness:
-        specifier: 2.13.0
-        version: 2.13.0
+        specifier: 2.13.1
+        version: 2.13.1
       ts-jest:
         specifier: ~29.4.11
         version: 29.4.11(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
@@ -96,23 +96,23 @@ importers:
   asset:
     dependencies:
       '@terascope/core-utils':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       '@terascope/data-mate':
-        specifier: 2.11.0
-        version: 2.11.0
+        specifier: 2.11.1
+        version: 2.11.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.10.0
-        version: 5.10.0
+        specifier: 5.10.1
+        version: 5.10.1
       '@terascope/elasticsearch-asset-apis':
         specifier: workspace:~
         version: link:../packages/elasticsearch-asset-apis
       '@terascope/job-components':
-        specifier: 2.12.0
-        version: 2.12.0
+        specifier: 2.12.1
+        version: 2.12.1
       '@terascope/teraslice-state-storage':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       datemath-parser:
         specifier: ~1.0.6
         version: 1.0.6
@@ -126,20 +126,20 @@ importers:
   packages/elasticsearch-asset-apis:
     dependencies:
       '@terascope/core-utils':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       '@terascope/data-mate':
-        specifier: 2.11.0
-        version: 2.11.0
+        specifier: 2.11.1
+        version: 2.11.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/data-types':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.10.0
-        version: 5.10.0
+        specifier: 5.10.1
+        version: 5.10.1
       '@terascope/geo-utils':
-        specifier: 2.10.0
-        version: 2.10.0
+        specifier: 2.10.1
+        version: 2.10.1
       datemath-parser:
         specifier: ~1.0.6
         version: 1.0.6
@@ -151,8 +151,8 @@ importers:
         version: 2.30.1
     devDependencies:
       '@terascope/scripts':
-        specifier: 2.14.0
-        version: 2.14.0(typescript@5.9.3)
+        specifier: 2.15.0
+        version: 2.15.0(typescript@5.9.3)
       '@terascope/types':
         specifier: 2.10.0
         version: 2.10.0
@@ -684,20 +684,20 @@ packages:
     peerDependencies:
       eslint: '>=9.0.0'
 
-  '@terascope/core-utils@2.10.0':
-    resolution: {integrity: sha512-waAjrSnAazoWdy9/ttyTL/Bykm6Yo/xHHKdPayMvcxfncxaQHXlQpYrx2xEIidXkUuS+r5DpGAiRVu9eRzgLlg==}
+  '@terascope/core-utils@2.10.1':
+    resolution: {integrity: sha512-JT/aIxCUKwHFgt4glub5lcOHeD7LVDLKx+7ZNREhCIRRTSdwHv+/VCH5Y8Tr/yofnChv6i3KRxgsC42hHN0UIA==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/data-mate@2.11.0':
-    resolution: {integrity: sha512-XCMnWrwsBEgGHK+ws9GyatSoqr9s6MPc0g7JB+IppGl7j5VfDzMMXkKFsWg/486L40MaOCZ0bOzcVINrYP3/jw==}
+  '@terascope/data-mate@2.11.1':
+    resolution: {integrity: sha512-EQjT0ScVRRgVvlPCXpd3UW0fdKI3m81bIsnatOml45rFSgjr/Abv+G6Zg/wdbBP5JkT8w9U7VQ0409xabVdppw==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/data-types@2.10.0':
-    resolution: {integrity: sha512-lU7WyZjTUbBDmKVnTHYTE+p9hukJ7ZvPyFHjvUpgY8gaQzzpN7Xnugz3peXc5Nhs8Go2/J1CQ1jzc/Outzyn+A==}
+  '@terascope/data-types@2.10.1':
+    resolution: {integrity: sha512-SG7Kr6w17qJK39Fd/6ETUWJmt2R48RS2GG2JmqfBCLHVaYWOpzPrwAN+ofF5Sob21YVzBwPudRIzC04dXaXz+w==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/elasticsearch-api@5.10.0':
-    resolution: {integrity: sha512-WKkSHGdv/52jNZW07qk+srX3XAQAmny6ShetVq823+uPqoarl65aVUEq2sxrCEahKK3tHkSp1EI36nWvkdQLvA==}
+  '@terascope/elasticsearch-api@5.10.1':
+    resolution: {integrity: sha512-vz3M5t0elSSElQLWNR5LTmOrtoN3LtPOpV72Q5VzyJZ3rQsZJTNrvn1GWKoxzd7RP1R9sWVAunHK56upnBCwDw==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
   '@terascope/eslint-config@1.2.1':
@@ -709,24 +709,24 @@ packages:
     engines: {node: '>=22.0.0', pnpm: '>=10.32.1'}
     hasBin: true
 
-  '@terascope/geo-utils@2.10.0':
-    resolution: {integrity: sha512-x+zWKT0yECqtJcajIv9u32Ou9uqPdcoPEMJT2hTZ7oLi465RXIxZoNeVoEV+Xs/MLy6vURLLUKu62eyaUdbDcQ==}
+  '@terascope/geo-utils@2.10.1':
+    resolution: {integrity: sha512-6AMFaa5Ew8XWPBBQuG98L2WUXTw8bdaCVDAvUsL2NIFEIR2uZcFNTnstGlgw/FSQJMjpNTzEPckmckoLaLP4iw==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/ip-utils@2.11.0':
-    resolution: {integrity: sha512-xrcDFLQzRTE6p/jKTnX0nhDPg5eRNIExunmsThveuFQgWcSXwsnzeH8MsHwZNJ+LbrneJIBvre5k2lth7MBRAQ==}
+  '@terascope/ip-utils@2.11.1':
+    resolution: {integrity: sha512-0mPGNAoDAu9AMP0xzJpFTomzHgfYtz6TTjDVPjjbxq1uH5QHQqyLIdBSlYAmtG3+KGA1H3zslmRtLRNK91JjTg==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/job-components@2.12.0':
-    resolution: {integrity: sha512-1tMKdtmgp+jzQ4vvd5OZmaE/1OMROLWJQRXKro8suPWiYqrcoIzntP4+x8ZkavLHQSXYxkFUQjY4pnWlsF3KeA==}
+  '@terascope/job-components@2.12.1':
+    resolution: {integrity: sha512-XKwV/LGO2ntPS+TDCoM1O2vphhB4S5c9kDZLemDass7jpOu17vbIkrDeALdx2lkptjAJXFhWNQZ3+vNQ2gFnlA==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/opensearch-client@2.10.0':
-    resolution: {integrity: sha512-1HybXvxVuSAGKzf+8WxWQUqeIWOWD7zcw634mFZtMhY+MvbFjJ+xZgGzpXB526poXqUvB2j4pUiNr6hNrLdsWg==}
+  '@terascope/opensearch-client@2.10.1':
+    resolution: {integrity: sha512-cmLQxDmg1ae+fqXXQurhRDGCPQLY9xxDTEBmdqDfgIjRezry6cJESxc/yRnD2nemiNPkUJpV5Ne1p63KrFWHaQ==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  '@terascope/scripts@2.14.0':
-    resolution: {integrity: sha512-kTW8TvMLj92v+prlmwCpKZWJAKHmrnlvCD6hvKjsrNTEClE5G776JmPLp8m6/IYtKwv8sw6GAl0wfrW5vQvLwQ==}
+  '@terascope/scripts@2.15.0':
+    resolution: {integrity: sha512-KAvNjJBJyPTwyQsVenCi6gOTDj2oHt7/6gN1NPI8J7iRjiSLzmOV4J4CuAu3Lt/1DdZolf84PbFutU+F3QOJ1A==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
     hasBin: true
     peerDependencies:
@@ -735,8 +735,8 @@ packages:
       typescript:
         optional: true
 
-  '@terascope/teraslice-state-storage@2.10.0':
-    resolution: {integrity: sha512-wXCglxPTW2sQlJerL/69M6ByrY/oatlWmkremoCjSOp0wdUamWqRA9TFIAJrCFmu0vYOABay2ijfBuUyrRPfxA==}
+  '@terascope/teraslice-state-storage@2.10.1':
+    resolution: {integrity: sha512-9U4d+GkOyUNT/GpV72DGDvoz3I2bE6Nao7eDyJcgottA0g4ypqKhbazdOqQKY1OezD/PJsMu6txyHP07u9UOyw==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
   '@terascope/types@2.10.0':
@@ -1298,8 +1298,8 @@ packages:
     resolution: {integrity: sha512-6M5XjcnsygQNPMCMPXSK379xrJFiZ/AEMNBmFEmQW8d/789VQATvriyi5r0HYTL9TkQ26rn3kgdTG3aisbrXkQ==}
     engines: {bare: '>=1.14.0'}
 
-  bare-path@3.0.0:
-    resolution: {integrity: sha512-tyfW2cQcB5NN8Saijrhqn0Zh7AnFNsnczRcuWODH0eYAXBsJ5gVxAUuNr7tsHSC6IZ77cA0SitzT+s47kot8Mw==}
+  bare-path@3.0.1:
+    resolution: {integrity: sha512-ghj2DSK/2e99a1anTVPCV4m4YIYtrbXhfM7V3D7XZLOTsybnYyaJloymGqssQc8l/or0UoDyRtNQkmkEF/ysgQ==}
 
   bare-stream@2.13.1:
     resolution: {integrity: sha512-Vp0cnjYyrEC4whYTymQ+YZi6pBpfiICZO3cfRG8sy67ZNWe951urv1x4eW1BKNngw3U+3fPYb5JQvHbCtxH7Ow==}
@@ -2170,6 +2170,10 @@ packages:
     resolution: {integrity: sha512-ej4AhfhfL2Q2zpMmLo7U1Uv9+PyhIZpgQLGT1F9miIGmiCJIoCgSmczFdrc97mWT4kVY72KA+WnnhJ5pghSvSg==}
     engines: {node: '>= 0.4'}
 
+  hasown@2.0.4:
+    resolution: {integrity: sha512-T2UbfbBEF32wiepXIsMlTW9+dDYC6wMh/t/vYA4tuOMKqWz/n3vr1NFSxQiyP+zk2mXsoMA/i/7qV6LKut1t1A==}
+    engines: {node: '>= 0.4'}
+
   hpagent@0.1.2:
     resolution: {integrity: sha512-ePqFXHtSQWAFXYmj+JtOTHr84iNrII4/QRlAAPPE+zqnKy4xJo7Ie1Y4kC7AdB+LxLxSTTzBMASsEcy0q8YyvQ==}
 
@@ -2244,8 +2248,8 @@ packages:
     resolution: {integrity: sha512-/+S6j4E9AHvW9SWMSEY9Xfy66O5PWvVEJ08O0y5JGyEKQpojb0K0GKpz/v5HJ/G0vi3D2sjGK78119oXZeE0qA==}
     engines: {node: '>= 12'}
 
-  ip-bigint@9.0.4:
-    resolution: {integrity: sha512-b9fkGBL2HuChLdf8s+lo7AMtupprxX+6IEVbu1yZWPcDWcNbQeZ9Jj7z20PVPANKTYZFFMVmcYSXVqArhB8+bg==}
+  ip-bigint@9.0.5:
+    resolution: {integrity: sha512-C+wkW87nNsb6lmOG6mIuZFwosx+vRN7AMypCG3q0zDoqwQqQkhOff5/CWzwaV4o+4VsFae8S2GEf021cNIbYpQ==}
     engines: {node: '>=22'}
 
   ip@2.0.1:
@@ -3615,12 +3619,12 @@ packages:
   teex@1.0.1:
     resolution: {integrity: sha512-eYE6iEI62Ni1H8oIa7KlDU6uQBtqr4Eajni3wX7rpfXD8ysFx8z0+dri+KWEPWpBsxXfxu58x/0jvTVT1ekOSg==}
 
-  teraslice-client-js@2.10.0:
-    resolution: {integrity: sha512-pzBWj8DIhhZtK1OnpsrOs9z0Km/WzsFTwFz9eAOtDTLx5IGw/bfClVvSiKwFjUvrxuM6eSfZyHhbHiG5D331fg==}
+  teraslice-client-js@2.10.1:
+    resolution: {integrity: sha512-TmnFI3cbAG3/NmPrihoK/NNftPRAo0UyuVL+AS895R5TKJLLdjfOaeAKY3mT2Y1n5RqeVLb67o4TPAwzsrcPww==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
-  teraslice-test-harness@2.13.0:
-    resolution: {integrity: sha512-INKOytTVeb18uth+PE24lUxO8kIsAdB0i86G1usJOPR5pWqbVrZVjECDFmL/ESCcZMRnz/0DM/WjMs7/nNbxKg==}
+  teraslice-test-harness@2.13.1:
+    resolution: {integrity: sha512-/Pcxrv9ZO0icVdjgGZHW/rrVLVkpSiMafeJH2/qXPScTJLcjkRS9HYSDX9liQg9/qmMxg1Y66G4mEJI41jNvCg==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
   test-exclude@6.0.0:
@@ -3642,6 +3646,10 @@ packages:
 
   tinyglobby@0.2.16:
     resolution: {integrity: sha512-pn99VhoACYR8nFHhxqix+uvsbXineAasWm5ojXoN8xEwK5Kd3/TrhNn1wByuD52UxWRLy8pu+kRMniEi6Eq9Zg==}
+    engines: {node: '>=12.0.0'}
+
+  tinyglobby@0.2.17:
+    resolution: {integrity: sha512-wXR/dYpcqKmfWpEdZjiKJOwCNFndD0DMnrW/cYjVGttEkBfVgcLFHoNrlj47mjOVic9yyNu65alsgF4NQyTa2g==}
     engines: {node: '>=12.0.0'}
 
   tinyqueue@2.0.3:
@@ -3719,8 +3727,8 @@ packages:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
 
-  type-fest@5.6.0:
-    resolution: {integrity: sha512-8ZiHFm91orbSAe2PSAiSVBVko18pbhbiB3U9GglSzF/zCGkR+rxpHx6sEMCUm4kxY4LjDIUGgCfUMtwfZfjfUA==}
+  type-fest@5.7.0:
+    resolution: {integrity: sha512-1URUxUqfHFM1c+zfSPsa3gnkO7Aq21qyH75SIduNYz4SzY964rn1X2vCMQaHSHhktiw+0kPa2iyb6PUpXqB6Vg==}
     engines: {node: '>=20'}
 
   typed-array-buffer@1.0.3:
@@ -3906,8 +3914,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  xlucene-parser@2.11.0:
-    resolution: {integrity: sha512-UUx//mnbldnuQTV/oWeddxYAkP0TpYRy7WH9XbH7DDT/p8IpV95pcFU0rhrnNfbPkgMj4KgiCyN88yYDEZ5ENg==}
+  xlucene-parser@2.11.1:
+    resolution: {integrity: sha512-tpTg+bfMWEF485N9nZ8kbsCuToJu3vNUS9M5qGaHMEKAF88Dl2UFt/345OHKfVWqrf5HYUynazteMSBu9gCSTQ==}
     engines: {node: '>=22.0.0', pnpm: '>=10.25.0'}
 
   xtend@4.0.2:
@@ -4668,7 +4676,7 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.4
 
-  '@terascope/core-utils@2.10.0':
+  '@terascope/core-utils@2.10.1':
     dependencies:
       '@terascope/types': 2.10.0
       awesome-phonenumber: 7.8.0
@@ -4691,13 +4699,13 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/data-mate@2.11.0':
+  '@terascope/data-mate@2.11.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
       '@faker-js/faker': 10.4.0
-      '@terascope/core-utils': 2.10.0
-      '@terascope/data-types': 2.10.0
-      '@terascope/geo-utils': 2.10.0
-      '@terascope/ip-utils': 2.11.0
+      '@terascope/core-utils': 2.10.1
+      '@terascope/data-types': 2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
+      '@terascope/geo-utils': 2.10.1
+      '@terascope/ip-utils': 2.11.1
       '@terascope/types': 2.10.0
       '@turf/random': 7.3.5
       '@types/validator': 13.15.10
@@ -4705,28 +4713,33 @@ snapshots:
       big-json: 3.2.0
       chance: 1.1.13
       date-fns: 4.2.1
-      ip-bigint: 9.0.4
+      ip-bigint: 9.0.5
       jexl: 2.3.0
       mnemonist: 0.40.4
       randexp: 0.5.3
       uuid: 14.0.0
       valid-url: 1.0.9
       validator: 13.15.35
-      xlucene-parser: 2.11.0
+      xlucene-parser: 2.11.1
     transitivePeerDependencies:
+      - jest
       - supports-color
+      - typescript
 
-  '@terascope/data-types@2.10.0':
+  '@terascope/data-types@2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
       graphql: 16.12.0
+      jest-extended: 7.0.0(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
     transitivePeerDependencies:
+      - jest
       - supports-color
+      - typescript
 
-  '@terascope/elasticsearch-api@5.10.0':
+  '@terascope/elasticsearch-api@5.10.1':
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
       setimmediate: 1.0.5
     transitivePeerDependencies:
@@ -4768,9 +4781,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/geo-utils@2.10.0':
+  '@terascope/geo-utils@2.10.1':
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
       '@turf/bbox': 7.3.5
       '@turf/bbox-polygon': 7.3.5
@@ -4789,16 +4802,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/ip-utils@2.11.0':
+  '@terascope/ip-utils@2.11.1':
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/job-components@2.12.0':
+  '@terascope/job-components@2.12.1':
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
       import-meta-resolve: 4.2.0
       prom-client: 15.1.3
@@ -4807,22 +4820,24 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/opensearch-client@2.10.0':
+  '@terascope/opensearch-client@2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
-      '@terascope/core-utils': 2.10.0
-      '@terascope/data-types': 2.10.0
+      '@terascope/core-utils': 2.10.1
+      '@terascope/data-types': 2.10.1(jest@30.4.2(@types/node@25.9.1)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/types': 2.10.0
       opensearch1: '@opensearch-project/opensearch@1.2.0'
       opensearch2: '@opensearch-project/opensearch@2.12.0'
       opensearch3: '@opensearch-project/opensearch@3.5.1'
       setimmediate: 1.0.5
     transitivePeerDependencies:
+      - jest
       - supports-color
+      - typescript
 
-  '@terascope/scripts@2.14.0(typescript@5.9.3)':
+  '@terascope/scripts@2.15.0(typescript@5.9.3)':
     dependencies:
       '@kubernetes/client-node': 1.4.0
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       execa: 9.6.1
       fs-extra: 11.3.5
       globby: 16.2.0
@@ -4855,10 +4870,10 @@ snapshots:
       - supports-color
       - utf-8-validate
 
-  '@terascope/teraslice-state-storage@2.10.0':
+  '@terascope/teraslice-state-storage@2.10.1':
     dependencies:
-      '@terascope/core-utils': 2.10.0
-      '@terascope/elasticsearch-api': 5.10.0
+      '@terascope/core-utils': 2.10.1
+      '@terascope/elasticsearch-api': 5.10.1
       '@terascope/types': 2.10.0
     transitivePeerDependencies:
       - supports-color
@@ -5584,7 +5599,7 @@ snapshots:
   bare-fs@4.7.1:
     dependencies:
       bare-events: 2.8.3
-      bare-path: 3.0.0
+      bare-path: 3.0.1
       bare-stream: 2.13.1(bare-events@2.8.3)
       bare-url: 2.4.3
       fast-fifo: 1.3.2
@@ -5594,7 +5609,7 @@ snapshots:
 
   bare-os@3.9.1: {}
 
-  bare-path@3.0.0:
+  bare-path@3.0.1:
     dependencies:
       bare-os: 3.9.1
 
@@ -5609,7 +5624,7 @@ snapshots:
 
   bare-url@2.4.3:
     dependencies:
-      bare-path: 3.0.0
+      bare-path: 3.0.1
 
   base64-js@1.5.1: {}
 
@@ -6423,7 +6438,7 @@ snapshots:
       asynckit: 0.4.0
       combined-stream: 1.0.8
       es-set-tostringtag: 2.1.0
-      hasown: 2.0.3
+      hasown: 2.0.4
       mime-types: 2.1.35
 
   from2@2.3.0:
@@ -6608,7 +6623,7 @@ snapshots:
       keyv: 5.6.0
       lowercase-keys: 4.0.1
       responselike: 4.0.2
-      type-fest: 5.6.0
+      type-fest: 5.7.0
       uint8array-extras: 1.5.0
 
   graceful-fs@4.2.10: {}
@@ -6649,6 +6664,10 @@ snapshots:
       has-symbols: 1.1.0
 
   hasown@2.0.3:
+    dependencies:
+      function-bind: 1.1.2
+
+  hasown@2.0.4:
     dependencies:
       function-bind: 1.1.2
 
@@ -6711,7 +6730,7 @@ snapshots:
 
   ip-address@10.2.0: {}
 
-  ip-bigint@9.0.4: {}
+  ip-bigint@9.0.5: {}
 
   ip@2.0.1: {}
 
@@ -8096,7 +8115,7 @@ snapshots:
       is-plain-obj: 4.1.0
       semver: 7.8.1
       sort-object-keys: 2.1.0
-      tinyglobby: 0.2.16
+      tinyglobby: 0.2.17
 
   source-map-generator@2.0.6: {}
 
@@ -8268,7 +8287,7 @@ snapshots:
       tar-stream: 3.2.0
     optionalDependencies:
       bare-fs: 4.7.1
-      bare-path: 3.0.0
+      bare-path: 3.0.1
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -8306,19 +8325,19 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  teraslice-client-js@2.10.0:
+  teraslice-client-js@2.10.1:
     dependencies:
-      '@terascope/core-utils': 2.10.0
+      '@terascope/core-utils': 2.10.1
       '@terascope/types': 2.10.0
       auto-bind: 5.0.1
       got: 15.0.5
     transitivePeerDependencies:
       - supports-color
 
-  teraslice-test-harness@2.13.0:
+  teraslice-test-harness@2.13.1:
     dependencies:
       '@terascope/fetch-github-release': 2.3.1
-      '@terascope/job-components': 2.12.0
+      '@terascope/job-components': 2.12.1
       decompress: 4.2.1
       fs-extra: 11.3.5
     transitivePeerDependencies:
@@ -8346,6 +8365,11 @@ snapshots:
   through@2.3.8: {}
 
   tinyglobby@0.2.16:
+    dependencies:
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
+
+  tinyglobby@0.2.17:
     dependencies:
       fdir: 6.5.0(picomatch@4.0.4)
       picomatch: 4.0.4
@@ -8411,7 +8435,7 @@ snapshots:
 
   type-fest@4.41.0: {}
 
-  type-fest@5.6.0:
+  type-fest@5.7.0:
     dependencies:
       tagged-tag: 1.0.0
 
@@ -8642,11 +8666,11 @@ snapshots:
 
   ws@8.21.0: {}
 
-  xlucene-parser@2.11.0:
+  xlucene-parser@2.11.1:
     dependencies:
-      '@terascope/core-utils': 2.10.0
-      '@terascope/geo-utils': 2.10.0
-      '@terascope/ip-utils': 2.11.0
+      '@terascope/core-utils': 2.10.1
+      '@terascope/geo-utils': 2.10.1
+      '@terascope/ip-utils': 2.11.1
       '@terascope/types': 2.10.0
       peggy: 5.1.0
     transitivePeerDependencies:
