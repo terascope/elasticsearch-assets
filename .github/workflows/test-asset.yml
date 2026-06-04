@@ -5,47 +5,75 @@ on:
   push:
     branches:
       - master
+      - 'release/elasticsearch-assets-v*'
   pull_request:
     branches:
       - master
+      - 'release/elasticsearch-assets-v*'
+
+permissions: {}
 
 jobs:
   compute-vars:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     outputs:
       COMMIT_SHORT_SHA: ${{ steps.get-short-sha.outputs.COMMIT_SHORT_SHA }}
+      TERASLICE_CLI_VERSION: ${{ steps.get-cli-version.outputs.TERASLICE_CLI_VERSION }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
       - name: Get Commit Short SHA
         id: get-short-sha
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          calculatedSha=$(git rev-parse --short ${{ github.event.pull_request.head.sha || github.sha }})
+          calculatedSha=$(git rev-parse --short "$HEAD_SHA")
           echo "COMMIT_SHORT_SHA=$calculatedSha" >> $GITHUB_OUTPUT
+      - name: Get Teraslice CLI version
+        id: get-cli-version
+        env:
+          TERASLICE_CLI_VERSION: ${{ (startsWith(github.ref, 'refs/heads/release/standard-assets-v') || startsWith(github.base_ref, 'release/standard-assets-v')) && 'prerelease' || 'latest' }}
+        run: echo "TERASLICE_CLI_VERSION=$TERASLICE_CLI_VERSION" >> $GITHUB_OUTPUT
 
   check-docker-limit-before:
-   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
-   secrets: inherit
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    permissions:
+      contents: read
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
-    secrets: inherit
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    permissions:
+      contents: read
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   build-elasticsearch-assets:
     runs-on: ubuntu-latest
     needs: compute-vars
+    permissions:
+      contents: read
     strategy:
       matrix:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
@@ -53,16 +81,24 @@ jobs:
       - run: pnpm run setup
 
       - name: Append dev tag to version
+        env:
+          COMMIT_SHORT_SHA: ${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}
         run: |
-          jq '.version += "-dev.${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}"' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
+          jq --arg sha "$COMMIT_SHORT_SHA" '.version += "-dev." + $sha' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
 
-      - run: pnpm dlx teraslice-cli -v
-      - run: pnpm dlx teraslice-cli assets build
+      - name: Check teraslice-cli version
+        env:
+          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
+        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" -v
+      - name: Build asset
+        env:
+          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
+        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" assets build
       - run: ls -l build/
 
       - name: Archive test build artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: teraslice-test-asset-${{ matrix.node-version }}-dev.${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}
           path: ./build
@@ -71,6 +107,8 @@ jobs:
   test-elasticsearch-assets:
     runs-on: ubuntu-latest
     needs: [compute-vars, cache-docker-images]
+    permissions:
+      contents: read
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
@@ -81,20 +119,22 @@ jobs:
         node-version: [22, 24]
         search-version: [opensearch1, opensearch2, opensearch3]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -109,7 +149,7 @@ jobs:
 
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -126,7 +166,7 @@ jobs:
 
       - name: Upload logs artifact
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: logs.commit-${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}.${{ matrix.search-version }}
           path: |
@@ -137,6 +177,8 @@ jobs:
   test-elasticsearch-assets-encrypted:
     runs-on: ubuntu-latest
     needs: [compute-vars, cache-docker-images]
+    permissions:
+      contents: read
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
@@ -146,20 +188,22 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -174,7 +218,7 @@ jobs:
 
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -189,13 +233,13 @@ jobs:
       - name: Test asset with encrypted opensearch
         run: SKIP_IMAGE_DELETION='true' pnpm run test:encrypted
 
-      - name: Test apis for with encrypted opensearch
+      - name: Test apis with encrypted opensearch
         run: pnpm run test:encrypted
         working-directory: ./packages/elasticsearch-asset-apis
 
       - name: Upload logs artifact
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: logs.commit-${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
           path: |
@@ -206,6 +250,8 @@ jobs:
   test-e2e:
     runs-on: ubuntu-latest
     needs: [compute-vars, cache-docker-images]
+    permissions:
+      contents: read
     env:
       NODE_OPTIONS: "--max-old-space-size=4096"
     strategy:
@@ -215,20 +261,22 @@ jobs:
         # NOTE: Hard Coded Node Version array, should match array in build-and-publish-asset.yml
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
 
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
 
       # we login to docker to avoid docker pull limit rates
       - name: Login to Docker Hub
-        uses: docker/login-action@v4
+        uses: docker/login-action@650006c6eb7dba73a995cc03b0b2d7f5ca915bee # v4.2.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
@@ -243,7 +291,7 @@ jobs:
 
       - name: Restore Docker image cache
         id: docker-cache
-        uses: actions/cache@v5
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: /tmp/docker_cache
           key: docker-images-${{ hashFiles('./images/image-list.txt') }}-master
@@ -256,7 +304,7 @@ jobs:
       - run: pnpm test:e2e
       - name: Upload logs artifact
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: logs.commit-${{ needs.compute-vars.outputs.COMMIT_SHORT_SHA }}.job-${{ github.job }}.node-${{ matrix.node-version }}
           path: logs/*.log
@@ -264,15 +312,19 @@ jobs:
 
   test-website:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        with:
+          persist-credentials: false
       - name: Install pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@0e279bb959325dab635dd2c09392533439d90093 # v6.0.8
       - name: Use Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
           # NOTE: Hard Coded Node Version
-          node-version: '22'
+          node-version: '24'
           cache: 'pnpm'
       - name: Build Documentation
         run: pnpm run setup && ./scripts/build-documentation.sh
@@ -282,39 +334,51 @@ jobs:
   comment-artifact-urls:
     # skip comment on push event (merge to master) and dependabot PRs
     if: github.event_name != 'push' && github.actor != 'dependabot[bot]'
-    needs: test-elasticsearch-assets
+    needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      pull-requests: write
     steps:
       - name: Get Artifacts List
         id: artifacts-list
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          ARTIFACTS_JSON=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)
-          echo $ARTIFACTS_JSON
+          ARTIFACTS_JSON=$(gh api "repos/${REPOSITORY}/actions/runs/${RUN_ID}/artifacts")
+          echo "$ARTIFACTS_JSON"
           ID_LIST=$(echo "$ARTIFACTS_JSON" | jq -c  '[.artifacts[] | {name: .name, id:.id}]')
-          echo $ID_LIST
+          echo "$ID_LIST"
           echo "artifact-ids=$ID_LIST" >> "$GITHUB_OUTPUT"
 
       - name: Comment on PR
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
+          ARTIFACT_IDS: ${{ steps.artifacts-list.outputs.artifact-ids }}
+          REPOSITORY: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
         run: |
-          ARTIFACT_IDS='${{ steps.artifacts-list.outputs.artifact-ids }}'
-          LIST=$(echo "$ARTIFACT_IDS" | jq -r '.[] | "\(.name): https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/\(.id)"')
+          LIST=$(echo "$ARTIFACT_IDS" | jq -r --arg repo "$REPOSITORY" --arg run_id "$RUN_ID" '.[] | "\(.name): https://github.com/\($repo)/actions/runs/\($run_id)/artifacts/\(.id)"')
           COMMENT=$(printf "Asset artifacts:\n%s" "$LIST")
-          gh api repos/${{ github.repository }}/issues/${PR_NUMBER}/comments -f body="$COMMENT"
+          gh api "repos/${REPOSITORY}/issues/${PR_NUMBER}/comments" -f body="$COMMENT"
 
   check-docker-limit-after:
-    needs: test-elasticsearch-assets
+    needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
-    secrets: inherit
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    permissions:
+      contents: read
+    secrets:
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   all-tests-passed:
-    needs: [build-elasticsearch-assets, test-elasticsearch-assets, test-website]
+    needs: [build-elasticsearch-assets, test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e, test-website]
     runs-on: ubuntu-latest
+    permissions: {}
     steps:
       - run: echo "All tests have passed"
       
@@ -332,7 +396,7 @@ jobs:
   #       uses: actions/setup-node@v4
   #       with:
   #         # NOTE: Hard Coded Node Version
-  #         node-version: '22'
+  #         node-version: '24'
   #         cache: 'pnpm'
   #     - run: pnpm run setup
   #     - run: pnpm run lint
