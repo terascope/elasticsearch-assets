@@ -11,12 +11,12 @@ on:
 
 jobs:
   check-docker-limit-before:
-   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@main
+   uses: terascope/workflows/.github/workflows/check-docker-limit.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
    secrets: inherit
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@main
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
     secrets: inherit
 
   build-elasticsearch-assets:
@@ -275,7 +275,7 @@ jobs:
   check-docker-limit-after:
     needs: test-elasticsearch-assets
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@main
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@92c8f6b6312803300b0f36ba6b38d8007d7f471f
     secrets: inherit
 
   all-tests-passed:
