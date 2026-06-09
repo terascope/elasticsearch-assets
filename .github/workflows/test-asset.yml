@@ -35,11 +35,11 @@ jobs:
       - name: Get Teraslice CLI version
         id: get-cli-version
         env:
-          TERASLICE_CLI_VERSION: ${{ (startsWith(github.ref, 'refs/heads/release/standard-assets-v') || startsWith(github.base_ref, 'release/standard-assets-v')) && 'prerelease' || 'latest' }}
+          TERASLICE_CLI_VERSION: ${{ (startsWith(github.ref, 'refs/heads/release/elasticsearch-assets-v') || startsWith(github.base_ref, 'release/elasticsearch-assets-v')) && 'prerelease' || 'latest' }}
         run: echo "TERASLICE_CLI_VERSION=$TERASLICE_CLI_VERSION" >> $GITHUB_OUTPUT
 
   check-docker-limit-before:
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
     permissions:
       contents: read
     secrets:
@@ -48,7 +48,7 @@ jobs:
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
     permissions:
       contents: read
     secrets:
@@ -368,7 +368,7 @@ jobs:
   check-docker-limit-after:
     needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@d2864085b6d36798749fce3dd549dae10283f76a
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
     permissions:
       contents: read
     secrets:
