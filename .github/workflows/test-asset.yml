@@ -39,7 +39,7 @@ jobs:
         run: echo "TERASLICE_CLI_VERSION=$TERASLICE_CLI_VERSION" >> $GITHUB_OUTPUT
 
   check-docker-limit-before:
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
     permissions:
       contents: read
     secrets:
@@ -48,7 +48,7 @@ jobs:
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
     permissions:
       contents: read
     secrets:
@@ -368,7 +368,7 @@ jobs:
   check-docker-limit-after:
     needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ce327af249470d5d00c81e9e80dc714c860ac5bb
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
     permissions:
       contents: read
     secrets:
