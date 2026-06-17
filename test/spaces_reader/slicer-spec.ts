@@ -222,4 +222,89 @@ describe('spaces_reader slicer', () => {
             expect(scope.isDone()).toBeTrue();
         });
     });
+
+    describe('when the query has too many clauses during slicer initialization', () => {
+        const query = 'ip:(TERM_1 OR TERM_2 OR TERM_3)';
+        const opConfig = {
+            _op: 'spaces_reader',
+            query,
+            index: testIndex,
+            endpoint: baseUri,
+            token,
+            size: 100000,
+            interval: 'auto',
+            delay: '30s',
+            date_field_name: 'date',
+            timeout: 5000,
+            retry: 0
+        };
+
+        const job = newTestJobConfig({
+            name: 'spaces-reader-slicer-too-many-clauses',
+            lifecycle: 'once',
+            operations: [
+                opConfig,
+                { _op: 'noop' }
+            ]
+        });
+
+        let harness: SlicerTestHarness;
+
+        beforeEach(async () => {
+            harness = new SlicerTestHarness(job, { assetDir, clients });
+
+            scope.get(`/${testIndex}/_info?token=${token}`)
+                .reply(200, {
+                    params: {
+                        size: {
+                            max: maxSize
+                        }
+                    }
+                });
+
+            // Mock the elasticsearch error response for too many clauses during
+            // slicer initialization
+            // The slicer calls getIndexDate twice - once for start (asc) and once for end (desc)
+            scope.post(`/${testIndex}?token=${token}`, {
+                q: 'ip:(TERM_1 OR TERM_2 OR TERM_3)',
+                size: 1,
+                sort: 'date:asc',
+                track_total_hits: false
+            }).reply(400, {
+                error: 'search_phase_execution_exception: [too_many_clauses] Reason: too_many_clauses: maxClauseCount is set to 1024'
+            });
+
+            scope.post(`/${testIndex}?token=${token}`, {
+                q: 'ip:(TERM_1 OR TERM_2 OR TERM_3)',
+                size: 1,
+                sort: 'date:desc',
+                track_total_hits: false
+            }).reply(400, {
+                error: 'search_phase_execution_exception: [too_many_clauses] Reason: too_many_clauses: maxClauseCount is set to 1024'
+            });
+        });
+
+        afterEach(async () => {
+            if (harness) await harness.shutdown();
+        });
+
+        it('should throw a meaningful error during initialization', async () => {
+            try {
+                await harness.initialize([]);
+                throw new Error('Expected initialization to fail');
+            } catch (err) {
+                expect(
+                    // @ts-expect-error
+                    err.message
+                ).toContain('Failed to initialize date slicer ranges');
+                expect(
+                    // @ts-expect-error
+                    err.message
+                ).toContain('Elasticsearch query failed');
+            }
+
+            // Note: Not checking scope.isDone() since the slicer might not use all mocks
+            // depending on which date determination request fails first
+        });
+    });
 });
