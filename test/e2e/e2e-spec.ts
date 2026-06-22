@@ -12,6 +12,122 @@ const {
     cleanupIndex, populateIndex, makeClient,
 } = ElasticsearchTestHelpers;
 
+interface RecoveryDiagnosticArgs {
+    label: string;
+    job: Job;
+    searchClient: Client;
+    destIndex: string;
+    sourceIndex: string;
+    expectedUuids: string[];
+    actualCount: number;
+    expectedCount: number;
+}
+
+function prefixHistogram(values: string[], depth: number): Record<string, number> {
+    const hist: Record<string, number> = {};
+    for (const value of values) {
+        const key = value.slice(0, depth);
+        hist[key] = (hist[key] ?? 0) + 1;
+    }
+    return hist;
+}
+
+/**
+ * The destination `_id` is the source `uuid` (the fixture sets `_id` from uuid and the
+ * bulk sender writes `_key` -> `_id`), so an `mget` by id tells us exactly which records
+ * never made it across.
+ */
+async function findMissingUuids(
+    searchClient: Client, index: string, uuids: string[]
+): Promise<string[]> {
+    const missing: string[] = [];
+    const batchSize = 5000;
+    for (let i = 0; i < uuids.length; i += batchSize) {
+        const ids = uuids.slice(i, i + batchSize);
+        const res = await searchClient.mget({
+            index,
+            _source: false,
+            body: { ids }
+        });
+        for (const doc of res.docs as Array<{ _id: string; found?: boolean }>) {
+            if (!doc.found) missing.push(doc._id);
+        }
+    }
+    return missing;
+}
+
+/**
+ * Logs why a recovered reindex came up short. Only call this on a count mismatch.
+ *
+ * The prefix histograms are the key signal. `id_reader` slices by uuid key-prefix, so:
+ *  - missing uuids clustered under a few prefixes => a slice range was skipped during
+ *    recovery (a read/slice-coverage gap);
+ *  - missing uuids scattered evenly => the records were read but not written, i.e. a
+ *    write-path loss such as silently-rejected bulk items (see the source-presence check
+ *    in step 5) rather than a recovery gap.
+ */
+async function logRecoveryDiagnostics(args: RecoveryDiagnosticArgs): Promise<void> {
+    const {
+        label, job, searchClient, destIndex, sourceIndex, expectedUuids, actualCount, expectedCount
+    } = args;
+
+    const log = (msg: string) => console.error(`[recovery-diagnostics:${label}] ${msg}`);
+
+    log(`doc count mismatch: expected ${expectedCount}, got ${actualCount} `
+        + `(diff ${expectedCount - actualCount})`);
+
+    // 1. Recovery execution + slicer stats: did the slicer believe it finished every slice?
+    try {
+        const ex = await job.execution() as any;
+        log(`recovery ex_id=${ex.ex_id} status=${ex._status} failureReason=${ex._failureReason ?? 'none'}`);
+        log(`_slicer_stats=${JSON.stringify(ex._slicer_stats)}`);
+    } catch (err) {
+        log(`could not fetch execution: ${(err as Error).message}`);
+    }
+
+    // 2. Slice-level errors recorded in the state store.
+    try {
+        const errors = await job.errors();
+        log(`recorded slice errors: ${errors.length}`);
+        if (errors.length > 0) {
+            log(`first errors: ${JSON.stringify(errors.slice(0, 5), null, 2)}`);
+        }
+    } catch (err) {
+        log(`could not fetch errors: ${(err as Error).message}`);
+    }
+
+    // 3. Cross-check indices.stats against the count API to rule out a refresh/stats race.
+    try {
+        const countRes = await searchClient.count({ index: destIndex });
+        log(`count API reports ${countRes.count} docs (indices.stats reported ${actualCount})`);
+    } catch (err) {
+        log(`could not run count: ${(err as Error).message}`);
+    }
+
+    // 4. Pinpoint exactly which records are missing and how they are distributed.
+    try {
+        const missing = await findMissingUuids(searchClient, destIndex, expectedUuids);
+        log(`missing record count: ${missing.length}`);
+        log(`sample missing uuids: ${JSON.stringify(missing.slice(0, 20))}`);
+        log(`missing by 1-char prefix: ${JSON.stringify(prefixHistogram(missing, 1))}`);
+        log(`missing by 2-char prefix: ${JSON.stringify(prefixHistogram(missing, 2))}`);
+
+        // 5. Confirm the missing records were actually present in the source. If they still
+        // exist in `sourceIndex`, recovery read-coverage was fine and the loss is in the
+        // write path (e.g. silently-rejected bulk items); a source that is itself short
+        // would instead point upstream of this job.
+        const sourceCount = await searchClient.count({ index: sourceIndex });
+        log(`source index ${sourceIndex} count: ${sourceCount.count} (expected ${expectedCount})`);
+        if (missing.length > 0) {
+            const stillInSource = await findMissingUuids(searchClient, sourceIndex, missing);
+            log(`of ${missing.length} missing-from-dest uuids, ${missing.length - stillInSource.length} `
+                + `are present in source and ${stillInSource.length} are absent from source too`);
+        }
+    } catch (err) {
+        log(`could not compute missing records: ${(err as Error).message}`);
+    }
+}
+
 describe('Elasticsearch Assets e2e', () => {
     jest.setTimeout(5 * 60 * 1000);
 
@@ -135,8 +251,22 @@ describe('Elasticsearch Assets e2e', () => {
 
             await searchClient.indices.refresh({ index: newDateIndex });
             const stats = await searchClient.indices.stats({ index: newDateIndex });
+            const actualCount = stats._all.total.docs.count;
 
-            expect(stats._all.total.docs.count).toBe(finalData.length);
+            if (actualCount !== finalData.length) {
+                await logRecoveryDiagnostics({
+                    label: 'elasticsearch_reader',
+                    job,
+                    searchClient,
+                    destIndex: newDateIndex,
+                    sourceIndex: readIndex,
+                    expectedUuids: finalData.map((item) => item.uuid),
+                    actualCount,
+                    expectedCount: finalData.length,
+                });
+            }
+
+            expect(actualCount).toBe(finalData.length);
         });
     });
 
@@ -260,8 +390,22 @@ describe('Elasticsearch Assets e2e', () => {
 
             await searchClient.indices.refresh({ index: testIndex });
             const stats = await searchClient.indices.stats({ index: testIndex });
+            const actualCount = stats._all.total.docs.count;
 
-            expect(stats._all.total.docs.count).toBe(finalData.length);
+            if (actualCount !== finalData.length) {
+                await logRecoveryDiagnostics({
+                    label: 'id_reader',
+                    job,
+                    searchClient,
+                    destIndex: testIndex,
+                    sourceIndex: readIndex,
+                    expectedUuids: finalData.map((item) => item.uuid),
+                    actualCount,
+                    expectedCount: finalData.length,
+                });
+            }
+
+            expect(actualCount).toBe(finalData.length);
         });
     });
 });
