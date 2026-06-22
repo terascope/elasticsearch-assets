@@ -143,6 +143,8 @@ jobs:
       - run: pnpm run lint
 
       - name: Create Docker Image List
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run docker:listImages
           cat ./images/image-list.txt
@@ -212,6 +214,8 @@ jobs:
       - run: pnpm run lint
 
       - name: Create Docker Image List
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run docker:listImages
           cat ./images/image-list.txt
@@ -285,6 +289,8 @@ jobs:
       - run: pnpm run lint
 
       - name: Create Docker Image List
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           pnpm run docker:listImages
           cat ./images/image-list.txt
@@ -301,7 +307,10 @@ jobs:
 
       - name: Install teraslice-cli
         run: npm install -g teraslice-cli
-      - run: pnpm test:e2e
+      - name: Run e2e tests
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm test:e2e
       - name: Upload logs artifact
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

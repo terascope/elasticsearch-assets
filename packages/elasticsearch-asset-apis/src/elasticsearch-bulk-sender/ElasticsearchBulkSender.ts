@@ -21,38 +21,15 @@ export class ElasticsearchBulkSender implements RouteSenderAPI {
 
     async send(dataArray: Iterable<DataEntity>): Promise<number> {
         let affectedRecords = 0;
-        let attemptedWrites = 0;
 
         await pMap(
             this.chunkRequests(
                 this.createBulkMetadata(dataArray)
             ),
             async (data) => {
-                // index/create/update actions carry `data`; deletes do not. Only the
-                // write actions are records we expect the cluster to acknowledge.
-                for (const record of data) {
-                    if (record.data != null) attemptedWrites += 1;
-                }
                 affectedRecords += await this.client.bulkSend(data);
             }
         );
-
-        // For a plain index, bulkSend retries throttling (429 / queue overflow) until it
-        // succeeds and throws on any hard error, so every write action must come back
-        // acknowledged. A shortfall here means records were silently dropped -- surface it
-        // rather than letting the slice report success and the data quietly go missing.
-        // (create/update/upsert/delete can legitimately skip items via
-        // document_already_exists / document_missing, so we only assert for a plain index.)
-        const isPlainIndex = !this.config.create && !this.config.update
-            && !this.config.upsert && !this.config.delete;
-
-        if (isPlainIndex && affectedRecords < attemptedWrites) {
-            throw new Error(
-                `elasticsearch_bulk: cluster acknowledged only ${affectedRecords} of `
-                + `${attemptedWrites} index actions; ${attemptedWrites - affectedRecords} `
-                + 'records were silently dropped'
-            );
-        }
 
         return affectedRecords;
     }

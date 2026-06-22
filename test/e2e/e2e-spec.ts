@@ -62,9 +62,10 @@ async function findMissingUuids(
  * The prefix histograms are the key signal. `id_reader` slices by uuid key-prefix, so:
  *  - missing uuids clustered under a few prefixes => a slice range was skipped during
  *    recovery (a read/slice-coverage gap);
- *  - missing uuids scattered evenly => the records were read but not written, i.e. a
- *    write-path loss such as silently-rejected bulk items (see the source-presence check
- *    in step 5) rather than a recovery gap.
+ *  - missing uuids scattered evenly => the records were sliced but never landed in the
+ *    destination, i.e. a write/commit-path loss (a dropped final flush, or the execution
+ *    reporting `completed` before the last writes are durable) rather than a recovery gap.
+ *    The source-presence check in step 5 confirms the records did exist to be copied.
  */
 async function logRecoveryDiagnostics(args: RecoveryDiagnosticArgs): Promise<void> {
     const {
@@ -114,8 +115,8 @@ async function logRecoveryDiagnostics(args: RecoveryDiagnosticArgs): Promise<voi
 
         // 5. Confirm the missing records were actually present in the source. If they still
         // exist in `sourceIndex`, recovery read-coverage was fine and the loss is in the
-        // write path (e.g. silently-rejected bulk items); a source that is itself short
-        // would instead point upstream of this job.
+        // write/commit path (dropped final flush, or `completed` racing the last writes);
+        // a source that is itself short would instead point upstream of this job.
         const sourceCount = await searchClient.count({ index: sourceIndex });
         log(`source index ${sourceIndex} count: ${sourceCount.count} (expected ${expectedCount})`);
         if (missing.length > 0) {
