@@ -26,18 +26,18 @@
     },
     "dependencies": {
         "@terascope/core-utils": "2.12.1",
-        "@terascope/data-mate": "2.13.1",
+        "@terascope/data-mate": "2.13.2",
         "@terascope/data-types": "2.12.1",
         "@terascope/elasticsearch-api": "5.12.1",
         "@terascope/geo-utils": "2.12.1",
         "datemath-parser": "~1.0.6",
-        "got": "~15.0.5",
+        "got": "~15.0.7",
         "moment": "~2.30.1"
     },
     "devDependencies": {
-        "@terascope/scripts": "2.19.0",
+        "@terascope/scripts": "2.19.2",
         "@terascope/types": "2.12.0",
-        "@types/node": "~26.0.0",
+        "@types/node": "~26.0.1",
         "jest": "~30.4.2"
     },
     "engines": {
