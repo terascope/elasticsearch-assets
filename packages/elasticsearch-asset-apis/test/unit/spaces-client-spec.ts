@@ -75,7 +75,7 @@ describe('Spaces Reader Client', () => {
         });
 
         it('should be able to make a search request without use data frames', async () => {
-            const params: SearchParams = {
+            const params: SearchParams & { include_total?: SearchParams['track_total_hits'] } = {
                 q: '(foo:bar)',
                 size: 100,
                 include_total: true
@@ -109,7 +109,7 @@ describe('Spaces Reader Client', () => {
                 }
             );
 
-            const params: SearchParams = {
+            const params: SearchParams & { include_total?: SearchParams['track_total_hits'] } = {
                 q: '(foo:bar)',
                 size: 100,
                 include_total: true
