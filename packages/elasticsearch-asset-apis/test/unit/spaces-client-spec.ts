@@ -78,7 +78,7 @@ describe('Spaces Reader Client', () => {
             const params: SearchParams = {
                 q: '(foo:bar)',
                 size: 100,
-                track_total_hits: true
+                include_total: true
             };
             scope.post(
                 `/${index}?token=${token}`,
@@ -112,7 +112,7 @@ describe('Spaces Reader Client', () => {
             const params: SearchParams = {
                 q: '(foo:bar)',
                 size: 100,
-                track_total_hits: true
+                include_total: true
             };
             scope.post(
                 `/${index}?token=${token}&format=dfjson`,
