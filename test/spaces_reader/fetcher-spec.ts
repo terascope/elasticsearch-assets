@@ -196,7 +196,9 @@ describe('spaces_reader fetcher', () => {
             // query size are overridden for unbounded fetches
             query.size = maxSize;
 
-            (query as SearchParams).track_total_hits = false;
+            (query as SearchParams & {
+                include_total?: SearchParams['track_total_hits'];
+            }).include_total = false;
 
             let results: DataEntity[];
 
@@ -271,7 +273,7 @@ describe('spaces_reader fetcher', () => {
                 scope.post(`/${testIndex}?token=${token}`, {
                     q: '(test:query)',
                     size: 100000,
-                    track_total_hits: false
+                    include_total: false
                 })
                     .delay(500)
                     .reply(200, {
