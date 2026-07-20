@@ -193,6 +193,8 @@ export class SpacesReaderClient implements ReaderClient {
                 token: config.token,
                 q: luceneQuery,
                 size,
+                // @deprecated track_total_hits is now include_total
+                track_total_hits: queryConfig.track_total_hits,
                 include_total: queryConfig.track_total_hits,
                 meta_fields: config?.meta_fields
             });
@@ -267,6 +269,8 @@ export class SpacesReaderClient implements ReaderClient {
             q: '_exists_:_key',
             size: 0,
             include_type_config: true,
+            // @deprecated track_total_hits is now include_total
+            track_total_hits: false,
             include_total: false
         };
 
