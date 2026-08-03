@@ -15,8 +15,8 @@ importers:
         specifier: 2.15.0
         version: 2.15.0
       '@terascope/data-types':
-        specifier: 2.15.0
-        version: 2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        specifier: 2.15.1
+        version: 2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
         specifier: 5.15.0
         version: 5.15.0
@@ -25,13 +25,13 @@ importers:
         version: link:packages/elasticsearch-asset-apis
       '@terascope/eslint-config':
         specifier: ~1.3.0
-        version: 1.3.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))
+        version: 1.3.0(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))
       '@terascope/job-components':
         specifier: 2.17.0
         version: 2.17.0
       '@terascope/opensearch-client':
-        specifier: 2.15.0
-        version: 2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        specifier: 2.15.1
+        version: 2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/scripts':
         specifier: 2.22.0
         version: 2.22.0(typescript@5.9.3)
@@ -48,11 +48,11 @@ importers:
         specifier: ~30.0.0
         version: 30.0.0
       '@types/node':
-        specifier: ~26.1.1
-        version: 26.1.1
+        specifier: ~26.1.2
+        version: 26.1.2
       '@types/semver':
-        specifier: ~7.7.1
-        version: 7.7.1
+        specifier: ~7.8.0
+        version: 7.8.0
       eslint:
         specifier: ~9.39.4
         version: 9.39.4
@@ -61,16 +61,16 @@ importers:
         version: 11.4.0
       jest:
         specifier: ~30.4.2
-        version: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+        version: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
       jest-extended:
         specifier: ~7.0.0
-        version: 7.0.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 7.0.0(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       moment:
         specifier: ~2.30.1
         version: 2.30.1
       nock:
-        specifier: ~14.0.16
-        version: 14.0.16
+        specifier: ~14.0.17
+        version: 14.0.17
       node-notifier:
         specifier: ~10.0.1
         version: 10.0.1
@@ -85,7 +85,7 @@ importers:
         version: 2.18.0
       ts-jest:
         specifier: ~29.4.12
-        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       typescript:
         specifier: ~5.9.3
         version: 5.9.3
@@ -99,8 +99,8 @@ importers:
         specifier: 2.15.0
         version: 2.15.0
       '@terascope/data-mate':
-        specifier: 2.16.0
-        version: 2.16.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        specifier: 2.16.1
+        version: 2.16.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
         specifier: 5.15.0
         version: 5.15.0
@@ -129,11 +129,11 @@ importers:
         specifier: 2.15.0
         version: 2.15.0
       '@terascope/data-mate':
-        specifier: 2.16.0
-        version: 2.16.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        specifier: 2.16.1
+        version: 2.16.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/data-types':
-        specifier: 2.15.0
-        version: 2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+        specifier: 2.15.1
+        version: 2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/elasticsearch-api':
         specifier: 5.15.0
         version: 5.15.0
@@ -157,11 +157,11 @@ importers:
         specifier: 2.14.0
         version: 2.14.0
       '@types/node':
-        specifier: ~26.1.1
-        version: 26.1.1
+        specifier: ~26.1.2
+        version: 26.1.2
       jest:
         specifier: ~30.4.2
-        version: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+        version: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
 
 packages:
 
@@ -692,12 +692,12 @@ packages:
     resolution: {integrity: sha512-fyZV522OCvlh/ZdUrOp0h5HGGcl+vhoGS7+R+N+hkXFYH7lQWP/hTtajK5mCYIauQ0OuMsH9pC5qJgEBR8oo9g==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
-  '@terascope/data-mate@2.16.0':
-    resolution: {integrity: sha512-+dwBwrPkilW473aHqyGET5ayy4gvyeXy7DTne96nIxATOJCf5otldQMAhkMKKKjucosQlqpK5h4RkkMhMvMIKQ==}
+  '@terascope/data-mate@2.16.1':
+    resolution: {integrity: sha512-0gxm/Uv2CAmCsXnzfJfMG4/AY/ObbuGUll2b97TVbHrUMq7ReiROSIhJWLzWx9Eh9b/Wzp0er2p9iwNhF1arIg==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
-  '@terascope/data-types@2.15.0':
-    resolution: {integrity: sha512-f8ya2eoo5C3Ry4F2ZWPwAS5Kx3roMMZTbne+v8ZkJzFyRSTb+3U5Nck1mum/ENvkF31tni75JoEEt8IOoJEBRw==}
+  '@terascope/data-types@2.15.1':
+    resolution: {integrity: sha512-k2ApT9oMR4kqQ0nm/32XVZ/SPJBmaEH5aQtA+8CyR9joTf1+wCoRkmhDFJcXNdEMvBUaNnm8AI6EQI5/j5DfmA==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
   '@terascope/elasticsearch-api@5.15.0':
@@ -725,8 +725,8 @@ packages:
     resolution: {integrity: sha512-hs4WJRwFPA7y7gC3gx1J1TJKMcJJi79Mkgf/tAUxSzjf/d1TbiwrqLdZjKPYE+d1hKy6BRIxFXcIQuiu6T2/YA==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
-  '@terascope/opensearch-client@2.15.0':
-    resolution: {integrity: sha512-XSHHt7O47T5pEO9thKFGyNSQX22CMTAzGOa7Tu/KjA5NJyPTK68JpxaDej5VthdgAyJxiNIAeC1Y6ptyUzVJ0w==}
+  '@terascope/opensearch-client@2.15.1':
+    resolution: {integrity: sha512-Pe0nQKeh6kpNaSNQj6LMj3njs+okAGm+9YV2fuUs7xb7WGEm389hNVDUbUAzxUyAs4jh2dSmW9ZhvxgashzCDQ==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
   '@terascope/scripts@2.22.0':
@@ -885,11 +885,11 @@ packages:
   '@types/node@24.13.3':
     resolution: {integrity: sha512-Dh8vAsV36ig5wa9OX4pXvMc9D3Veibfw2wix0CUwYODLD8nkj9UsLjASr49nPg+2eKzxhBV+v7L8pXvT4e639Q==}
 
-  '@types/node@26.1.1':
-    resolution: {integrity: sha512-nxAkRSVkN1Y0JC1W8ky/fTfkGsMmcrRsbx+3XoZE+rMOX71kLYTV7fLXpqud1GpbpP5TuffXFqfX7fH2GgZREw==}
+  '@types/node@26.1.2':
+    resolution: {integrity: sha512-Vu4a5UFA9rIIFJ7rB/Vaafh9lrCQszopTCx6KjFboXTGQbPNasehVR5TEiithSDGyd1DEiUByggTZsg8jukeIg==}
 
-  '@types/semver@7.7.1':
-    resolution: {integrity: sha512-FmgJfu+MOcQ370SD0ev7EI8TlCAfKYU+B4m5T3yXc1CiRN94g/SZPtsCkk506aUDtlMnFZvasDwHHUcZUEaYuA==}
+  '@types/semver@7.8.0':
+    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
 
   '@types/stack-utils@2.0.3':
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
@@ -2256,8 +2256,8 @@ packages:
     resolution: {integrity: sha512-1e9d3kb97NHJTIJDZW9rKqW2h6+dFa50Dy0fpPSMQp2ADje5gvKsXmdiK6dwY5t76TaTt5+P5N1Y/LoToIxP6g==}
     engines: {node: '>= 12'}
 
-  ip-bigint@9.0.6:
-    resolution: {integrity: sha512-dpEy7cSzYM9JsL6Ai9KGO0eCKALRtbYCb57Nfc8/kflSyBakf1Orb6/8u+NDlhS+7THbjrOfY52z9PnJXh/mWA==}
+  ip-bigint@9.0.7:
+    resolution: {integrity: sha512-HBYqqsIgMSrLUqq2bBGhA0DJpWYGkt62oCv+oDZFlOJfnqX7SfqmbWET1q4CJY+8wpEzUIXRoMb/Jzb70DyrAg==}
     engines: {node: '>=22'}
 
   ip@2.0.1:
@@ -2915,8 +2915,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  nock@14.0.16:
-    resolution: {integrity: sha512-8r4KEc6nT1D/fdLD/R1BO1CPaVEL8o40u/guFRJlXabN7vr3RmMqyjsY5Krt0nMwhsOAwXQ/mtN5vy5Jh3aErg==}
+  nock@14.0.17:
+    resolution: {integrity: sha512-EjRr1weMa4ALQX35AgZTEnP+weJJjlW1KGDiNM2IQC2069YDHas4f4B4UUYR+TTLyKWxJvOz2wObDKQs/LNreA==}
     engines: {node: '>=18.20.0 <20 || >=20.12.1'}
 
   node-exports-info@1.6.2:
@@ -4299,7 +4299,7 @@ snapshots:
   '@jest/console@30.4.1':
     dependencies:
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       jest-message-util: 30.4.1
       jest-util: 30.4.1
@@ -4313,7 +4313,7 @@ snapshots:
       '@jest/test-result': 30.4.1
       '@jest/transform': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 4.4.0
@@ -4321,7 +4321,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       graceful-fs: 4.2.11
       jest-changed-files: 30.4.1
-      jest-config: 30.4.2(@types/node@26.1.1)
+      jest-config: 30.4.2(@types/node@26.1.2)
       jest-haste-map: 30.4.1
       jest-message-util: 30.4.1
       jest-regex-util: 30.4.0
@@ -4351,7 +4351,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-mock: 30.4.1
 
   '@jest/expect-utils@30.2.0':
@@ -4373,7 +4373,7 @@ snapshots:
     dependencies:
       '@jest/types': 30.4.1
       '@sinonjs/fake-timers': 15.4.0
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-message-util: 30.4.1
       jest-mock: 30.4.1
       jest-util: 30.4.1
@@ -4391,12 +4391,12 @@ snapshots:
 
   '@jest/pattern@30.0.1':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-regex-util: 30.0.1
 
   '@jest/pattern@30.4.0':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-regex-util: 30.4.0
 
   '@jest/reporters@30.4.1(node-notifier@10.0.1)':
@@ -4407,7 +4407,7 @@ snapshots:
       '@jest/transform': 30.4.1
       '@jest/types': 30.4.1
       '@jridgewell/trace-mapping': 0.3.31
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       collect-v8-coverage: 1.0.3
       exit-x: 0.2.2
@@ -4489,7 +4489,7 @@ snapshots:
       '@jest/schemas': 30.0.5
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -4499,7 +4499,7 @@ snapshots:
       '@jest/schemas': 30.4.1
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -4726,11 +4726,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/data-mate@2.16.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/data-mate@2.16.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
       '@faker-js/faker': 10.5.0
       '@terascope/core-utils': 2.15.0
-      '@terascope/data-types': 2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+      '@terascope/data-types': 2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/geo-utils': 2.15.0
       '@terascope/ip-utils': 2.16.0
       '@terascope/types': 2.14.0
@@ -4740,7 +4740,7 @@ snapshots:
       big-json: 3.2.0
       chance: 1.1.13
       date-fns: 4.4.0
-      ip-bigint: 9.0.6
+      ip-bigint: 9.0.7
       jexl: 2.3.0
       mnemonist: 0.40.4
       randexp: 0.5.3
@@ -4753,12 +4753,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@terascope/data-types@2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/data-types@2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
       '@terascope/core-utils': 2.15.0
       '@terascope/types': 2.14.0
       graphql: 16.12.0
-      jest-extended: 7.0.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+      jest-extended: 7.0.0(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
     transitivePeerDependencies:
       - jest
       - supports-color
@@ -4772,7 +4772,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/eslint-config@1.3.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))':
+  '@terascope/eslint-config@1.3.0(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))':
     dependencies:
       '@eslint/compat': 2.0.5(eslint@9.39.4)
       '@eslint/js': 9.39.5
@@ -4781,7 +4781,7 @@ snapshots:
       '@typescript-eslint/parser': 8.54.0(eslint@9.39.4)(typescript@5.9.3)
       eslint: 9.39.4
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)
-      eslint-plugin-jest: 29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+      eslint-plugin-jest: 29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       eslint-plugin-jest-dom: 5.5.0(eslint@9.39.4)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.4)
       eslint-plugin-react: 7.37.5(eslint@9.39.4)
@@ -4847,10 +4847,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/opensearch-client@2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/opensearch-client@2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)':
     dependencies:
       '@terascope/core-utils': 2.15.0
-      '@terascope/data-types': 2.15.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3)
+      '@terascope/data-types': 2.15.1(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3)
       '@terascope/types': 2.14.0
       opensearch1: '@opensearch-project/opensearch@1.2.0'
       opensearch2: '@opensearch-project/opensearch@2.12.0'
@@ -5145,7 +5145,7 @@ snapshots:
   '@types/fs-extra@11.0.4':
     dependencies:
       '@types/jsonfile': 6.1.4
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
 
   '@types/geojson@7946.0.16': {}
 
@@ -5178,28 +5178,28 @@ snapshots:
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       form-data: 4.0.6
 
   '@types/node@24.13.3':
     dependencies:
       undici-types: 7.18.2
 
-  '@types/node@26.1.1':
+  '@types/node@26.1.2':
     dependencies:
       undici-types: 8.3.0
 
-  '@types/semver@7.7.1': {}
+  '@types/semver@7.8.0': {}
 
   '@types/stack-utils@2.0.3': {}
 
   '@types/stream-buffers@3.0.8':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
 
   '@types/unist@3.0.3': {}
 
@@ -5213,7 +5213,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
     optional: true
 
   '@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)':
@@ -6167,13 +6167,13 @@ snapshots:
       eslint: 9.39.4
       requireindex: 1.2.0
 
-  eslint-plugin-jest@29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3):
+  eslint-plugin-jest@29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 8.63.0(eslint@9.39.4)(typescript@5.9.3)
       eslint: 9.39.4
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
-      jest: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+      jest: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
       typescript: 5.9.3
     transitivePeerDependencies:
       - supports-color
@@ -6759,7 +6759,7 @@ snapshots:
 
   ip-address@10.3.1: {}
 
-  ip-bigint@9.0.6: {}
+  ip-bigint@9.0.7: {}
 
   ip@2.0.1: {}
 
@@ -6973,7 +6973,7 @@ snapshots:
       '@jest/expect': 30.4.1
       '@jest/test-result': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       co: 4.6.0
       dedent: 1.7.2
@@ -6993,7 +6993,7 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1):
+  jest-cli@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1):
     dependencies:
       '@jest/core': 30.4.2(node-notifier@10.0.1)
       '@jest/test-result': 30.4.1
@@ -7001,7 +7001,7 @@ snapshots:
       chalk: 4.1.2
       exit-x: 0.2.2
       import-local: 3.2.0
-      jest-config: 30.4.2(@types/node@26.1.1)
+      jest-config: 30.4.2(@types/node@26.1.2)
       jest-util: 30.4.1
       jest-validate: 30.4.1
       yargs: 17.7.2
@@ -7014,7 +7014,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-config@30.4.2(@types/node@26.1.1):
+  jest-config@30.4.2(@types/node@26.1.2):
     dependencies:
       '@babel/core': 7.29.0
       '@jest/get-type': 30.1.0
@@ -7040,7 +7040,7 @@ snapshots:
       slash: 3.0.0
       strip-json-comments: 3.1.1
     optionalDependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -7076,22 +7076,22 @@ snapshots:
       '@jest/environment': 30.4.1
       '@jest/fake-timers': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-mock: 30.4.1
       jest-util: 30.4.1
       jest-validate: 30.4.1
 
-  jest-extended@7.0.0(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3):
+  jest-extended@7.0.0(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3):
     dependencies:
       jest-diff: 30.2.0
       typescript: 5.9.3
     optionalDependencies:
-      jest: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+      jest: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
 
   jest-haste-map@30.4.1:
     dependencies:
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       graceful-fs: 4.2.11
@@ -7150,13 +7150,13 @@ snapshots:
   jest-mock@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-util: 30.2.0
 
   jest-mock@30.4.1:
     dependencies:
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       jest-util: 30.4.1
 
   jest-pnp-resolver@1.2.3(jest-resolve@30.4.1):
@@ -7192,7 +7192,7 @@ snapshots:
       '@jest/test-result': 30.4.1
       '@jest/transform': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       emittery: 0.13.1
       exit-x: 0.2.2
@@ -7221,7 +7221,7 @@ snapshots:
       '@jest/test-result': 30.4.1
       '@jest/transform': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       cjs-module-lexer: 2.2.0
       collect-v8-coverage: 1.0.3
@@ -7268,7 +7268,7 @@ snapshots:
   jest-util@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
@@ -7277,7 +7277,7 @@ snapshots:
   jest-util@30.4.1:
     dependencies:
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
@@ -7296,7 +7296,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 30.4.1
       '@jest/types': 30.4.1
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -7305,18 +7305,18 @@ snapshots:
 
   jest-worker@30.4.1:
     dependencies:
-      '@types/node': 26.1.1
+      '@types/node': 26.1.2
       '@ungap/structured-clone': 1.3.1
       jest-util: 30.4.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1):
+  jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1):
     dependencies:
       '@jest/core': 30.4.2(node-notifier@10.0.1)
       '@jest/types': 30.4.1
       import-local: 3.2.0
-      jest-cli: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+      jest-cli: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
     optionalDependencies:
       node-notifier: 10.0.1
     transitivePeerDependencies:
@@ -7575,7 +7575,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  nock@14.0.16:
+  nock@14.0.17:
     dependencies:
       '@mswjs/interceptors': 0.41.9
       json-stringify-safe: 5.0.1
@@ -8436,12 +8436,12 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.1.1)(node-notifier@10.0.1))(typescript@5.9.3):
+  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.1.2)(node-notifier@10.0.1))(typescript@5.9.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       handlebars: 4.7.9
-      jest: 30.4.2(@types/node@26.1.1)(node-notifier@10.0.1)
+      jest: 30.4.2(@types/node@26.1.2)(node-notifier@10.0.1)
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
