@@ -39,7 +39,7 @@ jobs:
         run: echo "TERASLICE_CLI_VERSION=$TERASLICE_CLI_VERSION" >> $GITHUB_OUTPUT
 
   check-docker-limit-before:
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@b7b03054122f0f4c73a15f523bb224588552f55c
     permissions:
       contents: read
     secrets:
@@ -48,7 +48,7 @@ jobs:
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@b7b03054122f0f4c73a15f523bb224588552f55c
     permissions:
       contents: read
     secrets:
@@ -301,7 +301,12 @@ jobs:
 
       - name: Install teraslice-cli
         run: npm install -g teraslice-cli
-      - run: pnpm test:e2e
+
+      - name: Test e2e
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm test:e2e
+
       - name: Upload logs artifact
         if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
@@ -368,7 +373,7 @@ jobs:
   check-docker-limit-after:
     needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@ee93e5655fd79976999f2c665ac1b6d7e334ec3b
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@b7b03054122f0f4c73a15f523bb224588552f55c
     permissions:
       contents: read
     secrets:
