@@ -16,7 +16,7 @@ importers:
         version: 2.16.3
       '@terascope/data-types':
         specifier: 2.16.3
-        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/elasticsearch-api':
         specifier: 5.16.3
         version: 5.16.3
@@ -31,10 +31,10 @@ importers:
         version: 2.18.3
       '@terascope/opensearch-client':
         specifier: 2.16.3
-        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/scripts':
         specifier: 2.23.4
-        version: 2.23.4(typescript@5.9.3)
+        version: 2.23.4(typescript@6.0.3)
       '@terascope/teraslice-state-storage':
         specifier: 2.16.3
         version: 2.16.3
@@ -64,7 +64,7 @@ importers:
         version: 30.4.2(@types/node@26.2.0)(node-notifier@10.0.1)
       jest-extended:
         specifier: ~7.0.0
-        version: 7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       moment:
         specifier: ~2.30.1
         version: 2.30.1
@@ -85,10 +85,10 @@ importers:
         version: 2.19.3
       ts-jest:
         specifier: ~29.4.12
-        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       typescript:
-        specifier: ~5.9.3
-        version: 5.9.3
+        specifier: ~6.0.3
+        version: 6.0.3
       uuid:
         specifier: ~14.0.1
         version: 14.0.1
@@ -100,7 +100,7 @@ importers:
         version: 2.16.3
       '@terascope/data-mate':
         specifier: 2.17.3
-        version: 2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/elasticsearch-api':
         specifier: 5.16.3
         version: 5.16.3
@@ -130,10 +130,10 @@ importers:
         version: 2.16.3
       '@terascope/data-mate':
         specifier: 2.17.3
-        version: 2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/data-types':
         specifier: 2.16.3
-        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+        version: 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/elasticsearch-api':
         specifier: 5.16.3
         version: 5.16.3
@@ -152,7 +152,7 @@ importers:
     devDependencies:
       '@terascope/scripts':
         specifier: 2.23.4
-        version: 2.23.4(typescript@5.9.3)
+        version: 2.23.4(typescript@6.0.3)
       '@terascope/types':
         specifier: 2.15.1
         version: 2.15.1
@@ -3789,6 +3789,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   uc.micro@2.1.0:
     resolution: {integrity: sha512-ARDJmphmdvUk6Glw7y9DQ2bFkKBHwQHLi2lsaH6PPmz/Ka9sFOBsBluozhDltWmnv9u/cF6Rt87znRTPV+yp/A==}
 
@@ -4726,11 +4731,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/data-mate@2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/data-mate@2.17.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)':
     dependencies:
       '@faker-js/faker': 10.6.0
       '@terascope/core-utils': 2.16.3
-      '@terascope/data-types': 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+      '@terascope/data-types': 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/geo-utils': 2.16.3
       '@terascope/ip-utils': 2.17.3
       '@terascope/types': 2.15.1
@@ -4753,12 +4758,12 @@ snapshots:
       - supports-color
       - typescript
 
-  '@terascope/data-types@2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/data-types@2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)':
     dependencies:
       '@terascope/core-utils': 2.16.3
       '@terascope/types': 2.15.1
       graphql: 16.12.0
-      jest-extended: 7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+      jest-extended: 7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
     transitivePeerDependencies:
       - jest
       - supports-color
@@ -4777,11 +4782,11 @@ snapshots:
       '@eslint/compat': 2.0.5(eslint@9.39.4)
       '@eslint/js': 9.39.5
       '@stylistic/eslint-plugin': 5.7.1(eslint@9.39.4)
-      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.54.0(eslint@9.39.4)(typescript@5.9.3)
       eslint: 9.39.4
-      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)
-      eslint-plugin-jest: 29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+      eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)
+      eslint-plugin-jest: 29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
       eslint-plugin-jest-dom: 5.5.0(eslint@9.39.4)
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.4)
       eslint-plugin-react: 7.37.5(eslint@9.39.4)
@@ -4847,10 +4852,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/opensearch-client@2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)':
+  '@terascope/opensearch-client@2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)':
     dependencies:
       '@terascope/core-utils': 2.16.3
-      '@terascope/data-types': 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3)
+      '@terascope/data-types': 2.16.3(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3)
       '@terascope/types': 2.15.1
       opensearch1: '@opensearch-project/opensearch@1.2.0'
       opensearch2: '@opensearch-project/opensearch@2.12.0'
@@ -4861,7 +4866,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@terascope/scripts@2.23.4(typescript@5.9.3)':
+  '@terascope/scripts@2.23.4(typescript@6.0.3)':
     dependencies:
       '@kubernetes/client-node': 1.4.0
       '@terascope/core-utils': 2.16.3
@@ -4882,12 +4887,12 @@ snapshots:
       signale: 1.4.0
       sort-package-json: 4.0.0
       toposort: 2.0.2
-      typedoc: 0.28.20(typescript@5.9.3)
-      typedoc-plugin-markdown: 4.12.0(typedoc@0.28.20(typescript@5.9.3))
+      typedoc: 0.28.20(typescript@6.0.3)
+      typedoc-plugin-markdown: 4.12.0(typedoc@0.28.20(typescript@6.0.3))
       yaml: 2.9.0
       yargs: 18.1.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
@@ -5210,7 +5215,7 @@ snapshots:
       '@types/node': 26.2.0
     optional: true
 
-  '@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)':
+  '@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@5.9.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
       '@typescript-eslint/parser': 8.54.0(eslint@9.39.4)(typescript@5.9.3)
@@ -6116,7 +6121,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.14.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4):
+  eslint-module-utils@2.14.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
@@ -6126,7 +6131,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -6137,7 +6142,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 9.39.4
       eslint-import-resolver-node: 0.3.10
-      eslint-module-utils: 2.14.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4)
+      eslint-module-utils: 2.14.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@9.39.4)
       hasown: 2.0.4
       is-core-module: 2.16.2
       is-glob: 4.0.3
@@ -6161,12 +6166,12 @@ snapshots:
       eslint: 9.39.4
       requireindex: 1.2.0
 
-  eslint-plugin-jest@29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3):
+  eslint-plugin-jest@29.12.2(@typescript-eslint/eslint-plugin@8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3):
     dependencies:
       '@typescript-eslint/utils': 8.67.0(eslint@9.39.4)(typescript@5.9.3)
       eslint: 9.39.4
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@5.9.3)
       jest: 30.4.2(@types/node@26.2.0)(node-notifier@10.0.1)
       typescript: 5.9.3
     transitivePeerDependencies:
@@ -7069,10 +7074,10 @@ snapshots:
       jest-util: 30.4.1
       jest-validate: 30.4.1
 
-  jest-extended@7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3):
+  jest-extended@7.0.0(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3):
     dependencies:
       jest-diff: 30.2.0
-      typescript: 5.9.3
+      typescript: 6.0.3
     optionalDependencies:
       jest: 30.4.2(@types/node@26.2.0)(node-notifier@10.0.1)
 
@@ -8419,7 +8424,7 @@ snapshots:
     dependencies:
       typescript: 5.9.3
 
-  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@5.9.3):
+  ts-jest@29.4.12(@babel/core@7.29.0)(@jest/transform@30.4.1)(@jest/types@30.4.1)(babel-jest@30.4.1(@babel/core@7.29.0))(jest-util@30.4.1)(jest@30.4.2(@types/node@26.2.0)(node-notifier@10.0.1))(typescript@6.0.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
@@ -8430,7 +8435,7 @@ snapshots:
       make-error: 1.3.6
       semver: 7.8.5
       type-fest: 4.41.0
-      typescript: 5.9.3
+      typescript: 6.0.3
       yargs-parser: 21.1.1
     optionalDependencies:
       '@babel/core': 7.29.0
@@ -8497,22 +8502,22 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typedoc-plugin-markdown@4.12.0(typedoc@0.28.20(typescript@5.9.3)):
+  typedoc-plugin-markdown@4.12.0(typedoc@0.28.20(typescript@6.0.3)):
     dependencies:
-      typedoc: 0.28.20(typescript@5.9.3)
+      typedoc: 0.28.20(typescript@6.0.3)
 
-  typedoc@0.28.20(typescript@5.9.3):
+  typedoc@0.28.20(typescript@6.0.3):
     dependencies:
       '@gerrit0/mini-shiki': 3.23.0
       lunr: 2.3.9
       markdown-it: 14.3.0
       minimatch: 10.2.6
-      typescript: 5.9.3
+      typescript: 6.0.3
       yaml: 2.9.0
 
   typescript-eslint@8.54.0(eslint@9.39.4)(typescript@5.9.3):
     dependencies:
-      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@5.9.3))(eslint@9.39.4)(typescript@5.9.3)
+      '@typescript-eslint/eslint-plugin': 8.54.0(@typescript-eslint/parser@8.54.0(eslint@9.39.4)(typescript@6.0.3))(eslint@9.39.4)(typescript@5.9.3)
       '@typescript-eslint/parser': 8.54.0(eslint@9.39.4)(typescript@5.9.3)
       '@typescript-eslint/typescript-estree': 8.54.0(typescript@5.9.3)
       '@typescript-eslint/utils': 8.54.0(eslint@9.39.4)(typescript@5.9.3)
@@ -8522,6 +8527,8 @@ snapshots:
       - supports-color
 
   typescript@5.9.3: {}
+
+  typescript@6.0.3: {}
 
   uc.micro@2.1.0: {}
 
