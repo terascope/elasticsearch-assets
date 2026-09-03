@@ -1,4 +1,7 @@
-import { GeoPoint, ClientParams, GeoQuery } from '@terascope/types';
+import {
+    ClientParams, GeoDistanceSort, GeoDistanceUnit,
+    GeoPoint, GeoQuery, SortOrder
+} from '@terascope/types';
 import { isString } from '@terascope/core-utils';
 import { parseGeoPoint } from '@terascope/geo-utils';
 import { ESReaderOptions, ReaderSlice } from './interfaces.js';
@@ -118,7 +121,7 @@ export function validateGeoParameters(opConfig: ESReaderOptions): void {
         geo_distance: geoDistance,
         geo_sort_point: geoSortPoint,
         geo_sort_order: geoSortOrder,
-        geo_sort_unit: geoSortUnit,
+        geo_sort_unit: geoSortUnit
     } = opConfig;
 
     function isBoundingBoxQuery() {
@@ -165,85 +168,75 @@ export function validateGeoParameters(opConfig: ESReaderOptions): void {
 }
 
 export function geoSearch(opConfig: ESReaderOptions): Record<string, any> {
-    let isGeoSort = false;
-    const queryResults: Record<string, any> = {};
-    // check for key existence to see if they are user defined
-    if (opConfig.geo_sort_order || opConfig.geo_sort_unit || opConfig.geo_sort_point) {
-        isGeoSort = true;
+    const geoField = opConfig.geo_field;
+    if (!geoField) throw new Error('Missing geo_field for geo search');
+
+    const queryResults: { query?: GeoQuery; sort?: GeoDistanceSort } = {};
+
+    const createGeoDistanceSort = (location: GeoPoint): GeoDistanceSort => {
+        return {
+            _geo_distance: {
+                order: (opConfig.geo_sort_order as SortOrder) || 'asc',
+                unit: (opConfig.geo_sort_unit || 'm') as GeoDistanceUnit,
+                [opConfig.geo_sort_field || geoField]: {
+                    lat: location.lat,
+                    lon: location.lon
+                }
+            }
+        };
+    };
+
+    let parsedGeoSortPoint: GeoPoint | undefined;
+    if (opConfig.geo_sort_point) {
+        parsedGeoSortPoint = parseGeoPoint(opConfig.geo_sort_point);
     }
 
-    const {
-        geo_box_top_left: geoBoxTopLeft,
-        geo_box_bottom_right: geoBoxBottomRight,
-        geo_point: geoPoint,
-        geo_distance: geoDistance,
-        geo_sort_point: geoSortPoint,
-        geo_sort_order: geoSortOrder = 'asc',
-        geo_sort_unit: geoSortUnit = 'm',
-    } = opConfig;
+    // Geo Bounding Box query
+    if (opConfig.geo_box_top_left) {
+        const topLeft = parseGeoPoint(opConfig.geo_box_top_left);
+        const bottomRight = parseGeoPoint(opConfig.geo_box_bottom_right);
 
-    function createGeoSortQuery(location: GeoPoint) {
-        const sortedSearch: Record<string, any> = { _geo_distance: {} };
-        sortedSearch._geo_distance[opConfig.geo_field as string] = {
-            lat: location.lat,
-            lon: location.lon,
-        };
-        sortedSearch._geo_distance.order = geoSortOrder;
-        sortedSearch._geo_distance.unit = geoSortUnit;
-        return sortedSearch;
-    }
-
-    let parsedGeoSortPoint;
-
-    if (geoSortPoint) {
-        parsedGeoSortPoint = parseGeoPoint(geoSortPoint);
-    }
-
-    // Handle an Geo Bounding Box query
-    if (geoBoxTopLeft) {
-        const topLeft = parseGeoPoint(geoBoxTopLeft);
-        const bottomRight = parseGeoPoint(geoBoxBottomRight as string);
-
-        const searchQuery: GeoQuery = {
-            geo_bounding_box: {},
+        queryResults.query = {
+            geo_bounding_box: {
+                [geoField]: {
+                    top_left: {
+                        lat: topLeft.lat,
+                        lon: topLeft.lon
+                    },
+                    bottom_right: {
+                        lat: bottomRight.lat,
+                        lon: bottomRight.lon
+                    }
+                }
+            }
         };
 
-        searchQuery.geo_bounding_box![opConfig.geo_field as string] = {
-            top_left: {
-                lat: topLeft.lat,
-                lon: topLeft.lon,
-            },
-            bottom_right: {
-                lat: bottomRight.lat,
-                lon: bottomRight.lon,
-            },
-        };
-
-        queryResults.query = searchQuery;
-
-        if (isGeoSort) {
-            queryResults.sort = createGeoSortQuery(parsedGeoSortPoint as GeoPoint);
+        const isGeoSort = Boolean(
+            opConfig.geo_sort_order || opConfig.geo_sort_unit
+            || opConfig.geo_sort_point || opConfig.geo_sort_field
+        );
+        if (isGeoSort && parsedGeoSortPoint) {
+            queryResults.sort = createGeoDistanceSort(parsedGeoSortPoint);
         }
 
         return queryResults;
     }
 
-    if (geoDistance) {
-        const location = parseGeoPoint(geoPoint as string);
-        const searchQuery: GeoQuery = {
+    // Geo Distance query
+    if (opConfig.geo_distance) {
+        const location = parseGeoPoint(opConfig.geo_point);
+        queryResults.query = {
             geo_distance: {
-                distance: geoDistance,
+                distance: opConfig.geo_distance,
+                [geoField]: {
+                    lat: location.lat,
+                    lon: location.lon
+                }
             },
         };
 
-        searchQuery.geo_distance![opConfig.geo_field as string] = {
-            lat: location.lat,
-            lon: location.lon,
-        };
-
-        queryResults.query = searchQuery;
         const locationPoints = parsedGeoSortPoint || location;
-        queryResults.sort = createGeoSortQuery(locationPoints);
+        queryResults.sort = createGeoDistanceSort(locationPoints);
     }
 
     return queryResults;

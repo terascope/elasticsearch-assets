@@ -176,6 +176,11 @@ export const schema = {
         default: '',
         format: validGeoDistance
     },
+    geo_sort_field: {
+        doc: 'used for sorting geo queries',
+        default: '',
+        format: 'optional_string'
+    },
     geo_sort_point: {
         doc: 'used for sorting geo queries',
         default: '',

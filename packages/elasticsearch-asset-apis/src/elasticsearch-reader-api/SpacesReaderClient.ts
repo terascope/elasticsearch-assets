@@ -199,23 +199,17 @@ export class SpacesReaderClient implements ReaderClient {
         }
 
         function _parseGeoQuery(): Record<string, any> {
-            const {
-                geo_box_top_left: geoBoxTopLeft,
-                geo_box_bottom_right: geoBoxBottomRight,
-                geo_point: geoPoint,
-                geo_distance: geoDistance,
-                geo_sort_point: geoSortPoint,
-                geo_sort_order: geoSortOrder,
-                geo_sort_unit: geoSortUnit
-            } = config;
             const geoQuery: any = {};
-            if (geoBoxTopLeft) geoQuery.geo_box_top_left = geoBoxTopLeft;
-            if (geoBoxBottomRight) geoQuery.geo_box_bottom_right = geoBoxBottomRight;
-            if (geoPoint) geoQuery.geo_point = geoPoint;
-            if (geoDistance) geoQuery.geo_distance = geoDistance;
-            if (geoSortPoint) geoQuery.geo_sort_point = geoSortPoint;
-            if (geoSortOrder) geoQuery.geo_sort_order = geoSortOrder;
-            if (geoSortUnit) geoQuery.geo_sort_unit = geoSortUnit;
+            if (config.geo_box_top_left) geoQuery.geo_box_top_left = config.geo_box_top_left;
+            if (config.geo_box_bottom_right) {
+                geoQuery.geo_box_bottom_right = config.geo_box_bottom_right;
+            }
+            if (config.geo_point) geoQuery.geo_point = config.geo_point;
+            if (config.geo_distance) geoQuery.geo_distance = config.geo_distance;
+            if (config.geo_sort_point) geoQuery.geo_sort_point = config.geo_sort_point;
+            if (config.geo_sort_order) geoQuery.geo_sort_order = config.geo_sort_order;
+            if (config.geo_sort_unit) geoQuery.geo_sort_unit = config.geo_sort_unit;
+            if (config.geo_sort_field) geoQuery.geo_sort_field = config.geo_sort_field;
             return geoQuery;
         }
 
