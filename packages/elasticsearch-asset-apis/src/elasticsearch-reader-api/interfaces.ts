@@ -343,6 +343,7 @@ export interface ESReaderOptions {
     geo_box_bottom_right?: string;
     geo_point?: string;
     geo_distance?: string;
+    geo_sort_field?: string;
     geo_sort_point?: string;
     geo_sort_order?: string;
     geo_sort_unit?: string;
