@@ -37,7 +37,7 @@
     "devDependencies": {
         "@terascope/scripts": "2.25.1",
         "@terascope/types": "2.16.1",
-        "@types/node": "~26.5.0",
+        "@types/node": "~26.5.1",
         "jest": "~30.5.1"
     },
     "engines": {
