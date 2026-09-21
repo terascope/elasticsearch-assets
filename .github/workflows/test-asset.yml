@@ -39,7 +39,7 @@ jobs:
         run: echo "TERASLICE_CLI_VERSION=$TERASLICE_CLI_VERSION" >> $GITHUB_OUTPUT
 
   check-docker-limit-before:
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@b7b03054122f0f4c73a15f523bb224588552f55c
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@1a5d64fcdb79d88443f0eb9468a9bd8117cc4bea
     permissions:
       contents: read
     secrets:
@@ -48,7 +48,7 @@ jobs:
 
   cache-docker-images:
     needs: check-docker-limit-before
-    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@b7b03054122f0f4c73a15f523bb224588552f55c
+    uses: terascope/workflows/.github/workflows/cache-docker-images.yml@1a5d64fcdb79d88443f0eb9468a9bd8117cc4bea
     permissions:
       contents: read
     secrets:
@@ -87,14 +87,14 @@ jobs:
           jq --arg sha "$COMMIT_SHORT_SHA" '.version += "-dev." + $sha' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
 
+      - name: Install teraslice-cli
+        env:
+          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
+        run: npm install -g "teraslice-cli@$TERASLICE_CLI_VERSION"
       - name: Check teraslice-cli version
-        env:
-          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" -v
+        run: teraslice-cli -v
       - name: Build asset
-        env:
-          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" assets build
+        run: teraslice-cli assets build
       - run: ls -l build/
 
       - name: Archive test build artifacts
@@ -373,7 +373,7 @@ jobs:
   check-docker-limit-after:
     needs: [test-elasticsearch-assets, test-elasticsearch-assets-encrypted, test-e2e]
     if: always()
-    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@b7b03054122f0f4c73a15f523bb224588552f55c
+    uses: terascope/workflows/.github/workflows/check-docker-limit.yml@1a5d64fcdb79d88443f0eb9468a9bd8117cc4bea
     permissions:
       contents: read
     secrets:
