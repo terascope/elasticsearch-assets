@@ -87,14 +87,14 @@ jobs:
           jq --arg sha "$COMMIT_SHORT_SHA" '.version += "-dev." + $sha' asset/asset.json > tempAsset.json && mv tempAsset.json asset/asset.json
           cat asset/asset.json
 
+      - name: Install teraslice-cli
+        env:
+          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
+        run: npm install -g "teraslice-cli@$TERASLICE_CLI_VERSION"
       - name: Check teraslice-cli version
-        env:
-          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" -v
+        run: teraslice-cli -v
       - name: Build asset
-        env:
-          TERASLICE_CLI_VERSION: ${{ needs.compute-vars.outputs.TERASLICE_CLI_VERSION }}
-        run: pnpm dlx "teraslice-cli@$TERASLICE_CLI_VERSION" assets build
+        run: teraslice-cli assets build
       - run: ls -l build/
 
       - name: Archive test build artifacts

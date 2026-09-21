@@ -6,7 +6,6 @@ allowBuilds:
   '@parcel/watcher': true
   dtrace-provider: true
   unrs-resolver: true
-  esbuild: true
 
 blockExoticSubdeps: true
 
