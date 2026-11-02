@@ -1,5 +1,5 @@
 {
     "name": "elasticsearch",
-    "version": "5.3.1",
+    "version": "5.3.2",
     "minimum_teraslice_version": "3.15.0"
 }
