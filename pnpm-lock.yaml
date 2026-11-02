@@ -170,32 +170,32 @@ importers:
         specifier: ^30.5.2
         version: 30.5.2(supports-color@8.1.1)
       '@terascope/core-utils':
-        specifier: 2.24.0
-        version: 2.24.0(supports-color@8.1.1)
+        specifier: 2.25.0
+        version: 2.25.0(supports-color@8.1.1)
       '@terascope/data-types':
-        specifier: 2.24.0
-        version: 2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+        specifier: 2.25.0
+        version: 2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.25.0
-        version: 5.25.0(supports-color@8.1.1)
+        specifier: 5.26.0
+        version: 5.26.0(supports-color@8.1.1)
       '@terascope/elasticsearch-asset-apis':
         specifier: workspace:~
         version: link:packages/elasticsearch-asset-apis
       '@terascope/eslint-config':
         specifier: ~1.4.2
-        version: 1.4.2(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)
+        version: 1.4.2(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)
       '@terascope/job-components':
+        specifier: 2.27.0
+        version: 2.27.0(supports-color@8.1.1)
+      '@terascope/opensearch-client':
+        specifier: 2.25.0
+        version: 2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+      '@terascope/scripts':
+        specifier: 2.33.0
+        version: 2.33.0(supports-color@8.1.1)(typescript@6.0.3)
+      '@terascope/teraslice-state-storage':
         specifier: 2.26.0
         version: 2.26.0(supports-color@8.1.1)
-      '@terascope/opensearch-client':
-        specifier: 2.24.0
-        version: 2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
-      '@terascope/scripts':
-        specifier: 2.32.1
-        version: 2.32.1(supports-color@8.1.1)(typescript@6.0.3)
-      '@terascope/teraslice-state-storage':
-        specifier: 2.25.0
-        version: 2.25.0(supports-color@8.1.1)
       '@terascope/types':
         specifier: 2.23.0
         version: 2.23.0
@@ -206,8 +206,8 @@ importers:
         specifier: ~30.0.0
         version: 30.0.0
       '@types/node':
-        specifier: ~26.6.5
-        version: 26.6.5
+        specifier: ~26.6.6
+        version: 26.6.6
       '@types/semver':
         specifier: ~7.8.0
         version: 7.8.0
@@ -219,10 +219,10 @@ importers:
         version: 11.4.1
       jest:
         specifier: ~30.5.2
-        version: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+        version: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
       jest-extended:
         specifier: ~7.0.0
-        version: 7.0.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
+        version: 7.0.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
       moment:
         specifier: ~2.31.0
         version: 2.31.0
@@ -236,14 +236,14 @@ importers:
         specifier: ~7.8.5
         version: 7.8.5
       teraslice-client-js:
-        specifier: ~2.24.0
-        version: 2.24.0(supports-color@8.1.1)
+        specifier: ~2.25.0
+        version: 2.25.0(supports-color@8.1.1)
       teraslice-test-harness:
-        specifier: 2.27.0
-        version: 2.27.0(supports-color@8.1.1)
+        specifier: 2.28.0
+        version: 2.28.0(supports-color@8.1.1)
       ts-jest:
         specifier: ~29.4.15
-        version: 29.4.15(@babel/core@7.29.7(supports-color@8.1.1))(@jest/transform@30.5.1(supports-color@8.1.1))(@jest/types@30.5.1)(babel-jest@30.5.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(jest-util@30.5.1)(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
+        version: 29.4.15(@babel/core@7.29.7(supports-color@8.1.1))(@jest/transform@30.5.1(supports-color@8.1.1))(@jest/types@30.5.1)(babel-jest@30.5.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(jest-util@30.5.1)(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
@@ -254,23 +254,23 @@ importers:
   asset:
     dependencies:
       '@terascope/core-utils':
-        specifier: 2.24.0
-        version: 2.24.0(supports-color@8.1.1)
-      '@terascope/data-mate':
         specifier: 2.25.0
-        version: 2.25.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+        version: 2.25.0(supports-color@8.1.1)
+      '@terascope/data-mate':
+        specifier: 2.26.0
+        version: 2.26.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.25.0
-        version: 5.25.0(supports-color@8.1.1)
+        specifier: 5.26.0
+        version: 5.26.0(supports-color@8.1.1)
       '@terascope/elasticsearch-asset-apis':
         specifier: workspace:~
         version: link:../packages/elasticsearch-asset-apis
       '@terascope/job-components':
+        specifier: 2.27.0
+        version: 2.27.0(supports-color@8.1.1)
+      '@terascope/teraslice-state-storage':
         specifier: 2.26.0
         version: 2.26.0(supports-color@8.1.1)
-      '@terascope/teraslice-state-storage':
-        specifier: 2.25.0
-        version: 2.25.0(supports-color@8.1.1)
       datemath-parser:
         specifier: ~1.0.6
         version: 1.0.6
@@ -284,20 +284,20 @@ importers:
   packages/elasticsearch-asset-apis:
     dependencies:
       '@terascope/core-utils':
-        specifier: 2.24.0
-        version: 2.24.0(supports-color@8.1.1)
-      '@terascope/data-mate':
         specifier: 2.25.0
-        version: 2.25.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+        version: 2.25.0(supports-color@8.1.1)
+      '@terascope/data-mate':
+        specifier: 2.26.0
+        version: 2.26.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/data-types':
-        specifier: 2.24.0
-        version: 2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+        specifier: 2.25.0
+        version: 2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/elasticsearch-api':
-        specifier: 5.25.0
-        version: 5.25.0(supports-color@8.1.1)
+        specifier: 5.26.0
+        version: 5.26.0(supports-color@8.1.1)
       '@terascope/geo-utils':
-        specifier: 2.24.0
-        version: 2.24.0(supports-color@8.1.1)
+        specifier: 2.25.0
+        version: 2.25.0(supports-color@8.1.1)
       datemath-parser:
         specifier: ~1.0.6
         version: 1.0.6
@@ -309,17 +309,17 @@ importers:
         version: 2.31.0
     devDependencies:
       '@terascope/scripts':
-        specifier: 2.32.1
-        version: 2.32.1(supports-color@8.1.1)(typescript@6.0.3)
+        specifier: 2.33.0
+        version: 2.33.0(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/types':
         specifier: 2.23.0
         version: 2.23.0
       '@types/node':
-        specifier: ~26.6.5
-        version: 26.6.5
+        specifier: ~26.6.6
+        version: 26.6.6
       jest:
         specifier: ~30.5.2
-        version: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+        version: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
 
 packages:
 
@@ -796,8 +796,8 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@kubernetes/client-node@1.4.0':
-    resolution: {integrity: sha512-Zge3YvF7DJi264dU1b3wb/GmzR99JhUpqTvp+VGHfwZT+g7EOOYNScDJNZwXy9cszyIGPIs0VHr+kk8e95qqrA==}
+  '@kubernetes/client-node@2.0.1':
+    resolution: {integrity: sha512-evJgmEtgArEYlj6DNkMGjK41IrFK/hEwb5lWVxx0VRBWybQpnvi+2TtA19mLgVfRHfqX5yjHObX6e9W7LEZBjw==}
 
   '@mswjs/interceptors@0.41.9':
     resolution: {integrity: sha512-VVPPgHyQ6ShqnrmDWuxjmUIsO9gWyOZFmuOfLd9LfBGQJwZfy0gvv9pbHSJuoFNIYC7ZDX9aoFwowjcdSC4E8w==}
@@ -1000,25 +1000,25 @@ packages:
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
 
-  '@terascope/core-utils@2.24.0':
-    resolution: {integrity: sha512-He8PacwZ8jcaJHf6pGDcgTGyVYHI0J7qx9gBgaubjxXidqhcK70dlXdygzkAzQfHdppoYf74GRTRTjPG3qEx1Q==}
+  '@terascope/core-utils@2.25.0':
+    resolution: {integrity: sha512-wmEsw0z2aWz/oHHISnp/n67lLwjj75GGw5Fj7MMSGBN0vX4T9WentuM2WmyhvYsPpT2aE9SiLi76vsjJnW7kiQ==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/data-mate@2.25.0':
-    resolution: {integrity: sha512-1Tzc1Up9Qavbe/m9r833BMdnr7QmJ/fMVAahHqVuIGqI+uT0IPp3Ulu9h3ATWDZDeOs18E3i0pLRN4/khMs2kA==}
+  '@terascope/data-mate@2.26.0':
+    resolution: {integrity: sha512-Zd4v2ijyCR+Hd2u/o+00n3WctpTiG/OUt7SvAwaP9yu1l4dsTQ4eGW3SgiB3yVhkL4tQEVAsuOl1aXxK6AtHWg==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
     hasBin: true
 
-  '@terascope/data-types@2.24.0':
-    resolution: {integrity: sha512-lX/LKaD3p3+hra8KxVkT7oZjDdRqVcmI7V+IMgUX61s2j+ES5b8sUws1mRZV/xnfMJCh3Vn5EIb7JzIzNIFj+w==}
+  '@terascope/data-types@2.25.0':
+    resolution: {integrity: sha512-ypR7ukmReUDTzhkIRNLqHN3u5bYV9FTl8DtnPwvflVpvXX5S8jWRVbyEUbeN5oDhOtsTVjMVPlU0rhhroHZUXQ==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
   '@terascope/docker-compose-js@2.2.0':
     resolution: {integrity: sha512-/UtjFn+EwOUJYQQ8XFrhFY/KWy3JhDb91VbJ08QcPgxG/h3wp20oyJGLnkt5ldzQnmVCNhetgNpFPzKCsR6nLg==}
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
 
-  '@terascope/elasticsearch-api@5.25.0':
-    resolution: {integrity: sha512-h7sdtXwhmvyWXXGUad4jntCau5LaP7qookLxY0qCrpvJPCSe+gEHV2Leugfpuqm11NL255NqgmrxJsXiwt12YA==}
+  '@terascope/elasticsearch-api@5.26.0':
+    resolution: {integrity: sha512-Bw9ICrYACBDE0OAPXFjKcgOcZ/pFN9VweLLPfFbLVtLReh76+nRo9mZS0GGNweyweMhtLUt1RKdJEEFf69E0pA==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
   '@terascope/eslint-config@1.4.2':
@@ -1030,24 +1030,24 @@ packages:
     engines: {node: '>=22.0.0', pnpm: '>=11.3.0'}
     hasBin: true
 
-  '@terascope/geo-utils@2.24.0':
-    resolution: {integrity: sha512-ypi4NSY/rc/oexgLnLX88+M1YB5loumxUEpxrDQyRW/434sfftf1a5h78zXH4FtTN2hIis59rvHTu7eKR7rnqQ==}
+  '@terascope/geo-utils@2.25.0':
+    resolution: {integrity: sha512-jJn16WzIW2WEVad+JRbdKzFfh+LgLzupmJG3impKTObEYMbbEtOCod8FhuDb9QeZGOR6bOAoSLyB4Mh/VQsxqA==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/ip-utils@2.25.0':
-    resolution: {integrity: sha512-6I3J6O9ZM1s/q48osQapt3s9Ox+b4AQ8TZe0y04KNUj3v59jYB6fZl9rPgc4/32Mo/JNGMdESN/oZ24UTNU4Mw==}
+  '@terascope/ip-utils@2.26.0':
+    resolution: {integrity: sha512-noch5S8M4Rosx7NJrmw7BKuthP/+Ht2LSEhr4L+bFklNb5LTRjAZZtOSQ7LXYTjL+G0Kawdm1D/3BUZvAHfa1A==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/job-components@2.26.0':
-    resolution: {integrity: sha512-LxpJ5Izp18J9F2ZVdDoDFxstIyTUR2bE24Pw7WW+3dCPCkccfdmmxRGBxOJESgbFI0vk0skXDEpSpXi4G3J19w==}
+  '@terascope/job-components@2.27.0':
+    resolution: {integrity: sha512-nUFvqFyP+ZRmCJU++vmMIm39SA1IhZeQyxmiQl1SXmlH4W25jkFN7v8W1a+dgsRh32hJswmKwUMgcPagNk0kew==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/opensearch-client@2.24.0':
-    resolution: {integrity: sha512-rr1VhShDfFPLWkrShTwBmxSwti/1QZquQG893DSzec/l3Oumh6RAifMac4M/pfzn6uVjd7/tGTOinmKIypwf6w==}
+  '@terascope/opensearch-client@2.25.0':
+    resolution: {integrity: sha512-T2ZAECFF+Q/tok212xpGKgV8QdvciMSNktLA/h/p6CL3EwZXxy4DHOhmxnW09s+L92gs5Py1oXXrvh4CfB3U2w==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/scripts@2.32.1':
-    resolution: {integrity: sha512-Ek3gDus5cNUVsqHzvpCXuf1UTtPR7nJl6hhv9GJ+e6VxtzcSdEzVGtHZROHOe6OagDzJ7qrcFmH7558jvsFYXg==}
+  '@terascope/scripts@2.33.0':
+    resolution: {integrity: sha512-+cB75MiRWxybayGR5WKV7ITWh5RIQhKlu2h6HHzrbyDjeB/pLJ91cJq3E7dFJXsiejh4sFsD4PQAQiTlALIADQ==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
     hasBin: true
     peerDependencies:
@@ -1056,12 +1056,12 @@ packages:
       typescript:
         optional: true
 
-  '@terascope/sql-builder@0.1.0':
-    resolution: {integrity: sha512-Q73XKLL3+O59ybX25M2QSopp25V7mOVpHX96wJi3Rf4bwPIsyBmi9GicfsLPpazoLVN93MxqZD9NZA+XIcr1Dw==}
+  '@terascope/sql-builder@0.2.0':
+    resolution: {integrity: sha512-iGcr8YAxu2ItZB7Ge0/z5XjGHGYUwsGO67LqBpvfhWGAygaPleCIjsfRNU5CctsTfMewPlrwOjD7L2aBc3Bb8w==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  '@terascope/teraslice-state-storage@2.25.0':
-    resolution: {integrity: sha512-CZAhSoX0pHLM15qSk4FQZOALX2tADezRNkO67UIS6r6ERyGXMPh+Qa4HEvAGt4wL6pQD1uoO0bfcgu5sEB8ODg==}
+  '@terascope/teraslice-state-storage@2.26.0':
+    resolution: {integrity: sha512-Q8O4eVW0VjmeWaw5P4JEVqVzf7bmYUPF5YjVOKaPemVy4yXKO6vcup3/7mTPih7l200ENb5LMCb11/Z0guJdsw==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
   '@terascope/types@2.23.0':
@@ -1206,14 +1206,8 @@ packages:
   '@types/lodash@4.17.25':
     resolution: {integrity: sha512-+K1NIO8I+F9/wNulfVvu23QYd0Pe9/OCqRrim4NoYIf1VoEDL90Ve4ClzpyqBLc7NpGGWRvYNCKZ1BE/Jpf8dQ==}
 
-  '@types/node-fetch@2.6.13':
-    resolution: {integrity: sha512-QGpRVpzSaUs30JBSGPjOg4Uveu384erbHBoT1zeONvyCfwQxIkUshLAOqN/k9EjGviPRmWTTe6aH2qySWKTVSw==}
-
-  '@types/node@24.19.2':
-    resolution: {integrity: sha512-93d49wCWJkCyN87MxLpNN6KXPCwFw7bVUg79mGUV1OS40JGWwVCr8n61DXCSqz7CV6/VfPkb7xec7uP2M+QHWQ==}
-
-  '@types/node@26.6.5':
-    resolution: {integrity: sha512-uMzsv9stDdofIZBx4UGh4Z9ZgXnGC9seRDscilBcTHAeOFk67MZg/k9bWVfO+bk4qZmG+l52hRnLwUiH2LnJTg==}
+  '@types/node@26.6.6':
+    resolution: {integrity: sha512-MzQj+8Kx3XI40OmUAE6Qoh58ZMNstNNMwn2nfd3qWsfe7nDNSqJNzes4njhz6AHwrSHOffSLwXU6yb474Q4aog==}
 
   '@types/semver@7.8.0':
     resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
@@ -1472,9 +1466,9 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  agent-base@7.1.4:
-    resolution: {integrity: sha512-MnA+YT8fwfJPgBx3m60MNqakm30XOkyIoH1y6huTQvC0PwZG7ki8NacLBcrPbNoo8vEZy7Jpuk7+jMO+CUovTQ==}
-    engines: {node: '>= 14'}
+  agent-base@9.0.0:
+    resolution: {integrity: sha512-TQf59BsZnytt8GdJKLPfUZ54g/iaUL2OWDSFCCvMOhsHduDQxO8xC4PNeyIkVcA5KwL2phPSv0douC0fgWzmnA==}
+    engines: {node: '>= 20'}
 
   ajv@6.14.0:
     resolution: {integrity: sha512-IWrosm/yrn43eiKqkfkHis7QioDleaXQHdDVPKg0FSwwd/DuvyX79TZnFOnYpB7dcsFAMmtFztZuXPDvSePkFw==}
@@ -2223,8 +2217,8 @@ packages:
   events-universal@1.0.1:
     resolution: {integrity: sha512-LUd5euvbMLpwOF8m6ivPCbhQeSiYVNb8Vs0fQ8QjXo0JTkEHpz8pxdQf0gStltaPpw0Cca8b39KxvK9cfKRiAw==}
 
-  execa@10.0.1:
-    resolution: {integrity: sha512-ge98qjkRK4IB7tL7Ju/6qmm5LHoH1eEMt5FNZrz3f4UIYhF28lggX20z3FaX1sgc67msLEn0N0BscOs29iuwyw==}
+  execa@10.2.1:
+    resolution: {integrity: sha512-/Bofl3ZBh2Q4/PG0W63qFzP5vDAypi8Zc90UWTBzaDNIYiX7apPOd0N6L8hG8CojUdq4V51adu8BObP+iVsSTw==}
     engines: {node: '>=22'}
 
   execa@5.1.1:
@@ -2477,6 +2471,10 @@ packages:
 
   got@16.0.0:
     resolution: {integrity: sha512-UtzSUebtRHHAUaNB/X37X1LQgHvdSrgXUIWGUBDhLu05CYtUr9svjeN6wmG333nzdJASFUjXMOuRBjZLf8oF1w==}
+    engines: {node: '>=22'}
+
+  got@16.1.0:
+    resolution: {integrity: sha512-LOvohAoc/3O8+Gi3E5RRvamkyXmJq9ewj/cimmqQYn+Me5OKCVHKQI9ygF0O882l573lrpLbKZpsydYRttpDEg==}
     engines: {node: '>=22'}
 
   graceful-fs@4.2.10:
@@ -2982,10 +2980,6 @@ packages:
     resolution: {integrity: sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ==}
     hasBin: true
 
-  js-yaml@4.3.2:
-    resolution: {integrity: sha512-SFNOvSJ+Dgf/9An904Yx+CgSlIPCkIpao4qo51lpee25TIRejdH3rhR4EZMGoNx3/TP3O+wzWuiTFl4sqbltzA==}
-    hasBin: true
-
   js-yaml@5.4.3:
     resolution: {integrity: sha512-yzzNtgczwgoVHNigCyKTXcQJU4Y8t/ikU4UxXW0BvrLfHTGWZhsNcOT2s/a7vn81/4KqVnNmHjaUEPlvWnNwVw==}
     hasBin: true
@@ -3216,8 +3210,8 @@ packages:
     resolution: {integrity: sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==}
     hasBin: true
 
-  mnemonist@0.40.5:
-    resolution: {integrity: sha512-egXDkYJsKZCizjk8FydZ3g8TOigBwt+dIaehgKcQSAE3DCkCTWG4N94trvwR1ZYeAHo1exxE+ZhZOUuj01HdNw==}
+  mnemonist@0.40.6:
+    resolution: {integrity: sha512-c4mbin5HCz77Srw1L3nwThCH/0hLVYuY3oMF2plP2tKfp/gqzSgHP63qRUOpL8jutYWNNCr49LUlKSt7exkaww==}
 
   moment@2.31.0:
     resolution: {integrity: sha512-0acOTfMiWOheYS4eoWb80yYMb/JLvVv9SHbs2PehaDzfUG0Bw855SKyk0IKTnPGa5+U2bmi3W68l1+sGLX/pvw==}
@@ -3267,15 +3261,6 @@ packages:
   node-exports-info@1.6.2:
     resolution: {integrity: sha512-kXs9Go0cah0qHVV2v389IXQLdLCeE1xfFtjOAF+iobu0OIoG1pje8At2vMHyaPMiPMnG/LWP50twML21eMcAag==}
     engines: {node: '>= 0.4'}
-
-  node-fetch@2.7.0:
-    resolution: {integrity: sha512-c4FRfUm/dbcWZ7U+1Wq0AwCyFL+3nt2bEw05wfxSz+DWpWsitgmSgYmy2dQdWyKC1694ELPqMs/YzUSNozLt8A==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
 
   node-int64@0.4.0:
     resolution: {integrity: sha512-O5lz91xSOeoXP6DulyHfllpq+Eg00MWitZIbtPfoSEvqIHdl5gfcY6hYzDWnj0qD5tz52PI08u9qUvSVeUBeHw==}
@@ -3390,8 +3375,8 @@ packages:
     resolution: {integrity: sha512-LaNjtRWUBY++zB5nE/NwcaoMylSPk+S+ZHNB1TzdbMJMny6dynpAGt7X/tl/QYq3TIeE6nxHppbo2LGymrG5Pw==}
     engines: {node: '>=10'}
 
-  p-map@7.0.8:
-    resolution: {integrity: sha512-MitaVsCuCFIvOLLPIU7NnfrZvS9H9h7kwMUkDo+T2pEISaJD48IV9S8iIdXB7PsvvdxyYcsSTTrr90XKsbulNw==}
+  p-map@7.1.1:
+    resolution: {integrity: sha512-6Lh3jQPLthYujSrlw6ccWXBGZTkoTCz27Hd92g79LH/kjAbgoEu0t442cCCNbegPSJsA0lwDX8z0bcKtkpA32g==}
     engines: {node: '>=18'}
 
   p-try@1.0.0:
@@ -3811,9 +3796,9 @@ packages:
     resolution: {integrity: sha512-94hK0Hh8rPqQl2xXc3HsaBoOXKV20MToPkcXvwbISWLEs+64sBq5kFgn2kJDHb1Pry9yrP0dxrCI9RRci7RXKg==}
     engines: {node: '>= 6.0.0', npm: '>= 3.0.0'}
 
-  socks-proxy-agent@8.0.5:
-    resolution: {integrity: sha512-HehCEsotFqbPW9sJ8WVYB6UbmIMv7kUUORIF2Nncq4VQvBfNBLibW9YZR5dlYCSUhwcD628pRllm7n+E+YTzJw==}
-    engines: {node: '>= 14'}
+  socks-proxy-agent@10.1.0:
+    resolution: {integrity: sha512-WlMj/67cEJ6MDI1OcsnjuYKDNDoyPCCYZ249kuuXPiMDw9F8PXkVaQ7YWu3siTydfQ/4BEZcvGzu+aYvz7dDCQ==}
+    engines: {node: '>= 20'}
 
   socks@2.8.9:
     resolution: {integrity: sha512-LJhUYUvItdQ0LkJTmPeaEObWXAqFyfmP85x0tch/ez9cahmhlBBLbIqDFnvBnUJGagb0JbIQrkBs1wJ+yRYpEw==}
@@ -3983,12 +3968,12 @@ packages:
   teex@1.0.1:
     resolution: {integrity: sha512-eYE6iEI62Ni1H8oIa7KlDU6uQBtqr4Eajni3wX7rpfXD8ysFx8z0+dri+KWEPWpBsxXfxu58x/0jvTVT1ekOSg==}
 
-  teraslice-client-js@2.24.0:
-    resolution: {integrity: sha512-epi5fZJof3OZTr91OSMbC+sLK4WK9EIJSp/rImdWYo+dacRjJKMYZG3rPq7fUIEEy+xi35mwT5HgrZFgb6PFLg==}
+  teraslice-client-js@2.25.0:
+    resolution: {integrity: sha512-fa6KJPrQ5i/vdKrtoZx/hUOhvnQGhuRbxjQpY/Q43XgY8aybqrP68IO9pXQUK5x0YQgZh7NYagt6dKltxQSucA==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
-  teraslice-test-harness@2.27.0:
-    resolution: {integrity: sha512-OxKnZXq8ngzaXfIZyShloWQ8Rpm88gzqKnJ8RqmqyCfVSaXxZiiSPwfqNSmJLBbgdPU1sk4dv373vC2Y2AMUTg==}
+  teraslice-test-harness@2.28.0:
+    resolution: {integrity: sha512-7NfUqXCfX4xcYOT6iTT/rg3hnD9h7EsiXq6bgKtILHrgz1y78g8hPAVgZN1FmEH4LE4vgd1SAvmgYClC1o++ZQ==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
   test-exclude@7.0.2:
@@ -4025,9 +4010,6 @@ packages:
 
   toposort@2.0.2:
     resolution: {integrity: sha512-0a5EOkAUp8D4moMi2W8ZF8jcga7BgZd91O/yabJCFY8az+XSzeGyTKs0Aoo897iV1Nj6guFq8orWDS96z91oGg==}
-
-  tr46@0.0.3:
-    resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
   ts-api-utils@2.5.0:
     resolution: {integrity: sha512-OJ/ibxhPlqrMM0UiNHJ/0CKQkoKF243/AEmplt3qpRgkW8VG7IfOS41h7V8TjITqdByHzrjcS/2si+y4lIh8NA==}
@@ -4083,6 +4065,10 @@ packages:
   type-fest@4.41.0:
     resolution: {integrity: sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA==}
     engines: {node: '>=16'}
+
+  type-fest@5.10.0:
+    resolution: {integrity: sha512-NoSdpq/WEiAg5sjmBkmV/hfxv6HJH4NqPNrqjtSO5CwRmpsDfaf4begxW34KdJykH/l1yHtwBWQkCRdoXO8mPA==}
+    engines: {node: '>=20'}
 
   type-fest@5.8.0:
     resolution: {integrity: sha512-YGYEVz3Fm5iy/AybuA0oyNFq7H4CgQNfRp/qfe8nurE1kuCeNm3/vfm9X4Mtl+qLyaKJUh5xrFZwogr41SMjYA==}
@@ -4144,6 +4130,10 @@ packages:
     resolution: {integrity: sha512-rvKSBiC5zqCCiDZ9kAOszZcDvdAHwwIKJG33Ykj43OKcWsnmcBRL09YTU4nOeHZ8Y2a7l1MgTd08SBe9A8Qj6A==}
     engines: {node: '>=18'}
 
+  uint8array-extras@1.6.0:
+    resolution: {integrity: sha512-8iAasVS4wUx0gPLjH8Xtz2PeDzTSiy8QiLGu2DT3X5GU+egFEQhpnbtkehbAwjvDcxIERmCYcysiODFmE3Ud0Q==}
+    engines: {node: '>=18'}
+
   unbox-primitive@1.1.0:
     resolution: {integrity: sha512-nWJ91DjeOkej/TA8pXQ3myruKpKEYgqvpw9lz4OPHj/NWFNluYrjbz9j01CJ8yKQd2g4jFoOkINCTW2I5LEEyw==}
     engines: {node: '>= 0.4'}
@@ -4151,11 +4141,12 @@ packages:
   unbzip2-stream@1.4.3:
     resolution: {integrity: sha512-mlExGW4w71ebDJviH16lQLtZS32VKqsSfk80GCfUlwT/4/hNRFsoscrF/c++9xinkMzECL1uL9DDwXqFWkruPg==}
 
-  undici-types@7.24.6:
-    resolution: {integrity: sha512-WRNW+sJgj5OBN4/0JpHFqtqzhpbnV0GuB+OozA9gCL7a993SmU+1JBZCzLNxYsbMfIeDL+lTsphD5jN5N+n0zg==}
-
   undici-types@8.9.0:
     resolution: {integrity: sha512-KTDyRTYX8sWmKXAikPHHSyc63CRPETMctyjKFupcC6OBLXT3xsN0e9aF7m+mIXutFWpUXuedtowG7iLOzp0kQg==}
+
+  undici@8.12.3:
+    resolution: {integrity: sha512-+fdndUTwBP86cVjihTp21hZHo7d6oj1c/47XPA3lL8mM0XHs+C4EkcjmgRsFnFk2f/UONGDy9ItBItmXsLOQHw==}
+    engines: {node: '>=22.19.0'}
 
   unicorn-magic@0.3.0:
     resolution: {integrity: sha512-+QBBXBCvifc56fsbuxZQ6Sic3wqqc3WWaqxs58gvJrcOuN83HGTCwz3oS5phzU9LthRNE9VrJCFCLUgHeeFnfA==}
@@ -4203,12 +4194,6 @@ packages:
   validator@13.15.35:
     resolution: {integrity: sha512-TQ5pAGhd5whStmqWvYF4OjQROlmv9SMFVt37qoCBdqRffuuklWYQlCNnEs2ZaIBD1kZRNnikiZOS1eqgkar0iw==}
     engines: {node: '>= 0.10'}
-
-  webidl-conversions@3.0.1:
-    resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
-
-  whatwg-url@5.0.0:
-    resolution: {integrity: sha512-saE57nupxk6v3HY35+jzBwYa0rKSy0XR8JSxZPwgLr7ys0IBzhGviA1/TUGJLmSVqs8pb9AnvICXEuOHLprYTw==}
 
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
@@ -4274,8 +4259,8 @@ packages:
       utf-8-validate:
         optional: true
 
-  xlucene-parser@2.25.0:
-    resolution: {integrity: sha512-YweQZXNlL2yiZ2GZ26OMh7KzMZZN9UWVl10rT7DP2hDo09c23JMANEEDncWF2j9KZDasqnxwEImqh3R1l+k8vQ==}
+  xlucene-parser@2.26.0:
+    resolution: {integrity: sha512-Lqfk6JMdSreREvcp0Ok3aoM7IpMd7NZywgyVeJigGZFPDTyuNkOGsr7D+hVvRsa9FNFusYSEGdpDod2gTllHtQ==}
     engines: {node: '>=22.0.0', pnpm: '>=12.3.4'}
 
   xtend@4.0.2:
@@ -4688,7 +4673,7 @@ snapshots:
   '@jest/console@30.5.2':
     dependencies:
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       jest-message-util: 30.5.1
       jest-util: 30.5.1
@@ -4702,7 +4687,7 @@ snapshots:
       '@jest/test-result': 30.5.2
       '@jest/transform': 30.5.2(supports-color@8.1.1)
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       ci-info: 4.4.0
@@ -4710,7 +4695,7 @@ snapshots:
       fast-json-stable-stringify: 2.1.0
       graceful-fs: 4.2.11
       jest-changed-files: 30.5.1
-      jest-config: 30.5.2(@types/node@26.6.5)(supports-color@8.1.1)
+      jest-config: 30.5.2(@types/node@26.6.6)(supports-color@8.1.1)
       jest-haste-map: 30.5.1
       jest-message-util: 30.5.1
       jest-regex-util: 30.5.0
@@ -4740,7 +4725,7 @@ snapshots:
     dependencies:
       '@jest/fake-timers': 30.5.2
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-mock: 30.5.2
 
   '@jest/expect-utils@30.2.0':
@@ -4762,7 +4747,7 @@ snapshots:
     dependencies:
       '@jest/types': 30.5.1
       '@sinonjs/fake-timers': 15.4.0
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-message-util: 30.5.1
       jest-mock: 30.5.2
       jest-util: 30.5.1
@@ -4782,12 +4767,12 @@ snapshots:
 
   '@jest/pattern@30.0.1':
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-regex-util: 30.0.1
 
   '@jest/pattern@30.5.0':
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-regex-util: 30.5.0
 
   '@jest/reporters@30.5.2(node-notifier@10.0.1)(supports-color@8.1.1)':
@@ -4798,7 +4783,7 @@ snapshots:
       '@jest/transform': 30.5.2(supports-color@8.1.1)
       '@jest/types': 30.5.1
       '@jridgewell/trace-mapping': 0.3.31
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       collect-v8-coverage: 1.0.3
       exit-x: 0.2.2
@@ -4901,7 +4886,7 @@ snapshots:
       '@jest/schemas': 30.0.5
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -4911,7 +4896,7 @@ snapshots:
       '@jest/schemas': 30.5.0
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       '@types/yargs': 17.0.35
       chalk: 4.1.2
 
@@ -4944,29 +4929,28 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@kubernetes/client-node@1.4.0(supports-color@8.1.1)':
+  '@kubernetes/client-node@2.0.1(supports-color@8.1.1)':
     dependencies:
       '@types/js-yaml': 4.0.9
-      '@types/node': 24.19.2
-      '@types/node-fetch': 2.6.13
+      '@types/node': 26.6.6
       '@types/stream-buffers': 3.0.8
       form-data: 4.0.6
       hpagent: 1.2.0
       isomorphic-ws: 5.0.0(ws@8.21.3)
-      js-yaml: 4.3.2
+      js-yaml: 5.4.3
       jsonpath-plus: 10.4.0
-      node-fetch: 2.7.0
       openid-client: 6.8.7
       rfc4648: 1.5.4
-      socks-proxy-agent: 8.0.5(supports-color@8.1.1)
+      socks: 2.8.9
+      socks-proxy-agent: 10.1.0(supports-color@8.1.1)
       stream-buffers: 3.0.3
       tar-fs: 3.1.3
+      undici: 8.12.3
       ws: 8.21.3
     transitivePeerDependencies:
       - bare-abort-controller
       - bare-buffer
       - bufferutil
-      - encoding
       - react-native-b4a
       - supports-color
       - utf-8-validate
@@ -5169,7 +5153,7 @@ snapshots:
       estraverse: 5.3.0
       picomatch: 4.0.7
 
-  '@terascope/core-utils@2.24.0(supports-color@8.1.1)':
+  '@terascope/core-utils@2.25.0(supports-color@8.1.1)':
     dependencies:
       '@terascope/types': 2.23.0
       '@types/lodash-es': 4.17.12
@@ -5184,25 +5168,25 @@ snapshots:
       js-string-escape: 1.0.1
       kind-of: 6.0.3
       lodash-es: 4.18.1
-      mnemonist: 0.40.5
+      mnemonist: 0.40.6
       moment: 2.31.0
       ms: 2.1.3
-      p-map: 7.0.8
+      p-map: 7.1.1
       shallow-clone: 3.0.1
       validator: 13.15.35
       zod: 4.6.7
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/data-mate@2.25.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
+  '@terascope/data-mate@2.26.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
       '@duckdb/node-api': 1.5.5-r.3
       '@faker-js/faker': 10.6.0
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/data-types': 2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
-      '@terascope/geo-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/ip-utils': 2.25.0(supports-color@8.1.1)
-      '@terascope/sql-builder': 0.1.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/data-types': 2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+      '@terascope/geo-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/ip-utils': 2.26.0(supports-color@8.1.1)
+      '@terascope/sql-builder': 0.2.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       '@turf/random': 7.4.0
       '@types/validator': 13.15.10
@@ -5212,23 +5196,23 @@ snapshots:
       date-fns: 4.4.0
       ip-bigint: 10.0.4
       jexl: 2.3.0
-      mnemonist: 0.40.5
+      mnemonist: 0.40.6
       randexp: 0.5.3
       uuid: 14.0.3
       valid-url: 1.0.9
       validator: 13.15.35
-      xlucene-parser: 2.25.0(supports-color@8.1.1)
+      xlucene-parser: 2.26.0(supports-color@8.1.1)
     transitivePeerDependencies:
       - jest
       - supports-color
       - typescript
 
-  '@terascope/data-types@2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
+  '@terascope/data-types@2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       graphql: 16.12.0
-      jest-extended: 7.0.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
+      jest-extended: 7.0.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3)
     transitivePeerDependencies:
       - jest
       - supports-color
@@ -5240,15 +5224,15 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/elasticsearch-api@5.25.0(supports-color@8.1.1)':
+  '@terascope/elasticsearch-api@5.26.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       setimmediate: 1.0.5
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/eslint-config@1.4.2(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)':
+  '@terascope/eslint-config@1.4.2(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)':
     dependencies:
       '@eslint/compat': 2.1.1(eslint@9.39.4(supports-color@8.1.1))
       '@eslint/js': 9.39.5
@@ -5257,7 +5241,7 @@ snapshots:
       '@typescript-eslint/parser': 8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       eslint: 9.39.4(supports-color@8.1.1)
       eslint-plugin-import: 2.32.0(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)
-      eslint-plugin-jest: 29.16.6(@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+      eslint-plugin-jest: 29.16.6(@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       eslint-plugin-jest-dom: 5.5.0(eslint@9.39.4(supports-color@8.1.1))
       eslint-plugin-jsx-a11y: 6.10.2(eslint@9.39.4(supports-color@8.1.1))
       eslint-plugin-react: 7.37.5(eslint@9.39.4(supports-color@8.1.1))
@@ -5284,9 +5268,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/geo-utils@2.24.0(supports-color@8.1.1)':
+  '@terascope/geo-utils@2.25.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       '@turf/bbox': 7.4.0
       '@turf/bbox-polygon': 7.4.0
@@ -5305,16 +5289,16 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/ip-utils@2.25.0(supports-color@8.1.1)':
+  '@terascope/ip-utils@2.26.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/job-components@2.26.0(supports-color@8.1.1)':
+  '@terascope/job-components@2.27.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       import-meta-resolve: 4.2.0
       prom-client: 15.1.3
@@ -5323,10 +5307,10 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/opensearch-client@2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
+  '@terascope/opensearch-client@2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/data-types': 2.24.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/data-types': 2.25.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       '@terascope/types': 2.23.0
       opensearch1: '@opensearch-project/opensearch@1.2.0(supports-color@8.1.1)'
       opensearch2: '@opensearch-project/opensearch@2.12.0(supports-color@8.1.1)'
@@ -5337,20 +5321,20 @@ snapshots:
       - supports-color
       - typescript
 
-  '@terascope/scripts@2.32.1(supports-color@8.1.1)(typescript@6.0.3)':
+  '@terascope/scripts@2.33.0(supports-color@8.1.1)(typescript@6.0.3)':
     dependencies:
-      '@kubernetes/client-node': 1.4.0(supports-color@8.1.1)
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@kubernetes/client-node': 2.0.1(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/docker-compose-js': 2.2.0(supports-color@8.1.1)
-      execa: 10.0.1
+      execa: 10.2.1
       fs-extra: 11.4.1
       globby: 16.2.4
-      got: 16.0.0
+      got: 16.1.0
       ip: 2.0.1
       js-yaml: 5.4.3
       kafkajs: 2.2.4
       micromatch: 4.0.8
-      mnemonist: 0.40.5
+      mnemonist: 0.40.6
       ms: 2.1.3
       nanoid: 6.0.1
       package-json: 10.0.1
@@ -5369,24 +5353,23 @@ snapshots:
       - bare-abort-controller
       - bare-buffer
       - bufferutil
-      - encoding
       - react-native-b4a
       - supports-color
       - utf-8-validate
 
-  '@terascope/sql-builder@0.1.0(supports-color@8.1.1)':
+  '@terascope/sql-builder@0.2.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/geo-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/ip-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/geo-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/ip-utils': 2.26.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
     transitivePeerDependencies:
       - supports-color
 
-  '@terascope/teraslice-state-storage@2.25.0(supports-color@8.1.1)':
+  '@terascope/teraslice-state-storage@2.26.0(supports-color@8.1.1)':
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/elasticsearch-api': 5.25.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/elasticsearch-api': 5.26.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
     transitivePeerDependencies:
       - supports-color
@@ -5625,7 +5608,7 @@ snapshots:
   '@types/fs-extra@11.0.4':
     dependencies:
       '@types/jsonfile': 6.1.4
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
 
   '@types/geojson@7946.0.16': {}
 
@@ -5658,7 +5641,7 @@ snapshots:
 
   '@types/jsonfile@6.1.4':
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
 
   '@types/lodash-es@4.17.12':
     dependencies:
@@ -5666,16 +5649,7 @@ snapshots:
 
   '@types/lodash@4.17.25': {}
 
-  '@types/node-fetch@2.6.13':
-    dependencies:
-      '@types/node': 26.6.5
-      form-data: 4.0.6
-
-  '@types/node@24.19.2':
-    dependencies:
-      undici-types: 7.24.6
-
-  '@types/node@26.6.5':
+  '@types/node@26.6.6':
     dependencies:
       undici-types: 8.9.0
 
@@ -5685,7 +5659,7 @@ snapshots:
 
   '@types/stream-buffers@3.0.8':
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
 
   '@types/unist@3.0.3': {}
 
@@ -5699,7 +5673,7 @@ snapshots:
 
   '@types/yauzl@2.10.3':
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
     optional: true
 
   '@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)':
@@ -5927,7 +5901,7 @@ snapshots:
 
   acorn@8.16.0: {}
 
-  agent-base@7.1.4: {}
+  agent-base@9.0.0: {}
 
   ajv@6.14.0:
     dependencies:
@@ -6688,13 +6662,13 @@ snapshots:
       eslint: 9.39.4(supports-color@8.1.1)
       requireindex: 1.2.0
 
-  eslint-plugin-jest@29.16.6(@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3):
+  eslint-plugin-jest@29.16.6(@typescript-eslint/eslint-plugin@8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3):
     dependencies:
       '@typescript-eslint/utils': 8.69.0(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
       eslint: 9.39.4(supports-color@8.1.1)
     optionalDependencies:
       '@typescript-eslint/eslint-plugin': 8.71.2(@typescript-eslint/parser@8.71.2(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3))(eslint@9.39.4(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.3)
-      jest: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+      jest: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
@@ -6829,7 +6803,7 @@ snapshots:
     transitivePeerDependencies:
       - bare-abort-controller
 
-  execa@10.0.1:
+  execa@10.2.1:
     dependencies:
       '@sindresorhus/merge-streams': 4.0.0
       figures: 6.1.0
@@ -7163,6 +7137,19 @@ snapshots:
       type-fest: 5.8.0
       uint8array-extras: 1.5.0
 
+  got@16.1.0:
+    dependencies:
+      '@sindresorhus/is': 8.1.0
+      byte-counter: 0.1.0
+      cacheable-request: 13.0.19
+      chunk-data: 0.1.0
+      decompress-response: 10.0.0
+      keyv: 5.6.0
+      lowercase-keys: 4.0.1
+      responselike: 4.0.2
+      type-fest: 5.10.0
+      uint8array-extras: 1.6.0
+
   graceful-fs@4.2.10: {}
 
   graceful-fs@4.2.11: {}
@@ -7480,7 +7467,7 @@ snapshots:
       '@jest/expect': 30.5.2(supports-color@8.1.1)
       '@jest/test-result': 30.5.2
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       co: 4.6.0
       dedent: 1.7.2
@@ -7500,7 +7487,7 @@ snapshots:
       - babel-plugin-macros
       - supports-color
 
-  jest-cli@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1):
+  jest-cli@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1):
     dependencies:
       '@jest/core': 30.5.2(node-notifier@10.0.1)(supports-color@8.1.1)
       '@jest/test-result': 30.5.2
@@ -7508,7 +7495,7 @@ snapshots:
       chalk: 4.1.2
       exit-x: 0.2.2
       import-local: 3.2.0
-      jest-config: 30.5.2(@types/node@26.6.5)(supports-color@8.1.1)
+      jest-config: 30.5.2(@types/node@26.6.6)(supports-color@8.1.1)
       jest-util: 30.5.1
       jest-validate: 30.5.1
       yargs: 17.7.3
@@ -7521,7 +7508,7 @@ snapshots:
       - supports-color
       - ts-node
 
-  jest-config@30.5.2(@types/node@26.6.5)(supports-color@8.1.1):
+  jest-config@30.5.2(@types/node@26.6.6)(supports-color@8.1.1):
     dependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
       '@jest/get-type': 30.5.0
@@ -7547,7 +7534,7 @@ snapshots:
       slash: 3.0.0
       strip-json-comments: 3.1.1
     optionalDependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
     transitivePeerDependencies:
       - babel-plugin-macros
       - supports-color
@@ -7584,23 +7571,23 @@ snapshots:
       '@jest/environment': 30.5.2
       '@jest/fake-timers': 30.5.2
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-mock: 30.5.2
       jest-util: 30.5.1
       jest-validate: 30.5.1
 
-  jest-extended@7.0.0(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3):
+  jest-extended@7.0.0(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3):
     dependencies:
       jest-diff: 30.2.0
       typescript: 6.0.3
     optionalDependencies:
-      jest: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+      jest: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
 
   jest-haste-map@30.5.1:
     dependencies:
       '@jest/types': 30.5.1
       '@parcel/watcher': 2.6.0
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       anymatch: 3.1.3
       fb-watchman: 2.0.2
       fdir: 6.5.0(picomatch@4.0.7)
@@ -7657,14 +7644,14 @@ snapshots:
   jest-mock@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-util: 30.2.0
 
   jest-mock@30.5.2:
     dependencies:
       '@jest/expect-utils': 30.5.2
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       jest-util: 30.5.1
 
   jest-regex-util@30.0.1: {}
@@ -7696,7 +7683,7 @@ snapshots:
       '@jest/test-result': 30.5.2
       '@jest/transform': 30.5.2(supports-color@8.1.1)
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       emittery: 0.13.1
       exit-x: 0.2.2
@@ -7724,7 +7711,7 @@ snapshots:
       '@jest/test-result': 30.5.2
       '@jest/transform': 30.5.2(supports-color@8.1.1)
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       cjs-module-lexer: 2.2.1
       collect-v8-coverage: 1.0.3
@@ -7772,7 +7759,7 @@ snapshots:
   jest-util@30.2.0:
     dependencies:
       '@jest/types': 30.2.0
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
@@ -7781,7 +7768,7 @@ snapshots:
   jest-util@30.5.1:
     dependencies:
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       chalk: 4.1.2
       ci-info: 4.4.0
       graceful-fs: 4.2.11
@@ -7800,7 +7787,7 @@ snapshots:
     dependencies:
       '@jest/test-result': 30.5.2
       '@jest/types': 30.5.1
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       emittery: 0.13.1
@@ -7809,18 +7796,18 @@ snapshots:
 
   jest-worker@30.5.1:
     dependencies:
-      '@types/node': 26.6.5
+      '@types/node': 26.6.6
       '@ungap/structured-clone': 1.4.0
       jest-util: 30.5.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
-  jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1):
+  jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1):
     dependencies:
       '@jest/core': 30.5.2(node-notifier@10.0.1)(supports-color@8.1.1)
       '@jest/types': 30.5.1
       import-local: 3.2.0
-      jest-cli: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+      jest-cli: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
     optionalDependencies:
       node-notifier: 10.0.1
     transitivePeerDependencies:
@@ -7846,10 +7833,6 @@ snapshots:
       esprima: 4.0.1
 
   js-yaml@4.3.1:
-    dependencies:
-      argparse: 2.0.1
-
-  js-yaml@4.3.2:
     dependencies:
       argparse: 2.0.1
 
@@ -8048,7 +8031,7 @@ snapshots:
       minimist: 1.2.8
     optional: true
 
-  mnemonist@0.40.5:
+  mnemonist@0.40.6:
     dependencies:
       obliterator: 2.0.5
 
@@ -8095,10 +8078,6 @@ snapshots:
       es-errors: 1.3.0
       object.entries: 1.1.9
       semver: 6.3.1
-
-  node-fetch@2.7.0:
-    dependencies:
-      whatwg-url: 5.0.0
 
   node-int64@0.4.0: {}
 
@@ -8229,7 +8208,7 @@ snapshots:
     dependencies:
       p-limit: 3.1.0
 
-  p-map@7.0.8: {}
+  p-map@7.1.1: {}
 
   p-try@1.0.0: {}
 
@@ -8644,9 +8623,9 @@ snapshots:
 
   smart-buffer@4.2.0: {}
 
-  socks-proxy-agent@8.0.5(supports-color@8.1.1):
+  socks-proxy-agent@10.1.0(supports-color@8.1.1):
     dependencies:
-      agent-base: 7.1.4
+      agent-base: 9.0.0
       debug: 4.4.3(supports-color@8.1.1)
       socks: 2.8.9
     transitivePeerDependencies:
@@ -8874,19 +8853,19 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  teraslice-client-js@2.24.0(supports-color@8.1.1):
+  teraslice-client-js@2.25.0(supports-color@8.1.1):
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       auto-bind: 5.0.1
-      got: 16.0.0
+      got: 16.1.0
     transitivePeerDependencies:
       - supports-color
 
-  teraslice-test-harness@2.27.0(supports-color@8.1.1):
+  teraslice-test-harness@2.28.0(supports-color@8.1.1):
     dependencies:
       '@terascope/fetch-github-release': 2.3.2(supports-color@8.1.1)
-      '@terascope/job-components': 2.26.0(supports-color@8.1.1)
+      '@terascope/job-components': 2.27.0(supports-color@8.1.1)
       decompress: 4.2.1
       fs-extra: 11.4.1
     transitivePeerDependencies:
@@ -8932,18 +8911,16 @@ snapshots:
 
   toposort@2.0.2: {}
 
-  tr46@0.0.3: {}
-
   ts-api-utils@2.5.0(typescript@6.0.3):
     dependencies:
       typescript: 6.0.3
 
-  ts-jest@29.4.15(@babel/core@7.29.7(supports-color@8.1.1))(@jest/transform@30.5.1(supports-color@8.1.1))(@jest/types@30.5.1)(babel-jest@30.5.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(jest-util@30.5.1)(jest@30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3):
+  ts-jest@29.4.15(@babel/core@7.29.7(supports-color@8.1.1))(@jest/transform@30.5.1(supports-color@8.1.1))(@jest/types@30.5.1)(babel-jest@30.5.1(@babel/core@7.29.7(supports-color@8.1.1))(supports-color@8.1.1))(jest-util@30.5.1)(jest@30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1))(typescript@6.0.3):
     dependencies:
       bs-logger: 0.2.6
       fast-json-stable-stringify: 2.1.0
       handlebars: 4.7.10
-      jest: 30.5.2(@types/node@26.6.5)(node-notifier@10.0.1)(supports-color@8.1.1)
+      jest: 30.5.2(@types/node@26.6.6)(node-notifier@10.0.1)(supports-color@8.1.1)
       json5: 2.2.3
       lodash.memoize: 4.1.2
       make-error: 1.3.6
@@ -8976,6 +8953,10 @@ snapshots:
   type-fest@0.21.3: {}
 
   type-fest@4.41.0: {}
+
+  type-fest@5.10.0:
+    dependencies:
+      tagged-tag: 1.0.0
 
   type-fest@5.8.0:
     dependencies:
@@ -9049,6 +9030,8 @@ snapshots:
 
   uint8array-extras@1.5.0: {}
 
+  uint8array-extras@1.6.0: {}
+
   unbox-primitive@1.1.0:
     dependencies:
       call-bound: 1.0.4
@@ -9061,9 +9044,9 @@ snapshots:
       buffer: 5.7.1
       through: 2.3.8
 
-  undici-types@7.24.6: {}
-
   undici-types@8.9.0: {}
+
+  undici@8.12.3: {}
 
   unicorn-magic@0.3.0: {}
 
@@ -9123,13 +9106,6 @@ snapshots:
   valid-url@1.0.9: {}
 
   validator@13.15.35: {}
-
-  webidl-conversions@3.0.1: {}
-
-  whatwg-url@5.0.0:
-    dependencies:
-      tr46: 0.0.3
-      webidl-conversions: 3.0.1
 
   which-boxed-primitive@1.1.1:
     dependencies:
@@ -9209,11 +9185,11 @@ snapshots:
 
   ws@8.21.3: {}
 
-  xlucene-parser@2.25.0(supports-color@8.1.1):
+  xlucene-parser@2.26.0(supports-color@8.1.1):
     dependencies:
-      '@terascope/core-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/geo-utils': 2.24.0(supports-color@8.1.1)
-      '@terascope/ip-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/core-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/geo-utils': 2.25.0(supports-color@8.1.1)
+      '@terascope/ip-utils': 2.26.0(supports-color@8.1.1)
       '@terascope/types': 2.23.0
       peggy: 5.1.0
     transitivePeerDependencies:
