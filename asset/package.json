@@ -1,7 +1,7 @@
 {
     "name": "elasticsearch-assets",
     "displayName": "Asset",
-    "version": "5.3.1",
+    "version": "5.3.2",
     "private": true,
     "description": "Teraslice asset for elasticsearch operations",
     "license": "MIT",
@@ -18,12 +18,12 @@
         "test": "pnpm --cwd ../ test"
     },
     "dependencies": {
-        "@terascope/core-utils": "2.24.0",
-        "@terascope/data-mate": "2.25.0",
-        "@terascope/elasticsearch-api": "5.25.0",
+        "@terascope/core-utils": "2.25.0",
+        "@terascope/data-mate": "2.26.0",
+        "@terascope/elasticsearch-api": "5.26.0",
         "@terascope/elasticsearch-asset-apis": "workspace:~",
-        "@terascope/job-components": "2.26.0",
-        "@terascope/teraslice-state-storage": "2.25.0",
+        "@terascope/job-components": "2.27.0",
+        "@terascope/teraslice-state-storage": "2.26.0",
         "datemath-parser": "~1.0.6",
         "got": "~15.1.0",
         "moment": "~2.31.0"
